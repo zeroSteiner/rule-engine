@@ -39,17 +39,6 @@ class Expression(object):
 	def evaluate(self, context, thing):
 		raise NotImplementedError()
 
-class LiteralExpression(Expression):
-	__slots__ = ('value',)
-	def __init__(self, value):
-		self.value = value
-
-	def __repr__(self):
-		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
-
-	def evaluate(self, context, thing):
-		return self.value
-
 class LogicExpression(Expression):
 	__op = {'==': 'eq', '!=': 'ne', '=~': 'eq_re', '!~':  'ne_re', 'and': 'and', 'or': 'or'}
 	__slots__ = ('type', 'left', 'right')
@@ -99,12 +88,6 @@ class TernaryExpression(Expression):
 		case = (self.case_true if self.condition.evaluate(context, thing) else self.case_false)
 		return case.evaluate(context, thing)
 
-class BooleanExpression(LiteralExpression):
-	pass
-
-class StringExpression(LiteralExpression):
-	pass
-
 class SymbolExpression(Expression):
 	__slots__ = ('name',)
 	def __init__(self, name):
@@ -123,3 +106,29 @@ class Statement(object):
 
 	def evaluate(self, context, thing):
 		return self.expression.evaluate(context, thing)
+
+################################################################################
+# Literal Expressions
+################################################################################
+class LiteralExpression(Expression):
+	__slots__ = ('value',)
+	def __init__(self, value):
+		self.value = value
+
+	def __repr__(self):
+		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
+
+	def evaluate(self, context, thing):
+		return self.value
+
+class BooleanExpression(LiteralExpression):
+	pass
+
+class FloatExpression(LiteralExpression):
+	pass
+
+class IntegerExpression(LiteralExpression):
+	pass
+
+class StringExpression(LiteralExpression):
+	pass

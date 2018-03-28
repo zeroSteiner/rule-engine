@@ -62,7 +62,8 @@ class Parser(ParserBase):
 		'false': 'FALSE',
 	}
 	tokens = [
-		'SYMBOL', 'STRING', 'LPAREN', 'RPAREN',
+		'FLOAT', 'INTEGER', 'STRING',
+		'LPAREN', 'RPAREN', 'SYMBOL',
 		'EQ', 'EQ_RE', 'NE', 'NE_RE', 'QMARK', 'COLON'
 	] + list(reserved.values())
 
@@ -75,7 +76,7 @@ class Parser(ParserBase):
 	t_NE_RE            = r'!~'
 	t_QMARK            = r'\?'
 	t_COLON            = r'\:'
-	t_STRING = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
+	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
 	t_ignore = ' \t'
 	precedence = (
@@ -83,6 +84,12 @@ class Parser(ParserBase):
 		('right',    'QMARK', 'COLON'),
 		('nonassoc', 'EQ', 'NE', 'EQ_RE', 'NE_RE'),  # Nonassociative operators
 	)
+
+	def t_INTEGER(self, t):
+		r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?|\.[0-9]+'
+		if '.' in t.value:
+			t.type = 'FLOAT'
+		return t
 
 	def t_SYMBOL(self, t):
 		r'[a-zA-Z_][a-zA-Z0-9_]*'
@@ -96,7 +103,10 @@ class Parser(ParserBase):
 	def t_error(self, t):
 		raise errors.RuleSyntaxError("syntax error (illegal character {0!r})".format(t.value[0]), t)
 
-	# Parsing rules
+	# Parsing Rules
+	def p_error(self, token):
+		raise errors.RuleSyntaxError('syntax error', token)
+
 	def p_statement_expr(self, p):
 		'statement : expression'
 		p[0] = ast.Statement(p[1])
@@ -125,17 +135,22 @@ class Parser(ParserBase):
 		"""
 		p[0] = ast.BooleanExpression(p[1] == 'true')
 
+	def p_expression_float(self, p):
+		'expression : FLOAT'
+		p[0] = ast.FloatExpression(literal_eval(p[1]))
+
+	def p_expression_integer(self, p):
+		'expression : INTEGER'
+		p[0] = ast.IntegerExpression(literal_eval(p[1]))
+
 	def p_expression_group(self, p):
 		'expression : LPAREN expression RPAREN'
 		p[0] = p[2]
-
-	def p_expression_symbol(self, p):
-		'expression : SYMBOL'
-		p[0] = ast.SymbolExpression(p[1])
 
 	def p_expression_string(self, p):
 		'expression : STRING'
 		p[0] = ast.StringExpression(literal_eval(p[1]))
 
-	def p_error(self, token):
-		raise errors.RuleSyntaxError('syntax error', token)
+	def p_expression_symbol(self, p):
+		'expression : SYMBOL'
+		p[0] = ast.SymbolExpression(p[1])

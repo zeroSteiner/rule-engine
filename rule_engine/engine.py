@@ -36,7 +36,7 @@ from . import errors
 from . import parser
 
 def resolve_attribute(thing, name):
-	if hasattr(thing, name):
+	if not hasattr(thing, name):
 		raise errors.SymbolResolutionError(name)
 	return getattr(thing, name)
 

@@ -30,5 +30,11 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from .engine import resolve_attribute
+from .engine import resolve_item
 from .engine import EvaluationContext
 from .engine import Rule
+
+from .errors import EngineError
+from .errors import RuleSyntaxError
+from .errors import SymbolResolutionError

@@ -39,18 +39,27 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import rule_engine
 
+def resolve_item(thing, name):
+	if not name in thing:
+		name = name.replace('_', ' ')
+	return rule_engine.resolve_item(thing, name)
+
 def main():
 	parser = argparse.ArgumentParser(description='csv_filter', conflict_handler='resolve')
 	parser.add_argument('csv_file', type=argparse.FileType('r'), help='the CSV file to filter')
 	parser.add_argument('rule', help='the rule to apply')
 	arguments = parser.parse_args()
 
+	context = rule_engine.EvaluationContext(resolve=resolve_item)
+	try:
+		rule = rule_engine.Rule(arguments.rule, context=context)
+	except rule_engine.RuleSyntaxError as error:
+		print(error.message)
+		return 0
+
 	csv_reader = csv.DictReader(arguments.csv_file)
 	csv_writer = csv.DictWriter(sys.stdout, csv_reader.fieldnames, dialect=csv_reader.dialect)
-	rule = rule_engine.Rule(arguments.rule)
-	for row in csv_reader:
-		if not rule.matches(row):
-			continue
+	for row in rule.filter(csv_reader):
 		csv_writer.writerow(row)
 
 if __name__ == '__main__':

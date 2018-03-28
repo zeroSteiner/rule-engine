@@ -46,5 +46,5 @@ class RuleSyntaxError(EngineError):
 
 class SymbolResolutionError(EngineError):
 	def __init__(self, symbol_name):
-		self.symbol_name
+		self.symbol_name = symbol_name
 		super(SymbolResolutionError, self).__init__('unknown symbol: ' + symbol_name)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  rule_engine/__init__.py
+#  rule_engine/engine.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,5 +30,52 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from .engine import EvaluationContext
-from .engine import Rule
+import re
+
+from . import errors
+from . import parser
+
+def resolve_attribute(thing, name):
+	if hasattr(thing, name):
+		raise errors.SymbolResolutionError(name)
+	return getattr(thing, name)
+
+def resolve_item(thing, name):
+	if not name in thing:
+		raise errors.SymbolResolutionError(name)
+	return thing[name]
+
+class EvaluationContext(object):
+	def __init__(self, regex=None, resolve=None):
+		self.__regex = regex or re.match
+		self.__resolve = resolve or resolve_item
+
+	def regex(self, pattern, symbol):
+		return self.__regex(pattern, symbol)
+
+	def resolve(self, thing, name):
+		return self.__resolve(thing, name)
+
+class Rule(object):
+	parser = parser.Parser()
+	def __init__(self, text, context=None):
+		self.text = text
+		self.context = context or EvaluationContext()
+		self.statement = self.parser.parse(text)
+
+	def __repr__(self):
+		return "<{0} text={1!r} >".format(self.__class__.__name__, self.text)
+
+	def filter(self, things):
+		yield from (thing for thing in things if self.matches(thing))
+
+	@classmethod
+	def is_valid(cls, text):
+		try:
+			cls.parser.parse(text)
+		except errors.RuleSyntaxError:
+			return False
+		return True
+
+	def matches(self, thing):
+		return bool(self.statement.evaluate(self.context, thing))

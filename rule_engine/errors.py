@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  rule_engine/__init__.py
+#  rule_engine/errors.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,5 +30,21 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from .engine import EvaluationContext
-from .engine import Rule
+class EngineError(Exception):
+	def __init__(self, message=''):
+		self.message = message
+
+class RuleSyntaxError(EngineError):
+	def __init__(self, message, token=None):
+		if token is None:
+			position = 'EOF'
+		else:
+			position = "line {0}:{1}".format(token.lineno, token.lexpos)
+		message = message + ' at: ' + position
+		super(RuleSyntaxError, self).__init__(message)
+		self.token = token
+
+class SymbolResolutionError(EngineError):
+	def __init__(self, symbol_name):
+		self.symbol_name
+		super(SymbolResolutionError, self).__init__('unknown symbol: ' + symbol_name)

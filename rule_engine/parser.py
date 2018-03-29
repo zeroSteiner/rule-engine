@@ -86,7 +86,7 @@ class Parser(ParserBase):
 	precedence = (
 		('left',     'AND', 'OR'),
 		('right',    'QMARK', 'COLON'),
-		('nonassoc', 'EQ', 'NE', 'EQ_REM', 'EQ_RES', 'NE_REM', 'NE_RES'),  # Nonassociative operators
+		('nonassoc', 'EQ', 'NE', 'EQ_REM', 'EQ_RES', 'NE_REM', 'NE_RES', 'GE', 'GT', 'LE', 'LT'),  # Nonassociative operators
 	)
 
 	def t_EQ_REM(self, t):

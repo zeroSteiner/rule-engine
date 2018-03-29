@@ -34,6 +34,9 @@ class EngineError(Exception):
 	def __init__(self, message=''):
 		self.message = message
 
+class EvaluationError(EngineError):
+	pass
+
 class RuleSyntaxError(EngineError):
 	def __init__(self, message, token=None):
 		if token is None:

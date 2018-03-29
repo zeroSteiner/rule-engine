@@ -55,24 +55,25 @@ class ParserBase(object):
 		return self._parser.parse(*args, **kwargs)
 
 class Parser(ParserBase):
+	logic_op_names = {
+		'and': 'AND', 'or': 'OR',
+		'==': 'EQ', '=~': 'EQ_REM', '=~~': 'EQ_RES',
+		'!=': 'NE', '!~': 'NE_REM', '!~~': 'NE_RES',
+		'>':  'GT', '>=': 'GE',
+		'<':  'LT', '<=': 'LE',
+	}
 	reserved_words = {
 		'and':   'AND',
 		'or':    'OR',
 		'true':  'TRUE',
 		'false': 'FALSE',
 	}
-	tokens = [
-		'FLOAT', 'INTEGER', 'STRING',
-		'LPAREN', 'RPAREN', 'SYMBOL',
-		'EQ', 'EQ_REM', 'EQ_RES', 'NE', 'NE_REM', 'NE_RES', 'QMARK', 'COLON'
-	] + list(reserved_words.values())
-	logic_op_names = {
-		'and': 'AND', 'or': 'OR',
-		'==': 'EQ', '=~': 'EQ_REM', '=~~': 'EQ_RES',
-		'!=': 'NE', '!~': 'NE_REM', '!~~': 'NE_RES'
-	}
+	tokens = (
+		'FLOAT', 'INTEGER', 'STRING', 'SYMBOL',
+		'LPAREN', 'RPAREN', 'QMARK', 'COLON'
+	) + tuple(set(list(reserved_words.values()) + list(logic_op_names.values())))
 
-
+	t_ignore = ' \t'
 	# Tokens
 	t_LPAREN           = r'\('
 	t_RPAREN           = r'\)'
@@ -82,7 +83,6 @@ class Parser(ParserBase):
 	t_COLON            = r'\:'
 	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
-	t_ignore = ' \t'
 	precedence = (
 		('left',     'AND', 'OR'),
 		('right',    'QMARK', 'COLON'),
@@ -95,16 +95,28 @@ class Parser(ParserBase):
 			t.type = 'EQ_RES'
 		return t
 
-	def t_NE_REM(self, t):
-		r'!~~?'
-		if t.value == '!~~':
-			t.type = 'NE_RES'
+	def t_GE(self, t):
+		r'>=?'
+		if t.value == '>':
+			t.type = 'GT'
 		return t
 
 	def t_INTEGER(self, t):
 		r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?|\.[0-9]+'
 		if '.' in t.value:
 			t.type = 'FLOAT'
+		return t
+
+	def t_LE(self, t):
+		r'<=?'
+		if t.value == '<':
+			t.type = 'LT'
+		return t
+
+	def t_NE_REM(self, t):
+		r'!~~?'
+		if t.value == '!~~':
+			t.type = 'NE_RES'
 		return t
 
 	def t_SYMBOL(self, t):
@@ -139,6 +151,10 @@ class Parser(ParserBase):
 				   | expression NE     expression
 				   | expression AND    expression
 				   | expression OR     expression
+				   | expression GT     expression
+				   | expression GE     expression
+				   | expression LT     expression
+				   | expression LE     expression
 				   | expression EQ_REM expression
 				   | expression EQ_RES expression
 				   | expression NE_REM expression

@@ -30,8 +30,11 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import functools
 import re
 import operator
+
+from . import errors
 
 class Expression(object):
 	def __repr__(self):
@@ -51,41 +54,44 @@ class LogicExpression(Expression):
 	def evaluate(self, context, thing):
 		return self._evaluator(context, thing)
 
-	def _op_eq(self, context, thing):
-		left = self.left.evaluate(context, thing)
-		right = self.right.evaluate(context, thing)
-		return operator.eq(left, right)
-
-	def _op_ne(self, context, thing):
-		left = self.left.evaluate(context, thing)
-		right = self.right.evaluate(context, thing)
-		return operator.ne(left, right)
-
-	def _op_eq_rem(self, context, thing):
-		left = self.left.evaluate(context, thing)
-		right = self.right.evaluate(context, thing)
-		return re.match(right, left, flags=context.regex_flags) is not None
-
-	def _op_eq_res(self, context, thing):
-		left = self.left.evaluate(context, thing)
-		right = self.right.evaluate(context, thing)
-		return re.search(right, left, flags=context.regex_flags) is not None
-
-	def _op_ne_rem(self, context, thing):
-		left = self.left.evaluate(context, thing)
-		right = self.right.evaluate(context, thing)
-		return re.match(right, left, flags=context.regex_flags) is None
-
-	def _op_ne_res(self, context, thing):
-		left = self.left.evaluate(context, thing)
-		right = self.right.evaluate(context, thing)
-		return re.search(right, left, flags=context.regex_flags) is None
-
 	def _op_and(self, context, thing):
 		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
 
 	def _op_or(self, context, thing):
 		return bool(self.left.evaluate(context, thing) or self.right.evaluate(context, thing))
+
+	def __op_arithmetic(self, op, context, thing):
+		left = self.left.evaluate(context, thing)
+		if not isinstance(left, (int, float)):
+			raise errors.EvaluationError('data type mismatch')
+		right = self.right.evaluate(context, thing)
+		if not isinstance(right, (int, float)):
+			raise errors.EvaluationError('data type mismatch')
+		return op(left, right)
+
+	_op_ge = functools.partialmethod(__op_arithmetic, operator.ge)
+	_op_gt = functools.partialmethod(__op_arithmetic, operator.gt)
+	_op_le = functools.partialmethod(__op_arithmetic, operator.le)
+	_op_lt = functools.partialmethod(__op_arithmetic, operator.lt)
+
+	def __op_comparison(self, op, context, thing):
+		left = self.left.evaluate(context, thing)
+		right = self.right.evaluate(context, thing)
+		return op(left, right)
+
+	_op_eq = functools.partialmethod(__op_comparison, operator.eq)
+	_op_ne = functools.partialmethod(__op_comparison, operator.ne)
+
+	def __op_regex(self, regex_function, modifier, context, thing):
+		left_string = self.left.evaluate(context, thing)
+		right_regex = self.right.evaluate(context, thing)
+		match = regex_function(right_regex, left_string, flags=context.regex_flags)
+		return modifier(match, None)
+
+	_op_eq_rem = functools.partialmethod(__op_regex, re.match, operator.is_not)
+	_op_eq_res = functools.partialmethod(__op_regex, re.search, operator.is_not)
+	_op_ne_rem = functools.partialmethod(__op_regex, re.match, operator.is_)
+	_op_ne_res = functools.partialmethod(__op_regex, re.search, operator.is_)
 
 class TernaryExpression(Expression):
 	__slots__ = ('condition', 'case_true', 'case_false')

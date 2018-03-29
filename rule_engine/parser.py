@@ -62,7 +62,7 @@ class Parser(ParserBase):
 		'>':   'GT',  '>=': 'GE',
 		'<':   'LT',  '<=': 'LE',
 		'+':   'ADD', '-':  'SUB',
-		'*':   'MUL', '/':  'DIV',
+		'*':   'MUL', '/':  'TDIV', '//': 'FDIV',
 	}
 	reserved_words = {
 		'and':   'AND',
@@ -86,7 +86,6 @@ class Parser(ParserBase):
 	t_ADD              = r'\+'
 	t_SUB              = r'\-'
 	t_MUL              = r'\*'
-	t_DIV              = r'\/'
 	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear
@@ -96,7 +95,7 @@ class Parser(ParserBase):
 		('right',    'QMARK', 'COLON'),
 		('nonassoc', 'EQ', 'NE', 'EQ_REM', 'EQ_RES', 'NE_REM', 'NE_RES', 'GE', 'GT', 'LE', 'LT'),  # Nonassociative operators
 		('left',     'ADD', 'SUB'),
-		('left',     'MUL', 'DIV'),
+		('left',     'MUL', 'TDIV', 'FDIV'),
 	)
 
 	def t_EQ_REM(self, t):
@@ -115,6 +114,12 @@ class Parser(ParserBase):
 		r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?|\.[0-9]+'
 		if '.' in t.value:
 			t.type = 'FLOAT'
+		return t
+
+	def t_FDIV(self, t):
+		r'\/\/?'
+		if t.value == '/':
+			t.type = 'TDIV'
 		return t
 
 	def t_LE(self, t):
@@ -160,7 +165,8 @@ class Parser(ParserBase):
 		expression : expression ADD    expression
 				   | expression SUB    expression
 				   | expression MUL    expression
-				   | expression DIV    expression
+				   | expression FDIV   expression
+				   | expression TDIV   expression
 		"""
 		op_name = self.op_names[p[2]]
 		p[0] = ast.ArithmeticExpression(op_name, p[1], p[3])

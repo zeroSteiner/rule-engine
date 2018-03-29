@@ -64,10 +64,11 @@ class ArithmeticExpression(LeftOperatorRightExpression):
 			raise errors.EvaluationError('data type mismatch')
 		return op(left, right)
 
-	_op_add = functools.partialmethod(__op_arithmetic, operator.add)
-	_op_sub = functools.partialmethod(__op_arithmetic, operator.sub)
-	_op_div = functools.partialmethod(__op_arithmetic, operator.truediv)
-	_op_mul = functools.partialmethod(__op_arithmetic, operator.mul)
+	_op_add  = functools.partialmethod(__op_arithmetic, operator.add)
+	_op_sub  = functools.partialmethod(__op_arithmetic, operator.sub)
+	_op_fdiv = functools.partialmethod(__op_arithmetic, operator.floordiv)
+	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)
+	_op_mul  = functools.partialmethod(__op_arithmetic, operator.mul)
 
 class ComparisonExpression(LeftOperatorRightExpression):
 	def __op_arithmetic(self, op, context, thing):

@@ -43,7 +43,7 @@ class Expression(object):
 	def evaluate(self, context, thing):
 		raise NotImplementedError()
 
-class LogicExpression(Expression):
+class LeftOperatorRightExpression(Expression):
 	__slots__ = ('_evaluator', 'type', 'left', 'right')
 	def __init__(self, type_, left, right):
 		self.type = type_
@@ -54,12 +54,22 @@ class LogicExpression(Expression):
 	def evaluate(self, context, thing):
 		return self._evaluator(context, thing)
 
-	def _op_and(self, context, thing):
-		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
+class ArithmeticExpression(LeftOperatorRightExpression):
+	def __op_arithmetic(self, op, context, thing):
+		left = self.left.evaluate(context, thing)
+		if not isinstance(left, (int, float)):
+			raise errors.EvaluationError('data type mismatch')
+		right = self.right.evaluate(context, thing)
+		if not isinstance(right, (int, float)):
+			raise errors.EvaluationError('data type mismatch')
+		return op(left, right)
 
-	def _op_or(self, context, thing):
-		return bool(self.left.evaluate(context, thing) or self.right.evaluate(context, thing))
+	_op_add = functools.partialmethod(__op_arithmetic, operator.add)
+	_op_sub = functools.partialmethod(__op_arithmetic, operator.sub)
+	_op_div = functools.partialmethod(__op_arithmetic, operator.truediv)
+	_op_mul = functools.partialmethod(__op_arithmetic, operator.mul)
 
+class ComparisonExpression(LeftOperatorRightExpression):
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		if not isinstance(left, (int, float)):
@@ -92,6 +102,13 @@ class LogicExpression(Expression):
 	_op_eq_res = functools.partialmethod(__op_regex, re.search, operator.is_not)
 	_op_ne_rem = functools.partialmethod(__op_regex, re.match, operator.is_)
 	_op_ne_res = functools.partialmethod(__op_regex, re.search, operator.is_)
+
+class LogicExpression(LeftOperatorRightExpression):
+	def _op_and(self, context, thing):
+		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
+
+	def _op_or(self, context, thing):
+		return bool(self.left.evaluate(context, thing) or self.right.evaluate(context, thing))
 
 class TernaryExpression(Expression):
 	__slots__ = ('condition', 'case_true', 'case_false')

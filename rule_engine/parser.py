@@ -55,12 +55,14 @@ class ParserBase(object):
 		return self._parser.parse(*args, **kwargs)
 
 class Parser(ParserBase):
-	logic_op_names = {
+	op_names = {
 		'and': 'AND', 'or': 'OR',
-		'==': 'EQ', '=~': 'EQ_REM', '=~~': 'EQ_RES',
-		'!=': 'NE', '!~': 'NE_REM', '!~~': 'NE_RES',
-		'>':  'GT', '>=': 'GE',
-		'<':  'LT', '<=': 'LE',
+		'==':  'EQ',  '=~': 'EQ_REM', '=~~': 'EQ_RES',
+		'!=':  'NE',  '!~': 'NE_REM', '!~~': 'NE_RES',
+		'>':   'GT',  '>=': 'GE',
+		'<':   'LT',  '<=': 'LE',
+		'+':   'ADD', '-':  'SUB',
+		'*':   'MUL', '/':  'DIV',
 	}
 	reserved_words = {
 		'and':   'AND',
@@ -71,7 +73,7 @@ class Parser(ParserBase):
 	tokens = (
 		'FLOAT', 'INTEGER', 'STRING', 'SYMBOL',
 		'LPAREN', 'RPAREN', 'QMARK', 'COLON'
-	) + tuple(set(list(reserved_words.values()) + list(logic_op_names.values())))
+	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
 
 	t_ignore = ' \t'
 	# Tokens
@@ -81,12 +83,20 @@ class Parser(ParserBase):
 	t_NE               = r'!='
 	t_QMARK            = r'\?'
 	t_COLON            = r'\:'
+	t_ADD              = r'\+'
+	t_SUB              = r'\-'
+	t_MUL              = r'\*'
+	t_DIV              = r'\/'
 	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
+	# tokens are listed from lowest to highest precedence, ones that appear
+	# later are effectively evaluated first
 	precedence = (
 		('left',     'AND', 'OR'),
 		('right',    'QMARK', 'COLON'),
 		('nonassoc', 'EQ', 'NE', 'EQ_REM', 'EQ_RES', 'NE_REM', 'NE_RES', 'GE', 'GT', 'LE', 'LT'),  # Nonassociative operators
+		('left',     'ADD', 'SUB'),
+		('left',     'MUL', 'DIV'),
 	)
 
 	def t_EQ_REM(self, t):
@@ -145,12 +155,20 @@ class Parser(ParserBase):
 		"""
 		p[0] = ast.TernaryExpression(p[1], p[3], p[5])
 
-	def p_expression_logic(self, p):
+	def p_expression_arithmetic(self, p):
+		"""
+		expression : expression ADD    expression
+				   | expression SUB    expression
+				   | expression MUL    expression
+				   | expression DIV    expression
+		"""
+		op_name = self.op_names[p[2]]
+		p[0] = ast.ArithmeticExpression(op_name, p[1], p[3])
+
+	def p_expression_comparison(self, p):
 		"""
 		expression : expression EQ     expression
 				   | expression NE     expression
-				   | expression AND    expression
-				   | expression OR     expression
 				   | expression GT     expression
 				   | expression GE     expression
 				   | expression LT     expression
@@ -160,7 +178,15 @@ class Parser(ParserBase):
 				   | expression NE_REM expression
 				   | expression NE_RES expression
 		"""
-		op_name = self.logic_op_names[p[2]]
+		op_name = self.op_names[p[2]]
+		p[0] = ast.ComparisonExpression(op_name, p[1], p[3])
+
+	def p_expression_logic(self, p):
+		"""
+		expression : expression AND    expression
+				   | expression OR     expression
+		"""
+		op_name = self.op_names[p[2]]
 		p[0] = ast.LogicExpression(op_name, p[1], p[3])
 
 	def p_expression_boolean(self, p):

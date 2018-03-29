@@ -43,7 +43,7 @@ literal_eval = ast_.literal_eval
 class ParserBase(object):
 	precedence = ()
 	tokens = ()
-	reserved = {}
+	reserved_words = {}
 	def __init__(self, debug=False):
 		self.debug = debug
 		# Build the lexer and parser
@@ -55,7 +55,7 @@ class ParserBase(object):
 		return self._parser.parse(*args, **kwargs)
 
 class Parser(ParserBase):
-	reserved = {
+	reserved_words = {
 		'and':   'AND',
 		'or':    'OR',
 		'true':  'TRUE',
@@ -64,16 +64,20 @@ class Parser(ParserBase):
 	tokens = [
 		'FLOAT', 'INTEGER', 'STRING',
 		'LPAREN', 'RPAREN', 'SYMBOL',
-		'EQ', 'EQ_RE', 'NE', 'NE_RE', 'QMARK', 'COLON'
-	] + list(reserved.values())
+		'EQ', 'EQ_REM', 'EQ_RES', 'NE', 'NE_REM', 'NE_RES', 'QMARK', 'COLON'
+	] + list(reserved_words.values())
+	logic_op_names = {
+		'and': 'AND', 'or': 'OR',
+		'==': 'EQ', '=~': 'EQ_REM', '=~~': 'EQ_RES',
+		'!=': 'NE', '!~': 'NE_REM', '!~~': 'NE_RES'
+	}
+
 
 	# Tokens
 	t_LPAREN           = r'\('
 	t_RPAREN           = r'\)'
 	t_EQ               = r'=='
-	t_EQ_RE            = r'=~'
 	t_NE               = r'!='
-	t_NE_RE            = r'!~'
 	t_QMARK            = r'\?'
 	t_COLON            = r'\:'
 	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
@@ -82,8 +86,20 @@ class Parser(ParserBase):
 	precedence = (
 		('left',     'AND', 'OR'),
 		('right',    'QMARK', 'COLON'),
-		('nonassoc', 'EQ', 'NE', 'EQ_RE', 'NE_RE'),  # Nonassociative operators
+		('nonassoc', 'EQ', 'NE', 'EQ_REM', 'EQ_RES', 'NE_REM', 'NE_RES'),  # Nonassociative operators
 	)
+
+	def t_EQ_REM(self, t):
+		r'=~~?'
+		if t.value == '=~~':
+			t.type = 'EQ_RES'
+		return t
+
+	def t_NE_REM(self, t):
+		r'!~~?'
+		if t.value == '!~~':
+			t.type = 'NE_RES'
+		return t
 
 	def t_INTEGER(self, t):
 		r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?|\.[0-9]+'
@@ -93,7 +109,7 @@ class Parser(ParserBase):
 
 	def t_SYMBOL(self, t):
 		r'[a-zA-Z_][a-zA-Z0-9_]*'
-		t.type = self.reserved.get(t.value, 'SYMBOL')
+		t.type = self.reserved_words.get(t.value, 'SYMBOL')
 		return t
 
 	def t_newline(self, t):
@@ -119,14 +135,17 @@ class Parser(ParserBase):
 
 	def p_expression_logic(self, p):
 		"""
-		expression : expression EQ    expression
-				   | expression NE    expression
-				   | expression AND   expression
-				   | expression OR    expression
-				   | expression EQ_RE expression
-				   | expression NE_RE expression
+		expression : expression EQ     expression
+				   | expression NE     expression
+				   | expression AND    expression
+				   | expression OR     expression
+				   | expression EQ_REM expression
+				   | expression EQ_RES expression
+				   | expression NE_REM expression
+				   | expression NE_RES expression
 		"""
-		p[0] = ast.LogicExpression(p[2], p[1], p[3])
+		op_name = self.logic_op_names[p[2]]
+		p[0] = ast.LogicExpression(op_name, p[1], p[3])
 
 	def p_expression_boolean(self, p):
 		"""

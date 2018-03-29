@@ -30,8 +30,6 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import re
-
 from . import errors
 from . import parser
 
@@ -46,12 +44,9 @@ def resolve_item(thing, name):
 	return thing[name]
 
 class EvaluationContext(object):
-	def __init__(self, regex=None, resolve=None):
-		self.__regex = regex or re.match
-		self.__resolve = resolve or resolve_item
-
-	def regex(self, pattern, symbol):
-		return self.__regex(pattern, symbol)
+	def __init__(self, regex_flags=0, resolver=None):
+		self.regex_flags = regex_flags
+		self.__resolve = resolver or resolve_item
 
 	def resolve(self, thing, name):
 		return self.__resolve(thing, name)

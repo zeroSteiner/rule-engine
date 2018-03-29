@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import re
 import operator
 
 class Expression(object):
@@ -40,16 +41,15 @@ class Expression(object):
 		raise NotImplementedError()
 
 class LogicExpression(Expression):
-	__op = {'==': 'eq', '!=': 'ne', '=~': 'eq_re', '!~':  'ne_re', 'and': 'and', 'or': 'or'}
-	__slots__ = ('type', 'left', 'right')
+	__slots__ = ('_evaluator', 'type', 'left', 'right')
 	def __init__(self, type_, left, right):
 		self.type = type_
+		self._evaluator = getattr(self, '_op_' + type_.lower())
 		self.left = left
 		self.right = right
 
 	def evaluate(self, context, thing):
-		evaluator = getattr(self, '_op_' + self.__op[self.type])
-		return evaluator(context, thing)
+		return self._evaluator(context, thing)
 
 	def _op_eq(self, context, thing):
 		left = self.left.evaluate(context, thing)
@@ -61,15 +61,25 @@ class LogicExpression(Expression):
 		right = self.right.evaluate(context, thing)
 		return operator.ne(left, right)
 
-	def _op_eq_re(self, context, thing):
+	def _op_eq_rem(self, context, thing):
 		left = self.left.evaluate(context, thing)
 		right = self.right.evaluate(context, thing)
-		return context.regex(right, left) is not None
+		return re.match(right, left, flags=context.regex_flags) is not None
 
-	def _op_ne_re(self, context, thing):
+	def _op_eq_res(self, context, thing):
 		left = self.left.evaluate(context, thing)
 		right = self.right.evaluate(context, thing)
-		return context.regex(right, left) is None
+		return re.search(right, left, flags=context.regex_flags) is not None
+
+	def _op_ne_rem(self, context, thing):
+		left = self.left.evaluate(context, thing)
+		right = self.right.evaluate(context, thing)
+		return re.match(right, left, flags=context.regex_flags) is None
+
+	def _op_ne_res(self, context, thing):
+		left = self.left.evaluate(context, thing)
+		right = self.right.evaluate(context, thing)
+		return re.search(right, left, flags=context.regex_flags) is None
 
 	def _op_and(self, context, thing):
 		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))

@@ -56,14 +56,20 @@ class ParserBase(object):
 
 class Parser(ParserBase):
 	op_names = {
-		'and': 'AND',  'or': 'OR',
-		'==':  'EQ',   '=~': 'EQ_REM', '=~~': 'EQ_RES',
-		'!=':  'NE',   '!~': 'NE_REM', '!~~': 'NE_RES',
-		'>':   'GT',   '>=': 'GE',
-		'<':   'LT',   '<=': 'LE',
-		'+':   'ADD',  '-':  'SUB',
-		'**':  'POW',  '*':  'MUL',
-		'/':   'TDIV', '//': 'FDIV', '%': 'MOD',
+		# arithmetic operators
+		'+':   'ADD',   '-':  'SUB',
+		'**':  'POW',   '*':  'MUL',
+		'/':   'TDIV',  '//': 'FDIV', '%': 'MOD',
+		# bitwise operators
+		'&':   'BWAND', '|':  'BWOR', '^': 'BWXOR',
+		'<<':  'BWLSH', '>>': 'BWRSH',
+		# comparison operators
+		'==':  'EQ',    '=~': 'EQ_REM', '=~~': 'EQ_RES',
+		'!=':  'NE',    '!~': 'NE_REM', '!~~': 'NE_RES',
+		'>':   'GT',    '>=': 'GE',
+		'<':   'LT',    '<=': 'LE',
+		# logical operators
+		'and': 'AND',   'or': 'OR',
 	}
 	reserved_words = {
 		'and':   'AND',
@@ -78,6 +84,9 @@ class Parser(ParserBase):
 
 	t_ignore = ' \t'
 	# Tokens
+	t_BWAND            = r'\&'
+	t_BWOR             = r'\|'
+	t_BWXOR            = r'\^'
 	t_LPAREN           = r'\('
 	t_RPAREN           = r'\)'
 	t_EQ               = r'=='
@@ -91,12 +100,17 @@ class Parser(ParserBase):
 
 	# tokens are listed from lowest to highest precedence, ones that appear
 	# later are effectively evaluated first
+	# see: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages
 	precedence = (
 		('left',     'OR'),
 		('left',     'AND'),
+		('left',     'BWOR'),
+		('left',     'BWXOR'),
+		('left',     'BWAND'),
 		('right',    'QMARK', 'COLON'),
 		('nonassoc', 'EQ', 'NE', 'EQ_REM', 'EQ_RES', 'NE_REM', 'NE_RES', 'GE', 'GT', 'LE', 'LT'),  # Nonassociative operators
 		('left',     'ADD', 'SUB'),
+		('left',     'BWLSH', 'BWRSH'),
 		('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
 		('left',     'POW'),
 		('right',    'UMINUS'),
@@ -120,16 +134,14 @@ class Parser(ParserBase):
 			t.type = 'TDIV'
 		return t
 
-	def t_LE(self, t):
-		r'<=?'
-		if t.value == '<':
-			t.type = 'LT'
+	def t_LT(self, t):
+		r'<([=<])?'
+		t.type = {'<': 'LT', '<=': 'LE', '<<': 'BWLSH'}[t.value]
 		return t
 
-	def t_GE(self, t):
-		r'>=?'
-		if t.value == '>':
-			t.type = 'GT'
+	def t_GT(self, t):
+		r'>([=>])?'
+		t.type = {'>': 'GT', '>=': 'GE', '>>': 'BWRSH'}[t.value]
 		return t
 
 	def t_EQ_RES(self, t):
@@ -182,6 +194,17 @@ class Parser(ParserBase):
 		"""
 		op_name = self.op_names[p[2]]
 		p[0] = ast.ArithmeticExpression(op_name, p[1], p[3])
+
+	def p_expression_bitwise(self, p):
+		"""
+		expression : expression BWAND  expression
+				   | expression BWOR   expression
+				   | expression BWXOR  expression
+				   | expression BWLSH  expression
+				   | expression BWRSH  expression
+		"""
+		op_name = self.op_names[p[2]]
+		p[0] = ast.BitwiseExpression(op_name, p[1], p[3])
 
 	def p_expression_comparison(self, p):
 		"""

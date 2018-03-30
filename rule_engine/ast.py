@@ -31,19 +31,34 @@
 #
 
 import functools
-import re
+import math
 import operator
+import re
 
 from . import errors
 
-class Expression(object):
+def is_real_number(value):
+	if not isinstance(value, (int, float)):
+		return False
+	if isinstance(value, bool):
+		return False
+	return True
+
+def _assert_is_real_number(value):
+	if not is_real_number(value):
+		raise errors.EvaluationError('data type mismatch')
+
+################################################################################
+# Base Expression Classes
+################################################################################
+class ExpressionBase(object):
 	def __repr__(self):
 		return "<{0} >".format(self.__class__.__name__)
 
 	def evaluate(self, context, thing):
 		raise NotImplementedError()
 
-class LeftOperatorRightExpression(Expression):
+class LeftOperatorRightExpressionBase(ExpressionBase):
 	__slots__ = ('_evaluator', 'type', 'left', 'right')
 	def __init__(self, type_, left, right):
 		self.type = type_
@@ -54,14 +69,41 @@ class LeftOperatorRightExpression(Expression):
 	def evaluate(self, context, thing):
 		return self._evaluator(context, thing)
 
-class ArithmeticExpression(LeftOperatorRightExpression):
+################################################################################
+# Literal Expressions
+################################################################################
+class LiteralExpression(ExpressionBase):
+	__slots__ = ('value',)
+	def __init__(self, value):
+		self.value = value
+
+	def __repr__(self):
+		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
+
+	def evaluate(self, context, thing):
+		return self.value
+
+class BooleanExpression(LiteralExpression):
+	pass
+
+class FloatExpression(LiteralExpression):
+	pass
+
+class IntegerExpression(LiteralExpression):
+	pass
+
+class StringExpression(LiteralExpression):
+	pass
+
+################################################################################
+# Left-Operator-Right Expressions
+################################################################################
+class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
-		if not isinstance(left, (int, float)) or isinstance(left, bool):
-			raise errors.EvaluationError('data type mismatch')
+		_assert_is_real_number(left)
 		right = self.right.evaluate(context, thing)
-		if not isinstance(right, (int, float)) or isinstance(right, bool):
-			raise errors.EvaluationError('data type mismatch')
+		_assert_is_real_number(right)
 		return op(left, right)
 
 	_op_add  = functools.partialmethod(__op_arithmetic, operator.add)
@@ -70,16 +112,28 @@ class ArithmeticExpression(LeftOperatorRightExpression):
 	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)
 	_op_mod  = functools.partialmethod(__op_arithmetic, operator.mod)
 	_op_mul  = functools.partialmethod(__op_arithmetic, operator.mul)
-	_op_pow  = functools.partialmethod(__op_arithmetic, operator.pow)
+	_op_pow  = functools.partialmethod(__op_arithmetic, math.pow)
 
-class ComparisonExpression(LeftOperatorRightExpression):
+class BitwiseExpression(LeftOperatorRightExpressionBase):
+	def __op_bitwise(self, op, context, thing):
+		left = self.left.evaluate(context, thing)
+		_assert_is_real_number(left)
+		right = self.right.evaluate(context, thing)
+		_assert_is_real_number(right)
+		return op(left, right)
+
+	_op_bwand = functools.partialmethod(__op_bitwise, operator.and_)
+	_op_bwor  = functools.partialmethod(__op_bitwise, operator.or_)
+	_op_bwxor = functools.partialmethod(__op_bitwise, operator.xor)
+	_op_bwlsh = functools.partialmethod(__op_bitwise, operator.lshift)
+	_op_bwrsh = functools.partialmethod(__op_bitwise, operator.rshift)
+
+class ComparisonExpression(LeftOperatorRightExpressionBase):
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
-		if not isinstance(left, (int, float)):
-			raise errors.EvaluationError('data type mismatch')
+		_assert_is_real_number(left)
 		right = self.right.evaluate(context, thing)
-		if not isinstance(right, (int, float)):
-			raise errors.EvaluationError('data type mismatch')
+		_assert_is_real_number(right)
 		return op(left, right)
 
 	_op_ge = functools.partialmethod(__op_arithmetic, operator.ge)
@@ -106,14 +160,17 @@ class ComparisonExpression(LeftOperatorRightExpression):
 	_op_ne_rem = functools.partialmethod(__op_regex, re.match, operator.is_)
 	_op_ne_res = functools.partialmethod(__op_regex, re.search, operator.is_)
 
-class LogicExpression(LeftOperatorRightExpression):
+class LogicExpression(LeftOperatorRightExpressionBase):
 	def _op_and(self, context, thing):
 		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
 
 	def _op_or(self, context, thing):
 		return bool(self.left.evaluate(context, thing) or self.right.evaluate(context, thing))
 
-class TernaryExpression(Expression):
+################################################################################
+# Miscellaneous Expressions
+################################################################################
+class TernaryExpression(ExpressionBase):
 	__slots__ = ('condition', 'case_true', 'case_false')
 	def __init__(self, condition, case_true, case_false):
 		self.condition = condition
@@ -124,7 +181,7 @@ class TernaryExpression(Expression):
 		case = (self.case_true if self.condition.evaluate(context, thing) else self.case_false)
 		return case.evaluate(context, thing)
 
-class UnaryExpression(Expression):
+class UnaryExpression(ExpressionBase):
 	__slots__ = ('_evaluator', 'type', 'right')
 	def __init__(self, type_, right):
 		self.type = type_
@@ -136,13 +193,12 @@ class UnaryExpression(Expression):
 
 	def __op(self, op, context, thing):
 		right = self.right.evaluate(context, thing)
-		if not isinstance(right, (int, float)) or isinstance(right, bool):
-			raise errors.EvaluationError('data type mismatch')
+		_assert_is_real_number(right)
 		return op(right)
 
 	_op_uminus = functools.partialmethod(__op, operator.neg)
 
-class SymbolExpression(Expression):
+class SymbolExpression(ExpressionBase):
 	__slots__ = ('name',)
 	def __init__(self, name):
 		self.name = name
@@ -160,29 +216,3 @@ class Statement(object):
 
 	def evaluate(self, context, thing):
 		return self.expression.evaluate(context, thing)
-
-################################################################################
-# Literal Expressions
-################################################################################
-class LiteralExpression(Expression):
-	__slots__ = ('value',)
-	def __init__(self, value):
-		self.value = value
-
-	def __repr__(self):
-		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
-
-	def evaluate(self, context, thing):
-		return self.value
-
-class BooleanExpression(LiteralExpression):
-	pass
-
-class FloatExpression(LiteralExpression):
-	pass
-
-class IntegerExpression(LiteralExpression):
-	pass
-
-class StringExpression(LiteralExpression):
-	pass

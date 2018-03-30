@@ -180,7 +180,8 @@ class Parser(ParserBase):
 		"""
 		expression : expression QMARK expression COLON expression
 		"""
-		p[0] = ast.TernaryExpression(p[1], p[3], p[5])
+		condition, _, case_true, _, case_false = p[1:6]
+		p[0] = ast.TernaryExpression(condition, case_true, case_false).reduce()
 
 	def p_expression_arithmetic(self, p):
 		"""
@@ -192,8 +193,9 @@ class Parser(ParserBase):
 				   | expression TDIV   expression
 				   | expression POW    expression
 		"""
-		op_name = self.op_names[p[2]]
-		p[0] = ast.ArithmeticExpression(op_name, p[1], p[3])
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = ast.ArithmeticExpression(op_name, left, right).reduce()
 
 	def p_expression_bitwise(self, p):
 		"""
@@ -203,8 +205,9 @@ class Parser(ParserBase):
 				   | expression BWLSH  expression
 				   | expression BWRSH  expression
 		"""
-		op_name = self.op_names[p[2]]
-		p[0] = ast.BitwiseExpression(op_name, p[1], p[3])
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = ast.BitwiseExpression(op_name, left, right).reduce()
 
 	def p_expression_comparison(self, p):
 		"""
@@ -219,17 +222,33 @@ class Parser(ParserBase):
 				   | expression NE_REM expression
 				   | expression NE_RES expression
 		"""
-		op_name = self.op_names[p[2]]
-		p[0] = ast.ComparisonExpression(op_name, p[1], p[3])
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = ast.ComparisonExpression(op_name, left, right).reduce()
 
 	def p_expression_logic(self, p):
 		"""
 		expression : expression AND    expression
 				   | expression OR     expression
 		"""
-		op_name = self.op_names[p[2]]
-		p[0] = ast.LogicExpression(op_name, p[1], p[3])
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = ast.LogicExpression(op_name, left, right).reduce()
 
+	def p_expression_group(self, p):
+		'expression : LPAREN expression RPAREN'
+		p[0] = p[2]
+
+	def p_expression_symbol(self, p):
+		'expression : SYMBOL'
+		p[0] = ast.SymbolExpression(p[1])
+
+	def p_expression_uminus(self, p):
+		'expression : SUB expression %prec UMINUS'
+		names = {'-': 'UMINUS'}
+		p[0] = ast.UnaryExpression(names[p[1]], p[2]).reduce()
+
+	# Literal expressions
 	def p_expression_boolean(self, p):
 		"""
 		expression : TRUE
@@ -245,20 +264,6 @@ class Parser(ParserBase):
 		'expression : INTEGER'
 		p[0] = ast.IntegerExpression(literal_eval(p[1]))
 
-	def p_expression_group(self, p):
-		'expression : LPAREN expression RPAREN'
-		p[0] = p[2]
-
 	def p_expression_string(self, p):
 		'expression : STRING'
 		p[0] = ast.StringExpression(literal_eval(p[1]))
-
-	def p_expression_symbol(self, p):
-		'expression : SYMBOL'
-		p[0] = ast.SymbolExpression(p[1])
-
-
-	def p_expression_uminus(self, p):
-		'expression : SUB expression %prec UMINUS'
-		names = {'-': 'UMINUS'}
-		p[0] = ast.UnaryExpression(names[p[1]], p[2])

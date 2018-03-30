@@ -124,6 +124,24 @@ class TernaryExpression(Expression):
 		case = (self.case_true if self.condition.evaluate(context, thing) else self.case_false)
 		return case.evaluate(context, thing)
 
+class UnaryExpression(Expression):
+	__slots__ = ('_evaluator', 'type', 'right')
+	def __init__(self, type_, right):
+		self.type = type_
+		self._evaluator = getattr(self, '_op_' + type_.lower())
+		self.right = right
+
+	def evaluate(self, context, thing):
+		return self._evaluator(context, thing)
+
+	def __op(self, op, context, thing):
+		right = self.right.evaluate(context, thing)
+		if not isinstance(right, (int, float)) or isinstance(right, bool):
+			raise errors.EvaluationError('data type mismatch')
+		return op(right)
+
+	_op_uminus = functools.partialmethod(__op, operator.neg)
+
 class SymbolExpression(Expression):
 	__slots__ = ('name',)
 	def __init__(self, name):

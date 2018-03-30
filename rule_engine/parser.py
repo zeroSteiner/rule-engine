@@ -99,6 +99,7 @@ class Parser(ParserBase):
 		('left',     'ADD', 'SUB'),
 		('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
 		('left',     'POW'),
+		('right',    'UMINUS'),
 	)
 
 	def t_POW(self, t):
@@ -232,3 +233,9 @@ class Parser(ParserBase):
 	def p_expression_symbol(self, p):
 		'expression : SYMBOL'
 		p[0] = ast.SymbolExpression(p[1])
+
+
+	def p_expression_uminus(self, p):
+		'expression : SUB expression %prec UMINUS'
+		names = {'-': 'UMINUS'}
+		p[0] = ast.UnaryExpression(names[p[1]], p[2])

@@ -56,13 +56,14 @@ class ParserBase(object):
 
 class Parser(ParserBase):
 	op_names = {
-		'and': 'AND', 'or': 'OR',
-		'==':  'EQ',  '=~': 'EQ_REM', '=~~': 'EQ_RES',
-		'!=':  'NE',  '!~': 'NE_REM', '!~~': 'NE_RES',
-		'>':   'GT',  '>=': 'GE',
-		'<':   'LT',  '<=': 'LE',
-		'+':   'ADD', '-':  'SUB',
-		'*':   'MUL', '/':  'TDIV', '//': 'FDIV',
+		'and': 'AND',  'or': 'OR',
+		'==':  'EQ',   '=~': 'EQ_REM', '=~~': 'EQ_RES',
+		'!=':  'NE',   '!~': 'NE_REM', '!~~': 'NE_RES',
+		'>':   'GT',   '>=': 'GE',
+		'<':   'LT',   '<=': 'LE',
+		'+':   'ADD',  '-':  'SUB',
+		'**':  'POW',  '*':  'MUL',
+		'/':   'TDIV', '//': 'FDIV', '%': 'MOD',
 	}
 	reserved_words = {
 		'and':   'AND',
@@ -85,29 +86,25 @@ class Parser(ParserBase):
 	t_COLON            = r'\:'
 	t_ADD              = r'\+'
 	t_SUB              = r'\-'
-	t_MUL              = r'\*'
+	t_MOD              = r'\%'
 	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear
 	# later are effectively evaluated first
 	precedence = (
-		('left',     'AND', 'OR'),
+		('left',     'OR'),
+		('left',     'AND'),
 		('right',    'QMARK', 'COLON'),
 		('nonassoc', 'EQ', 'NE', 'EQ_REM', 'EQ_RES', 'NE_REM', 'NE_RES', 'GE', 'GT', 'LE', 'LT'),  # Nonassociative operators
 		('left',     'ADD', 'SUB'),
-		('left',     'MUL', 'TDIV', 'FDIV'),
+		('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
+		('left',     'POW'),
 	)
 
-	def t_EQ_REM(self, t):
-		r'=~~?'
-		if t.value == '=~~':
-			t.type = 'EQ_RES'
-		return t
-
-	def t_GE(self, t):
-		r'>=?'
-		if t.value == '>':
-			t.type = 'GT'
+	def t_POW(self, t):
+		r'\*\*?'
+		if t.value == '*':
+			t.type = 'MUL'
 		return t
 
 	def t_INTEGER(self, t):
@@ -128,10 +125,22 @@ class Parser(ParserBase):
 			t.type = 'LT'
 		return t
 
-	def t_NE_REM(self, t):
+	def t_GE(self, t):
+		r'>=?'
+		if t.value == '>':
+			t.type = 'GT'
+		return t
+
+	def t_EQ_RES(self, t):
+		r'=~~?'
+		if t.value == '=~':
+			t.type = 'EQ_REM'
+		return t
+
+	def t_NE_RES(self, t):
 		r'!~~?'
-		if t.value == '!~~':
-			t.type = 'NE_RES'
+		if t.value == '!~':
+			t.type = 'NE_REM'
 		return t
 
 	def t_SYMBOL(self, t):
@@ -164,9 +173,11 @@ class Parser(ParserBase):
 		"""
 		expression : expression ADD    expression
 				   | expression SUB    expression
+				   | expression MOD    expression
 				   | expression MUL    expression
 				   | expression FDIV   expression
 				   | expression TDIV   expression
+				   | expression POW    expression
 		"""
 		op_name = self.op_names[p[2]]
 		p[0] = ast.ArithmeticExpression(op_name, p[1], p[3])

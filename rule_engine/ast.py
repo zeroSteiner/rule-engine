@@ -57,10 +57,10 @@ class LeftOperatorRightExpression(Expression):
 class ArithmeticExpression(LeftOperatorRightExpression):
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
-		if not isinstance(left, (int, float)):
+		if not isinstance(left, (int, float)) or isinstance(left, bool):
 			raise errors.EvaluationError('data type mismatch')
 		right = self.right.evaluate(context, thing)
-		if not isinstance(right, (int, float)):
+		if not isinstance(right, (int, float)) or isinstance(right, bool):
 			raise errors.EvaluationError('data type mismatch')
 		return op(left, right)
 
@@ -68,7 +68,9 @@ class ArithmeticExpression(LeftOperatorRightExpression):
 	_op_sub  = functools.partialmethod(__op_arithmetic, operator.sub)
 	_op_fdiv = functools.partialmethod(__op_arithmetic, operator.floordiv)
 	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)
+	_op_mod  = functools.partialmethod(__op_arithmetic, operator.mod)
 	_op_mul  = functools.partialmethod(__op_arithmetic, operator.mul)
+	_op_pow  = functools.partialmethod(__op_arithmetic, operator.pow)
 
 class ComparisonExpression(LeftOperatorRightExpression):
 	def __op_arithmetic(self, op, context, thing):

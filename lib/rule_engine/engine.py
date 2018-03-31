@@ -37,11 +37,37 @@ from . import errors
 from . import parser
 
 def resolve_attribute(thing, name):
+	"""
+	A replacement resolver function for looking up symbols as members of
+	*thing*. This is effectively the same as ``thing.name``. The *thing* object
+	can be a :py:class:`~collections.namedtuple` a custom Python class or any
+	other object. Each of the members of *thing* must be of a compatible data
+	type.
+
+	.. warning::
+		This effectively exposes all members of *thing*. If any members are
+		sensitive, then a custom resolver should be used that checks *name*
+		against a whitelist of attributes that are allowed to be accessed.
+
+	:param thing: The object on which the *name* attribute will be accessed.
+	:param str name: The symbol name that is being resolved.
+	:return: The value for the corresponding attribute *name*.
+	"""
 	if not hasattr(thing, name):
 		raise errors.SymbolResolutionError(name)
 	return getattr(thing, name)
 
 def resolve_item(thing, name):
+	"""
+	A resolver function for looking up symbols as items from an object (*thing*)
+	which supports the :py:class:`~collections.abc.Mapping` interface, such as a
+	dictionary. This is effectively the same as ``thing['name']``. Each of the
+	values in *thing* must be of a compatible data type.
+
+	:param thing: The object from which the *name* item will be accessed.
+	:param str name: The symbol name that is being resolved.
+	:return: The value for the corresponding attribute *name*.
+	"""
 	if not name in thing:
 		raise errors.SymbolResolutionError(name)
 	return thing[name]
@@ -54,21 +80,82 @@ def type_resolver_from_dict(dictionary):
 	return functools.partial(_type_resolver, type_map)
 
 class Context(object):
+	"""
+	An object defining the context for a rule's evaluation. This can be used to
+	change the behavior of certain aspects of the rule such as how symbols are
+	resolved and what regex flags should be used.
+	"""
 	def __init__(self, regex_flags=0, resolver=None, type_resolver=None):
+		"""
+		:param int regex_flags: The flags to provide to functions in the
+			:py:mod:`re` module.
+		:param resolver: An optional callback function to use in place of
+			:py:meth:`.resolve`.
+		:param type_resolver: An optional callback function to use in place of
+			:py:meth:`.resolve_type`.
+		"""
 		self.regex_flags = regex_flags
+		"""
+		The flags to provide to the :py:func:`~re.match` and
+		:py:func:`~re.search` functions when matching or searching for patterns.
+		"""
 		self.symbols = set()
+		"""
+		The symbols that are referred to by the rule. Some or all of these will
+		need to be resolved at evaluation time. This attribute can be used after
+		a rule is generated to ensure that all symbols are valid before it is
+		evaluated.
+		"""
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
 
 	def resolve(self, thing, name):
+		"""
+		The method to use for resolving symbols names to values. This function
+		must return a compatible value for the specified symbol name. This
+		function defaults to :py:func:`resolve_item`.
+
+		:param thing: The object from which the *name* item will be accessed.
+		:param str name: The symbol name that is being resolved.
+		:return: The value for the corresponding attribute *name*.
+		"""
 		return self.__resolver(thing, name)
 
 	def resolve_type(self, name):
+		"""
+		A method for providing type hints while the rule is being generated.
+		This can be used to ensure that all symbol names are valid and that the
+		types are appropriate for the operations being performed. It must then
+		return one of the compatible data type constants if the symbol is valid
+		or raise an exception. The default behavior is to return
+		:py:data:`rule_engine.ast.DataType.UNDEFINED` for all symbols.
+
+		:param str name: The symbol name to provide a type hint for.
+		:return: The type of the specified symbol
+		"""
 		return self.__type_resolver(name)
 
 class Rule(object):
+	"""
+	A rule which parses a string with a logical expression and can then evaluate
+	an arbitrary object for whether or not it matches based on the constraints
+	of the expression.
+	"""
 	parser = parser.Parser()
+	"""
+	The :py:class:`rule_engine.parser.Parser` instance that will be used for
+	parsing the rule text into a compatible abstract syntax tree (AST) for
+	evaluation.
+	"""
 	def __init__(self, text, context=None):
+		"""
+		:param str text: The text of the logical expression.
+		:param context: The context to use for evaluating the expression on
+			arbitrary objects. This can be used to change the default behavior.
+			The default context is :py:class:`.Context` but any object providing
+			the same interface (such as a subclass) can be used.
+		:type context: :py:class:`.Context`
+		"""
 		context = context or Context()
 		self.text = text
 		self.context = context
@@ -78,15 +165,42 @@ class Rule(object):
 		return "<{0} text={1!r} >".format(self.__class__.__name__, self.text)
 
 	def filter(self, things):
+		"""
+		A convenience function for iterating over *things* and yielding each
+		member that :py:meth:`.matches` return True for.
+
+		:param things: The collection of objects to iterate over.
+		"""
 		yield from (thing for thing in things if self.matches(thing))
 
 	@classmethod
-	def is_valid(cls, text):
+	def is_valid(cls, text, context=None):
+		"""
+		Test whether or not the rule is syntactically correct. This verifies the
+		grammar is well structured and that there are no type compatibility
+		issues regarding literals or symbols with known types (see
+		:py:meth:`~.Context.resolve_type` for specifying symbol type
+		information).
+
+		:param str text: The text of the logical expression.
+		:param context: The context as would be passed to the
+			:py:meth:`.__init__` method. This can be used for specifying symbol
+			type information.
+		:return: Whether or not the expression is well formed and appears valid.
+		"""
 		try:
-			cls.parser.parse(text)
-		except errors.RuleSyntaxError:
+			cls.pparser.parse(text, (context or Context()))
+		except errors.EngineError:
 			return False
 		return True
 
 	def matches(self, thing):
+		"""
+		Evaluate the rule against the specified *thing*. This will either return
+		whether *thing* matches, or an exception will be raised.
+
+		:param thing: The object on which to apply the rule.
+		:return: Whether or not the rule matches.
+		:rtype: bool
+		"""
 		return bool(self.statement.evaluate(self.context, thing))

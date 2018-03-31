@@ -1,0 +1,8 @@
+*.py[cod]
+
+.pylintrc
+.python-version
+build/*
+dist/*
+docs/build/*
+docs/html/*

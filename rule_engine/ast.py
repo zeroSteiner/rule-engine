@@ -59,11 +59,14 @@ def _assert_is_real_number(value):
 		raise errors.EvaluationError('data type mismatch')
 
 class DataType(enum.Enum):
-	UNDEFINED = 0
-	BOOLEAN = 1
-	INTEGER = 2
-	FLOAT = 3
-	STRING = 4
+	UNDEFINED = None
+	BOOLEAN = bool
+	INTEGER = int
+	FLOAT = float
+	STRING = str
+	@classmethod
+	def from_value(cls, value):
+		return next((Type for Type in cls if Type.value and isinstance(value, Type.value)), cls.UNDEFINED)
 
 ################################################################################
 # Base Expression Classes
@@ -117,7 +120,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 class LiteralExpression(ExpressionBase):
 	__slots__ = ('value',)
 	def __init__(self, value):
-		self.value = self._type(value)
+		self.value = self.result_type.value(value)
 
 	def __repr__(self):
 		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
@@ -127,19 +130,15 @@ class LiteralExpression(ExpressionBase):
 
 class BooleanExpression(LiteralExpression):
 	result_type = DataType.BOOLEAN
-	_type = bool
 
 class FloatExpression(LiteralExpression):
 	result_type = DataType.FLOAT
-	_type = float
 
 class IntegerExpression(LiteralExpression):
 	result_type = DataType.INTEGER
-	_type = int
 
 class StringExpression(LiteralExpression):
 	result_type = DataType.STRING
-	_type = str
 
 ################################################################################
 # Left-Operator-Right Expressions
@@ -283,7 +282,7 @@ class SymbolExpression(ExpressionBase):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
 	def evaluate(self, context, thing):
-		return context.resolve(thing, self.name)
+		return context.resolve_value(thing, self.name)
 
 class Statement(object):
 	__slots__ = ('expression',)

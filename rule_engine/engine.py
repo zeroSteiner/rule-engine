@@ -48,7 +48,7 @@ class EvaluationContext(object):
 		self.regex_flags = regex_flags
 		self.__resolve = resolver or resolve_item
 
-	def resolve(self, thing, name):
+	def resolve_value(self, thing, name):
 		return self.__resolve(thing, name)
 
 class Rule(object):

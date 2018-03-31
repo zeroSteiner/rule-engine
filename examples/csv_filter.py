@@ -50,7 +50,7 @@ def main():
 	parser.add_argument('rule', help='the rule to apply')
 	arguments = parser.parse_args()
 
-	context = rule_engine.EvaluationContext(resolve=resolve_item)
+	context = rule_engine.Context(resolve=resolve_item)
 	try:
 		rule = rule_engine.Rule(arguments.rule, context=context)
 	except rule_engine.RuleSyntaxError as error:

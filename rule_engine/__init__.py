@@ -32,7 +32,7 @@
 
 from .engine import resolve_attribute
 from .engine import resolve_item
-from .engine import EvaluationContext
+from .engine import Context
 from .engine import Rule
 
 from .errors import EngineError

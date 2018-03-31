@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from . import ast
 from . import errors
 from . import parser
 
@@ -43,20 +44,26 @@ def resolve_item(thing, name):
 		raise errors.SymbolResolutionError(name)
 	return thing[name]
 
-class EvaluationContext(object):
-	def __init__(self, regex_flags=0, resolver=None):
+class Context(object):
+	def __init__(self, regex_flags=0, resolver=None, type_resolver=None):
 		self.regex_flags = regex_flags
-		self.__resolve = resolver or resolve_item
+		self.symbols = set()
+		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
+		self.__resolver = resolver or resolve_item
 
-	def resolve_value(self, thing, name):
-		return self.__resolve(thing, name)
+	def resolve(self, thing, name):
+		return self.__resolver(thing, name)
+
+	def resolve_type(self, name):
+		return self.__type_resolver(name)
 
 class Rule(object):
 	parser = parser.Parser()
 	def __init__(self, text, context=None):
+		context = context or Context()
 		self.text = text
-		self.context = context or EvaluationContext()
-		self.statement = self.parser.parse(text)
+		self.context = context
+		self.statement = self.parser.parse(text, context)
 
 	def __repr__(self):
 		return "<{0} text={1!r} >".format(self.__class__.__name__, self.text)

@@ -275,14 +275,16 @@ class UnaryExpression(ExpressionBase):
 
 class SymbolExpression(ExpressionBase):
 	__slots__ = ('name',)
-	def __init__(self, name):
+	def __init__(self, name, type_hint=None):
 		self.name = name
+		if type_hint is not None:
+			self.result_type = type_hint
 
 	def __repr__(self):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
 	def evaluate(self, context, thing):
-		return context.resolve_value(thing, self.name)
+		return context.resolve(thing, self.name)
 
 class Statement(object):
 	__slots__ = ('expression',)

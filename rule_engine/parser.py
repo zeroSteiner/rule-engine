@@ -31,6 +31,7 @@
 #
 
 import ast as ast_
+import threading
 
 from . import ast
 from . import errors
@@ -44,15 +45,21 @@ class ParserBase(object):
 	precedence = ()
 	tokens = ()
 	reserved_words = {}
+	__mutex = threading.Lock()
 	def __init__(self, debug=False):
 		self.debug = debug
+		self.context = None
 		# Build the lexer and parser
 		self._lexer = lex.lex(module=self, debug=self.debug)
 		self._parser = yacc.yacc(module=self, debug=self.debug, write_tables=self.debug)
 
-	def parse(self, *args, **kwargs):
+	def parse(self, text, context, **kwargs):
 		kwargs['lexer'] = kwargs.pop('lexer', self._lexer)
-		return self._parser.parse(*args, **kwargs)
+		with self.__mutex:
+			self.context = context
+			result =  self._parser.parse(text, **kwargs)
+			self.context = None
+		return result
 
 class Parser(ParserBase):
 	op_names = {
@@ -241,7 +248,9 @@ class Parser(ParserBase):
 
 	def p_expression_symbol(self, p):
 		'expression : SYMBOL'
-		p[0] = ast.SymbolExpression(p[1]).reduce()
+		name = p[1]
+		self.context.symbols.add(name)
+		p[0] = ast.SymbolExpression(name, type_hint=self.context.resolve_type(name)).reduce()
 
 	def p_expression_uminus(self, p):
 		'expression : SUB expression %prec UMINUS'

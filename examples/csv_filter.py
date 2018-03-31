@@ -32,10 +32,12 @@
 
 import argparse
 import csv
+import functools
 import os
 import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+get_path = functools.partial(os.path.join, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(get_path('lib'))
 
 import rule_engine
 
@@ -50,7 +52,7 @@ def main():
 	parser.add_argument('rule', help='the rule to apply')
 	arguments = parser.parse_args()
 
-	context = rule_engine.Context(resolve=resolve_item)
+	context = rule_engine.Context(resolver= resolve_item)
 	try:
 		rule = rule_engine.Rule(arguments.rule, context=context)
 	except rule_engine.RuleSyntaxError as error:

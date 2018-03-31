@@ -30,6 +30,8 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import functools
+
 from . import ast
 from . import errors
 from . import parser
@@ -43,6 +45,13 @@ def resolve_item(thing, name):
 	if not name in thing:
 		raise errors.SymbolResolutionError(name)
 	return thing[name]
+
+def _type_resolver(type_map, name):
+	return type_map[name]
+
+def type_resolver_from_dict(dictionary):
+	type_map = {key: ast.DataType.from_value(value) for key, value in dictionary.items()}
+	return functools.partial(_type_resolver, type_map)
 
 class Context(object):
 	def __init__(self, regex_flags=0, resolver=None, type_resolver=None):

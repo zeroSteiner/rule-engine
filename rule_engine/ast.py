@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import enum
 import functools
 import math
 import operator
@@ -57,10 +58,18 @@ def _assert_is_real_number(value):
 	if not is_real_number(value):
 		raise errors.EvaluationError('data type mismatch')
 
+class DataType(enum.Enum):
+	UNDEFINED = 0
+	BOOLEAN = 1
+	INTEGER = 2
+	FLOAT = 3
+	STRING = 4
+
 ################################################################################
 # Base Expression Classes
 ################################################################################
 class ExpressionBase(object):
+	result_type = DataType.UNDEFINED
 	def __repr__(self):
 		return "<{0} >".format(self.__class__.__name__)
 
@@ -72,12 +81,20 @@ class ExpressionBase(object):
 
 class LeftOperatorRightExpressionBase(ExpressionBase):
 	__slots__ = ('_evaluator', 'type', 'left', 'right')
+	compatible_types = (DataType.BOOLEAN, DataType.INTEGER, DataType.FLOAT, DataType.STRING)
+	result_type = DataType.BOOLEAN
 	_reduce_literals = ()
 	def __init__(self, type_, left, right):
 		self.type = type_
 		self._evaluator = getattr(self, '_op_' + type_.lower())
 		self.left = left
+		if self.left.result_type is not DataType.UNDEFINED:
+			if self.left.result_type not in self.compatible_types:
+				raise errors.EvaluationError('data type mismatch')
 		self.right = right
+		if self.right.result_type is not DataType.UNDEFINED:
+			if self.right.result_type not in self.compatible_types:
+				raise errors.EvaluationError('data type mismatch')
 
 	def evaluate(self, context, thing):
 		return self._evaluator(context, thing)
@@ -109,28 +126,34 @@ class LiteralExpression(ExpressionBase):
 		return self.value
 
 class BooleanExpression(LiteralExpression):
+	result_type = DataType.BOOLEAN
 	_type = bool
 
 class FloatExpression(LiteralExpression):
+	result_type = DataType.FLOAT
 	_type = float
 
 class IntegerExpression(LiteralExpression):
+	result_type = DataType.INTEGER
 	_type = int
 
 class StringExpression(LiteralExpression):
+	result_type = DataType.STRING
 	_type = str
 
 ################################################################################
 # Left-Operator-Right Expressions
 ################################################################################
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
+	compatible_types = (DataType.INTEGER, DataType.FLOAT)
+	result_type = DataType.FLOAT
 	_reduce_literals = (FloatExpression, IntegerExpression)
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		_assert_is_real_number(left)
 		right = self.right.evaluate(context, thing)
 		_assert_is_real_number(right)
-		return op(left, right)
+		return float(op(left, right))
 
 	_op_add  = functools.partialmethod(__op_arithmetic, operator.add)
 	_op_sub  = functools.partialmethod(__op_arithmetic, operator.sub)
@@ -141,13 +164,15 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	_op_pow  = functools.partialmethod(__op_arithmetic, math.pow)
 
 class BitwiseExpression(LeftOperatorRightExpressionBase):
+	compatible_types = (DataType.INTEGER, DataType.FLOAT)
+	result_type = DataType.INTEGER
 	_reduce_literals = (IntegerExpression, FloatExpression)
 	def __op_bitwise(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		_assert_is_natural_number(left)
 		right = self.right.evaluate(context, thing)
 		_assert_is_natural_number(right)
-		return op(left, right)
+		return op(int(left), int(right))
 
 	_op_bwand = functools.partialmethod(__op_bitwise, operator.and_)
 	_op_bwor  = functools.partialmethod(__op_bitwise, operator.or_)

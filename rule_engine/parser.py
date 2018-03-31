@@ -241,7 +241,7 @@ class Parser(ParserBase):
 
 	def p_expression_symbol(self, p):
 		'expression : SYMBOL'
-		p[0] = ast.SymbolExpression(p[1])
+		p[0] = ast.SymbolExpression(p[1]).reduce()
 
 	def p_expression_uminus(self, p):
 		'expression : SUB expression %prec UMINUS'

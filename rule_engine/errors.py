@@ -47,7 +47,7 @@ class RuleSyntaxError(EngineError):
 		super(RuleSyntaxError, self).__init__(message)
 		self.token = token
 
-class SymbolResolutionError(EngineError):
+class SymbolResolutionError(EvaluationError):
 	def __init__(self, symbol_name):
 		self.symbol_name = symbol_name
 		super(SymbolResolutionError, self).__init__('unknown symbol: ' + symbol_name)

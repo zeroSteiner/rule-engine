@@ -85,7 +85,7 @@ class Parser(ParserBase):
 		'false': 'FALSE',
 	}
 	tokens = (
-		'FLOAT', 'INTEGER', 'STRING', 'SYMBOL',
+		'FLOAT', 'STRING', 'SYMBOL',
 		'LPAREN', 'RPAREN', 'QMARK', 'COLON'
 	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
 
@@ -103,6 +103,7 @@ class Parser(ParserBase):
 	t_ADD              = r'\+'
 	t_SUB              = r'\-'
 	t_MOD              = r'\%'
+	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?|\.[0-9]+'
 	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear
@@ -127,12 +128,6 @@ class Parser(ParserBase):
 		r'\*\*?'
 		if t.value == '*':
 			t.type = 'MUL'
-		return t
-
-	def t_INTEGER(self, t):
-		r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?|\.[0-9]+'
-		if '.' in t.value:
-			t.type = 'FLOAT'
 		return t
 
 	def t_FDIV(self, t):
@@ -268,10 +263,6 @@ class Parser(ParserBase):
 	def p_expression_float(self, p):
 		'expression : FLOAT'
 		p[0] = ast.FloatExpression(literal_eval(p[1]))
-
-	def p_expression_integer(self, p):
-		'expression : INTEGER'
-		p[0] = ast.IntegerExpression(literal_eval(p[1]))
 
 	def p_expression_string(self, p):
 		'expression : STRING'

@@ -39,11 +39,29 @@ import re
 from . import errors
 
 def is_natural_number(value):
+	"""
+	Check whether *value* is a natural number (i.e. a whole, non-negative
+	number). This can, for example, be used to check if a floating point number
+	such as ``3.0`` can safely be converted to an integer without lose of
+	information.
+
+	:param value: The value to check. This value is a native Python type.
+	:return: Whether or not the value is a natural number.
+	:rtype: bool
+	"""
 	if not is_real_number(value):
 		return False
 	return math.floor(value) == value
 
 def is_real_number(value):
+	"""
+	Check whether *value* is a real number (i.e. capable of being represented as
+	a floating point value with lose of information.
+
+	:param value: The value to check. This value is a native Python type.
+	:return: Whether or not the value is a natural number.
+	:rtype: bool
+	"""
 	if not isinstance(value, (int, float)):
 		return False
 	if isinstance(value, bool):
@@ -51,7 +69,7 @@ def is_real_number(value):
 	return True
 
 def _assert_is_natural_number(value):
-	if not is_real_number(value):
+	if not is_natural_number(value):
 		raise errors.EvaluationError('data type mismatch')
 
 def _assert_is_real_number(value):
@@ -59,14 +77,19 @@ def _assert_is_real_number(value):
 		raise errors.EvaluationError('data type mismatch')
 
 class DataType(enum.Enum):
-	UNDEFINED = None
 	BOOLEAN = bool
-	INTEGER = int
 	FLOAT = float
 	STRING = str
+	UNDEFINED = None
 	@classmethod
 	def from_value(cls, value):
-		return next((Type for Type in cls if Type.value and isinstance(value, Type.value)), cls.UNDEFINED)
+		if isinstance(value, bool):
+			return cls.BOOLEAN
+		elif isinstance(value, (float, int)):
+			return cls.FLOAT
+		elif isinstance(value, (str,)):
+			return cls.STRING
+		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(value).__name__))
 
 ################################################################################
 # Base Expression Classes
@@ -84,7 +107,7 @@ class ExpressionBase(object):
 
 class LeftOperatorRightExpressionBase(ExpressionBase):
 	__slots__ = ('_evaluator', 'type', 'left', 'right')
-	compatible_types = (DataType.BOOLEAN, DataType.INTEGER, DataType.FLOAT, DataType.STRING)
+	compatible_types = (DataType.BOOLEAN, DataType.FLOAT, DataType.STRING)
 	result_type = DataType.BOOLEAN
 	_reduce_literals = ()
 	def __init__(self, type_, left, right):
@@ -134,9 +157,6 @@ class BooleanExpression(LiteralExpression):
 class FloatExpression(LiteralExpression):
 	result_type = DataType.FLOAT
 
-class IntegerExpression(LiteralExpression):
-	result_type = DataType.INTEGER
-
 class StringExpression(LiteralExpression):
 	result_type = DataType.STRING
 
@@ -144,9 +164,9 @@ class StringExpression(LiteralExpression):
 # Left-Operator-Right Expressions
 ################################################################################
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
-	compatible_types = (DataType.INTEGER, DataType.FLOAT)
+	compatible_types = (DataType.FLOAT,)
 	result_type = DataType.FLOAT
-	_reduce_literals = (FloatExpression, IntegerExpression)
+	_reduce_literals = (FloatExpression,)
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		_assert_is_real_number(left)
@@ -163,15 +183,15 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	_op_pow  = functools.partialmethod(__op_arithmetic, math.pow)
 
 class BitwiseExpression(LeftOperatorRightExpressionBase):
-	compatible_types = (DataType.INTEGER, DataType.FLOAT)
-	result_type = DataType.INTEGER
-	_reduce_literals = (IntegerExpression, FloatExpression)
+	compatible_types = (DataType.FLOAT,)
+	result_type = DataType.FLOAT
+	_reduce_literals = (FloatExpression,)
 	def __op_bitwise(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		_assert_is_natural_number(left)
 		right = self.right.evaluate(context, thing)
 		_assert_is_natural_number(right)
-		return op(int(left), int(right))
+		return float(op(int(left), int(right)))
 
 	_op_bwand = functools.partialmethod(__op_bitwise, operator.and_)
 	_op_bwor  = functools.partialmethod(__op_bitwise, operator.or_)
@@ -180,7 +200,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	_op_bwrsh = functools.partialmethod(__op_bitwise, operator.rshift)
 
 class ComparisonExpression(LeftOperatorRightExpressionBase):
-	_reduce_literals = (BooleanExpression, IntegerExpression, FloatExpression, StringExpression)
+	_reduce_literals = (BooleanExpression, FloatExpression, StringExpression)
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		_assert_is_real_number(left)
@@ -217,7 +237,7 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	_op_ne_res = functools.partialmethod(__op_regex, re.search, operator.is_)
 
 class LogicExpression(LeftOperatorRightExpressionBase):
-	_reduce_literals = (BooleanExpression, IntegerExpression, FloatExpression, StringExpression)
+	_reduce_literals = (BooleanExpression, FloatExpression, StringExpression)
 	def _op_and(self, context, thing):
 		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
 
@@ -269,7 +289,7 @@ class UnaryExpression(ExpressionBase):
 			raise NotImplementedError()
 		if not isinstance(self.right, LiteralExpression):
 			return self
-		if not isinstance(self.right, (FloatExpression, IntegerExpression)):
+		if not isinstance(self.right, (FloatExpression,)):
 			raise errors.EvaluationError('data type mismatch')
 		return FloatExpression(self.evaluate(None, None))
 

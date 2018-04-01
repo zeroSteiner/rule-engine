@@ -14,6 +14,8 @@ Functions
 
 .. autofunction:: resolve_item
 
+.. autofunction:: type_resolver_from_dict
+
 Classes
 -------
 

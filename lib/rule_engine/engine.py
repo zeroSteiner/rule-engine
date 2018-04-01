@@ -68,14 +68,30 @@ def resolve_item(thing, name):
 	:param str name: The symbol name that is being resolved.
 	:return: The value for the corresponding attribute *name*.
 	"""
-	if not name in thing:
+	if name not in thing:
 		raise errors.SymbolResolutionError(name)
 	return thing[name]
 
 def _type_resolver(type_map, name):
+	if name not in type_map:
+		raise errors.SymbolResolutionError(name)
 	return type_map[name]
 
 def type_resolver_from_dict(dictionary):
+	"""
+	Return a function suitable for use as the *type_resolver* for a
+	:py:class:`.Context` instance from a dictionary. If any of the values within
+	the dictionary are not of a compatible data type, a :py:exc:`TypeError` will
+	be raised. Additionally the resulting function will raise a
+	:py:exc:`~errors.SymbolResolutionError` if the symbol name does not exist
+	within the dictionary.
+
+	:param dict dictionary: A dictionary (or any other object which supports the
+		:py:class:`~collections.abc.Mapping` interface) from which to create the
+		callback function.
+	:return: The callback function.
+	:rtype: function
+	"""
 	type_map = {key: ast.DataType.from_value(value) for key, value in dictionary.items()}
 	return functools.partial(_type_resolver, type_map)
 

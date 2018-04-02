@@ -11,6 +11,7 @@ Welcome to Rule Engine's documentation!
    :caption: Contents:
 
    rule_engine/engine.rst
+   rule_engine/errors.rst
 
 Indices and tables
 ==================

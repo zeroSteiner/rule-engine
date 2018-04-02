@@ -31,13 +31,29 @@
 #
 
 class EngineError(Exception):
+	"""
+	The base exception class from which other exceptions within this package
+	inherit.
+	"""
 	def __init__(self, message=''):
+		"""
+		:param str message: A text description of what error occurred.
+		"""
 		self.message = message
 
 class EvaluationError(EngineError):
+	"""
+	An error raised for issues which occur while the rule is being evaluated.
+	This can occur at parse time while AST nodes are being evaluated during
+	the reduction phase.
+	"""
 	pass
 
 class RuleSyntaxError(EngineError):
+	"""
+	An error raised for issues identified in while parsing the grammar of the
+	rule text.
+	"""
 	def __init__(self, message, token=None):
 		if token is None:
 			position = 'EOF'
@@ -46,8 +62,13 @@ class RuleSyntaxError(EngineError):
 		message = message + ' at: ' + position
 		super(RuleSyntaxError, self).__init__(message)
 		self.token = token
+		"""The PLY token (if available) which is related to the syntax error."""
 
 class SymbolResolutionError(EvaluationError):
+	"""
+	An error raised when a symbol name is not able to be resolved to a value.
+	"""
 	def __init__(self, symbol_name):
 		self.symbol_name = symbol_name
+		"""The name of the symbol that can not be resolved."""
 		super(SymbolResolutionError, self).__init__('unknown symbol: ' + symbol_name)

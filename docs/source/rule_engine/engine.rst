@@ -4,8 +4,7 @@
 .. module:: rule_engine.engine
    :synopsis:
 
-This module keeps collections of related constants organized for use in other
-modules.
+This module contains the primary externally facing API for the package.
 
 Functions
 ---------
@@ -21,10 +20,12 @@ Classes
 
 .. autoclass:: Context
    :members:
+   :show-inheritance:
    :special-members: __init__
    :undoc-members:
 
 .. autoclass:: Rule
    :members:
+   :show-inheritance:
    :special-members: __init__
    :undoc-members:

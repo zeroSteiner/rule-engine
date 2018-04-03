@@ -1,5 +1,5 @@
-:mod:`rule_engine.errors`
-=========================
+:mod:`errors`
+=============
 
 .. module:: rule_engine.errors
    :synopsis:

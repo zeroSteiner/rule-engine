@@ -1,5 +1,5 @@
-:mod:`rule_engine.engine`
-=========================
+:mod:`engine`
+=============
 
 .. module:: rule_engine.engine
    :synopsis:

@@ -126,10 +126,9 @@ class ExpressionBase(object):
 		Evaluate this AST node and all applicable children nodes.
 
 		:param context: The context to use for evaluating the expression.
-		:type context: :py:class:`rule_engine.engine.Context`
+		:type context: :py:class:`~rule_engine.engine.Context`
 		:param thing: The object to use for symbol resolution.
 		:return: The result of the evaluation as a native Python type.
-		:rtype:
 		"""
 		raise NotImplementedError()
 
@@ -145,6 +144,10 @@ class ExpressionBase(object):
 		return self
 
 class LeftOperatorRightExpressionBase(ExpressionBase):
+	"""
+	A base class for representing complex expressions composed of a left side
+	and a right side, separated by an operator.
+	"""
 	__slots__ = ('_evaluator', 'type', 'left', 'right')
 	compatible_types = (DataType.BOOLEAN, DataType.FLOAT, DataType.STRING)
 	"""
@@ -333,6 +336,13 @@ class SymbolExpression(ExpressionBase):
 	"""
 	__slots__ = ('name',)
 	def __init__(self, name, type_hint=None):
+		"""
+		:param str name: The name of the symbol. This will be resolved with a
+			given context object on the specified *thing*.
+		:param type_hint: An optional data type hint for this symbol. When set,
+			this is used by other nodes at parse time to determine if the symbol
+			is used in compatible operations.
+		"""
 		self.name = name
 		if type_hint is not None:
 			self.result_type = type_hint
@@ -347,6 +357,10 @@ class Statement(object):
 	"""A class representing the top level statement of the grammar text."""
 	__slots__ = ('expression',)
 	def __init__(self, expression):
+		"""
+		:param expression: The top level expression of the statement.
+		:type expression: :py:class:`~.ExpressionBase`
+		"""
 		self.expression = expression
 
 	def evaluate(self, context, thing):
@@ -388,6 +402,12 @@ class TernaryExpression(ExpressionBase):
 class UnaryExpression(ExpressionBase):
 	__slots__ = ('_evaluator', 'type', 'right')
 	def __init__(self, type_, right):
+		"""
+		:param str type_: The grammar type of operator to the left of the
+			expression.
+		:param right: The expression to the right of the operator.
+		:type right: :py:class:`~.ExpressionBase`
+		"""
 		self.type = type_
 		self._evaluator = getattr(self, '_op_' + type_.lower())
 		self.right = right

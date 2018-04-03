@@ -1,5 +1,5 @@
-:mod:`rule_engine.ast`
-======================
+:mod:`ast`
+==========
 
 .. module:: rule_engine.ast
    :synopsis:

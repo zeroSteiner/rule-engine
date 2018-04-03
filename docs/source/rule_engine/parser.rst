@@ -1,5 +1,5 @@
-:mod:`rule_engine.parser`
-=========================
+:mod:`parser`
+=============
 
 .. module:: rule_engine.parser
    :synopsis:

@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rule_engine.engine &mdash; Rule Engine 0.9 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Rule Engine 0.9 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Rule Engine
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rule Engine</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>rule_engine.engine</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rule_engine.engine</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  rule_engine/engine.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">ast</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">errors</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">parser</span>
+
+<div class="viewcode-block" id="resolve_attribute"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_attribute">[docs]</a><span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A replacement resolver function for looking up symbols as members of</span>
+<span class="sd">	*thing*. This is effectively the same as ``thing.name``. The *thing* object</span>
+<span class="sd">	can be a :py:class:`~collections.namedtuple` a custom Python class or any</span>
+<span class="sd">	other object. Each of the members of *thing* must be of a compatible data</span>
+<span class="sd">	type.</span>
+
+<span class="sd">	.. warning::</span>
+<span class="sd">		This effectively exposes all members of *thing*. If any members are</span>
+<span class="sd">		sensitive, then a custom resolver should be used that checks *name*</span>
+<span class="sd">		against a whitelist of attributes that are allowed to be accessed.</span>
+
+<span class="sd">	:param thing: The object on which the *name* attribute will be accessed.</span>
+<span class="sd">	:param str name: The symbol name that is being resolved.</span>
+<span class="sd">	:return: The value for the corresponding attribute *name*.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+	<span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="resolve_item"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_item">[docs]</a><span class="k">def</span> <span class="nf">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A resolver function for looking up symbols as items from an object (*thing*)</span>
+<span class="sd">	which supports the :py:class:`~collections.abc.Mapping` interface, such as a</span>
+<span class="sd">	dictionary. This is effectively the same as ``thing[&#39;name&#39;]``. Each of the</span>
+<span class="sd">	values in *thing* must be of a compatible data type.</span>
+
+<span class="sd">	:param thing: The object from which the *name* item will be accessed.</span>
+<span class="sd">	:param str name: The symbol name that is being resolved.</span>
+<span class="sd">	:return: The value for the corresponding attribute *name*.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">:</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">thing</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+<span class="k">def</span> <span class="nf">_type_resolver</span><span class="p">(</span><span class="n">type_map</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">type_map</span><span class="p">:</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">type_map</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+<div class="viewcode-block" id="type_resolver_from_dict"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict">[docs]</a><span class="k">def</span> <span class="nf">type_resolver_from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Return a function suitable for use as the *type_resolver* for a</span>
+<span class="sd">	:py:class:`.Context` instance from a dictionary. If any of the values within</span>
+<span class="sd">	the dictionary are not of a compatible data type, a :py:exc:`TypeError` will</span>
+<span class="sd">	be raised. Additionally the resulting function will raise a</span>
+<span class="sd">	:py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol name does</span>
+<span class="sd">	not exist within the dictionary.</span>
+
+<span class="sd">	:param dict dictionary: A dictionary (or any other object which supports the</span>
+<span class="sd">		:py:class:`~collections.abc.Mapping` interface) from which to create the</span>
+<span class="sd">		callback function.</span>
+<span class="sd">	:return: The callback function.</span>
+<span class="sd">	:rtype: function</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+	<span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">type_map</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An object defining the context for a rule&#39;s evaluation. This can be used to</span>
+<span class="sd">	change the behavior of certain aspects of the rule such as how symbols are</span>
+<span class="sd">	resolved and what regex flags should be used.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_flags</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param int regex_flags: The flags to provide to functions in the</span>
+<span class="sd">			:py:mod:`re` module.</span>
+<span class="sd">		:param resolver: An optional callback function to use in place of</span>
+<span class="sd">			:py:meth:`.resolve`.</span>
+<span class="sd">		:param type_resolver: An optional callback function to use in place of</span>
+<span class="sd">			:py:meth:`.resolve_type`.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">regex_flags</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		The flags to provide to the :py:func:`~re.match` and</span>
+<span class="sd">		:py:func:`~re.search` functions when matching or searching for patterns.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		The symbols that are referred to by the rule. Some or all of these will</span>
+<span class="sd">		need to be resolved at evaluation time. This attribute can be used after</span>
+<span class="sd">		a rule is generated to ensure that all symbols are valid before it is</span>
+<span class="sd">		evaluated.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">resolver</span> <span class="ow">or</span> <span class="n">resolve_item</span></div>
+
+<div class="viewcode-block" id="Context.resolve"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve">[docs]</a>	<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		The method to use for resolving symbols names to values. This function</span>
+<span class="sd">		must return a compatible value for the specified symbol name. This</span>
+<span class="sd">		function defaults to :py:func:`resolve_item`.</span>
+
+<span class="sd">		:param thing: The object from which the *name* item will be accessed.</span>
+<span class="sd">		:param str name: The symbol name that is being resolved.</span>
+<span class="sd">		:return: The value for the corresponding attribute *name*.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Context.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		A method for providing type hints while the rule is being generated.</span>
+<span class="sd">		This can be used to ensure that all symbol names are valid and that the</span>
+<span class="sd">		types are appropriate for the operations being performed. It must then</span>
+<span class="sd">		return one of the compatible data type constants if the symbol is valid</span>
+<span class="sd">		or raise an exception. The default behavior is to return</span>
+<span class="sd">		:py:data:`rule_engine.ast.DataType.UNDEFINED` for all symbols.</span>
+
+<span class="sd">		:param str name: The symbol name to provide a type hint for.</span>
+<span class="sd">		:return: The type of the specified symbol</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="Rule"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule">[docs]</a><span class="k">class</span> <span class="nc">Rule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A rule which parses a string with a logical expression and can then evaluate</span>
+<span class="sd">	an arbitrary object for whether or not it matches based on the constraints</span>
+<span class="sd">	of the expression.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">()</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	The :py:class:`rule_engine.parser.Parser` instance that will be used for</span>
+<span class="sd">	parsing the rule text into a compatible abstract syntax tree (AST) for</span>
+<span class="sd">	evaluation.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Rule.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str text: The text of the logical expression.</span>
+<span class="sd">		:param context: The context to use for evaluating the expression on</span>
+<span class="sd">			arbitrary objects. This can be used to change the default behavior.</span>
+<span class="sd">			The default context is :py:class:`.Context` but any object providing</span>
+<span class="sd">			the same interface (such as a subclass) can be used.</span>
+<span class="sd">		:type context: :py:class:`.Context`</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">statement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
+
+	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> text=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Rule.filter"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.filter">[docs]</a>	<span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">things</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		A convenience function for iterating over *things* and yielding each</span>
+<span class="sd">		member that :py:meth:`.matches` return True for.</span>
+
+<span class="sd">		:param things: The collection of objects to iterate over.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">yield from</span> <span class="p">(</span><span class="n">thing</span> <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="n">things</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Rule.is_valid"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.is_valid">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Test whether or not the rule is syntactically correct. This verifies the</span>
+<span class="sd">		grammar is well structured and that there are no type compatibility</span>
+<span class="sd">		issues regarding literals or symbols with known types (see</span>
+<span class="sd">		:py:meth:`~.Context.resolve_type` for specifying symbol type</span>
+<span class="sd">		information).</span>
+
+<span class="sd">		:param str text: The text of the logical expression.</span>
+<span class="sd">		:param context: The context as would be passed to the</span>
+<span class="sd">			:py:meth:`.__init__` method. This can be used for specifying symbol</span>
+<span class="sd">			type information.</span>
+<span class="sd">		:return: Whether or not the expression is well formed and appears valid.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="bp">cls</span><span class="o">.</span><span class="n">pparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="p">(</span><span class="n">context</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">()))</span>
+		<span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">EngineError</span><span class="p">:</span>
+			<span class="k">return</span> <span class="kc">False</span>
+		<span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Rule.matches"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.matches">[docs]</a>	<span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Evaluate the rule against the specified *thing*. This will either return</span>
+<span class="sd">		whether *thing* matches, or an exception will be raised.</span>
+
+<span class="sd">		:param thing: The object on which to apply the rule.</span>
+<span class="sd">		:return: Whether or not the rule matches.</span>
+<span class="sd">		:rtype: bool</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">))</span></div></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Spencer McIntyre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

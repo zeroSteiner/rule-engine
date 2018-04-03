@@ -1,0 +1,651 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rule_engine.ast &mdash; Rule Engine 0.9 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Rule Engine 0.9 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Rule Engine
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rule Engine</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>rule_engine.ast</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rule_engine.ast</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  rule_engine/ast.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">errors</span>
+
+<div class="viewcode-block" id="is_natural_number"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_natural_number">[docs]</a><span class="k">def</span> <span class="nf">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Check whether *value* is a natural number (i.e. a whole, non-negative</span>
+<span class="sd">	number). This can, for example, be used to check if a floating point number</span>
+<span class="sd">	such as ``3.0`` can safely be converted to an integer without lose of</span>
+<span class="sd">	information.</span>
+
+<span class="sd">	:param value: The value to check. This value is a native Python type.</span>
+<span class="sd">	:return: Whether or not the value is a natural number.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="is_real_number"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_real_number">[docs]</a><span class="k">def</span> <span class="nf">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Check whether *value* is a real number (i.e. capable of being represented as</span>
+<span class="sd">	a floating point value without lose of information). Despite being able to</span>
+<span class="sd">	be represented as a float, ``NaN`` is not considered a real number for the</span>
+<span class="sd">	purposes of this function.</span>
+
+<span class="sd">	:param value: The value to check. This value is a native Python type.</span>
+<span class="sd">	:return: Whether or not the value is a natural number.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="kc">True</span></div>
+
+<span class="k">def</span> <span class="nf">_assert_is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_assert_is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataType"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DataType">[docs]</a><span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A collection of constants representing the different supported data types.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">BOOLEAN</span> <span class="o">=</span> <span class="nb">bool</span>
+	<span class="n">FLOAT</span> <span class="o">=</span> <span class="nb">float</span>
+	<span class="n">STRING</span> <span class="o">=</span> <span class="nb">str</span>
+	<span class="n">UNDEFINED</span> <span class="o">=</span> <span class="kc">None</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Undefined values. This constant can be used to indicate that a particular</span>
+<span class="sd">	symbol is valid, but it&#39;s data type is currently unknown.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">from_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Get the supported data type constant for the specified Python value. If</span>
+<span class="sd">		the value can not be mapped to a supported data type, then a</span>
+<span class="sd">		:py:exc:`TypeError` exception will be raised. This function will not</span>
+<span class="sd">		return :py:attr:`.UNDEFINED`.</span>
+
+<span class="sd">		:param value: The native Python type to retrieve the corresponding data</span>
+<span class="sd">			type constant for.</span>
+<span class="sd">		:return: One of the constants.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,)):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Base Expression Classes</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="ExpressionBase"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ExpressionBase">[docs]</a><span class="k">class</span> <span class="nc">ExpressionBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+	<span class="sd">&quot;&quot;&quot;The data type of the result of successful evaluation.&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExpressionBase.evaluate"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ExpressionBase.evaluate">[docs]</a>	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Evaluate this AST node and all applicable children nodes.</span>
+
+<span class="sd">		:param context: The context to use for evaluating the expression.</span>
+<span class="sd">		:type context: :py:class:`~rule_engine.engine.Context`</span>
+<span class="sd">		:param thing: The object to use for symbol resolution.</span>
+<span class="sd">		:return: The result of the evaluation as a native Python type.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExpressionBase.reduce"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ExpressionBase.reduce">[docs]</a>	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Reduce this expression into a smaller subset of nodes. If the expression</span>
+<span class="sd">		can not be reduced, then return an instance of itself, otherwise return</span>
+<span class="sd">		a reduced :py:class:`.ExpressionBase` to replace it.</span>
+
+<span class="sd">		:return: Either a reduced version of this node or itself.</span>
+<span class="sd">		:rtype: :py:class:`.ExpressionBase`</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span></div></div>
+
+<div class="viewcode-block" id="LeftOperatorRightExpressionBase"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase">[docs]</a><span class="k">class</span> <span class="nc">LeftOperatorRightExpressionBase</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A base class for representing complex expressions composed of a left side</span>
+<span class="sd">	and a right side, separated by an operator.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_evaluator&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">)</span>
+	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A tuple containing the compatible data types that the left and right</span>
+<span class="sd">	expressions must return. This can for example be used to indicate that</span>
+<span class="sd">	arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but</span>
+<span class="sd">	not :py:attr:`.DataType.STRING` values.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span>
+	<span class="n">_reduce_literals</span> <span class="o">=</span> <span class="p">()</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str type_: The grammar type of operator at the center of the</span>
+<span class="sd">			expression. Subclasses must define operator methods to handle</span>
+<span class="sd">			evaluation based on this value.</span>
+<span class="sd">		:param left: The expression to the left of the operator.</span>
+<span class="sd">		:type left: :py:class:`.ExpressionBase`</span>
+<span class="sd">		:param right: The expression to the right of the operator.</span>
+<span class="sd">		:type right: :py:class:`.ExpressionBase`</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">type_</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_evaluator</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_op_&#39;</span> <span class="o">+</span> <span class="n">type_</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="kc">None</span><span class="p">)</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EngineError</span><span class="p">(</span><span class="s1">&#39;unsupported operator: &#39;</span> <span class="o">+</span> <span class="n">type_</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">compatible_types</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluator</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_literals</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_literals</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="n">primary_literal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_literals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">primary_literal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LiteralExpressionBase"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase">[docs]</a><span class="k">class</span> <span class="nc">LiteralExpressionBase</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;A base class for representing literal values from the grammar text.&quot;&quot;&quot;</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,)</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param value: The native Python value.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> value=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Literal Expressions</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="BooleanExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BooleanExpression">[docs]</a><span class="k">class</span> <span class="nc">BooleanExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;Literal boolean expressions representing True or False.&quot;&quot;&quot;</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span></div>
+
+<div class="viewcode-block" id="FloatExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FloatExpression">[docs]</a><span class="k">class</span> <span class="nc">FloatExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;Literal float expressions representing numerical values.&quot;&quot;&quot;</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span></div>
+
+<div class="viewcode-block" id="StringExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.StringExpression">[docs]</a><span class="k">class</span> <span class="nc">StringExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;Literal string expressions representing an array of characters.&quot;&quot;&quot;</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Left-Operator-Right Expressions</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="ArithmeticExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ArithmeticExpression">[docs]</a><span class="k">class</span> <span class="nc">ArithmeticExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A class for representing arithmetic expressions from the grammar text such</span>
+<span class="sd">	as addition and subtraction.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,)</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
+	<span class="n">_reduce_literals</span> <span class="o">=</span> <span class="p">(</span><span class="n">FloatExpression</span><span class="p">,)</span>
+	<span class="k">def</span> <span class="nf">__op_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
+
+	<span class="n">_op_add</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">)</span>
+	<span class="n">_op_sub</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">)</span>
+	<span class="n">_op_fdiv</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">floordiv</span><span class="p">)</span>
+	<span class="n">_op_tdiv</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">)</span>
+	<span class="n">_op_mod</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">)</span>
+	<span class="n">_op_mul</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">)</span>
+	<span class="n">_op_pow</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BitwiseExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BitwiseExpression">[docs]</a><span class="k">class</span> <span class="nc">BitwiseExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A class for representing bitwise arithmetic expressions from the grammar</span>
+<span class="sd">	text such as XOR and shifting operations.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,)</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
+	<span class="n">_reduce_literals</span> <span class="o">=</span> <span class="p">(</span><span class="n">FloatExpression</span><span class="p">,)</span>
+	<span class="k">def</span> <span class="nf">__op_bitwise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="n">_assert_is_natural_number</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="n">_assert_is_natural_number</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">left</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">right</span><span class="p">)))</span>
+
+	<span class="n">_op_bwand</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">)</span>
+	<span class="n">_op_bwor</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">)</span>
+	<span class="n">_op_bwxor</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">)</span>
+	<span class="n">_op_bwlsh</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">lshift</span><span class="p">)</span>
+	<span class="n">_op_bwrsh</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">rshift</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ComparisonExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ComparisonExpression">[docs]</a><span class="k">class</span> <span class="nc">ComparisonExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A class for representing comparison expressions from the grammar text such</span>
+<span class="sd">	as equality checks, and regular expression matching.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">_reduce_literals</span> <span class="o">=</span> <span class="p">(</span><span class="n">BooleanExpression</span><span class="p">,</span> <span class="n">FloatExpression</span><span class="p">,</span> <span class="n">StringExpression</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">__op_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">left</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">right</span><span class="p">))</span>
+
+	<span class="n">_op_ge</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">)</span>
+	<span class="n">_op_gt</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">)</span>
+	<span class="n">_op_le</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">)</span>
+	<span class="n">_op_lt</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">__op_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+	<span class="n">_op_eq</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_comparison</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">)</span>
+	<span class="n">_op_ne</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_comparison</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">__op_regex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_function</span><span class="p">,</span> <span class="n">modifier</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">left_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="n">right_regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_regex</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="n">match</span> <span class="o">=</span> <span class="n">regex_function</span><span class="p">(</span><span class="n">right_regex</span><span class="p">,</span> <span class="n">left_string</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">regex_flags</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">modifier</span><span class="p">(</span><span class="n">match</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+	<span class="n">_op_eq_rem</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_not</span><span class="p">)</span>
+	<span class="n">_op_eq_res</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_not</span><span class="p">)</span>
+	<span class="n">_op_ne_rem</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_</span><span class="p">)</span>
+	<span class="n">_op_ne_res</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogicExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LogicExpression">[docs]</a><span class="k">class</span> <span class="nc">LogicExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A class for representing logical expressions from the grammar text such as</span>
+<span class="sd">	as &quot;and&quot; and &quot;or&quot;.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">_reduce_literals</span> <span class="o">=</span> <span class="p">(</span><span class="n">BooleanExpression</span><span class="p">,</span> <span class="n">FloatExpression</span><span class="p">,</span> <span class="n">StringExpression</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">_op_and</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">))</span>
+
+	<span class="k">def</span> <span class="nf">_op_or</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">))</span></div>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Miscellaneous Expressions</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="SymbolExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.SymbolExpression">[docs]</a><span class="k">class</span> <span class="nc">SymbolExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A class representing a symbol name to be resolved at evaluation time with</span>
+<span class="sd">	the help of a :py:class:`~rule_engine.engine.Context` object.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,)</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">type_hint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str name: The name of the symbol. This will be resolved with a</span>
+<span class="sd">			given context object on the specified *thing*.</span>
+<span class="sd">		:param type_hint: An optional data type hint for this symbol. When set,</span>
+<span class="sd">			this is used by other nodes at parse time to determine if the symbol</span>
+<span class="sd">			is used in compatible operations.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+		<span class="k">if</span> <span class="n">type_hint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">type_hint</span>
+
+	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> name=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Statement"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Statement">[docs]</a><span class="k">class</span> <span class="nc">Statement</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;A class representing the top level statement of the grammar text.&quot;&quot;&quot;</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;expression&#39;</span><span class="p">,)</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expression</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param expression: The top level expression of the statement.</span>
+<span class="sd">		:type expression: :py:class:`~.ExpressionBase`</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span>
+
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expression</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TernaryExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.TernaryExpression">[docs]</a><span class="k">class</span> <span class="nc">TernaryExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A class for representing ternary expressions from the grammar text. These</span>
+<span class="sd">	involve evaluating :py:attr:`.condition` before evaluating either</span>
+<span class="sd">	:py:attr:`.case_true` or :py:attr:`.case_false` based on the results.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;condition&#39;</span><span class="p">,</span> <span class="s1">&#39;case_true&#39;</span><span class="p">,</span> <span class="s1">&#39;case_false&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">case_false</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param condition: The condition expression whose evaluation determines</span>
+<span class="sd">			whether the *case_true* or *case_false* expression is evaluated.</span>
+<span class="sd">		:param case_true: The expression that&#39;s evaluated when *condition* is</span>
+<span class="sd">			True.</span>
+<span class="sd">		:param case_false:The expression that&#39;s evaluated when *condition* is</span>
+<span class="sd">			False.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">condition</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">case_true</span> <span class="o">=</span> <span class="n">case_true</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">case_false</span> <span class="o">=</span> <span class="n">case_false</span>
+
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">case</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">case_true</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">case_false</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">case</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
+			<span class="n">reduced_condition</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">reduced_condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+			<span class="k">if</span> <span class="n">reduced_condition</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">:</span>
+				<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">case_true</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span> <span class="k">if</span> <span class="n">reduced_condition</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">case_false</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UnaryExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.UnaryExpression">[docs]</a><span class="k">class</span> <span class="nc">UnaryExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_evaluator&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str type_: The grammar type of operator to the left of the</span>
+<span class="sd">			expression.</span>
+<span class="sd">		:param right: The expression to the right of the operator.</span>
+<span class="sd">		:type right: :py:class:`~.ExpressionBase`</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">type_</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_evaluator</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_op_&#39;</span> <span class="o">+</span> <span class="n">type_</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
+
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluator</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">__op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">)</span>
+		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+
+	<span class="n">_op_uminus</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;uminus&#39;</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="p">(</span><span class="n">FloatExpression</span><span class="p">,)):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">FloatExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Spencer McIntyre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

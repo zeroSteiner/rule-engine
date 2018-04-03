@@ -1,0 +1,521 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rule_engine.parser &mdash; Rule Engine 0.9 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Rule Engine 0.9 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Rule Engine
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rule Engine</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>rule_engine.parser</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rule_engine.parser</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  rule_engine/parser.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">ast</span> <span class="k">as</span> <span class="nn">ast_</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">ast</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">errors</span>
+
+<span class="kn">import</span> <span class="nn">ply.lex</span> <span class="k">as</span> <span class="nn">lex</span>
+<span class="kn">import</span> <span class="nn">ply.yacc</span> <span class="k">as</span> <span class="nn">yacc</span>
+
+<span class="n">literal_eval</span> <span class="o">=</span> <span class="n">ast_</span><span class="o">.</span><span class="n">literal_eval</span>
+
+<div class="viewcode-block" id="ParserBase"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.engine.ParserBase">[docs]</a><span class="k">class</span> <span class="nc">ParserBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A base class for parser objects to inherit from. This does not provide any</span>
+<span class="sd">	grammar related definitions.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">precedence</span> <span class="o">=</span> <span class="p">()</span>
+	<span class="sd">&quot;&quot;&quot;The precedence for operators.&quot;&quot;&quot;</span>
+	<span class="n">tokens</span> <span class="o">=</span> <span class="p">()</span>
+	<span class="n">reserved_words</span> <span class="o">=</span> <span class="p">{}</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A mapping of literal words which are reserved to their corresponding grammar</span>
+<span class="sd">	names.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">__mutex</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+<div class="viewcode-block" id="ParserBase.__init__"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.engine.ParserBase.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param bool debug: Whether or not to enable debugging features when</span>
+<span class="sd">			using the ply API.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="c1"># Build the lexer and parser</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_lexer</span> <span class="o">=</span> <span class="n">lex</span><span class="o">.</span><span class="n">lex</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_parser</span> <span class="o">=</span> <span class="n">yacc</span><span class="o">.</span><span class="n">yacc</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">write_tables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ParserBase.parse"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.engine.ParserBase.parse">[docs]</a>	<span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Parse the specified text in an abstract syntax tree of nodes that can</span>
+<span class="sd">		later be evaluated.</span>
+
+<span class="sd">		:param str text: The grammar text to parse into an AST.</span>
+<span class="sd">		:param context: A context for specifying parsing and evaluation options.</span>
+<span class="sd">		:type context: :py:class:`~rule_engine.engine.Context`</span>
+<span class="sd">		:return: The parsed AST statement.</span>
+<span class="sd">		:rtype: :py:class:`~rule_engine.ast.Statement`</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;lexer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;lexer&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lexer</span><span class="p">)</span>
+		<span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mutex</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+			<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="k">return</span> <span class="n">result</span></div></div>
+
+<div class="viewcode-block" id="Parser"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.engine.Parser">[docs]</a><span class="k">class</span> <span class="nc">Parser</span><span class="p">(</span><span class="n">ParserBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	The parser class for the rule grammar. This class contains many ply specific</span>
+<span class="sd">	members to define the various components of the grammar allowing it to be</span>
+<span class="sd">	parsed and reduced into an abstract syntax tree (AST). Once the AST has been</span>
+<span class="sd">	constructed it can then be evaluated multiple times. To make the evaluation</span>
+<span class="sd">	more efficient, nodes within the AST that are able to be reduced are while</span>
+<span class="sd">	the parsing is taking place. This reduction phase involves evaluation,</span>
+<span class="sd">	causing :py:exc:`~rule_engine.errors.EvaluationError` exceptions to be</span>
+<span class="sd">	raised during parsing.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">op_names</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="c1"># arithmetic operators</span>
+		<span class="s1">&#39;+&#39;</span><span class="p">:</span>   <span class="s1">&#39;ADD&#39;</span><span class="p">,</span>   <span class="s1">&#39;-&#39;</span><span class="p">:</span>  <span class="s1">&#39;SUB&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;**&#39;</span><span class="p">:</span>  <span class="s1">&#39;POW&#39;</span><span class="p">,</span>   <span class="s1">&#39;*&#39;</span><span class="p">:</span>  <span class="s1">&#39;MUL&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;/&#39;</span><span class="p">:</span>   <span class="s1">&#39;TDIV&#39;</span><span class="p">,</span>  <span class="s1">&#39;//&#39;</span><span class="p">:</span> <span class="s1">&#39;FDIV&#39;</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">:</span> <span class="s1">&#39;MOD&#39;</span><span class="p">,</span>
+		<span class="c1"># bitwise operators</span>
+		<span class="s1">&#39;&amp;&#39;</span><span class="p">:</span>   <span class="s1">&#39;BWAND&#39;</span><span class="p">,</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>  <span class="s1">&#39;BWOR&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">:</span> <span class="s1">&#39;BWXOR&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;&lt;&lt;&#39;</span><span class="p">:</span>  <span class="s1">&#39;BWLSH&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;BWRSH&#39;</span><span class="p">,</span>
+		<span class="c1"># comparison operators</span>
+		<span class="s1">&#39;==&#39;</span><span class="p">:</span>  <span class="s1">&#39;EQ&#39;</span><span class="p">,</span>    <span class="s1">&#39;=~&#39;</span><span class="p">:</span> <span class="s1">&#39;EQ_REM&#39;</span><span class="p">,</span> <span class="s1">&#39;=~~&#39;</span><span class="p">:</span> <span class="s1">&#39;EQ_RES&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;!=&#39;</span><span class="p">:</span>  <span class="s1">&#39;NE&#39;</span><span class="p">,</span>    <span class="s1">&#39;!~&#39;</span><span class="p">:</span> <span class="s1">&#39;NE_REM&#39;</span><span class="p">,</span> <span class="s1">&#39;!~~&#39;</span><span class="p">:</span> <span class="s1">&#39;NE_RES&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>   <span class="s1">&#39;GT&#39;</span><span class="p">,</span>    <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;&lt;&#39;</span><span class="p">:</span>   <span class="s1">&#39;LT&#39;</span><span class="p">,</span>    <span class="s1">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span>
+		<span class="c1"># logical operators</span>
+		<span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="s1">&#39;AND&#39;</span><span class="p">,</span>   <span class="s1">&#39;or&#39;</span><span class="p">:</span> <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="n">reserved_words</span> <span class="o">=</span> <span class="p">{</span>
+		<span class="s1">&#39;and&#39;</span><span class="p">:</span>   <span class="s1">&#39;AND&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;or&#39;</span><span class="p">:</span>    <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;true&#39;</span><span class="p">:</span>  <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;false&#39;</span><span class="p">:</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span>
+	<span class="p">}</span>
+	<span class="n">tokens</span> <span class="o">=</span> <span class="p">(</span>
+		<span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span> <span class="s1">&#39;STRING&#39;</span><span class="p">,</span> <span class="s1">&#39;SYMBOL&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;LPAREN&#39;</span><span class="p">,</span> <span class="s1">&#39;RPAREN&#39;</span><span class="p">,</span> <span class="s1">&#39;QMARK&#39;</span><span class="p">,</span> <span class="s1">&#39;COLON&#39;</span>
+	<span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">reserved_words</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">op_names</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
+
+	<span class="n">t_ignore</span> <span class="o">=</span> <span class="s1">&#39; </span><span class="se">\t</span><span class="s1">&#39;</span>
+	<span class="c1"># Tokens</span>
+	<span class="n">t_BWAND</span>            <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\&amp;&#39;</span>
+	<span class="n">t_BWOR</span>             <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\|&#39;</span>
+	<span class="n">t_BWXOR</span>            <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\^&#39;</span>
+	<span class="n">t_LPAREN</span>           <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\(&#39;</span>
+	<span class="n">t_RPAREN</span>           <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\)&#39;</span>
+	<span class="n">t_EQ</span>               <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;==&#39;</span>
+	<span class="n">t_NE</span>               <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;!=&#39;</span>
+	<span class="n">t_QMARK</span>            <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\?&#39;</span>
+	<span class="n">t_COLON</span>            <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\:&#39;</span>
+	<span class="n">t_ADD</span>              <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\+&#39;</span>
+	<span class="n">t_SUB</span>              <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\-&#39;</span>
+	<span class="n">t_MOD</span>              <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\%&#39;</span>
+	<span class="n">t_FLOAT</span>            <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?|\.[0-9]+&#39;</span>
+	<span class="n">t_STRING</span>           <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?P&lt;quote&gt;[&quot;</span><span class="se">\&#39;</span><span class="s1">])([^</span><span class="se">\\</span><span class="s1">\n]|(</span><span class="se">\\</span><span class="s1">.))*?(?P=quote)&#39;</span>
+
+	<span class="c1"># tokens are listed from lowest to highest precedence, ones that appear</span>
+	<span class="c1"># later are effectively evaluated first</span>
+	<span class="c1"># see: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages</span>
+	<span class="n">precedence</span> <span class="o">=</span> <span class="p">(</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;OR&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;AND&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWOR&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWXOR&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWAND&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>    <span class="s1">&#39;QMARK&#39;</span><span class="p">,</span> <span class="s1">&#39;COLON&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;nonassoc&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ&#39;</span><span class="p">,</span> <span class="s1">&#39;NE&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_REM&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_RES&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_REM&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_RES&#39;</span><span class="p">,</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span> <span class="s1">&#39;GT&#39;</span><span class="p">,</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">),</span>  <span class="c1"># Nonassociative operators</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;ADD&#39;</span><span class="p">,</span> <span class="s1">&#39;SUB&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWLSH&#39;</span><span class="p">,</span> <span class="s1">&#39;BWRSH&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;MUL&#39;</span><span class="p">,</span> <span class="s1">&#39;TDIV&#39;</span><span class="p">,</span> <span class="s1">&#39;FDIV&#39;</span><span class="p">,</span> <span class="s1">&#39;MOD&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;POW&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>    <span class="s1">&#39;UMINUS&#39;</span><span class="p">),</span>
+	<span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">t_POW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;\*\*?&#39;</span>
+		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;MUL&#39;</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_FDIV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;\/\/?&#39;</span>
+		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;TDIV&#39;</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_LT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;&lt;([=&lt;])?&#39;</span>
+		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&lt;&#39;</span><span class="p">:</span> <span class="s1">&#39;LT&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&lt;&#39;</span><span class="p">:</span> <span class="s1">&#39;BWLSH&#39;</span><span class="p">}[</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_GT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;&gt;([=&gt;])?&#39;</span>
+		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;GT&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;BWRSH&#39;</span><span class="p">}[</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_EQ_RES</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;=~~?&#39;</span>
+		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;=~&#39;</span><span class="p">:</span>
+			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;EQ_REM&#39;</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_NE_RES</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;!~~?&#39;</span>
+		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;!~&#39;</span><span class="p">:</span>
+			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;NE_REM&#39;</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_SYMBOL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;[a-zA-Z_][a-zA-Z0-9_]*&#39;</span>
+		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved_words</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;SYMBOL&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_newline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;\n+&#39;</span>
+		<span class="n">t</span><span class="o">.</span><span class="n">lexer</span><span class="o">.</span><span class="n">lineno</span> <span class="o">+=</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">t_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s2">&quot;syntax error (illegal character </span><span class="si">{0!r}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span>
+
+	<span class="c1"># Parsing Rules</span>
+	<span class="k">def</span> <span class="nf">p_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s1">&#39;syntax error&#39;</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">p_statement_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="s1">&#39;statement : expression&#39;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Statement</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_ternary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : expression QMARK expression COLON expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">condition</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">case_false</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">TernaryExpression</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">case_false</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : expression ADD    expression</span>
+<span class="sd">				   | expression SUB    expression</span>
+<span class="sd">				   | expression MOD    expression</span>
+<span class="sd">				   | expression MUL    expression</span>
+<span class="sd">				   | expression FDIV   expression</span>
+<span class="sd">				   | expression TDIV   expression</span>
+<span class="sd">				   | expression POW    expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticExpression</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_bitwise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : expression BWAND  expression</span>
+<span class="sd">				   | expression BWOR   expression</span>
+<span class="sd">				   | expression BWXOR  expression</span>
+<span class="sd">				   | expression BWLSH  expression</span>
+<span class="sd">				   | expression BWRSH  expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BitwiseExpression</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : expression EQ     expression</span>
+<span class="sd">				   | expression NE     expression</span>
+<span class="sd">				   | expression GT     expression</span>
+<span class="sd">				   | expression GE     expression</span>
+<span class="sd">				   | expression LT     expression</span>
+<span class="sd">				   | expression LE     expression</span>
+<span class="sd">				   | expression EQ_REM expression</span>
+<span class="sd">				   | expression EQ_RES expression</span>
+<span class="sd">				   | expression NE_REM expression</span>
+<span class="sd">				   | expression NE_RES expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ComparisonExpression</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : expression AND    expression</span>
+<span class="sd">				   | expression OR     expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">LogicExpression</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="s1">&#39;expression : LPAREN expression RPAREN&#39;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="s1">&#39;expression : SYMBOL&#39;</span>
+		<span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">SymbolExpression</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">type_hint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">name</span><span class="p">))</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_uminus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="s1">&#39;expression : SUB expression %prec UMINUS&#39;</span>
+		<span class="n">names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;-&#39;</span><span class="p">:</span> <span class="s1">&#39;UMINUS&#39;</span><span class="p">}</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="c1"># Literal expressions</span>
+	<span class="k">def</span> <span class="nf">p_expression_boolean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : TRUE</span>
+<span class="sd">				   | FALSE</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="s1">&#39;expression : FLOAT&#39;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">FloatExpression</span><span class="p">(</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="s1">&#39;expression : STRING&#39;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">StringExpression</span><span class="p">(</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Spencer McIntyre.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

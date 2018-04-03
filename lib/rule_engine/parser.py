@@ -42,11 +42,24 @@ import ply.yacc as yacc
 literal_eval = ast_.literal_eval
 
 class ParserBase(object):
+	"""
+	A base class for parser objects to inherit from. This does not provide any
+	grammar related definitions.
+	"""
 	precedence = ()
+	"""The precedence for operators."""
 	tokens = ()
 	reserved_words = {}
+	"""
+	A mapping of literal words which are reserved to their corresponding grammar
+	names.
+	"""
 	__mutex = threading.Lock()
 	def __init__(self, debug=False):
+		"""
+		:param bool debug: Whether or not to enable debugging features when
+			using the ply API.
+		"""
 		self.debug = debug
 		self.context = None
 		# Build the lexer and parser
@@ -54,14 +67,34 @@ class ParserBase(object):
 		self._parser = yacc.yacc(module=self, debug=self.debug, write_tables=self.debug)
 
 	def parse(self, text, context, **kwargs):
+		"""
+		Parse the specified text in an abstract syntax tree of nodes that can
+		later be evaluated.
+
+		:param str text: The grammar text to parse into an AST.
+		:param context: A context for specifying parsing and evaluation options.
+		:type context: :py:class:`~rule_engine.engine.Context`
+		:return: The parsed AST statement.
+		:rtype: :py:class:`~rule_engine.ast.Statement`
+		"""
 		kwargs['lexer'] = kwargs.pop('lexer', self._lexer)
 		with self.__mutex:
 			self.context = context
-			result =  self._parser.parse(text, **kwargs)
+			result = self._parser.parse(text, **kwargs)
 			self.context = None
 		return result
 
 class Parser(ParserBase):
+	"""
+	The parser class for the rule grammar. This class contains many ply specific
+	members to define the various components of the grammar allowing it to be
+	parsed and reduced into an abstract syntax tree (AST). Once the AST has been
+	constructed it can then be evaluated multiple times. To make the evaluation
+	more efficient, nodes within the AST that are able to be reduced are while
+	the parsing is taking place. This reduction phase involves evaluation,
+	causing :py:exc:`~rule_engine.errors.EvaluationError` exceptions to be
+	raised during parsing.
+	"""
 	op_names = {
 		# arithmetic operators
 		'+':   'ADD',   '-':  'SUB',

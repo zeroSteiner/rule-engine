@@ -10,8 +10,10 @@ Welcome to Rule Engine's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   rule_engine/ast.rst
    rule_engine/engine.rst
    rule_engine/errors.rst
+   rule_engine/parser.rst
 
 Indices and tables
 ==================

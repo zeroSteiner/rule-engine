@@ -56,7 +56,9 @@ def is_natural_number(value):
 def is_real_number(value):
 	"""
 	Check whether *value* is a real number (i.e. capable of being represented as
-	a floating point value with lose of information.
+	a floating point value without lose of information). Despite being able to
+	be represented as a float, ``NaN`` is not considered a real number for the
+	purposes of this function.
 
 	:param value: The value to check. This value is a native Python type.
 	:return: Whether or not the value is a natural number.
@@ -65,6 +67,8 @@ def is_real_number(value):
 	if not isinstance(value, (int, float)):
 		return False
 	if isinstance(value, bool):
+		return False
+	if value == float('nan'):
 		return False
 	return True
 
@@ -77,12 +81,29 @@ def _assert_is_real_number(value):
 		raise errors.EvaluationError('data type mismatch')
 
 class DataType(enum.Enum):
+	"""
+	A collection of constants representing the different supported data types.
+	"""
 	BOOLEAN = bool
 	FLOAT = float
 	STRING = str
 	UNDEFINED = None
+	"""
+	Undefined values. This constant can be used to indicate that a particular
+	symbol is valid, but it's data type is currently unknown.
+	"""
 	@classmethod
 	def from_value(cls, value):
+		"""
+		Get the supported data type constant for the specified Python value. If
+		the value can not be mapped to a supported data type, then a
+		:py:exc:`TypeError` exception will be raised. This function will not
+		return :py:attr:`.UNDEFINED`.
+
+		:param value: The native Python type to retrieve the corresponding data
+			type constant for.
+		:return: One of the constants.
+		"""
 		if isinstance(value, bool):
 			return cls.BOOLEAN
 		elif isinstance(value, (float, int)):
@@ -96,23 +117,58 @@ class DataType(enum.Enum):
 ################################################################################
 class ExpressionBase(object):
 	result_type = DataType.UNDEFINED
+	"""The data type of the result of successful evaluation."""
 	def __repr__(self):
 		return "<{0} >".format(self.__class__.__name__)
 
 	def evaluate(self, context, thing):
+		"""
+		Evaluate this AST node and all applicable children nodes.
+
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`rule_engine.engine.Context`
+		:param thing: The object to use for symbol resolution.
+		:return: The result of the evaluation as a native Python type.
+		:rtype:
+		"""
 		raise NotImplementedError()
 
 	def reduce(self):
+		"""
+		Reduce this expression into a smaller subset of nodes. If the expression
+		can not be reduced, then return an instance of itself, otherwise return
+		a reduced :py:class:`.ExpressionBase` to replace it.
+
+		:return: Either a reduced version of this node or itself.
+		:rtype: :py:class:`.ExpressionBase`
+		"""
 		return self
 
 class LeftOperatorRightExpressionBase(ExpressionBase):
 	__slots__ = ('_evaluator', 'type', 'left', 'right')
 	compatible_types = (DataType.BOOLEAN, DataType.FLOAT, DataType.STRING)
+	"""
+	A tuple containing the compatible data types that the left and right
+	expressions must return. This can for example be used to indicate that
+	arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but
+	not :py:attr:`.DataType.STRING` values.
+	"""
 	result_type = DataType.BOOLEAN
 	_reduce_literals = ()
 	def __init__(self, type_, left, right):
+		"""
+		:param str type_: The grammar type of operator at the center of the
+			expression. Subclasses must define operator methods to handle
+			evaluation based on this value.
+		:param left: The expression to the left of the operator.
+		:type left: :py:class:`.ExpressionBase`
+		:param right: The expression to the right of the operator.
+		:type right: :py:class:`.ExpressionBase`
+		"""
 		self.type = type_
-		self._evaluator = getattr(self, '_op_' + type_.lower())
+		self._evaluator = getattr(self, '_op_' + type_.lower(), None)
+		if self._evaluator is None:
+			raise errors.EngineError('unsupported operator: ' + type_)
 		self.left = left
 		if self.left.result_type is not DataType.UNDEFINED:
 			if self.left.result_type not in self.compatible_types:
@@ -126,23 +182,24 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		return self._evaluator(context, thing)
 
 	def reduce(self):
-		if not isinstance(self.left, LiteralExpression):
+		if not isinstance(self.left, LiteralExpressionBase):
 			return self
 		if not isinstance(self.left, self._reduce_literals):
 			raise errors.EvaluationError('data type mismatch')
-		if not isinstance(self.right, LiteralExpression):
+		if not isinstance(self.right, LiteralExpressionBase):
 			return self
 		if not isinstance(self.right, self._reduce_literals):
 			raise errors.EvaluationError('data type mismatch')
 		primary_literal = self._reduce_literals[0]
 		return primary_literal(self.evaluate(None, None))
 
-################################################################################
-# Literal Expressions
-################################################################################
-class LiteralExpression(ExpressionBase):
+class LiteralExpressionBase(ExpressionBase):
+	"""A base class for representing literal values from the grammar text."""
 	__slots__ = ('value',)
 	def __init__(self, value):
+		"""
+		:param value: The native Python value.
+		"""
 		self.value = self.result_type.value(value)
 
 	def __repr__(self):
@@ -151,19 +208,29 @@ class LiteralExpression(ExpressionBase):
 	def evaluate(self, context, thing):
 		return self.value
 
-class BooleanExpression(LiteralExpression):
+################################################################################
+# Literal Expressions
+################################################################################
+class BooleanExpression(LiteralExpressionBase):
+	"""Literal boolean expressions representing True or False."""
 	result_type = DataType.BOOLEAN
 
-class FloatExpression(LiteralExpression):
+class FloatExpression(LiteralExpressionBase):
+	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
 
-class StringExpression(LiteralExpression):
+class StringExpression(LiteralExpressionBase):
+	"""Literal string expressions representing an array of characters."""
 	result_type = DataType.STRING
 
 ################################################################################
 # Left-Operator-Right Expressions
 ################################################################################
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
+	"""
+	A class for representing arithmetic expressions from the grammar text such
+	as addition and subtraction.
+	"""
 	compatible_types = (DataType.FLOAT,)
 	result_type = DataType.FLOAT
 	_reduce_literals = (FloatExpression,)
@@ -183,6 +250,10 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	_op_pow  = functools.partialmethod(__op_arithmetic, math.pow)
 
 class BitwiseExpression(LeftOperatorRightExpressionBase):
+	"""
+	A class for representing bitwise arithmetic expressions from the grammar
+	text such as XOR and shifting operations.
+	"""
 	compatible_types = (DataType.FLOAT,)
 	result_type = DataType.FLOAT
 	_reduce_literals = (FloatExpression,)
@@ -200,6 +271,10 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	_op_bwrsh = functools.partialmethod(__op_bitwise, operator.rshift)
 
 class ComparisonExpression(LeftOperatorRightExpressionBase):
+	"""
+	A class for representing comparison expressions from the grammar text such
+	as equality checks, and regular expression matching.
+	"""
 	_reduce_literals = (BooleanExpression, FloatExpression, StringExpression)
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
@@ -237,6 +312,10 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	_op_ne_res = functools.partialmethod(__op_regex, re.search, operator.is_)
 
 class LogicExpression(LeftOperatorRightExpressionBase):
+	"""
+	A class for representing logical expressions from the grammar text such as
+	as "and" and "or".
+	"""
 	_reduce_literals = (BooleanExpression, FloatExpression, StringExpression)
 	def _op_and(self, context, thing):
 		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
@@ -247,9 +326,48 @@ class LogicExpression(LeftOperatorRightExpressionBase):
 ################################################################################
 # Miscellaneous Expressions
 ################################################################################
+class SymbolExpression(ExpressionBase):
+	"""
+	A class representing a symbol name to be resolved at evaluation time with
+	the help of a :py:class:`~rule_engine.engine.Context` object.
+	"""
+	__slots__ = ('name',)
+	def __init__(self, name, type_hint=None):
+		self.name = name
+		if type_hint is not None:
+			self.result_type = type_hint
+
+	def __repr__(self):
+		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
+
+	def evaluate(self, context, thing):
+		return context.resolve(thing, self.name)
+
+class Statement(object):
+	"""A class representing the top level statement of the grammar text."""
+	__slots__ = ('expression',)
+	def __init__(self, expression):
+		self.expression = expression
+
+	def evaluate(self, context, thing):
+		return self.expression.evaluate(context, thing)
+
 class TernaryExpression(ExpressionBase):
+	"""
+	A class for representing ternary expressions from the grammar text. These
+	involve evaluating :py:attr:`.condition` before evaluating either
+	:py:attr:`.case_true` or :py:attr:`.case_false` based on the results.
+	"""
 	__slots__ = ('condition', 'case_true', 'case_false')
 	def __init__(self, condition, case_true, case_false):
+		"""
+		:param condition: The condition expression whose evaluation determines
+			whether the *case_true* or *case_false* expression is evaluated.
+		:param case_true: The expression that's evaluated when *condition* is
+			True.
+		:param case_false:The expression that's evaluated when *condition* is
+			False.
+		"""
 		self.condition = condition
 		self.case_true = case_true
 		self.case_false = case_false
@@ -259,7 +377,7 @@ class TernaryExpression(ExpressionBase):
 		return case.evaluate(context, thing)
 
 	def reduce(self):
-		if isinstance(self.condition, LiteralExpression):
+		if isinstance(self.condition, LiteralExpressionBase):
 			reduced_condition = bool(self.condition.value)
 		else:
 			reduced_condition = self.condition.reduce()
@@ -287,29 +405,8 @@ class UnaryExpression(ExpressionBase):
 	def reduce(self):
 		if not self.type.lower() == 'uminus':
 			raise NotImplementedError()
-		if not isinstance(self.right, LiteralExpression):
+		if not isinstance(self.right, LiteralExpressionBase):
 			return self
 		if not isinstance(self.right, (FloatExpression,)):
 			raise errors.EvaluationError('data type mismatch')
 		return FloatExpression(self.evaluate(None, None))
-
-class SymbolExpression(ExpressionBase):
-	__slots__ = ('name',)
-	def __init__(self, name, type_hint=None):
-		self.name = name
-		if type_hint is not None:
-			self.result_type = type_hint
-
-	def __repr__(self):
-		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
-
-	def evaluate(self, context, thing):
-		return context.resolve(thing, self.name)
-
-class Statement(object):
-	__slots__ = ('expression',)
-	def __init__(self, expression):
-		self.expression = expression
-
-	def evaluate(self, context, thing):
-		return self.expression.evaluate(context, thing)

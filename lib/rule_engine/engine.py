@@ -83,8 +83,8 @@ def type_resolver_from_dict(dictionary):
 	:py:class:`.Context` instance from a dictionary. If any of the values within
 	the dictionary are not of a compatible data type, a :py:exc:`TypeError` will
 	be raised. Additionally the resulting function will raise a
-	:py:exc:`~errors.SymbolResolutionError` if the symbol name does not exist
-	within the dictionary.
+	:py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol name does
+	not exist within the dictionary.
 
 	:param dict dictionary: A dictionary (or any other object which supports the
 		:py:class:`~collections.abc.Mapping` interface) from which to create the

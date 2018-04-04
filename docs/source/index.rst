@@ -10,6 +10,7 @@ The source code is available on the `GitHub homepage`_.
    :maxdepth: 2
    :caption: Contents:
 
+   grammar.rst
    rule_engine/index.rst
 
 Indices and tables

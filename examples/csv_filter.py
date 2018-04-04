@@ -52,7 +52,7 @@ def main():
 	parser.add_argument('rule', help='the rule to apply')
 	arguments = parser.parse_args()
 
-	context = rule_engine.Context(resolver= resolve_item)
+	context = rule_engine.Context(resolver=resolve_item)
 	try:
 		rule = rule_engine.Rule(arguments.rule, context=context)
 	except rule_engine.RuleSyntaxError as error:
@@ -63,6 +63,7 @@ def main():
 	csv_writer = csv.DictWriter(sys.stdout, csv_reader.fieldnames, dialect=csv_reader.dialect)
 	for row in rule.filter(csv_reader):
 		csv_writer.writerow(row)
+	return 0
 
 if __name__ == '__main__':
-	main()
+	sys.exit(main())

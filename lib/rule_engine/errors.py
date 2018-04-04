@@ -69,6 +69,9 @@ class SymbolResolutionError(EvaluationError):
 	An error raised when a symbol name is not able to be resolved to a value.
 	"""
 	def __init__(self, symbol_name):
+		"""
+		:param str symbol_name: The name of the symbol that can not be resolved.
+		"""
 		self.symbol_name = symbol_name
 		"""The name of the symbol that can not be resolved."""
 		super(SymbolResolutionError, self).__init__('unknown symbol: ' + symbol_name)

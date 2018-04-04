@@ -154,7 +154,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A tuple containing the compatible data types that the left and right
 	expressions must return. This can for example be used to indicate that
 	arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but
-	not :py:attr:`.DataType.STRING` values.
+	not :py:attr:`~.DataType.STRING` values.
 	"""
 	result_type = DataType.BOOLEAN
 	_reduce_literals = ()

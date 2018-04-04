@@ -4,6 +4,8 @@ This project provides a library for creating general purpose "Rule" objects from
 a logical expression which can then be applied to arbitrary objects to evaluate
 whether or not they match.
 
+Documentation is available at https://zeroSteiner.github.io/rule-engine/.
+
 Example
 -------
 

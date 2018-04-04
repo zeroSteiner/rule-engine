@@ -1,5 +1,5 @@
-Rule Engine
-===========
+Rule Engine Documentation
+=========================
 This project provides a library for creating general purpose "Rule" objects from
 a logical expression which can then be applied to arbitrary objects to evaluate
 whether or not they match.

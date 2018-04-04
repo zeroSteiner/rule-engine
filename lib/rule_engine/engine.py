@@ -159,7 +159,7 @@ class Rule(object):
 	"""
 	parser = parser.Parser()
 	"""
-	The :py:class:`rule_engine.parser.Parser` instance that will be used for
+	The :py:class:`~rule_engine.parser.Parser` instance that will be used for
 	parsing the rule text into a compatible abstract syntax tree (AST) for
 	evaluation.
 	"""
@@ -203,6 +203,7 @@ class Rule(object):
 			:py:meth:`.__init__` method. This can be used for specifying symbol
 			type information.
 		:return: Whether or not the expression is well formed and appears valid.
+		:rtype: bool
 		"""
 		try:
 			cls.pparser.parse(text, (context or Context()))

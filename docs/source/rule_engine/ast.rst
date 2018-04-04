@@ -46,11 +46,16 @@ Base Classes
 
 .. autoclass:: rule_engine.ast.LeftOperatorRightExpressionBase
    :show-inheritance:
-   :special-members: __init__
+
+   .. autoattribute:: compatible_types
+      :annotation:
+
+   .. automethod:: __init__
 
 .. autoclass:: rule_engine.ast.LiteralExpressionBase
    :show-inheritance:
-   :special-members: __init__
+
+   .. automethod:: __init__
 
 Left-Operator-Right Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,13 +76,13 @@ Left-Operator-Right Expressions
    :show-inheritance:
 
    .. autoattribute:: result_type
-      :annotation: = STRING
+      :annotation: = BOOLEAN
 
 .. autoclass:: rule_engine.ast.LogicExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
-      :annotation: = STRING
+      :annotation: = BOOLEAN
 
 Literal Expressions
 ~~~~~~~~~~~~~~~~~~~

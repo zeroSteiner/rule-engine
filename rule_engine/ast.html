@@ -323,6 +323,35 @@ a reduced <a class="reference internal" href="#rule_engine.ast.ExpressionBase" t
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A base class for representing complex expressions composed of a left side
 and a right side, separated by an operator.</p>
+<dl class="attribute">
+<dt id="rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types">
+<code class="descname">compatible_types</code><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple containing the compatible data types that the left and right
+expressions must return. This can for example be used to indicate that
+arithmetic operations are compatible with <a class="reference internal" href="#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a> but
+not <a class="reference internal" href="#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> values.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="rule_engine.ast.LeftOperatorRightExpressionBase.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The grammar type of operator at the center of the
+expression. Subclasses must define operator methods to handle
+evaluation based on this value.</li>
+<li><strong>left</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the left of the operator.</li>
+<li><strong>right</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the right of the operator.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -330,6 +359,19 @@ and a right side, separated by an operator.</p>
 <em class="property">class </em><code class="descname">LiteralExpressionBase</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A base class for representing literal values from the grammar text.</p>
+<dl class="method">
+<dt id="rule_engine.ast.LiteralExpressionBase.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> – The native Python value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -369,7 +411,7 @@ text such as XOR and shifting operations.</p>
 as equality checks, and regular expression matching.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.ComparisonExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = STRING</em><a class="headerlink" href="#rule_engine.ast.ComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.ComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -382,7 +424,7 @@ as equality checks, and regular expression matching.</p>
 as “and” and “or”.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.LogicExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = STRING</em><a class="headerlink" href="#rule_engine.ast.LogicExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.LogicExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

@@ -87,6 +87,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../grammar.html">Grammar</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 </ul>
 
@@ -313,7 +314,7 @@
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">()</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	The :py:class:`rule_engine.parser.Parser` instance that will be used for</span>
+<span class="sd">	The :py:class:`~rule_engine.parser.Parser` instance that will be used for</span>
 <span class="sd">	parsing the rule text into a compatible abstract syntax tree (AST) for</span>
 <span class="sd">	evaluation.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -357,6 +358,7 @@
 <span class="sd">			:py:meth:`.__init__` method. This can be used for specifying symbol</span>
 <span class="sd">			type information.</span>
 <span class="sd">		:return: Whether or not the expression is well formed and appears valid.</span>
+<span class="sd">		:rtype: bool</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">try</span><span class="p">:</span>
 			<span class="bp">cls</span><span class="o">.</span><span class="n">pparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="p">(</span><span class="n">context</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">()))</span>

@@ -87,6 +87,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../grammar.html">Grammar</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 </ul>
 
@@ -223,6 +224,9 @@
 <span class="sd">	An error raised when a symbol name is not able to be resolved to a value.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="SymbolResolutionError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str symbol_name: The name of the symbol that can not be resolved.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">symbol_name</span> <span class="o">=</span> <span class="n">symbol_name</span>
 		<span class="sd">&quot;&quot;&quot;The name of the symbol that can not be resolved.&quot;&quot;&quot;</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">SymbolResolutionError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;unknown symbol: &#39;</span> <span class="o">+</span> <span class="n">symbol_name</span><span class="p">)</span></div></div>

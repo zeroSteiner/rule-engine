@@ -351,7 +351,11 @@ class SymbolExpression(ExpressionBase):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
 	def evaluate(self, context, thing):
-		return context.resolve(thing, self.name)
+		value = context.resolve(thing, self.name)
+		# use DataType.from_value to raise a TypeError if value is not of a
+		# compatible data type
+		DataType.from_value(value)
+		return value
 
 class Statement(object):
 	"""A class representing the top level statement of the grammar text."""

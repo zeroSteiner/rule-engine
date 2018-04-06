@@ -53,9 +53,11 @@ def resolve_attribute(thing, name):
 	:param str name: The symbol name that is being resolved.
 	:return: The value for the corresponding attribute *name*.
 	"""
-	if not hasattr(thing, name):
-		raise errors.SymbolResolutionError(name)
-	return getattr(thing, name)
+	for name_part in name.split('.'):
+		if not hasattr(thing, name_part):
+			raise errors.SymbolResolutionError(name_part)
+		thing = getattr(thing, name_part)
+	return thing
 
 def resolve_item(thing, name):
 	"""

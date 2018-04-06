@@ -192,7 +192,7 @@ class Parser(ParserBase):
 		return t
 
 	def t_SYMBOL(self, t):
-		r'[a-zA-Z_][a-zA-Z0-9_]*'
+		r'[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*'
 		t.type = self.reserved_words.get(t.value, 'SYMBOL')
 		return t
 

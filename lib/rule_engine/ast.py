@@ -421,16 +421,26 @@ class UnaryExpression(ExpressionBase):
 
 	def __op(self, op, context, thing):
 		right = self.right.evaluate(context, thing)
+		return op(right)
+
+	_op_not = functools.partialmethod(__op, operator.not_)
+
+	def __op_arithmetic(self, op, context, thing):
+		right = self.right.evaluate(context, thing)
 		_assert_is_real_number(right)
 		return op(right)
 
-	_op_uminus = functools.partialmethod(__op, operator.neg)
+	_op_uminus = functools.partialmethod(__op_arithmetic, operator.neg)
 
 	def reduce(self):
-		if not self.type.lower() == 'uminus':
+		type_ = self.type.lower()
+		if type_ not in ('not', 'uminus'):
 			raise NotImplementedError()
 		if not isinstance(self.right, LiteralExpressionBase):
 			return self
-		if not isinstance(self.right, (FloatExpression,)):
-			raise errors.EvaluationError('data type mismatch')
-		return FloatExpression(self.evaluate(None, None))
+		if type_ == 'not':
+			return BooleanExpression(self.evaluate(None, None))
+		elif type_ == 'uminus':
+			if not isinstance(self.right, (FloatExpression,)):
+				raise errors.EvaluationError('data type mismatch')
+			return FloatExpression(self.evaluate(None, None))

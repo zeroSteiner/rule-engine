@@ -114,6 +114,7 @@ class Parser(ParserBase):
 	reserved_words = {
 		'and':   'AND',
 		'or':    'OR',
+		'not':   'NOT',
 		'true':  'TRUE',
 		'false': 'FALSE',
 	}
@@ -145,6 +146,7 @@ class Parser(ParserBase):
 	precedence = (
 		('left',     'OR'),
 		('left',     'AND'),
+		('right',    'NOT'),
 		('left',     'BWOR'),
 		('left',     'BWXOR'),
 		('left',     'BWAND'),
@@ -273,6 +275,10 @@ class Parser(ParserBase):
 	def p_expression_group(self, p):
 		'expression : LPAREN expression RPAREN'
 		p[0] = p[2]
+
+	def p_expression_negate(self, p):
+		'expression : NOT expression'
+		p[0] = ast.UnaryExpression('NOT', p[2]).reduce()
 
 	def p_expression_symbol(self, p):
 		'expression : SYMBOL'

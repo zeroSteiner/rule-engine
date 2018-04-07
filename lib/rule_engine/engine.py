@@ -223,3 +223,12 @@ class Rule(object):
 		:rtype: bool
 		"""
 		return bool(self.statement.evaluate(self.context, thing))
+
+class DebugRule(Rule):
+	parser = None
+	def __init__(self, *args, **kwargs):
+		self.parser = parser.Parser(debug=True)
+		super(DebugRule, self).__init__(*args, **kwargs)
+
+	def matches(self, thing):
+		return self.statement.evaluate(self.context, thing)

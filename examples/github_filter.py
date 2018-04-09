@@ -54,6 +54,8 @@ def _get_github(arguments):
 	elif arguments.auth_user:
 		password = getpass.getpass("{0}@github.com: ".format(arguments.auth_user))
 		gh = github.Github(arguments.auth_user, password)
+	else:
+		gh = github.Github()
 	return gh
 
 def main():

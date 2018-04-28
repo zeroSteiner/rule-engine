@@ -31,8 +31,11 @@
 #
 
 __version__ = '0.9'
+from .ast import DataType
+
 from .engine import resolve_attribute
 from .engine import resolve_item
+from .engine import type_resolver_from_dict
 from .engine import Context
 from .engine import Rule
 

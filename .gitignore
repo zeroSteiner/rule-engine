@@ -6,3 +6,6 @@ build/*
 dist/*
 docs/build/*
 docs/html
+lib/rule_engine.egg-info/*
+lib/rule_engine/parser.out
+lib/rule_engine/parsetab.py

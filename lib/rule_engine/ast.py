@@ -143,59 +143,6 @@ class ExpressionBase(object):
 		"""
 		return self
 
-class LeftOperatorRightExpressionBase(ExpressionBase):
-	"""
-	A base class for representing complex expressions composed of a left side
-	and a right side, separated by an operator.
-	"""
-	__slots__ = ('_evaluator', 'type', 'left', 'right')
-	compatible_types = (DataType.BOOLEAN, DataType.FLOAT, DataType.STRING)
-	"""
-	A tuple containing the compatible data types that the left and right
-	expressions must return. This can for example be used to indicate that
-	arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but
-	not :py:attr:`~.DataType.STRING` values.
-	"""
-	result_type = DataType.BOOLEAN
-	_reduce_literals = ()
-	def __init__(self, type_, left, right):
-		"""
-		:param str type_: The grammar type of operator at the center of the
-			expression. Subclasses must define operator methods to handle
-			evaluation based on this value.
-		:param left: The expression to the left of the operator.
-		:type left: :py:class:`.ExpressionBase`
-		:param right: The expression to the right of the operator.
-		:type right: :py:class:`.ExpressionBase`
-		"""
-		self.type = type_
-		self._evaluator = getattr(self, '_op_' + type_.lower(), None)
-		if self._evaluator is None:
-			raise errors.EngineError('unsupported operator: ' + type_)
-		self.left = left
-		if self.left.result_type is not DataType.UNDEFINED:
-			if self.left.result_type not in self.compatible_types:
-				raise errors.EvaluationError('data type mismatch')
-		self.right = right
-		if self.right.result_type is not DataType.UNDEFINED:
-			if self.right.result_type not in self.compatible_types:
-				raise errors.EvaluationError('data type mismatch')
-
-	def evaluate(self, context, thing):
-		return self._evaluator(context, thing)
-
-	def reduce(self):
-		if not isinstance(self.left, LiteralExpressionBase):
-			return self
-		if not isinstance(self.left, self._reduce_literals):
-			raise errors.EvaluationError('data type mismatch')
-		if not isinstance(self.right, LiteralExpressionBase):
-			return self
-		if not isinstance(self.right, self._reduce_literals):
-			raise errors.EvaluationError('data type mismatch')
-		primary_literal = self._reduce_literals[0]
-		return primary_literal(self.evaluate(None, None))
-
 class LiteralExpressionBase(ExpressionBase):
 	"""A base class for representing literal values from the grammar text."""
 	__slots__ = ('value',)
@@ -229,14 +176,62 @@ class StringExpression(LiteralExpressionBase):
 ################################################################################
 # Left-Operator-Right Expressions
 ################################################################################
+class LeftOperatorRightExpressionBase(ExpressionBase):
+	"""
+	A base class for representing complex expressions composed of a left side
+	and a right side, separated by an operator.
+	"""
+	__slots__ = ('_evaluator', 'type', 'left', 'right')
+	compatible_types = (DataType.BOOLEAN, DataType.FLOAT, DataType.STRING)
+	"""
+	A tuple containing the compatible data types that the left and right
+	expressions must return. This can for example be used to indicate that
+	arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but
+	not :py:attr:`~.DataType.STRING` values.
+	"""
+	result_expression = BooleanExpression
+	result_type = DataType.BOOLEAN
+	def __init__(self, type_, left, right):
+		"""
+		:param str type_: The grammar type of operator at the center of the
+			expression. Subclasses must define operator methods to handle
+			evaluation based on this value.
+		:param left: The expression to the left of the operator.
+		:type left: :py:class:`.ExpressionBase`
+		:param right: The expression to the right of the operator.
+		:type right: :py:class:`.ExpressionBase`
+		"""
+		self.type = type_
+		self._evaluator = getattr(self, '_op_' + type_.lower(), None)
+		if self._evaluator is None:
+			raise errors.EngineError('unsupported operator: ' + type_)
+		self.left = left
+		if self.left.result_type is not DataType.UNDEFINED:
+			if self.left.result_type not in self.compatible_types:
+				raise errors.EvaluationError('data type mismatch')
+		self.right = right
+		if self.right.result_type is not DataType.UNDEFINED:
+			if self.right.result_type not in self.compatible_types:
+				raise errors.EvaluationError('data type mismatch')
+
+	def evaluate(self, context, thing):
+		return self._evaluator(context, thing)
+
+	def reduce(self):
+		if not isinstance(self.left, LiteralExpressionBase):
+			return self
+		if not isinstance(self.right, LiteralExpressionBase):
+			return self
+		return self.result_expression(self.evaluate(None, None))
+
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	"""
 	A class for representing arithmetic expressions from the grammar text such
 	as addition and subtraction.
 	"""
 	compatible_types = (DataType.FLOAT,)
+	result_expression = FloatExpression
 	result_type = DataType.FLOAT
-	_reduce_literals = (FloatExpression,)
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		_assert_is_real_number(left)
@@ -258,8 +253,8 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	text such as XOR and shifting operations.
 	"""
 	compatible_types = (DataType.FLOAT,)
+	result_expression = FloatExpression
 	result_type = DataType.FLOAT
-	_reduce_literals = (FloatExpression,)
 	def __op_bitwise(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		_assert_is_natural_number(left)
@@ -273,12 +268,35 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	_op_bwlsh = functools.partialmethod(__op_bitwise, operator.lshift)
 	_op_bwrsh = functools.partialmethod(__op_bitwise, operator.rshift)
 
+class LogicExpression(LeftOperatorRightExpressionBase):
+	"""
+	A class for representing logical expressions from the grammar text such as
+	as "and" and "or".
+	"""
+	def _op_and(self, context, thing):
+		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
+
+	def _op_or(self, context, thing):
+		return bool(self.left.evaluate(context, thing) or self.right.evaluate(context, thing))
+
+################################################################################
+# Left-Operator-Right Comparison Expressions
+################################################################################
 class ComparisonExpression(LeftOperatorRightExpressionBase):
 	"""
 	A class for representing comparison expressions from the grammar text such
 	as equality checks, and regular expression matching.
 	"""
-	_reduce_literals = (BooleanExpression, FloatExpression, StringExpression)
+	def __op_comparison(self, op, context, thing):
+		left = self.left.evaluate(context, thing)
+		right = self.right.evaluate(context, thing)
+		return op(left, right)
+
+	_op_eq = functools.partialmethod(__op_comparison, operator.eq)
+	_op_ne = functools.partialmethod(__op_comparison, operator.ne)
+
+class ArithmeticComparisonExpression(ComparisonExpression):
+	compatible_types = (DataType.FLOAT,)
 	def __op_arithmetic(self, op, context, thing):
 		left = self.left.evaluate(context, thing)
 		_assert_is_real_number(left)
@@ -291,14 +309,8 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	_op_le = functools.partialmethod(__op_arithmetic, operator.le)
 	_op_lt = functools.partialmethod(__op_arithmetic, operator.lt)
 
-	def __op_comparison(self, op, context, thing):
-		left = self.left.evaluate(context, thing)
-		right = self.right.evaluate(context, thing)
-		return op(left, right)
-
-	_op_eq = functools.partialmethod(__op_comparison, operator.eq)
-	_op_ne = functools.partialmethod(__op_comparison, operator.ne)
-
+class RegexComparisonExpression(ComparisonExpression):
+	compatible_types = (DataType.STRING,)
 	def __op_regex(self, regex_function, modifier, context, thing):
 		left_string = self.left.evaluate(context, thing)
 		if not isinstance(left_string, str):
@@ -313,18 +325,6 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	_op_eq_res = functools.partialmethod(__op_regex, re.search, operator.is_not)
 	_op_ne_rem = functools.partialmethod(__op_regex, re.match, operator.is_)
 	_op_ne_res = functools.partialmethod(__op_regex, re.search, operator.is_)
-
-class LogicExpression(LeftOperatorRightExpressionBase):
-	"""
-	A class for representing logical expressions from the grammar text such as
-	as "and" and "or".
-	"""
-	_reduce_literals = (BooleanExpression, FloatExpression, StringExpression)
-	def _op_and(self, context, thing):
-		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
-
-	def _op_or(self, context, thing):
-		return bool(self.left.evaluate(context, thing) or self.right.evaluate(context, thing))
 
 ################################################################################
 # Miscellaneous Expressions

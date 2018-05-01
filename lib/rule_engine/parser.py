@@ -250,18 +250,32 @@ class Parser(ParserBase):
 		"""
 		expression : expression EQ     expression
 				   | expression NE     expression
-				   | expression GT     expression
+		"""
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = ast.ComparisonExpression(op_name, left, right).reduce()
+
+	def p_expression_arithmetic_comparison(self, p):
+		"""
+		expression : expression GT     expression
 				   | expression GE     expression
 				   | expression LT     expression
 				   | expression LE     expression
-				   | expression EQ_REM expression
+		"""
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = ast.ArithmeticComparisonExpression(op_name, left, right).reduce()
+
+	def p_expression_regex_comparison(self, p):
+		"""
+		expression : expression EQ_REM expression
 				   | expression EQ_RES expression
 				   | expression NE_REM expression
 				   | expression NE_RES expression
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.ComparisonExpression(op_name, left, right).reduce()
+		p[0] = ast.RegexComparisonExpression(op_name, left, right).reduce()
 
 	def p_expression_logic(self, p):
 		"""

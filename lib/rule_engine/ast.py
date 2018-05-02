@@ -116,17 +116,16 @@ class DataType(enum.Enum):
 # Base Expression Classes
 ################################################################################
 class ExpressionBase(object):
+	__slots__ = ('context',)
 	result_type = DataType.UNDEFINED
 	"""The data type of the result of successful evaluation."""
 	def __repr__(self):
 		return "<{0} >".format(self.__class__.__name__)
 
-	def evaluate(self, context, thing):
+	def evaluate(self, thing):
 		"""
 		Evaluate this AST node and all applicable children nodes.
 
-		:param context: The context to use for evaluating the expression.
-		:type context: :py:class:`~rule_engine.engine.Context`
 		:param thing: The object to use for symbol resolution.
 		:return: The result of the evaluation as a native Python type.
 		"""
@@ -146,16 +145,19 @@ class ExpressionBase(object):
 class LiteralExpressionBase(ExpressionBase):
 	"""A base class for representing literal values from the grammar text."""
 	__slots__ = ('value',)
-	def __init__(self, value):
+	def __init__(self, context, value):
 		"""
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
 		:param value: The native Python value.
 		"""
+		self.context = context
 		self.value = self.result_type.value(value)
 
 	def __repr__(self):
 		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
 
-	def evaluate(self, context, thing):
+	def evaluate(self, thing):
 		return self.value
 
 ################################################################################
@@ -181,7 +183,6 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A base class for representing complex expressions composed of a left side
 	and a right side, separated by an operator.
 	"""
-	__slots__ = ('_evaluator', 'type', 'left', 'right')
 	compatible_types = (DataType.BOOLEAN, DataType.FLOAT, DataType.STRING)
 	"""
 	A tuple containing the compatible data types that the left and right
@@ -191,8 +192,10 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	"""
 	result_expression = BooleanExpression
 	result_type = DataType.BOOLEAN
-	def __init__(self, type_, left, right):
+	def __init__(self, context, type_, left, right):
 		"""
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
 		:param str type_: The grammar type of operator at the center of the
 			expression. Subclasses must define operator methods to handle
 			evaluation based on this value.
@@ -201,6 +204,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		:param right: The expression to the right of the operator.
 		:type right: :py:class:`.ExpressionBase`
 		"""
+		self.context = context
 		self.type = type_
 		self._evaluator = getattr(self, '_op_' + type_.lower(), None)
 		if self._evaluator is None:
@@ -214,15 +218,15 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 			if self.right.result_type not in self.compatible_types:
 				raise errors.EvaluationError('data type mismatch')
 
-	def evaluate(self, context, thing):
-		return self._evaluator(context, thing)
+	def evaluate(self, thing):
+		return self._evaluator(thing)
 
 	def reduce(self):
 		if not isinstance(self.left, LiteralExpressionBase):
 			return self
 		if not isinstance(self.right, LiteralExpressionBase):
 			return self
-		return self.result_expression(self.evaluate(None, None))
+		return self.result_expression(self.evaluate(None))
 
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	"""
@@ -232,10 +236,10 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	compatible_types = (DataType.FLOAT,)
 	result_expression = FloatExpression
 	result_type = DataType.FLOAT
-	def __op_arithmetic(self, op, context, thing):
-		left = self.left.evaluate(context, thing)
+	def __op_arithmetic(self, op, thing):
+		left = self.left.evaluate(thing)
 		_assert_is_real_number(left)
-		right = self.right.evaluate(context, thing)
+		right = self.right.evaluate(thing)
 		_assert_is_real_number(right)
 		return float(op(left, right))
 
@@ -255,10 +259,10 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	compatible_types = (DataType.FLOAT,)
 	result_expression = FloatExpression
 	result_type = DataType.FLOAT
-	def __op_bitwise(self, op, context, thing):
-		left = self.left.evaluate(context, thing)
+	def __op_bitwise(self, op, thing):
+		left = self.left.evaluate(thing)
 		_assert_is_natural_number(left)
-		right = self.right.evaluate(context, thing)
+		right = self.right.evaluate(thing)
 		_assert_is_natural_number(right)
 		return float(op(int(left), int(right)))
 
@@ -273,11 +277,11 @@ class LogicExpression(LeftOperatorRightExpressionBase):
 	A class for representing logical expressions from the grammar text such as
 	as "and" and "or".
 	"""
-	def _op_and(self, context, thing):
-		return bool(self.left.evaluate(context, thing) and self.right.evaluate(context, thing))
+	def _op_and(self, thing):
+		return bool(self.left.evaluate(thing) and self.right.evaluate(thing))
 
-	def _op_or(self, context, thing):
-		return bool(self.left.evaluate(context, thing) or self.right.evaluate(context, thing))
+	def _op_or(self, thing):
+		return bool(self.left.evaluate(thing) or self.right.evaluate(thing))
 
 ################################################################################
 # Left-Operator-Right Comparison Expressions
@@ -287,20 +291,18 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	A class for representing comparison expressions from the grammar text such
 	as equality checks, and regular expression matching.
 	"""
-	def __op_comparison(self, op, context, thing):
-		left = self.left.evaluate(context, thing)
-		right = self.right.evaluate(context, thing)
-		return op(left, right)
+	def __op_comparison(self, op, thing):
+		return op(self.left.evaluate(thing), self.right.evaluate(thing))
 
 	_op_eq = functools.partialmethod(__op_comparison, operator.eq)
 	_op_ne = functools.partialmethod(__op_comparison, operator.ne)
 
 class ArithmeticComparisonExpression(ComparisonExpression):
 	compatible_types = (DataType.FLOAT,)
-	def __op_arithmetic(self, op, context, thing):
-		left = self.left.evaluate(context, thing)
+	def __op_arithmetic(self, op, thing):
+		left = self.left.evaluate(thing)
 		_assert_is_real_number(left)
-		right = self.right.evaluate(context, thing)
+		right = self.right.evaluate(thing)
 		_assert_is_real_number(right)
 		return op(int(left), int(right))
 
@@ -311,20 +313,29 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 
 class RegexComparisonExpression(ComparisonExpression):
 	compatible_types = (DataType.STRING,)
-	def __op_regex(self, regex_function, modifier, context, thing):
-		left_string = self.left.evaluate(context, thing)
+	def __init__(self, *args, **kwargs):
+		super(RegexComparisonExpression, self).__init__(*args, **kwargs)
+		if isinstance(self.right, StringExpression):
+			self._right = re.compile(self.right.evaluate(None), flags=self.context.regex_flags)
+
+	def __op_regex(self, regex_function, modifier, thing):
+		left_string = self.left.evaluate(thing)
 		if not isinstance(left_string, str):
 			raise errors.EvaluationError('data type mismatch')
-		right_regex = self.right.evaluate(context, thing)
-		if not isinstance(right_regex, str):
-			raise errors.EvaluationError('data type mismatch')
-		match = regex_function(right_regex, left_string, flags=context.regex_flags)
+		if isinstance(self.right, StringExpression):
+			regex = self._right
+		else:
+			regex = self.right.evaluate(thing)
+			if not isinstance(regex, str):
+				raise errors.EvaluationError('data type mismatch')
+			regex = re.compile(self.right, flags=self.context.regex_flags)
+		match = getattr(regex, regex_function)(left_string)
 		return modifier(match, None)
 
-	_op_eq_rem = functools.partialmethod(__op_regex, re.match, operator.is_not)
-	_op_eq_res = functools.partialmethod(__op_regex, re.search, operator.is_not)
-	_op_ne_rem = functools.partialmethod(__op_regex, re.match, operator.is_)
-	_op_ne_res = functools.partialmethod(__op_regex, re.search, operator.is_)
+	_op_eq_rem = functools.partialmethod(__op_regex, 'match', operator.is_not)
+	_op_eq_res = functools.partialmethod(__op_regex, 'search', operator.is_not)
+	_op_ne_rem = functools.partialmethod(__op_regex, 'match', operator.is_)
+	_op_ne_res = functools.partialmethod(__op_regex, 'search', operator.is_)
 
 ################################################################################
 # Miscellaneous Expressions
@@ -334,24 +345,25 @@ class SymbolExpression(ExpressionBase):
 	A class representing a symbol name to be resolved at evaluation time with
 	the help of a :py:class:`~rule_engine.engine.Context` object.
 	"""
-	__slots__ = ('name',)
-	def __init__(self, name, type_hint=None):
+	__slots__ = ('name', 'result_type')
+	def __init__(self, context, name):
 		"""
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
 		:param str name: The name of the symbol. This will be resolved with a
 			given context object on the specified *thing*.
-		:param type_hint: An optional data type hint for this symbol. When set,
-			this is used by other nodes at parse time to determine if the symbol
-			is used in compatible operations.
 		"""
+		self.context = context
 		self.name = name
+		type_hint = context.resolve_type(name)
 		if type_hint is not None:
 			self.result_type = type_hint
 
 	def __repr__(self):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
-	def evaluate(self, context, thing):
-		value = context.resolve(thing, self.name)
+	def evaluate(self, thing):
+		value = self.context.resolve(thing, self.name)
 		# use DataType.from_value to raise a TypeError if value is not of a
 		# compatible data type
 		DataType.from_value(value)
@@ -359,16 +371,19 @@ class SymbolExpression(ExpressionBase):
 
 class Statement(object):
 	"""A class representing the top level statement of the grammar text."""
-	__slots__ = ('expression',)
-	def __init__(self, expression):
+	__slots__ = ('context', 'expression')
+	def __init__(self, context, expression):
 		"""
+		:param context: The context to use for evaluating the statement.
+		:type context: :py:class:`~rule_engine.engine.Context`
 		:param expression: The top level expression of the statement.
 		:type expression: :py:class:`~.ExpressionBase`
 		"""
+		self.context = context
 		self.expression = expression
 
-	def evaluate(self, context, thing):
-		return self.expression.evaluate(context, thing)
+	def evaluate(self, thing):
+		return self.expression.evaluate(thing)
 
 class TernaryExpression(ExpressionBase):
 	"""
@@ -376,9 +391,10 @@ class TernaryExpression(ExpressionBase):
 	involve evaluating :py:attr:`.condition` before evaluating either
 	:py:attr:`.case_true` or :py:attr:`.case_false` based on the results.
 	"""
-	__slots__ = ('condition', 'case_true', 'case_false')
-	def __init__(self, condition, case_true, case_false):
+	def __init__(self, context, condition, case_true, case_false):
 		"""
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
 		:param condition: The condition expression whose evaluation determines
 			whether the *case_true* or *case_false* expression is evaluated.
 		:param case_true: The expression that's evaluated when *condition* is
@@ -386,13 +402,14 @@ class TernaryExpression(ExpressionBase):
 		:param case_false:The expression that's evaluated when *condition* is
 			False.
 		"""
+		self.context = context
 		self.condition = condition
 		self.case_true = case_true
 		self.case_false = case_false
 
-	def evaluate(self, context, thing):
-		case = (self.case_true if self.condition.evaluate(context, thing) else self.case_false)
-		return case.evaluate(context, thing)
+	def evaluate(self, thing):
+		case = (self.case_true if self.condition.evaluate(thing) else self.case_false)
+		return case.evaluate(thing)
 
 	def reduce(self):
 		if isinstance(self.condition, LiteralExpressionBase):
@@ -404,29 +421,30 @@ class TernaryExpression(ExpressionBase):
 		return self.case_true.reduce() if reduced_condition else self.case_false.reduce()
 
 class UnaryExpression(ExpressionBase):
-	__slots__ = ('_evaluator', 'type', 'right')
-	def __init__(self, type_, right):
+	def __init__(self, context, type_, right):
 		"""
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
 		:param str type_: The grammar type of operator to the left of the
 			expression.
 		:param right: The expression to the right of the operator.
 		:type right: :py:class:`~.ExpressionBase`
 		"""
+		self.context = context
 		self.type = type_
 		self._evaluator = getattr(self, '_op_' + type_.lower())
 		self.right = right
 
-	def evaluate(self, context, thing):
-		return self._evaluator(context, thing)
+	def evaluate(self, thing):
+		return self._evaluator(thing)
 
-	def __op(self, op, context, thing):
-		right = self.right.evaluate(context, thing)
-		return op(right)
+	def __op(self, op, thing):
+		return op(self.right.evaluate(thing))
 
 	_op_not = functools.partialmethod(__op, operator.not_)
 
-	def __op_arithmetic(self, op, context, thing):
-		right = self.right.evaluate(context, thing)
+	def __op_arithmetic(self, op, thing):
+		right = self.right.evaluate(thing)
 		_assert_is_real_number(right)
 		return op(right)
 

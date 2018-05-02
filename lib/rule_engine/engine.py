@@ -208,7 +208,7 @@ class Rule(object):
 		:rtype: bool
 		"""
 		try:
-			cls.pparser.parse(text, (context or Context()))
+			cls.parser.parse(text, (context or Context()))
 		except errors.EngineError:
 			return False
 		return True
@@ -222,7 +222,7 @@ class Rule(object):
 		:return: Whether or not the rule matches.
 		:rtype: bool
 		"""
-		return bool(self.statement.evaluate(self.context, thing))
+		return bool(self.statement.evaluate(thing))
 
 class DebugRule(Rule):
 	parser = None
@@ -231,4 +231,4 @@ class DebugRule(Rule):
 		super(DebugRule, self).__init__(*args, **kwargs)
 
 	def matches(self, thing):
-		return self.statement.evaluate(self.context, thing)
+		return self.statement.evaluate(thing)

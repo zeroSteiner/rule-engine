@@ -211,14 +211,14 @@ class Parser(ParserBase):
 
 	def p_statement_expr(self, p):
 		'statement : expression'
-		p[0] = ast.Statement(p[1])
+		p[0] = ast.Statement(self.context, p[1])
 
 	def p_expression_ternary(self, p):
 		"""
 		expression : expression QMARK expression COLON expression
 		"""
 		condition, _, case_true, _, case_false = p[1:6]
-		p[0] = ast.TernaryExpression(condition, case_true, case_false).reduce()
+		p[0] = ast.TernaryExpression(self.context, condition, case_true, case_false).reduce()
 
 	def p_expression_arithmetic(self, p):
 		"""
@@ -232,7 +232,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.ArithmeticExpression(op_name, left, right).reduce()
+		p[0] = ast.ArithmeticExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_bitwise(self, p):
 		"""
@@ -244,7 +244,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.BitwiseExpression(op_name, left, right).reduce()
+		p[0] = ast.BitwiseExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_comparison(self, p):
 		"""
@@ -253,7 +253,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.ComparisonExpression(op_name, left, right).reduce()
+		p[0] = ast.ComparisonExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_arithmetic_comparison(self, p):
 		"""
@@ -264,7 +264,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.ArithmeticComparisonExpression(op_name, left, right).reduce()
+		p[0] = ast.ArithmeticComparisonExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_regex_comparison(self, p):
 		"""
@@ -275,7 +275,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.RegexComparisonExpression(op_name, left, right).reduce()
+		p[0] = ast.RegexComparisonExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_logic(self, p):
 		"""
@@ -284,7 +284,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.LogicExpression(op_name, left, right).reduce()
+		p[0] = ast.LogicExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_group(self, p):
 		'expression : LPAREN expression RPAREN'
@@ -292,18 +292,18 @@ class Parser(ParserBase):
 
 	def p_expression_negate(self, p):
 		'expression : NOT expression'
-		p[0] = ast.UnaryExpression('NOT', p[2]).reduce()
+		p[0] = ast.UnaryExpression(self.context, 'NOT', p[2]).reduce()
 
 	def p_expression_symbol(self, p):
 		'expression : SYMBOL'
 		name = p[1]
 		self.context.symbols.add(name)
-		p[0] = ast.SymbolExpression(name, type_hint=self.context.resolve_type(name)).reduce()
+		p[0] = ast.SymbolExpression(self.context, name).reduce()
 
 	def p_expression_uminus(self, p):
 		'expression : SUB expression %prec UMINUS'
 		names = {'-': 'UMINUS'}
-		p[0] = ast.UnaryExpression(names[p[1]], p[2]).reduce()
+		p[0] = ast.UnaryExpression(self.context, names[p[1]], p[2]).reduce()
 
 	# Literal expressions
 	def p_expression_boolean(self, p):
@@ -311,12 +311,12 @@ class Parser(ParserBase):
 		expression : TRUE
 				   | FALSE
 		"""
-		p[0] = ast.BooleanExpression(p[1] == 'true')
+		p[0] = ast.BooleanExpression(self.context, p[1] == 'true')
 
 	def p_expression_float(self, p):
 		'expression : FLOAT'
-		p[0] = ast.FloatExpression(literal_eval(p[1]))
+		p[0] = ast.FloatExpression(self.context, literal_eval(p[1]))
 
 	def p_expression_string(self, p):
 		'expression : STRING'
-		p[0] = ast.StringExpression(literal_eval(p[1]))
+		p[0] = ast.StringExpression(self.context, literal_eval(p[1]))

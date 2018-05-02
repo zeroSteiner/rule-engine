@@ -182,6 +182,9 @@ class Rule(object):
 	def __repr__(self):
 		return "<{0} text={1!r} >".format(self.__class__.__name__, self.text)
 
+	def __str__(self):
+		return self.text
+
 	def filter(self, things):
 		"""
 		A convenience function for iterating over *things* and yielding each

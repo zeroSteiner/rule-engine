@@ -30,45 +30,18 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import collections
 import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
-import rule_engine.errors as errors
+import rule_engine.parser as parser
 
-class EngineTests(unittest.TestCase):
-	def test_engine_resolve_attribute(self):
-		thing = collections.namedtuple('Thing', ('name',))(name='alice')
-		self.assertEqual(engine.resolve_attribute(thing, 'name'), thing.name)
-		with self.assertRaises(errors.SymbolResolutionError):
-			engine.resolve_attribute(thing, 'email')
-
-	def test_engine_resolve_item(self):
-		thing = {'name': 'Alice'}
-		self.assertEqual(engine.resolve_item(thing, 'name'), thing['name'])
-		with self.assertRaises(errors.SymbolResolutionError):
-			engine.resolve_attribute(thing, 'email')
-
-	def test_engine_type_resolver_from_dict(self):
-		type_resolver = engine.type_resolver_from_dict({
-			'string': ast.DataType.STRING,
-			'float': ast.DataType.FLOAT
-		})
-		self.assertTrue(callable(type_resolver))
-		self.assertEqual(type_resolver('string'), ast.DataType.STRING)
-		self.assertEqual(type_resolver('float'), ast.DataType.FLOAT)
-		with self.assertRaises(errors.SymbolResolutionError):
-			type_resolver('doesnotexist')
-
-class EngineRuleTests(unittest.TestCase):
-	def test_engine_rule_is_valid(self):
-		self.assertTrue(engine.Rule.is_valid('test == 1'))
-		self.assertFalse(engine.Rule.is_valid('test =='))
-
-	def test_engine_rule_raises(self):
-		with self.assertRaises(errors.RuleSyntaxError):
-			engine.Rule('test ==')
+class ParserTests(unittest.TestCase):
+	context = engine.Context()
+	def test_parser_reduces_ternary(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('true ? 1 : 0', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
 
 if __name__ == '__main__':
 	unittest.main()

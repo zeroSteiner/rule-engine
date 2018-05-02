@@ -226,7 +226,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 			return self
 		if not isinstance(self.right, LiteralExpressionBase):
 			return self
-		return self.result_expression(self.evaluate(None))
+		return self.result_expression(self.context, self.evaluate(None))
 
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	"""
@@ -289,7 +289,7 @@ class LogicExpression(LeftOperatorRightExpressionBase):
 class ComparisonExpression(LeftOperatorRightExpressionBase):
 	"""
 	A class for representing comparison expressions from the grammar text such
-	as equality checks, and regular expression matching.
+	as equality checks.
 	"""
 	def __op_comparison(self, op, thing):
 		return op(self.left.evaluate(thing), self.right.evaluate(thing))
@@ -298,6 +298,10 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	_op_ne = functools.partialmethod(__op_comparison, operator.ne)
 
 class ArithmeticComparisonExpression(ComparisonExpression):
+	"""
+	A class for representing arithmetic comparison expressions from the grammar
+	text such as less-than-or-equal-to and greater-than.
+	"""
 	compatible_types = (DataType.FLOAT,)
 	def __op_arithmetic(self, op, thing):
 		left = self.left.evaluate(thing)
@@ -312,6 +316,10 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 	_op_lt = functools.partialmethod(__op_arithmetic, operator.lt)
 
 class RegexComparisonExpression(ComparisonExpression):
+	"""
+	A class for representing regular expression comparison expressions from the
+	grammar text such as search and does not match.
+	"""
 	compatible_types = (DataType.STRING,)
 	def __init__(self, *args, **kwargs):
 		super(RegexComparisonExpression, self).__init__(*args, **kwargs)

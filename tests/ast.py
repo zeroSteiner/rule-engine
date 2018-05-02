@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/parser.py
+#  tests/ast.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -36,25 +36,47 @@ import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.parser as parser
 
-class ParserTests(unittest.TestCase):
+class AstTests(unittest.TestCase):
 	context = engine.Context()
-	def test_parser_order_of_operations(self):
+	thing = {'age': 21, 'name': 'Alice'}
+	def test_ast_evaluates_arithmetic_comparisons(self):
 		parser_ = parser.Parser()
-		cases = (
-			'100 * ( 2 + 12 ) / 14',
-			'50 + 50 * 2 - 50',
-			'19 + 9 ** 2',
-			'(4 * 5) ** 2 / 4'
-		)
-		for case in cases:
-			statement = parser_.parse(case, self.context)
-			self.assertIsInstance(statement.expression, ast.FloatExpression)
-			self.assertEqual(statement.evaluate(None), 100)
+		statement = parser_.parse('age >= 21', self.context)
+		self.assertTrue(statement.evaluate(self.thing))
+		statement = parser_.parse('age > 100', self.context)
+		self.assertFalse(statement.evaluate(self.thing))
 
-	def test_parser_returns_statement(self):
+	def test_ast_evaluates_string_comparisons(self):
 		parser_ = parser.Parser()
-		expression = parser_.parse('true', self.context)
-		self.assertIsInstance(expression, ast.Statement)
+		statement = parser_.parse('name == "Alice"', self.context)
+		self.assertTrue(statement.evaluate(self.thing))
+		statement = parser_.parse('name == "calie"', self.context)
+		self.assertFalse(statement.evaluate(self.thing))
+
+	def test_ast_evaluates_regex_comparisons(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('name =~ ".lic."', self.context)
+		self.assertTrue(statement.evaluate(self.thing))
+		statement = parser_.parse('name =~~ "lic"', self.context)
+		self.assertTrue(statement.evaluate(self.thing))
+
+	def test_ast_reduces_arithmetic(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('1 + 2', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
+		self.assertEqual(statement.evaluate(None), 3)
+
+	def test_ast_reduces_bitwise(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('1 << 2', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
+		self.assertEqual(statement.evaluate(None), 4)
+
+	def test_ast_reduces_ternary(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('true ? 1 : 0', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
+		self.assertEqual(statement.evaluate(None), 1)
 
 if __name__ == '__main__':
 	unittest.main()

@@ -465,8 +465,8 @@ class UnaryExpression(ExpressionBase):
 		if not isinstance(self.right, LiteralExpressionBase):
 			return self
 		if type_ == 'not':
-			return BooleanExpression(self.evaluate(None, None))
+			return BooleanExpression(self.context, self.evaluate(None))
 		elif type_ == 'uminus':
 			if not isinstance(self.right, (FloatExpression,)):
 				raise errors.EvaluationError('data type mismatch')
-			return FloatExpression(self.evaluate(None, None))
+			return FloatExpression(self.context, self.evaluate(None))

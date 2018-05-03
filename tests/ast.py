@@ -34,6 +34,7 @@ import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
+import rule_engine.errors as errors
 import rule_engine.parser as parser
 
 class AstTests(unittest.TestCase):
@@ -46,12 +47,13 @@ class AstTests(unittest.TestCase):
 		statement = parser_.parse('age > 100', self.context)
 		self.assertFalse(statement.evaluate(self.thing))
 
-	def test_ast_evaluates_string_comparisons(self):
+	def test_ast_evaluates_logic(self):
 		parser_ = parser.Parser()
-		statement = parser_.parse('name == "Alice"', self.context)
-		self.assertTrue(statement.evaluate(self.thing))
-		statement = parser_.parse('name == "calie"', self.context)
-		self.assertFalse(statement.evaluate(self.thing))
+		self.assertTrue(parser_.parse('true and true', self.context).evaluate(None))
+		self.assertFalse(parser_.parse('true and false', self.context).evaluate(None))
+
+		self.assertTrue(parser_.parse('true or false', self.context).evaluate(None))
+		self.assertFalse(parser_.parse('false or false', self.context).evaluate(None))
 
 	def test_ast_evaluates_regex_comparisons(self):
 		parser_ = parser.Parser()
@@ -59,6 +61,47 @@ class AstTests(unittest.TestCase):
 		self.assertTrue(statement.evaluate(self.thing))
 		statement = parser_.parse('name =~~ "lic"', self.context)
 		self.assertTrue(statement.evaluate(self.thing))
+
+	def test_ast_evaluates_string_comparisons(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('name == "Alice"', self.context)
+		self.assertTrue(statement.evaluate(self.thing))
+		statement = parser_.parse('name == "calie"', self.context)
+		self.assertFalse(statement.evaluate(self.thing))
+
+	def test_ast_evaluates_unary_not(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('not false', self.context)
+		self.assertTrue(statement.evaluate(None))
+		statement = parser_.parse('not true', self.context)
+		self.assertFalse(statement.evaluate(None))
+
+		statement = parser_.parse('true and not false', self.context)
+		self.assertTrue(statement.evaluate(None))
+		statement = parser_.parse('false and not true', self.context)
+		self.assertFalse(statement.evaluate(None))
+
+	def test_ast_evaluates_unary_uminus(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('-(2 * 5)', self.context)
+		self.assertEqual(statement.evaluate(None), -10)
+
+	def test_ast_raises_type_mismatch_arithmetic_comparisons(self):
+		parser_ = parser.Parser()
+		with self.assertRaises(errors.EvaluationError):
+			parser_.parse('"string" << 1', self.context)
+
+	def test_ast_raises_type_mismatch_bitwise(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('symbol << 1', self.context)
+		with self.assertRaises(errors.EvaluationError):
+			statement.evaluate({'symbol': 1.1})
+		self.assertEqual(statement.evaluate({'symbol': 1}), 2)
+
+	def test_ast_raises_type_mismatch_regex_comparisons(self):
+		parser_ = parser.Parser()
+		with self.assertRaises(errors.EvaluationError):
+			parser_.parse('"string" =~ 1', self.context)
 
 	def test_ast_reduces_arithmetic(self):
 		parser_ = parser.Parser()
@@ -77,6 +120,23 @@ class AstTests(unittest.TestCase):
 		statement = parser_.parse('true ? 1 : 0', self.context)
 		self.assertIsInstance(statement.expression, ast.FloatExpression)
 		self.assertEqual(statement.evaluate(None), 1)
+
+	def test_ast_type_hints(self):
+		parser_ = parser.Parser()
+		cases = (
+			# type, type_is, type_is_not
+			('symbol << 1',     ast.DataType.FLOAT,  ast.DataType.STRING),
+			('symbol + 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
+			('symbol > 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
+			('symbol =~ "foo"', ast.DataType.STRING, ast.DataType.FLOAT),
+		)
+		for case, type_is, type_is_not in cases:
+			parser_.parse(case, self.context)
+			context = engine.Context(type_resolver=engine.type_resolver_from_dict({'symbol': type_is}))
+			parser_.parse(case, context)
+			context = engine.Context(type_resolver=engine.type_resolver_from_dict({'symbol': type_is_not}))
+			with self.assertRaises(errors.EvaluationError):
+				parser_.parse(case, context)
 
 if __name__ == '__main__':
 	unittest.main()

@@ -50,9 +50,9 @@ except OSError:
 	long_description = None
 
 DESCRIPTION = """\
-This project provides a library for creating general purpose "Rule" objects from
-a logical expression which can then be applied to arbitrary objects to evaluate
-whether or not they match.
+This project provides a library for creating general purpose "Rule" objects from \
+a logical expression which can then be applied to arbitrary objects to evaluate \
+whether or not they match.\
 """
 
 setup(

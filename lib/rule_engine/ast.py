@@ -112,10 +112,14 @@ class DataType(enum.Enum):
 			return cls.STRING
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(value).__name__))
 
+class ASTNodeBase(object):
+	def to_graphviz(self, digraph):
+		digraph.node(str(id(self)), self.__class__.__name__)
+
 ################################################################################
 # Base Expression Classes
 ################################################################################
-class ExpressionBase(object):
+class ExpressionBase(ASTNodeBase):
 	__slots__ = ('context',)
 	result_type = DataType.UNDEFINED
 	"""The data type of the result of successful evaluation."""
@@ -227,6 +231,13 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		if not isinstance(self.right, LiteralExpressionBase):
 			return self
 		return self.result_expression(self.context, self.evaluate(None))
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(LeftOperatorRightExpressionBase, self).to_graphviz(digraph, *args, **kwargs)
+		self.left.to_graphviz(digraph, *args, **kwargs)
+		self.right.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.left)))
+		digraph.edge(str(id(self)), str(id(self.right)))
 
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	"""
@@ -384,7 +395,7 @@ class SymbolExpression(ExpressionBase):
 		DataType.from_value(value)
 		return value
 
-class Statement(object):
+class Statement(ASTNodeBase):
 	"""A class representing the top level statement of the grammar text."""
 	__slots__ = ('context', 'expression')
 	def __init__(self, context, expression):
@@ -399,6 +410,11 @@ class Statement(object):
 
 	def evaluate(self, thing):
 		return self.expression.evaluate(thing)
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(Statement, self).to_graphviz(digraph, *args, **kwargs)
+		self.expression.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.expression)))
 
 class TernaryExpression(ExpressionBase):
 	"""
@@ -434,6 +450,13 @@ class TernaryExpression(ExpressionBase):
 			if reduced_condition is self.condition:
 				return self
 		return self.case_true.reduce() if reduced_condition else self.case_false.reduce()
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(TernaryExpression, self).to_graphviz(digraph, *args, **kwargs)
+		self.case_true.to_graphviz(digraph, *args, **kwargs)
+		self.case_false.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.case_true)))
+		digraph.edge(str(id(self)), str(id(self.case_false)))
 
 class UnaryExpression(ExpressionBase):
 	def __init__(self, context, type_, right):
@@ -477,3 +500,8 @@ class UnaryExpression(ExpressionBase):
 			if not isinstance(self.right, (FloatExpression,)):
 				raise errors.EvaluationError('data type mismatch')
 			return FloatExpression(self.context, self.evaluate(None))
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(UnaryExpression, self).to_graphviz(digraph, *args, **kwargs)
+		self.right.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.right)))

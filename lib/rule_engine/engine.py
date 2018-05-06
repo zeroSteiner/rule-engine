@@ -227,6 +227,12 @@ class Rule(object):
 		"""
 		return bool(self.statement.evaluate(thing))
 
+	def to_graphviz(self):
+		import graphviz
+		digraph = graphviz.Digraph(comment=self.text)
+		self.statement.to_graphviz(digraph)
+		return digraph
+
 class DebugRule(Rule):
 	parser = None
 	def __init__(self, *args, **kwargs):

@@ -259,6 +259,13 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	compatible_types = (DataType.FLOAT,)
 	result_expression = FloatExpression
 	result_type = DataType.FLOAT
+	def __init__(self, *args, **kwargs):
+		super(BitwiseExpression, self).__init__(*args, **kwargs)
+		if isinstance(self.left, LiteralExpressionBase):
+			_assert_is_natural_number(self.left.evaluate(None))
+		if isinstance(self.right, LiteralExpressionBase):
+			_assert_is_natural_number(self.right.evaluate(None))
+
 	def __op_bitwise(self, op, thing):
 		left = self.left.evaluate(thing)
 		_assert_is_natural_number(left)

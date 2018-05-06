@@ -88,20 +88,44 @@ class AstTests(unittest.TestCase):
 
 	def test_ast_raises_type_mismatch_arithmetic_comparisons(self):
 		parser_ = parser.Parser()
+		statement = parser_.parse('symbol < 1', self.context)
 		with self.assertRaises(errors.EvaluationError):
-			parser_.parse('"string" << 1', self.context)
+			statement.evaluate({'symbol': 'string'})
+		with self.assertRaises(errors.EvaluationError):
+			statement.evaluate({'symbol': True})
+		self.assertTrue(statement.evaluate({'symbol': 0}))
 
 	def test_ast_raises_type_mismatch_bitwise(self):
 		parser_ = parser.Parser()
 		statement = parser_.parse('symbol << 1', self.context)
 		with self.assertRaises(errors.EvaluationError):
 			statement.evaluate({'symbol': 1.1})
+		with self.assertRaises(errors.EvaluationError):
+			statement.evaluate({'symbol': 'string'})
+		with self.assertRaises(errors.EvaluationError):
+			statement.evaluate({'symbol': True})
 		self.assertEqual(statement.evaluate({'symbol': 1}), 2)
+
+		with self.assertRaises(errors.EvaluationError):
+			parser_.parse('symbol << 1.1', self.context)
+		with self.assertRaises(errors.EvaluationError):
+			parser_.parse('symbol << "string"', self.context)
+		with self.assertRaises(errors.EvaluationError):
+			parser_.parse('symbol << true', self.context)
 
 	def test_ast_raises_type_mismatch_regex_comparisons(self):
 		parser_ = parser.Parser()
+		statement = parser_.parse('symbol =~ "string"', self.context)
+		with self.assertRaises(errors.EvaluationError):
+			statement.evaluate({'symbol': 1.1})
+		with self.assertRaises(errors.EvaluationError):
+			statement.evaluate({'symbol': True})
+		self.assertTrue(statement.evaluate({'symbol': 'string'}))
+
 		with self.assertRaises(errors.EvaluationError):
 			parser_.parse('"string" =~ 1', self.context)
+		with self.assertRaises(errors.EvaluationError):
+			parser_.parse('"string" =~ true', self.context)
 
 	def test_ast_reduces_arithmetic(self):
 		parser_ = parser.Parser()

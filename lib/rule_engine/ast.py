@@ -453,8 +453,10 @@ class TernaryExpression(ExpressionBase):
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		super(TernaryExpression, self).to_graphviz(digraph, *args, **kwargs)
+		self.condition.to_graphviz(digraph, *args, **kwargs)
 		self.case_true.to_graphviz(digraph, *args, **kwargs)
 		self.case_false.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.condition)))
 		digraph.edge(str(id(self)), str(id(self.case_true)))
 		digraph.edge(str(id(self)), str(id(self.case_false)))
 

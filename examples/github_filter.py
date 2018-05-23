@@ -68,6 +68,7 @@ def main():
 	parser.add_argument('rule', help='the rule to apply')
 	arguments = parser.parse_args()
 
+	# need to define a custom context to use a custom resolver function
 	context = rule_engine.Context(resolver=rule_engine.engine.resolve_attribute)
 	try:
 		rule = rule_engine.Rule(arguments.rule, context=context)

@@ -41,6 +41,13 @@ sys.path.append(get_path('lib'))
 
 import rule_engine
 
+EPILOG = """\
+Apply a rule to the specified CSV file. The first row of the CSV file must be
+the field names which will be used as the symbols for the rule.
+"""
+
+# specify a custom resolve function that checks if the symbol is a column name
+# in the csv file and if not replaces underscores with spaces
 def resolve_item(thing, name):
 	if not name in thing:
 		name = name.replace('_', ' ')
@@ -50,8 +57,10 @@ def main():
 	parser = argparse.ArgumentParser(description='csv_filter', conflict_handler='resolve')
 	parser.add_argument('csv_file', type=argparse.FileType('r'), help='the CSV file to filter')
 	parser.add_argument('rule', help='the rule to apply')
+	parser.epilog = EPILOG
 	arguments = parser.parse_args()
 
+	# need to define a custom context to use a custom resolver function
 	context = rule_engine.Context(resolver=resolve_item)
 	try:
 		rule = rule_engine.Rule(arguments.rule, context=context)

@@ -89,6 +89,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../grammar.html">Grammar</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ast</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
@@ -253,8 +254,8 @@ symbol is valid, but it’s data type is currently unknown.</p>
 
 <dl class="class">
 <dt id="rule_engine.ast.Statement">
-<em class="property">class </em><code class="descname">Statement</code><span class="sig-paren">(</span><em>expression</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Statement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.Statement" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="descname">Statement</code><span class="sig-paren">(</span><em>context</em>, <em>expression</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Statement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.Statement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ASTNodeBase</span></code></p>
 <p>A class representing the top level statement of the grammar text.</p>
 </dd></dl>
 
@@ -263,7 +264,7 @@ symbol is valid, but it’s data type is currently unknown.</p>
 <dl class="class">
 <dt id="rule_engine.ast.ExpressionBase">
 <em class="property">class </em><code class="descname">ExpressionBase</code><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ASTNodeBase</span></code></p>
 <dl class="attribute">
 <dt id="rule_engine.ast.ExpressionBase.result_type">
 <code class="descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.ExpressionBase.result_type" title="Permalink to this definition">¶</a></dt>
@@ -272,20 +273,15 @@ symbol is valid, but it’s data type is currently unknown.</p>
 
 <dl class="method">
 <dt id="rule_engine.ast.ExpressionBase.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>context</em>, <em>thing</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate this AST node and all applicable children nodes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</li>
-<li><strong>thing</strong> – The object to use for symbol resolution.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>thing</strong> – The object to use for symbol resolution.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The result of the evaluation as a native Python type.</p>
-</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The result of the evaluation as a native Python type.</td>
 </tr>
 </tbody>
 </table>
@@ -319,7 +315,7 @@ a reduced <a class="reference internal" href="#rule_engine.ast.ExpressionBase" t
 
 <dl class="class">
 <dt id="rule_engine.ast.LeftOperatorRightExpressionBase">
-<em class="property">class </em><code class="descname">LeftOperatorRightExpressionBase</code><span class="sig-paren">(</span><em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">LeftOperatorRightExpressionBase</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A base class for representing complex expressions composed of a left side
 and a right side, separated by an operator.</p>
@@ -334,12 +330,13 @@ not <a class="reference internal" href="#rule_engine.ast.DataType.STRING" title=
 
 <dl class="method">
 <dt id="rule_engine.ast.LeftOperatorRightExpressionBase.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</li>
 <li><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The grammar type of operator at the center of the
 expression. Subclasses must define operator methods to handle
 evaluation based on this value.</li>
@@ -356,17 +353,21 @@ evaluation based on this value.</li>
 
 <dl class="class">
 <dt id="rule_engine.ast.LiteralExpressionBase">
-<em class="property">class </em><code class="descname">LiteralExpressionBase</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">LiteralExpressionBase</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A base class for representing literal values from the grammar text.</p>
 <dl class="method">
 <dt id="rule_engine.ast.LiteralExpressionBase.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> – The native Python value.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</li>
+<li><strong>value</strong> – The native Python value.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
@@ -379,7 +380,7 @@ evaluation based on this value.</li>
 <h3>Left-Operator-Right Expressions<a class="headerlink" href="#left-operator-right-expressions" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="rule_engine.ast.ArithmeticExpression">
-<em class="property">class </em><code class="descname">ArithmeticExpression</code><span class="sig-paren">(</span><em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">ArithmeticExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing arithmetic expressions from the grammar text such
 as addition and subtraction.</p>
@@ -391,8 +392,21 @@ as addition and subtraction.</p>
 </dd></dl>
 
 <dl class="class">
+<dt id="rule_engine.ast.ArithmeticComparisonExpression">
+<em class="property">class </em><code class="descname">ArithmeticComparisonExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ComparisonExpression" title="rule_engine.ast.ComparisonExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ComparisonExpression</span></code></a></p>
+<p>A class for representing arithmetic comparison expressions from the grammar
+text such as less-than-or-equal-to and greater-than.</p>
+<dl class="attribute">
+<dt id="rule_engine.ast.ArithmeticComparisonExpression.result_type">
+<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="rule_engine.ast.BitwiseExpression">
-<em class="property">class </em><code class="descname">BitwiseExpression</code><span class="sig-paren">(</span><em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BitwiseExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.BitwiseExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">BitwiseExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BitwiseExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.BitwiseExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing bitwise arithmetic expressions from the grammar
 text such as XOR and shifting operations.</p>
@@ -405,10 +419,10 @@ text such as XOR and shifting operations.</p>
 
 <dl class="class">
 <dt id="rule_engine.ast.ComparisonExpression">
-<em class="property">class </em><code class="descname">ComparisonExpression</code><span class="sig-paren">(</span><em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">ComparisonExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ComparisonExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing comparison expressions from the grammar text such
-as equality checks, and regular expression matching.</p>
+as equality checks.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.ComparisonExpression.result_type">
 <code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.ComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
@@ -418,7 +432,7 @@ as equality checks, and regular expression matching.</p>
 
 <dl class="class">
 <dt id="rule_engine.ast.LogicExpression">
-<em class="property">class </em><code class="descname">LogicExpression</code><span class="sig-paren">(</span><em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LogicExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LogicExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">LogicExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LogicExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LogicExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing logical expressions from the grammar text such as
 as “and” and “or”.</p>
@@ -429,12 +443,25 @@ as “and” and “or”.</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="rule_engine.ast.RegexComparisonExpression">
+<em class="property">class </em><code class="descname">RegexComparisonExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#RegexComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.RegexComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ComparisonExpression" title="rule_engine.ast.ComparisonExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ComparisonExpression</span></code></a></p>
+<p>A class for representing regular expression comparison expressions from the
+grammar text such as search and does not match.</p>
+<dl class="attribute">
+<dt id="rule_engine.ast.RegexComparisonExpression.result_type">
+<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.RegexComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="literal-expressions">
 <h3>Literal Expressions<a class="headerlink" href="#literal-expressions" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="rule_engine.ast.BooleanExpression">
-<em class="property">class </em><code class="descname">BooleanExpression</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BooleanExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.BooleanExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">BooleanExpression</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BooleanExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.BooleanExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal boolean expressions representing True or False.</p>
 <dl class="attribute">
@@ -446,7 +473,7 @@ as “and” and “or”.</p>
 
 <dl class="class">
 <dt id="rule_engine.ast.FloatExpression">
-<em class="property">class </em><code class="descname">FloatExpression</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FloatExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.FloatExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">FloatExpression</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FloatExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.FloatExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal float expressions representing numerical values.</p>
 <dl class="attribute">
@@ -458,7 +485,7 @@ as “and” and “or”.</p>
 
 <dl class="class">
 <dt id="rule_engine.ast.StringExpression">
-<em class="property">class </em><code class="descname">StringExpression</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#StringExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.StringExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">StringExpression</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#StringExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.StringExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal string expressions representing an array of characters.</p>
 <dl class="attribute">
@@ -473,20 +500,21 @@ as “and” and “or”.</p>
 <h3>Miscellaneous Expressions<a class="headerlink" href="#miscellaneous-expressions" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="rule_engine.ast.SymbolExpression">
-<em class="property">class </em><code class="descname">SymbolExpression</code><span class="sig-paren">(</span><em>name</em>, <em>type_hint=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#SymbolExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.SymbolExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">SymbolExpression</code><span class="sig-paren">(</span><em>context</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#SymbolExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.SymbolExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class representing a symbol name to be resolved at evaluation time with
 the help of a <a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.SymbolExpression.result_type">
 <code class="descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.SymbolExpression.result_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>A collection of constants representing the different supported data types.</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.TernaryExpression">
-<em class="property">class </em><code class="descname">TernaryExpression</code><span class="sig-paren">(</span><em>condition</em>, <em>case_true</em>, <em>case_false</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#TernaryExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.TernaryExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">TernaryExpression</code><span class="sig-paren">(</span><em>context</em>, <em>condition</em>, <em>case_true</em>, <em>case_false</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#TernaryExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.TernaryExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class for representing ternary expressions from the grammar text. These
 involve evaluating <code class="xref py py-attr docutils literal notranslate"><span class="pre">condition</span></code> before evaluating either
@@ -500,7 +528,7 @@ involve evaluating <code class="xref py py-attr docutils literal notranslate"><s
 
 <dl class="class">
 <dt id="rule_engine.ast.UnaryExpression">
-<em class="property">class </em><code class="descname">UnaryExpression</code><span class="sig-paren">(</span><em>type_</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#UnaryExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.UnaryExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">UnaryExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#UnaryExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.UnaryExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <dl class="attribute">
 <dt id="rule_engine.ast.UnaryExpression.result_type">

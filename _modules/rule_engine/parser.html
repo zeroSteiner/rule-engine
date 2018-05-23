@@ -87,7 +87,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../grammar.html">Grammar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 </ul>
 
@@ -269,6 +269,7 @@
 	<span class="n">reserved_words</span> <span class="o">=</span> <span class="p">{</span>
 		<span class="s1">&#39;and&#39;</span><span class="p">:</span>   <span class="s1">&#39;AND&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;or&#39;</span><span class="p">:</span>    <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;not&#39;</span><span class="p">:</span>   <span class="s1">&#39;NOT&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;true&#39;</span><span class="p">:</span>  <span class="s1">&#39;TRUE&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;false&#39;</span><span class="p">:</span> <span class="s1">&#39;FALSE&#39;</span><span class="p">,</span>
 	<span class="p">}</span>
@@ -300,6 +301,7 @@
 	<span class="n">precedence</span> <span class="o">=</span> <span class="p">(</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;OR&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;AND&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>    <span class="s1">&#39;NOT&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWOR&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWXOR&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWAND&#39;</span><span class="p">),</span>
@@ -347,7 +349,7 @@
 		<span class="k">return</span> <span class="n">t</span>
 
 	<span class="k">def</span> <span class="nf">t_SYMBOL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-		<span class="sa">r</span><span class="s1">&#39;[a-zA-Z_][a-zA-Z0-9_]*&#39;</span>
+		<span class="sa">r</span><span class="s1">&#39;[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*&#39;</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved_words</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;SYMBOL&#39;</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">t</span>
 
@@ -364,14 +366,14 @@
 
 	<span class="k">def</span> <span class="nf">p_statement_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;statement : expression&#39;</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Statement</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Statement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_ternary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression QMARK expression COLON expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">condition</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">case_false</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">TernaryExpression</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">case_false</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">TernaryExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">case_false</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -385,7 +387,7 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticExpression</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_bitwise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -397,24 +399,38 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BitwiseExpression</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BitwiseExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression EQ     expression</span>
 <span class="sd">				   | expression NE     expression</span>
-<span class="sd">				   | expression GT     expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ComparisonExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_arithmetic_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : expression GT     expression</span>
 <span class="sd">				   | expression GE     expression</span>
 <span class="sd">				   | expression LT     expression</span>
 <span class="sd">				   | expression LE     expression</span>
-<span class="sd">				   | expression EQ_REM expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticComparisonExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_regex_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : expression EQ_REM expression</span>
 <span class="sd">				   | expression EQ_RES expression</span>
 <span class="sd">				   | expression NE_REM expression</span>
 <span class="sd">				   | expression NE_RES expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ComparisonExpression</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">RegexComparisonExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -423,22 +439,26 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">LogicExpression</span><span class="p">(</span><span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">LogicExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : LPAREN expression RPAREN&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
+	<span class="k">def</span> <span class="nf">p_expression_negate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="s1">&#39;expression : NOT expression&#39;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
 	<span class="k">def</span> <span class="nf">p_expression_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : SYMBOL&#39;</span>
 		<span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">SymbolExpression</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">type_hint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">name</span><span class="p">))</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">SymbolExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_uminus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : SUB expression %prec UMINUS&#39;</span>
 		<span class="n">names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;-&#39;</span><span class="p">:</span> <span class="s1">&#39;UMINUS&#39;</span><span class="p">}</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">names</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="c1"># Literal expressions</span>
 	<span class="k">def</span> <span class="nf">p_expression_boolean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -446,15 +466,15 @@
 <span class="sd">		expression : TRUE</span>
 <span class="sd">				   | FALSE</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : FLOAT&#39;</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">FloatExpression</span><span class="p">(</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">FloatExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : STRING&#39;</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">StringExpression</span><span class="p">(</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">StringExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div>
 </pre></div>
 
            </div>

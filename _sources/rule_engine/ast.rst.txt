@@ -66,6 +66,12 @@ Left-Operator-Right Expressions
    .. autoattribute:: result_type
       :annotation: = FLOAT
 
+.. autoclass:: rule_engine.ast.ArithmeticComparisonExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = BOOLEAN
+
 .. autoclass:: rule_engine.ast.BitwiseExpression
    :show-inheritance:
 
@@ -79,6 +85,12 @@ Left-Operator-Right Expressions
       :annotation: = BOOLEAN
 
 .. autoclass:: rule_engine.ast.LogicExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = BOOLEAN
+
+.. autoclass:: rule_engine.ast.RegexComparisonExpression
    :show-inheritance:
 
    .. autoattribute:: result_type

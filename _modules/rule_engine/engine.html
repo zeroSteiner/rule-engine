@@ -87,7 +87,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../grammar.html">Grammar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 </ul>
 
@@ -208,9 +208,11 @@
 <span class="sd">	:param str name: The symbol name that is being resolved.</span>
 <span class="sd">	:return: The value for the corresponding attribute *name*.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-	<span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+	<span class="k">for</span> <span class="n">name_part</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name_part</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name_part</span><span class="p">)</span>
+		<span class="n">thing</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name_part</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">thing</span></div>
 
 <div class="viewcode-block" id="resolve_item"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_item">[docs]</a><span class="k">def</span> <span class="nf">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -247,7 +249,7 @@
 <span class="sd">	:return: The callback function.</span>
 <span class="sd">	:rtype: function</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+	<span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="p">)</span> <span class="k">else</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 	<span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">type_map</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -335,6 +337,9 @@
 	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> text=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 
+	<span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span>
+
 <div class="viewcode-block" id="Rule.filter"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.filter">[docs]</a>	<span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">things</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		A convenience function for iterating over *things* and yielding each</span>
@@ -361,7 +366,7 @@
 <span class="sd">		:rtype: bool</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">try</span><span class="p">:</span>
-			<span class="bp">cls</span><span class="o">.</span><span class="n">pparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="p">(</span><span class="n">context</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">()))</span>
+			<span class="bp">cls</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="p">(</span><span class="n">context</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">()))</span>
 		<span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">EngineError</span><span class="p">:</span>
 			<span class="k">return</span> <span class="kc">False</span>
 		<span class="k">return</span> <span class="kc">True</span></div>
@@ -375,7 +380,22 @@
 <span class="sd">		:return: Whether or not the rule matches.</span>
 <span class="sd">		:rtype: bool</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">thing</span><span class="p">))</span></div></div>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Rule.to_graphviz"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz">[docs]</a>	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="kn">import</span> <span class="nn">graphviz</span>
+		<span class="n">digraph</span> <span class="o">=</span> <span class="n">graphviz</span><span class="o">.</span><span class="n">Digraph</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">digraph</span></div></div>
+
+<span class="k">class</span> <span class="nc">DebugRule</span><span class="p">(</span><span class="n">Rule</span><span class="p">):</span>
+	<span class="n">parser</span> <span class="o">=</span> <span class="kc">None</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">DebugRule</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
 </pre></div>
 
            </div>

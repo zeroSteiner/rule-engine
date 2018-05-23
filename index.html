@@ -36,7 +36,7 @@
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="Rule Engine 0.9 documentation" href="#"/>
-        <link rel="next" title="Grammar" href="grammar.html"/> 
+        <link rel="next" title="Syntax" href="syntax.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -87,7 +87,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="grammar.html">Grammar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 </ul>
 
@@ -158,11 +158,50 @@
 a logical expression which can then be applied to arbitrary objects to evaluate
 whether or not they match.</p>
 <p>The source code is available on the <a class="reference external" href="https://github.com/zeroSteiner/rule-engine">GitHub homepage</a>.</p>
+<div class="section" id="symbol-resolution">
+<h2>Symbol Resolution<a class="headerlink" href="#symbol-resolution" title="Permalink to this headline">¶</a></h2>
+<p>Symbols / variables in rules can be resolved from objects using an arbitrary
+function. Two are builtin, one for resolving symbols
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">keys</span></code></a> on objects (such as
+dictionaries) and one for resolving symbols
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">attributes</span></code></a> on objects.</p>
+</div>
+<div class="section" id="type-hinting">
+<h2>Type Hinting<a class="headerlink" href="#type-hinting" title="Permalink to this headline">¶</a></h2>
+<p>Symbol type information can be provided to the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code> through a
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance and will be used for
+compatibility testing. With type information, the engine will raise an
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> when an incompatible operation
+is detected such a regex match (<code class="docutils literal notranslate"><span class="pre">=~</span></code>) using an integer on either side. This
+makes it easier to detect errors in a rule’s syntax prior to it being applied to
+an object.</p>
+<p>Alternatively, a function can be specified that simply returns
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> for valid symbols. In both cases
+the engine will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a>
+when an invalid symbol is specified in a rule.</p>
+</div>
+<div class="section" id="usage-example">
+<h2>Usage Example<a class="headerlink" href="#usage-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rule_engine</span>
+<span class="c1"># match a literal first name and applying a regex to the email</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
+    <span class="s1">&#39;first_name == &quot;Luke&quot; and email =~ &quot;.*@rebels.org$&quot;&#39;</span>
+<span class="p">)</span> <span class="c1"># =&gt; &lt;Rule text=&#39;first_name == &quot;Luke&quot; and email =~ &quot;.*@rebels.org$&quot;&#39; &gt;</span>
+<span class="n">rule</span><span class="o">.</span><span class="n">matches</span><span class="p">({</span>
+    <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Luke&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Skywalker&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;luke@rebels.org&#39;</span>
+<span class="p">})</span> <span class="c1"># =&gt; True</span>
+<span class="n">rule</span><span class="o">.</span><span class="n">matches</span><span class="p">({</span>
+   <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Darth&#39;</span><span class="p">,</span> <span class="s1">&#39;last_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Vader&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;dvader@empire.net&#39;</span>
+<span class="p">})</span> <span class="c1"># =&gt; False</span>
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/tree/master/examples">examples</a> folder for more.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="grammar.html">Grammar</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="grammar.html#supported-operations">Supported Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="syntax.html#grammar">Grammar</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul>
@@ -173,6 +212,7 @@ whether or not they match.</p>
 </ul>
 </li>
 </ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -194,7 +234,7 @@ whether or not they match.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="grammar.html" class="btn btn-neutral float-right" title="Grammar" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="syntax.html" class="btn btn-neutral float-right" title="Syntax" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

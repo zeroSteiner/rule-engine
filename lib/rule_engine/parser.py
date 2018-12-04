@@ -112,11 +112,16 @@ class Parser(ParserBase):
 		'and': 'AND',   'or': 'OR',
 	}
 	reserved_words = {
-		'and':   'AND',
-		'or':    'OR',
-		'not':   'NOT',
+		# booleans
 		'true':  'TRUE',
 		'false': 'FALSE',
+		# float constants
+		'inf': 'FLOAT_INF',
+		'nan': 'FLOAT_NAN',
+		# operators
+		'and': 'AND',
+		'or': 'OR',
+		'not': 'NOT',
 	}
 	tokens = (
 		'FLOAT', 'STRING', 'SYMBOL',
@@ -137,7 +142,7 @@ class Parser(ParserBase):
 	t_ADD              = r'\+'
 	t_SUB              = r'\-'
 	t_MOD              = r'\%'
-	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
+	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
 	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear
@@ -316,6 +321,14 @@ class Parser(ParserBase):
 	def p_expression_float(self, p):
 		'expression : FLOAT'
 		p[0] = ast.FloatExpression(self.context, literal_eval(p[1]))
+
+	def p_expression_float_nan(self, p):
+		'expression : FLOAT_NAN'
+		p[0] = ast.FloatExpression(self.context, float('nan'))
+
+	def p_expression_float_inf(self, p):
+		'expression : FLOAT_INF'
+		p[0] = ast.FloatExpression(self.context, float('inf'))
 
 	def p_expression_string(self, p):
 		'expression : STRING'

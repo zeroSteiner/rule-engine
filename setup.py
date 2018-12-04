@@ -57,7 +57,7 @@ whether or not they match.\
 
 setup(
 	name='rule-engine',
-	version='0.9.0',
+	version='0.9.1',
 	author='Spencer McIntyre',
 	author_email='zeroSteiner@gmail.com',
 	maintainer='Spencer McIntyre',
@@ -81,6 +81,7 @@ setup(
 		'Programming Language :: Python :: 3.4',
 		'Programming Language :: Python :: 3.5',
 		'Programming Language :: Python :: 3.6',
+		'Programming Language :: Python :: 3.7',
 		'Topic :: Software Development :: Libraries :: Python Modules'
 	]
 )

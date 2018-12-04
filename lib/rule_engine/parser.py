@@ -137,7 +137,7 @@ class Parser(ParserBase):
 	t_ADD              = r'\+'
 	t_SUB              = r'\-'
 	t_MOD              = r'\%'
-	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?|\.[0-9]+'
+	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-f]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
 	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear

@@ -148,7 +148,7 @@ class AstTests(unittest.TestCase):
 	def test_ast_type_hints(self):
 		parser_ = parser.Parser()
 		cases = (
-			# type, type_is, type_is_not
+			# type,             type_is,             type_is_not
 			('symbol << 1',     ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol + 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol > 1',      ast.DataType.FLOAT,  ast.DataType.STRING),

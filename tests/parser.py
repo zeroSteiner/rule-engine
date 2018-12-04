@@ -56,5 +56,64 @@ class ParserTests(unittest.TestCase):
 		expression = parser_.parse('true', self.context)
 		self.assertIsInstance(expression, ast.Statement)
 
+class ParserLiteralTests(ParserTests):
+	def _evaluate(self, string):
+		parser_ = parser.Parser()
+		statement = parser_.parse(string, self.context)
+		return statement.evaluate({})
+
+	def assertLiteralStatementEqual(self, string, value, msg=None):
+		msg = msg or "{0!r} does not evaluate to {1!r}".format(string, value)
+		self.assertEqual(self._evaluate(string), value, msg=msg)
+
+	def test_parse_boolean(self):
+		self.assertLiteralStatementEqual('true', True)
+		self.assertLiteralStatementEqual('false', False)
+
+	def test_parse_float(self):
+		self.assertLiteralStatementEqual('3.14', 3.14)
+		self.assertLiteralStatementEqual('3.140', 3.140)
+		self.assertLiteralStatementEqual('.314', 0.314)
+		self.assertLiteralStatementEqual('0.314', 0.314)
+
+	def test_parse_float_exponent(self):
+		self.assertLiteralStatementEqual('3.14e5', 314000.0)
+		self.assertLiteralStatementEqual('3.14e+3', 3140.0)
+		self.assertLiteralStatementEqual('3.14e-3', 0.00314)
+		self.assertLiteralStatementEqual('3.14E5', 314000.0)
+		self.assertLiteralStatementEqual('3.14E+3', 3140.0)
+		self.assertLiteralStatementEqual('3.14E-3', 0.00314)
+
+		self.assertLiteralStatementEqual('-3.14e5', -314000.0)
+		self.assertLiteralStatementEqual('-3.14e+3', -3140.0)
+		self.assertLiteralStatementEqual('-3.14e-3', -0.00314)
+		self.assertLiteralStatementEqual('-3.14E5', -314000.0)
+		self.assertLiteralStatementEqual('-3.14E+3', -3140.0)
+		self.assertLiteralStatementEqual('-3.14E-3', -0.00314)
+
+	def test_parse_float_base_2(self):
+		self.assertLiteralStatementEqual('0b00', 0)
+		self.assertLiteralStatementEqual('0b11', 3)
+
+	def test_parse_float_base_8(self):
+		self.assertLiteralStatementEqual('0o00', 0)
+		self.assertLiteralStatementEqual('0o77', 63)
+
+	def test_parse_float_base_10(self):
+		self.assertLiteralStatementEqual('00', 0)
+		self.assertLiteralStatementEqual('99', 99)
+
+	def test_parse_float_base_16(self):
+		self.assertLiteralStatementEqual('0x00', 0)
+		self.assertLiteralStatementEqual('0xdeadbeef', 3735928559)
+
+	def test_parse_string(self):
+		self.assertLiteralStatementEqual("'Alice'", 'Alice')
+		self.assertLiteralStatementEqual('"Alice"', 'Alice')
+
+	def test_parse_string_escapes(self):
+		self.assertLiteralStatementEqual("'Alice\\\'s'", 'Alice\'s')
+		self.assertLiteralStatementEqual('"Alice\'s"', 'Alice\'s')
+
 if __name__ == '__main__':
 	unittest.main()

@@ -19,7 +19,7 @@ Type Hinting
 ------------
 
 Symbol type information can be provided to the
-:py:class:`~rule_engine.engine.Engine` through a
+:py:class:`~rule_engine.engine.Rule` through a
 :py:class:`~rule_engine.engine.Context` instance and will be used for
 compatibility testing. With type information, the engine will raise an
 :py:class:`~rule_engine.errors.EvaluationError` when an incompatible operation

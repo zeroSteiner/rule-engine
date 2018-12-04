@@ -40,7 +40,7 @@ def resolve_attribute(thing, name):
 	"""
 	A replacement resolver function for looking up symbols as members of
 	*thing*. This is effectively the same as ``thing.name``. The *thing* object
-	can be a :py:class:`~collections.namedtuple` a custom Python class or any
+	can be a :py:class:`~collections.namedtuple`, a custom Python class or any
 	other object. Each of the members of *thing* must be of a compatible data
 	type.
 
@@ -84,7 +84,7 @@ def type_resolver_from_dict(dictionary):
 	Return a function suitable for use as the *type_resolver* for a
 	:py:class:`.Context` instance from a dictionary. If any of the values within
 	the dictionary are not of a compatible data type, a :py:exc:`TypeError` will
-	be raised. Additionally the resulting function will raise a
+	be raised. Additionally, the resulting function will raise a
 	:py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol name does
 	not exist within the dictionary.
 
@@ -228,6 +228,12 @@ class Rule(object):
 		return bool(self.statement.evaluate(thing))
 
 	def to_graphviz(self):
+		"""
+		Generate a diagram of the parsed rule's AST using GraphViz.
+
+		:return: The rule diagram.
+		:rtype: :py:class:`graphviz.Digraph`
+		"""
 		import graphviz
 		digraph = graphviz.Digraph(comment=self.text)
 		self.statement.to_graphviz(digraph)

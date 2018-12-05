@@ -104,6 +104,10 @@ class AstTests(unittest.TestCase):
 			statement.evaluate({'symbol': 'string'})
 		with self.assertRaises(errors.EvaluationError):
 			statement.evaluate({'symbol': True})
+		with self.assertRaises(errors.EvaluationError):
+			statement.evaluate({'symbol': float('inf')})
+		with self.assertRaises(errors.EvaluationError):
+			statement.evaluate({'symbol': float('nan')})
 		self.assertEqual(statement.evaluate({'symbol': 1}), 2)
 
 		with self.assertRaises(errors.EvaluationError):
@@ -112,6 +116,10 @@ class AstTests(unittest.TestCase):
 			parser_.parse('symbol << "string"', self.context)
 		with self.assertRaises(errors.EvaluationError):
 			parser_.parse('symbol << true', self.context)
+		with self.assertRaises(errors.EvaluationError):
+			parser_.parse('inf << 1', self.context)
+		with self.assertRaises(errors.EvaluationError):
+			parser_.parse('nan << 1', self.context)
 
 	def test_ast_raises_type_mismatch_regex_comparisons(self):
 		parser_ = parser.Parser()

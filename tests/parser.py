@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import math
 import unittest
 
 import rule_engine.ast as ast
@@ -106,6 +107,15 @@ class ParserLiteralTests(ParserTests):
 	def test_parse_float_base_16(self):
 		self.assertLiteralStatementEqual('0x00', 0)
 		self.assertLiteralStatementEqual('0xdeadbeef', 3735928559)
+		self.assertLiteralStatementEqual('0xdeADbeEF', 3735928559)
+
+	def test_parse_float_inf(self):
+		self.assertLiteralStatementEqual('inf', float('inf'))
+		self.assertLiteralStatementEqual('-inf', float('-inf'))
+
+	def test_parse_float_nan(self):
+		self.assertTrue(math.isnan(self._evaluate('nan')))
+		self.assertTrue(math.isnan(self._evaluate('-nan')))
 
 	def test_parse_string(self):
 		self.assertLiteralStatementEqual("'Alice'", 'Alice')

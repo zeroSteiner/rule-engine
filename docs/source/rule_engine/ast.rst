@@ -12,6 +12,8 @@ Functions
 
 .. autofunction:: rule_engine.ast.is_natural_number
 
+.. autofunction:: rule_engine.ast.is_numeric
+
 .. autofunction:: rule_engine.ast.is_real_number
 
 Classes

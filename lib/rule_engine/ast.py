@@ -42,7 +42,7 @@ def is_natural_number(value):
 	"""
 	Check whether *value* is a natural number (i.e. a whole, non-negative
 	number). This can, for example, be used to check if a floating point number
-	such as ``3.0`` can safely be converted to an integer without lose of
+	such as ``3.0`` can safely be converted to an integer without loss of
 	information.
 
 	:param value: The value to check. This value is a native Python type.
@@ -51,34 +51,55 @@ def is_natural_number(value):
 	"""
 	if not is_real_number(value):
 		return False
-	return math.floor(value) == value
+	if not math.isfinite(value):
+		return False
+	if math.floor(value) != value:
+		return False
+	return True
 
 def is_real_number(value):
 	"""
 	Check whether *value* is a real number (i.e. capable of being represented as
-	a floating point value without lose of information). Despite being able to
-	be represented as a float, ``NaN`` is not considered a real number for the
-	purposes of this function.
+	a floating point value without loss of information as well as being finite).
+	Despite being able to be represented as a float, ``NaN`` is not considered a
+	real number for the purposes of this function.
 
 	:param value: The value to check. This value is a native Python type.
 	:return: Whether or not the value is a natural number.
+	:rtype: bool
+	"""
+	if not is_numeric(value):
+		return False
+	if not math.isfinite(value):
+		return False
+	return True
+
+def is_numeric(value):
+	"""
+	Check whether *value* is a numeric value (i.e. capable of being represented
+	as a floating point value without loss of information).
+
+	:param value: The value to check. This value is a native Python type.
+	:return: Whether or not the value is numeric.
 	:rtype: bool
 	"""
 	if not isinstance(value, (int, float)):
 		return False
 	if isinstance(value, bool):
 		return False
-	if value == float('nan'):
-		return False
 	return True
 
 def _assert_is_natural_number(value):
 	if not is_natural_number(value):
-		raise errors.EvaluationError('data type mismatch')
+		raise errors.EvaluationError('data type mismatch (not a natural number)')
 
 def _assert_is_real_number(value):
 	if not is_real_number(value):
-		raise errors.EvaluationError('data type mismatch')
+		raise errors.EvaluationError('data type mismatch (not a real number)')
+
+def _assert_is_numeric(value):
+	if not is_numeric(value):
+		raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
 class DataType(enum.Enum):
 	"""
@@ -249,9 +270,9 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	result_type = DataType.FLOAT
 	def __op_arithmetic(self, op, thing):
 		left = self.left.evaluate(thing)
-		_assert_is_real_number(left)
+		_assert_is_numeric(left)
 		right = self.right.evaluate(thing)
-		_assert_is_real_number(right)
+		_assert_is_numeric(right)
 		return float(op(left, right))
 
 	_op_add  = functools.partialmethod(__op_arithmetic, operator.add)
@@ -323,9 +344,9 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 	compatible_types = (DataType.FLOAT,)
 	def __op_arithmetic(self, op, thing):
 		left = self.left.evaluate(thing)
-		_assert_is_real_number(left)
+		_assert_is_numeric(left)
 		right = self.right.evaluate(thing)
-		_assert_is_real_number(right)
+		_assert_is_numeric(right)
 		return op(int(left), int(right))
 
 	_op_ge = functools.partialmethod(__op_arithmetic, operator.ge)
@@ -485,7 +506,7 @@ class UnaryExpression(ExpressionBase):
 
 	def __op_arithmetic(self, op, thing):
 		right = self.right.evaluate(thing)
-		_assert_is_real_number(right)
+		_assert_is_numeric(right)
 		return op(right)
 
 	_op_uminus = functools.partialmethod(__op_arithmetic, operator.neg)

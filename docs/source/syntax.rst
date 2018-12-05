@@ -81,4 +81,31 @@ raised.
 the string to compare and the expression on the right is the regular expression
 to use for either the match or search operation.
 
+Reserved Keywords
+^^^^^^^^^^^^^^^^^
+
++-----------+---------------------------------------+
+| Keyword   | Description                           |
++-----------+---------------------------------------+
+| Booleans                                          |
++-----------+---------------------------------------+
+| ``true``  | The "True" boolean value              |
++-----------+---------------------------------------+
+| ``false`` | The "False" boolean value             |
++-----------+---------------------------------------+
+| Floats                                            |
++-----------+---------------------------------------+
+| ``inf``   | Floating point value for infinity     |
++-----------+---------------------------------------+
+| ``nan``   | Floating point value for not-a-number |
++-----------+---------------------------------------+
+| Logical Operators                                 |
++-----------+---------------------------------------+
+| ``and``   | Logical "and" operator                |
++-----------+---------------------------------------+
+| ``not``   | Logical "not" operator                |
++-----------+---------------------------------------+
+| ``or``    | Logical "or" operator                 |
++-----------+---------------------------------------+
+
 .. _Order of operations: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages

@@ -85,13 +85,6 @@ class ParserLiteralTests(ParserTests):
 		self.assertLiteralStatementEqual('3.14E+3', 3140.0)
 		self.assertLiteralStatementEqual('3.14E-3', 0.00314)
 
-		self.assertLiteralStatementEqual('-3.14e5', -314000.0)
-		self.assertLiteralStatementEqual('-3.14e+3', -3140.0)
-		self.assertLiteralStatementEqual('-3.14e-3', -0.00314)
-		self.assertLiteralStatementEqual('-3.14E5', -314000.0)
-		self.assertLiteralStatementEqual('-3.14E+3', -3140.0)
-		self.assertLiteralStatementEqual('-3.14E-3', -0.00314)
-
 	def test_parse_float_base_2(self):
 		self.assertLiteralStatementEqual('0b00', 0)
 		self.assertLiteralStatementEqual('0b11', 3)
@@ -111,7 +104,6 @@ class ParserLiteralTests(ParserTests):
 
 	def test_parse_float_inf(self):
 		self.assertLiteralStatementEqual('inf', float('inf'))
-		self.assertLiteralStatementEqual('-inf', float('-inf'))
 
 	def test_parse_float_nan(self):
 		self.assertTrue(math.isnan(self._evaluate('nan')))

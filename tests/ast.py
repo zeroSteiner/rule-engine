@@ -30,12 +30,16 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import collections
 import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 import rule_engine.parser as parser
+
+inf = float('inf')
+nan = float('nan')
 
 class AstTests(unittest.TestCase):
 	context = engine.Context()
@@ -105,9 +109,9 @@ class AstTests(unittest.TestCase):
 		with self.assertRaises(errors.EvaluationError):
 			statement.evaluate({'symbol': True})
 		with self.assertRaises(errors.EvaluationError):
-			statement.evaluate({'symbol': float('inf')})
+			statement.evaluate({'symbol': inf})
 		with self.assertRaises(errors.EvaluationError):
-			statement.evaluate({'symbol': float('nan')})
+			statement.evaluate({'symbol': nan})
 		self.assertEqual(statement.evaluate({'symbol': 1}), 2)
 
 		with self.assertRaises(errors.EvaluationError):
@@ -169,6 +173,37 @@ class AstTests(unittest.TestCase):
 			context = engine.Context(type_resolver=engine.type_resolver_from_dict({'symbol': type_is_not}))
 			with self.assertRaises(errors.EvaluationError):
 				parser_.parse(case, context)
+
+class ValueTests(unittest.TestCase):
+	_Case = collections.namedtuple('_Case', ('value', 'numeric', 'real', 'natural'))
+	cases = (
+		#     value   numeric  real    natural
+		_Case(-inf,   True,    False,  False),
+		_Case(-1.5,   True,    True,   False),
+		_Case(-1.0,   True,    True,   False),
+		_Case(-1,     True,    True,   False),
+		_Case(0,      True,    True,   True ),
+		_Case(1,      True,    True,   True ),
+		_Case(1.0,    True,    True,   True ),
+		_Case(1.5,    True,    True,   False),
+		_Case(inf,    True,    False,  False),
+		_Case(nan,    True,    False,  False),
+		_Case(True,   False,   False,  False),
+		_Case(False,  False,   False,  False),
+		_Case('',     False,   False,  False),
+		_Case(None,   False,   False,  False),
+	)
+	def test_value_is_natural_number(self):
+		for case in self.cases:
+			self.assertEqual(ast.is_natural_number(case.value), case.natural)
+
+	def test_value_is_numeric(self):
+		for case in self.cases:
+			self.assertEqual(ast.is_numeric(case.value), case.numeric)
+
+	def test_value_is_real_number(self):
+		for case in self.cases:
+			self.assertEqual(ast.is_real_number(case.value), case.real)
 
 if __name__ == '__main__':
 	unittest.main()

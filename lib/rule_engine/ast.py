@@ -55,6 +55,8 @@ def is_natural_number(value):
 		return False
 	if math.floor(value) != value:
 		return False
+	if value < 0:
+		return False
 	return True
 
 def is_real_number(value):

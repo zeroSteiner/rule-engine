@@ -37,12 +37,20 @@ import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.parser as parser
 
-class ParserTests(unittest.TestCase):
+class ParserTestsBase(unittest.TestCase):
 	_parser = parser.Parser()
 	context = engine.Context()
 	def _parse(self, string, context):
 		return self._parser.parse(string, self.context)
 
+	def assertStatementType(self, string, ast_expression):
+		statement = self._parse(string, self.context)
+		self.assertIsInstance(statement, ast.Statement, msg='the parser did not return a statement')
+		expression = statement.expression
+		self.assertIsInstance(expression, ast_expression, msg='the statement expression is not the correct expression type')
+		return statement
+
+class ParserTests(ParserTestsBase):
 	def test_parser_order_of_operations(self):
 		cases = (
 			'100 * ( 2 + 12 ) / 14',
@@ -59,13 +67,92 @@ class ParserTests(unittest.TestCase):
 		expression = self._parse('true', self.context)
 		self.assertIsInstance(expression, ast.Statement)
 
-class ParserLiteralTests(ParserTests):
-	def assertLiteralStatementEqual(self, string, ast_type, python_value, msg=None):
-		msg = msg or "{0!r} does not evaluate to {1!r}".format(string, python_value)
+	def test_parser_symbol_expressions(self):
+		expressions = ('a', 'b')
+		for expression in expressions:
+			self.assertStatementType(expression, ast.SymbolExpression)
+
+	def test_parser_ternary_expressions(self):
+		statement = self.assertStatementType('condition ? case_true : case_false', ast.TernaryExpression)
+		self.assertIsInstance(statement.expression.condition, ast.SymbolExpression)
+		self.assertEqual(statement.expression.condition.name, 'condition')
+		self.assertIsInstance(statement.expression.case_true, ast.SymbolExpression)
+		self.assertEqual(statement.expression.case_true.name, 'case_true')
+		self.assertIsInstance(statement.expression.case_false, ast.SymbolExpression)
+		self.assertEqual(statement.expression.case_false.name, 'case_false')
+
+	def test_parser_unary_expressions(self):
+		expressions = ('-right', 'not right')
+		for expression in expressions:
+			statement = self.assertStatementType(expression, ast.UnaryExpression)
+			self.assertIsInstance(statement.expression.right, ast.SymbolExpression)
+			self.assertEqual(statement.expression.right.name, 'right')
+
+class ParserLeftOperatorRightTests(ParserTestsBase):
+	def assertStatementType(self, string, ast_expression):
+		statement = super(ParserLeftOperatorRightTests, self).assertStatementType(string, ast_expression)
+		expression = statement.expression
+		self.assertIsInstance(expression.left, ast.SymbolExpression)
+		self.assertEqual(expression.left.name, 'left')
+		self.assertIsInstance(expression.right, ast.SymbolExpression)
+		self.assertEqual(expression.right.name, 'right')
+		return statement
+
+	def test_parser_arithmetic_expressions(self):
+		expressions = (
+			'left + right',
+			'left - right',
+			'left / right',
+			'left // right',
+			'left % right',
+			'left * right',
+			'left ** right'
+		)
+		for expression in expressions:
+			self.assertStatementType(expression, ast.ArithmeticExpression)
+
+	def test_parser_bitwise_expressions(self):
+		expressions = (
+			'left & right',
+			'left | right',
+			'left ^ right',
+			'left << right',
+			'left >> right'
+		)
+		for expression in expressions:
+			self.assertStatementType(expression, ast.BitwiseExpression)
+
+	def test_parser_logical_expressions(self):
+		expressions = ('left and right', 'left or right')
+		for expression in expressions:
+			self.assertStatementType(expression, ast.LogicExpression)
+
+	def test_parser_comparison_expressions(self):
+		expressions = ('left == right', 'left != right')
+		for expression in expressions:
+			self.assertStatementType(expression, ast.ComparisonExpression)
+
+	def test_parser_comparison_arithmetic_expressions(self):
+		expressions = (
+			'left > right',
+			'left >= right',
+			'left < right',
+			'left <= right'
+		)
+		for expression in expressions:
+			self.assertStatementType(expression, ast.ComparisonExpression)
+
+	def test_parser_comparison_regex_expressions(self):
+		expressions = ('left =~ right', 'left =~~ right', 'left !~ right', 'left !~~ right')
+		for expression in expressions:
+			self.assertStatementType(expression, ast.RegexComparisonExpression)
+
+class ParserLiteralTests(ParserTestsBase):
+	def assertLiteralStatementEqual(self, string, ast_expression, python_value, msg=None):
 		statement = self._parse(string, self.context)
 		self.assertIsInstance(statement, ast.Statement, msg='the parser did not return a statement')
-		self.assertIsInstance(statement.expression, ast_type, msg='the statement expression is not the correct literal type')
-		self.assertEqual(statement.expression.value, python_value, msg=msg)
+		self.assertIsInstance(statement.expression, ast_expression, msg='the statement expression is not the correct literal type')
+		self.assertEqual(statement.expression.value, python_value, msg=msg or "{0!r} does not evaluate to {1!r}".format(string, python_value))
 
 	def test_parse_boolean(self):
 		self.assertLiteralStatementEqual('true', ast.BooleanExpression, True)

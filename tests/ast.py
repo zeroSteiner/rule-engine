@@ -174,6 +174,32 @@ class AstTests(unittest.TestCase):
 			with self.assertRaises(errors.EvaluationError):
 				parser_.parse(case, context)
 
+class DataTypeTests(unittest.TestCase):
+	class _UnsupportedType(object):
+		pass
+
+	def test_datatype_from_type(self):
+		self.assertIs(ast.DataType.from_type(bool), ast.DataType.BOOLEAN)
+		self.assertIs(ast.DataType.from_type(int), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_type(float), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_type(str), ast.DataType.STRING)
+
+	def test_datatype_from_type_exceptions(self):
+		with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be type, not _UnsupportedType$'):
+			ast.DataType.from_type(self._UnsupportedType())
+		with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
+			ast.DataType.from_type(self._UnsupportedType)
+
+	def test_datatype_from_value(self):
+		self.assertIs(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
+		self.assertIs(ast.DataType.from_value(0), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_value(0.0), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_value(''), ast.DataType.STRING)
+
+	def test_datatype_from_value_exceptions(self):
+		with self.assertRaisesRegex(TypeError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
+			ast.DataType.from_value(self._UnsupportedType())
+
 class ValueTests(unittest.TestCase):
 	_Case = collections.namedtuple('_Case', ('value', 'numeric', 'real', 'natural'))
 	cases = (

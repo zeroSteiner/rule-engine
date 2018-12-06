@@ -32,6 +32,10 @@ Classes
    .. autoattribute:: STRING
       :annotation:
 
+   .. automethod:: from_type
+
+   .. automethod:: from_value
+
 .. autoclass:: rule_engine.ast.Statement
    :show-inheritance:
 

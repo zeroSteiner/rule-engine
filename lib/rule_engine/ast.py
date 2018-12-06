@@ -116,24 +116,48 @@ class DataType(enum.Enum):
 	symbol is valid, but it's data type is currently unknown.
 	"""
 	@classmethod
-	def from_value(cls, value):
+	def from_type(cls, python_type):
+		"""
+		Get the supported data type constant for the specified Python type. If
+		the type can not be mapped to a supported data type, then a
+		:py:exc:`ValueError` exception will be raised. This function will not
+		return :py:attr:`.UNDEFINED`.
+
+		:param type python_type: The native Python type to retrieve the
+			corresponding type constant for.
+		:return: One of the constants.
+		"""
+		if not isinstance(python_type, type):
+			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
+		if python_type == bool:
+			return cls.BOOLEAN
+		elif python_type == float:
+			return cls.FLOAT
+		elif python_type == int:
+			return cls.FLOAT
+		elif python_type == str:
+			return cls.STRING
+		raise ValueError("can not map python type {0!r} to a compatible data type".format(python_type.__name__))
+
+	@classmethod
+	def from_value(cls, python_value):
 		"""
 		Get the supported data type constant for the specified Python value. If
 		the value can not be mapped to a supported data type, then a
 		:py:exc:`TypeError` exception will be raised. This function will not
 		return :py:attr:`.UNDEFINED`.
 
-		:param value: The native Python type to retrieve the corresponding data
-			type constant for.
+		:param python_value: The native Python value to retrieve the
+			corresponding data type constant for.
 		:return: One of the constants.
 		"""
-		if isinstance(value, bool):
+		if isinstance(python_value, bool):
 			return cls.BOOLEAN
-		elif isinstance(value, (float, int)):
+		elif isinstance(python_value, (float, int)):
 			return cls.FLOAT
-		elif isinstance(value, (str,)):
+		elif isinstance(python_value, (str,)):
 			return cls.STRING
-		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(value).__name__))
+		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
 class ASTNodeBase(object):
 	def to_graphviz(self, digraph):

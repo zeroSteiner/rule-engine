@@ -375,7 +375,7 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 		_assert_is_numeric(left)
 		right = self.right.evaluate(thing)
 		_assert_is_numeric(right)
-		return op(int(left), int(right))
+		return op(left, right)
 
 	_op_ge = functools.partialmethod(__op_arithmetic, operator.ge)
 	_op_gt = functools.partialmethod(__op_arithmetic, operator.gt)

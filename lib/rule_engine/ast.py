@@ -203,7 +203,9 @@ class LiteralExpressionBase(ExpressionBase):
 		:param value: The native Python value.
 		"""
 		self.context = context
-		self.value = self.result_type.value(value)
+		if not isinstance(value, self.result_type.value):
+			raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.value.__name__, type(value).__name__))
+		self.value = value
 
 	def __repr__(self):
 		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)

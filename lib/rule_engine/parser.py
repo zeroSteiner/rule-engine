@@ -320,7 +320,7 @@ class Parser(ParserBase):
 
 	def p_expression_float(self, p):
 		'expression : FLOAT'
-		p[0] = ast.FloatExpression(self.context, literal_eval(p[1]))
+		p[0] = ast.FloatExpression(self.context, float(literal_eval(p[1])))
 
 	def p_expression_float_nan(self, p):
 		'expression : FLOAT_NAN'

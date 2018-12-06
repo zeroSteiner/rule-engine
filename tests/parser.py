@@ -38,9 +38,12 @@ import rule_engine.engine as engine
 import rule_engine.parser as parser
 
 class ParserTests(unittest.TestCase):
+	_parser = parser.Parser()
 	context = engine.Context()
+	def _parse(self, string, context):
+		return self._parser.parse(string, self.context)
+
 	def test_parser_order_of_operations(self):
-		parser_ = parser.Parser()
 		cases = (
 			'100 * ( 2 + 12 ) / 14',
 			'50 + 50 * 2 - 50',
@@ -48,74 +51,73 @@ class ParserTests(unittest.TestCase):
 			'(4 * 5) ** 2 / 4'
 		)
 		for case in cases:
-			statement = parser_.parse(case, self.context)
+			statement = self._parse(case, self.context)
 			self.assertIsInstance(statement.expression, ast.FloatExpression)
 			self.assertEqual(statement.evaluate(None), 100)
 
 	def test_parser_returns_statement(self):
-		parser_ = parser.Parser()
-		expression = parser_.parse('true', self.context)
+		expression = self._parse('true', self.context)
 		self.assertIsInstance(expression, ast.Statement)
 
 class ParserLiteralTests(ParserTests):
-	def _evaluate(self, string):
-		parser_ = parser.Parser()
-		statement = parser_.parse(string, self.context)
-		return statement.evaluate({})
-
-	def assertLiteralStatementEqual(self, string, value, msg=None):
-		msg = msg or "{0!r} does not evaluate to {1!r}".format(string, value)
-		self.assertEqual(self._evaluate(string), value, msg=msg)
+	def assertLiteralStatementEqual(self, string, ast_type, python_value, msg=None):
+		msg = msg or "{0!r} does not evaluate to {1!r}".format(string, python_value)
+		statement = self._parse(string, self.context)
+		self.assertIsInstance(statement, ast.Statement, msg='the parser did not return a statement')
+		self.assertIsInstance(statement.expression, ast_type, msg='the statement expression is not the correct literal type')
+		self.assertEqual(statement.expression.value, python_value, msg=msg)
 
 	def test_parse_boolean(self):
-		self.assertLiteralStatementEqual('true', True)
-		self.assertLiteralStatementEqual('false', False)
+		self.assertLiteralStatementEqual('true', ast.BooleanExpression, True)
+		self.assertLiteralStatementEqual('false', ast.BooleanExpression, False)
 
 	def test_parse_float(self):
-		self.assertLiteralStatementEqual('3.14', 3.14)
-		self.assertLiteralStatementEqual('3.140', 3.140)
-		self.assertLiteralStatementEqual('.314', 0.314)
-		self.assertLiteralStatementEqual('0.314', 0.314)
+		self.assertLiteralStatementEqual('3.14', ast.FloatExpression, 3.14)
+		self.assertLiteralStatementEqual('3.140', ast.FloatExpression, 3.140)
+		self.assertLiteralStatementEqual('.314', ast.FloatExpression, 0.314)
+		self.assertLiteralStatementEqual('0.314', ast.FloatExpression, 0.314)
 
 	def test_parse_float_exponent(self):
-		self.assertLiteralStatementEqual('3.14e5', 314000.0)
-		self.assertLiteralStatementEqual('3.14e+3', 3140.0)
-		self.assertLiteralStatementEqual('3.14e-3', 0.00314)
-		self.assertLiteralStatementEqual('3.14E5', 314000.0)
-		self.assertLiteralStatementEqual('3.14E+3', 3140.0)
-		self.assertLiteralStatementEqual('3.14E-3', 0.00314)
+		self.assertLiteralStatementEqual('3.14e5', ast.FloatExpression, 314000.0)
+		self.assertLiteralStatementEqual('3.14e+3', ast.FloatExpression, 3140.0)
+		self.assertLiteralStatementEqual('3.14e-3', ast.FloatExpression, 0.00314)
+		self.assertLiteralStatementEqual('3.14E5', ast.FloatExpression, 314000.0)
+		self.assertLiteralStatementEqual('3.14E+3', ast.FloatExpression, 3140.0)
+		self.assertLiteralStatementEqual('3.14E-3', ast.FloatExpression, 0.00314)
 
 	def test_parse_float_base_2(self):
-		self.assertLiteralStatementEqual('0b00', 0)
-		self.assertLiteralStatementEqual('0b11', 3)
+		self.assertLiteralStatementEqual('0b00', ast.FloatExpression, 0)
+		self.assertLiteralStatementEqual('0b11', ast.FloatExpression, 3)
 
 	def test_parse_float_base_8(self):
-		self.assertLiteralStatementEqual('0o00', 0)
-		self.assertLiteralStatementEqual('0o77', 63)
+		self.assertLiteralStatementEqual('0o00', ast.FloatExpression, 0)
+		self.assertLiteralStatementEqual('0o77', ast.FloatExpression, 63)
 
 	def test_parse_float_base_10(self):
-		self.assertLiteralStatementEqual('00', 0)
-		self.assertLiteralStatementEqual('99', 99)
+		self.assertLiteralStatementEqual('00', ast.FloatExpression, 0)
+		self.assertLiteralStatementEqual('99', ast.FloatExpression, 99)
 
 	def test_parse_float_base_16(self):
-		self.assertLiteralStatementEqual('0x00', 0)
-		self.assertLiteralStatementEqual('0xdeadbeef', 3735928559)
-		self.assertLiteralStatementEqual('0xdeADbeEF', 3735928559)
+		self.assertLiteralStatementEqual('0x00', ast.FloatExpression, 0)
+		self.assertLiteralStatementEqual('0xdeadbeef', ast.FloatExpression, 3735928559)
+		self.assertLiteralStatementEqual('0xdeADbeEF', ast.FloatExpression, 3735928559)
 
 	def test_parse_float_inf(self):
-		self.assertLiteralStatementEqual('inf', float('inf'))
+		self.assertLiteralStatementEqual('inf', ast.FloatExpression, float('inf'))
 
 	def test_parse_float_nan(self):
-		self.assertTrue(math.isnan(self._evaluate('nan')))
-		self.assertTrue(math.isnan(self._evaluate('-nan')))
+		statement = self._parse('nan', self.context)
+		self.assertIsInstance(statement, ast.Statement, msg='the parser did not return a statement')
+		self.assertIsInstance(statement.expression, ast.FloatExpression, msg='the statement expression is not the correct literal type')
+		self.assertTrue(math.isnan(statement.expression.value), msg='the statement expression is not nan')
 
 	def test_parse_string(self):
-		self.assertLiteralStatementEqual("'Alice'", 'Alice')
-		self.assertLiteralStatementEqual('"Alice"', 'Alice')
+		self.assertLiteralStatementEqual("'Alice'", ast.StringExpression, 'Alice')
+		self.assertLiteralStatementEqual('"Alice"', ast.StringExpression, 'Alice')
 
 	def test_parse_string_escapes(self):
-		self.assertLiteralStatementEqual("'Alice\\\'s'", 'Alice\'s')
-		self.assertLiteralStatementEqual('"Alice\'s"', 'Alice\'s')
+		self.assertLiteralStatementEqual("'Alice\\\'s'", ast.StringExpression, 'Alice\'s')
+		self.assertLiteralStatementEqual('"Alice\'s"', ast.StringExpression, 'Alice\'s')
 
 if __name__ == '__main__':
 	unittest.main()

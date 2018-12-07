@@ -49,7 +49,10 @@ class EvaluationError(EngineError):
 	"""
 	pass
 
-class RuleSyntaxError(EngineError):
+class SyntaxError(EngineError):
+	"""A base error for syntax related issues."""
+
+class RuleSyntaxError(SyntaxError):
 	"""
 	An error raised for issues identified in while parsing the grammar of the
 	rule text.
@@ -63,6 +66,15 @@ class RuleSyntaxError(EngineError):
 		super(RuleSyntaxError, self).__init__(message)
 		self.token = token
 		"""The PLY token (if available) which is related to the syntax error."""
+
+class RegexSyntaxError(SyntaxError):
+	"""
+	An error raised for issues regarding the use of improper regular expression syntax.
+	"""
+	def __init__(self, message, error):
+		super(RegexSyntaxError, self).__init__(message)
+		self.error = error
+		"""The :py:exc:`re.error` exception from which this error was triggered."""
 
 class SymbolResolutionError(EvaluationError):
 	"""

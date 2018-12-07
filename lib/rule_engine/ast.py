@@ -391,7 +391,14 @@ class RegexComparisonExpression(ComparisonExpression):
 	def __init__(self, *args, **kwargs):
 		super(RegexComparisonExpression, self).__init__(*args, **kwargs)
 		if isinstance(self.right, StringExpression):
-			self._right = re.compile(self.right.evaluate(None), flags=self.context.regex_flags)
+			self._right = self._compile_regex(self.right.evaluate(None))
+
+	def _compile_regex(self, regex):
+		try:
+			result = re.compile(regex, flags=self.context.regex_flags)
+		except re.error as error:
+			raise errors.RegexSyntaxError('invalid regex', error=error) from None
+		return result
 
 	def __op_regex(self, regex_function, modifier, thing):
 		left_string = self.left.evaluate(thing)
@@ -403,7 +410,7 @@ class RegexComparisonExpression(ComparisonExpression):
 			regex = self.right.evaluate(thing)
 			if not isinstance(regex, str):
 				raise errors.EvaluationError('data type mismatch')
-			regex = re.compile(self.right, flags=self.context.regex_flags)
+			regex = self._compile_regex(regex)
 		match = getattr(regex, regex_function)(left_string)
 		return modifier(match, None)
 

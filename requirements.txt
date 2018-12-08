@@ -1,2 +1,0 @@
-# these are duplicated in setup.py
-ply>=3.9

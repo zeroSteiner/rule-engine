@@ -2,6 +2,7 @@
 
 .pylintrc
 .python-version
+Pipfile.lock
 build/*
 dist/*
 docs/build/*

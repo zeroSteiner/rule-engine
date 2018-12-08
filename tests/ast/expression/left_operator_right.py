@@ -50,7 +50,8 @@ __all__ = (
 
 class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):
 	ExpressionClass = None
-	false_value = ast.BooleanExpression(context, False)
+	false_value = False
+	thing = {}
 	def assertExpressionTests(self, operation, left_value=None, right_value=None, equals_value=None):
 		left_value = left_value or self.left_value
 		right_value = right_value or self.right_value
@@ -58,7 +59,7 @@ class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):
 		expression = self.ExpressionClass(context, operation, left_value, right_value)
 		self.assertIsInstance(expression, ast.LeftOperatorRightExpressionBase)
 		message = "{0}({1!r} {2} {3!r})".format(self.ExpressionClass.__name__, left_value, operation, right_value)
-		self.assertEqual(expression.evaluate(None), equals_value, msg=message)
+		self.assertEqual(expression.evaluate(self.thing), equals_value, msg=message)
 
 	def test_ast_expression_left_operator_right_operation_error(self):
 		if self.ExpressionClass is None:
@@ -71,7 +72,7 @@ class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):
 ################################################################################
 class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.ArithmeticExpression
-	false_value = ast.FloatExpression(context, 0.0)
+	false_value = 0.0
 	left_value = two = ast.FloatExpression(context, 2.0)
 	right_value = four = ast.FloatExpression(context, 4.0)
 	def test_ast_expression_left_operator_right_arithmetic(self):
@@ -96,7 +97,7 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 
 class BitwiseExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.BitwiseExpression
-	false_value = ast.FloatExpression(context, 0.0)
+	false_value = 0.0
 	left_value = three = ast.FloatExpression(context, 3.0)
 	right_value = five = ast.FloatExpression(context, 5.0)
 	def test_ast_expression_left_operator_right_bitwise(self):
@@ -139,10 +140,16 @@ class LogicExpressionTests(LeftOperatorRightExpresisonTestsBase):
 ################################################################################
 class ComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.ComparisonExpression
+	thing = {'pi': 3.14159}
 	def test_ast_expression_left_operator_right_comparison(self):
-		for left, right in itertools.product(itertools.chain(trueish, falseish), itertools.chain(trueish, falseish)):
+		chain = tuple(itertools.chain(
+			(ast.SymbolExpression(context, 'pi'),),
+			trueish,
+			falseish
+		))
+		for left, right in itertools.product(chain, chain):
 			self.assertExpressionTests('eq', left, right, left is right)
-		for left, right in itertools.product(itertools.chain(trueish, falseish), itertools.chain(trueish, falseish)):
+		for left, right in itertools.product(chain, chain):
 			self.assertExpressionTests('ne', left, right, left is not right)
 
 class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
@@ -168,7 +175,8 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 class RegexComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.RegexComparisonExpression
 	left_value = luke = ast.StringExpression(context, 'Luke Skywalker')
-	def test_ast_expression_left_operator_right_regexcomparison(self):
+	thing = {'darth': 'Vader', 'luke': 'Skywalker', 'zero': 0.0}
+	def test_ast_expression_left_operator_right_regexcomparison_literal(self):
 		regex = functools.partial(ast.StringExpression, context)
 		darth = ast.StringExpression(context, 'Darth Vader')
 		self.assertExpressionTests('eq_rem', right_value=self.luke, equals_value=True)
@@ -187,12 +195,39 @@ class RegexComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('ne_res', right_value=regex('Skywalker'), equals_value=False)
 		self.assertExpressionTests('ne_res', right_value=darth, equals_value=True)
 
+	def test_ast_expression_left_operator_right_regexcomparison_symbolic(self):
+		regex = functools.partial(ast.SymbolExpression, context)
+		darth = ast.SymbolExpression(context, 'darth')
+		self.assertExpressionTests('eq_rem', right_value=self.luke, equals_value=True)
+		self.assertExpressionTests('eq_rem', right_value=regex('luke'), equals_value=False)
+		self.assertExpressionTests('eq_rem', right_value=darth, equals_value=False)
+
+		self.assertExpressionTests('eq_res', right_value=self.luke, equals_value=True)
+		self.assertExpressionTests('eq_res', right_value=regex('luke'), equals_value=True)
+		self.assertExpressionTests('eq_res', right_value=darth, equals_value=False)
+
+		self.assertExpressionTests('ne_rem', right_value=self.luke, equals_value=False)
+		self.assertExpressionTests('ne_rem', right_value=regex('luke'), equals_value=True)
+		self.assertExpressionTests('ne_rem', right_value=darth, equals_value=True)
+
+		self.assertExpressionTests('ne_res', right_value=self.luke, equals_value=False)
+		self.assertExpressionTests('ne_res', right_value=regex('luke'), equals_value=False)
+		self.assertExpressionTests('ne_res', right_value=darth, equals_value=True)
+
 	def test_ast_expression_left_operator_right_regexcomparison_type_errors(self):
-		for operation, left, right in itertools.product(('eq_rem', 'eq_res', 'ne_rem', 'ne_res'), trueish, falseish):
+		operations = ('eq_rem', 'eq_res', 'ne_rem', 'ne_res')
+		for operation, left, right in itertools.product(operations, trueish, falseish):
 			if isinstance(left, ast.StringExpression) and isinstance(right, ast.StringExpression):
 				continue
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, left, right)
+		string = ast.StringExpression(context, 'string')
+		symbol = ast.SymbolExpression(context, 'zero')
+		for operation in operations:
+			with self.assertRaises(errors.EvaluationError):
+				self.assertExpressionTests(operation, string, symbol)
+			with self.assertRaises(errors.EvaluationError):
+				self.assertExpressionTests(operation, symbol, string)
 
 	def test_ast_expression_left_operator_right_regexcomparison_syntax_errors(self):
 		for operation in ('eq_rem', 'eq_res', 'ne_rem', 'ne_res'):

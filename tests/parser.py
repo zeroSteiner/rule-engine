@@ -35,6 +35,7 @@ import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
+import rule_engine.errors as errors
 import rule_engine.parser as parser
 
 class ParserTestsBase(unittest.TestCase):
@@ -62,6 +63,10 @@ class ParserTests(ParserTestsBase):
 			statement = self._parse(case, self.context)
 			self.assertIsInstance(statement.expression, ast.FloatExpression)
 			self.assertEqual(statement.evaluate(None), 100)
+
+	def test_parser_raises_syntax_error(self):
+		with self.assertRaises(errors.RuleSyntaxError):
+			self._parse('test[', self.context)
 
 	def test_parser_returns_statement(self):
 		expression = self._parse('true', self.context)

@@ -358,11 +358,25 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	A class for representing comparison expressions from the grammar text such
 	as equality checks.
 	"""
-	def __op_comparison(self, op, thing):
-		return op(self.left.evaluate(thing), self.right.evaluate(thing))
+	def _op_eq(self, thing):
+		if self.left.result_type is not DataType.UNDEFINED and self.right.result_type is not DataType.UNDEFINED:
+			if self.left.result_type is not self.right.result_type:
+				return False
+		left_value = self.left.evaluate(thing)
+		right_value = self.right.evaluate(thing)
+		if type(left_value) is not type(right_value):
+			return False
+		return operator.eq(left_value, right_value)
 
-	_op_eq = functools.partialmethod(__op_comparison, operator.eq)
-	_op_ne = functools.partialmethod(__op_comparison, operator.ne)
+	def _op_ne(self, thing):
+		if self.left.result_type is not DataType.UNDEFINED and self.right.result_type is not DataType.UNDEFINED:
+			if self.left.result_type is not self.right.result_type:
+				return True
+		left_value = self.left.evaluate(thing)
+		right_value = self.right.evaluate(thing)
+		if type(left_value) is not type(right_value):
+			return True
+		return operator.ne(left_value, right_value)
 
 class ArithmeticComparisonExpression(ComparisonExpression):
 	"""

@@ -37,6 +37,23 @@ import rule_engine.engine as engine
 
 __all__ = ('LiteralExpressionTests',)
 
+context = engine.Context()
+# literal expressions which should evaluate to false
+falseish = (
+	ast.BooleanExpression(context, False),
+	ast.FloatExpression(context, 0.0),
+	ast.StringExpression(context, '')
+)
+# literal expressions which should evaluate to true
+trueish = (
+	ast.BooleanExpression(context, True),
+	ast.FloatExpression(context, float('-inf')),
+	ast.FloatExpression(context, -1.0),
+	ast.FloatExpression(context, 1.0),
+	ast.FloatExpression(context, float('inf')),
+	ast.StringExpression(context, 'non-empty')
+)
+
 class UnknownType(object):
 	pass
 
@@ -55,10 +72,11 @@ class LiteralExpressionTests(unittest.TestCase):
 			self.assertTrue(expression.evaluate(None))
 
 	def test_ast_expression_literal_string(self):
-		self.assertLiteralTests(ast.StringExpression, '', 'true')
+		self.assertLiteralTests(ast.StringExpression, '', 'non-empty')
 
 	def test_ast_expression_literal_float(self):
-		self.assertLiteralTests(ast.FloatExpression, 0.0, -1.0, 1.0, float('nan'))
+		trueish_floats = (expression.value for expression in trueish if isinstance(expression, ast.FloatExpression))
+		self.assertLiteralTests(ast.FloatExpression, 0.0, float('nan'), *trueish_floats)
 
 	def test_ast_expression_literal_boolean(self):
 		self.assertLiteralTests(ast.BooleanExpression, False, True)

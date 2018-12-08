@@ -34,8 +34,8 @@ import functools
 import itertools
 import unittest
 
+from .literal import context, trueish, falseish
 import rule_engine.ast as ast
-import rule_engine.engine as engine
 import rule_engine.errors as errors
 
 __all__ = (
@@ -46,20 +46,6 @@ __all__ = (
 	'ComparisonExpressionTests',
 	'ArithmeticComparisonExpressionTests',
 	'RegexComparisonExpressionTests'
-)
-
-context = engine.Context()
-# literal expressions which should evaluate to false
-falseish = (
-	ast.BooleanExpression(context, False),
-	ast.FloatExpression(context, 0.0),
-	ast.StringExpression(context, '')
-)
-# literal expressions which should evaluate to true
-trueish = (
-	ast.BooleanExpression(context, True),
-	ast.FloatExpression(context, 1.0),
-	ast.StringExpression(context, 'non-empty')
 )
 
 class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):

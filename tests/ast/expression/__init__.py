@@ -34,7 +34,7 @@ import unittest
 
 from .left_operator_right import *
 from .literal import *
-
+from .miscellaneous import *
 
 if __name__ == '__main__':
 	unittest.main()

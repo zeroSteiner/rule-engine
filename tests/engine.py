@@ -31,11 +31,20 @@
 #
 
 import collections
+import re
+import types
 import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
+
+try:
+	import graphviz
+except ImportError:
+	has_graphviz = False
+else:
+	has_graphviz = True
 
 class EngineTests(unittest.TestCase):
 	def test_engine_resolve_attribute(self):
@@ -48,7 +57,7 @@ class EngineTests(unittest.TestCase):
 		thing = {'name': 'Alice'}
 		self.assertEqual(engine.resolve_item(thing, 'name'), thing['name'])
 		with self.assertRaises(errors.SymbolResolutionError):
-			engine.resolve_attribute(thing, 'email')
+			engine.resolve_item(thing, 'email')
 
 	def test_engine_type_resolver_from_dict(self):
 		type_resolver = engine.type_resolver_from_dict({
@@ -62,13 +71,46 @@ class EngineTests(unittest.TestCase):
 			type_resolver('doesnotexist')
 
 class EngineRuleTests(unittest.TestCase):
+	rule_text = 'first_name == "Luke" and email =~ ".*@rebels.org$"'
+	true_item = {'first_name': 'Luke', 'last_name': 'Skywalker', 'email': 'luke@rebels.org'}
+	false_item = {'first_name': 'Darth', 'last_name': 'Vader', 'email': 'dvader@empire.net'}
 	def test_engine_rule_is_valid(self):
+		self.assertTrue(engine.Rule.is_valid(self.rule_text))
 		self.assertTrue(engine.Rule.is_valid('test == 1'))
 		self.assertFalse(engine.Rule.is_valid('test =='))
 
 	def test_engine_rule_raises(self):
 		with self.assertRaises(errors.RuleSyntaxError):
 			engine.Rule('test ==')
+
+	@unittest.skipUnless(has_graphviz, 'graphviz is unavailable')
+	def test_engine_rule_to_graphviz(self):
+		rule = engine.Rule(self.rule_text)
+		digraph = rule.to_graphviz()
+		self.assertIsInstance(digraph, graphviz.Digraph)
+		self.assertEqual(digraph.comment, self.rule_text)
+
+	def test_engine_rule_to_strings(self):
+		rule = engine.Rule(self.rule_text)
+		self.assertEqual(str(rule), self.rule_text)
+		self.assertRegex(repr(rule), "<Rule text='{0}' >".format(re.escape(self.rule_text)))
+
+	def test_engine_rule_matches(self):
+		rule = engine.Rule(self.rule_text)
+		result = rule.matches(self.true_item)
+		self.assertIsInstance(result, bool)
+		self.assertTrue(result)
+		result = rule.matches(self.false_item)
+		self.assertIsInstance(result, bool)
+		self.assertFalse(result)
+
+	def test_engine_rule_filter(self):
+		rule = engine.Rule(self.rule_text)
+		result = rule.filter([self.true_item, self.false_item])
+		self.assertIsInstance(result, types.GeneratorType)
+		result = tuple(result)
+		self.assertIn(self.true_item, result)
+		self.assertNotIn(self.false_item, result)
 
 if __name__ == '__main__':
 	unittest.main()

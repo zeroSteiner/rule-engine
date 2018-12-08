@@ -177,15 +177,5 @@ class AstTests(unittest.TestCase):
 			with self.assertRaises(errors.EvaluationError):
 				parser_.parse(case, context)
 
-	def test_ast_regex_raises_syntax_error(self):
-		node = ast.RegexComparisonExpression(
-			self.context,
-			'EQ_REM',
-			ast.StringExpression(self.context, 'test'),
-			ast.SymbolExpression(self.context, 'bad_regex')
-		)
-		with self.assertRaises(errors.RegexSyntaxError):
-			node.evaluate({'bad_regex': '['})
-
 if __name__ == '__main__':
 	unittest.main()

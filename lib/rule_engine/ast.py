@@ -462,7 +462,9 @@ class SymbolExpression(ExpressionBase):
 		value = self.context.resolve(thing, self.name)
 		# use DataType.from_value to raise a TypeError if value is not of a
 		# compatible data type
-		DataType.from_value(value)
+		value_type = DataType.from_value(value)
+		if self.result_type is not DataType.UNDEFINED and self.result_type is not value_type:
+			raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
 		return value
 
 class Statement(ASTNodeBase):

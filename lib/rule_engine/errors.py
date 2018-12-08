@@ -86,4 +86,18 @@ class SymbolResolutionError(EvaluationError):
 		"""
 		self.symbol_name = symbol_name
 		"""The name of the symbol that can not be resolved."""
-		super(SymbolResolutionError, self).__init__('unknown symbol: ' + symbol_name)
+		super(SymbolResolutionError, self).__init__("unknown symbol: {0!r}".format(symbol_name))
+
+class SymbolTypeError(EvaluationError):
+	"""
+	An error raised when a symbol with type information is resolved to a python
+	value that is not of that type.
+	"""
+	def __init__(self, symbol_name, is_value, is_type, expected_type):
+		self.symbol_name = symbol_name
+		self.is_value = is_value
+		self.is_type = is_type
+		self.expected_type = expected_type
+		message = "symbol {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(symbol_name, is_type.name, expected_type.name)
+		super(SymbolTypeError, self).__init__(message)
+

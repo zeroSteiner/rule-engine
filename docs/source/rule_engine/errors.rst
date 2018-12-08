@@ -34,6 +34,11 @@ Exceptions
    :show-inheritance:
    :special-members: __init__
 
+.. autoexception:: SymbolTypeError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: SyntaxError
    :members:
    :show-inheritance:

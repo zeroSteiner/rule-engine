@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/ast.py
+#  tests/ast/__init__.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,8 +30,11 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import collections
 import unittest
+
+from .data_type import *
+from .expression import *
+from .value_is import *
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
@@ -183,63 +186,6 @@ class AstTests(unittest.TestCase):
 		)
 		with self.assertRaises(errors.RegexSyntaxError):
 			node.evaluate({'bad_regex': '['})
-
-class DataTypeTests(unittest.TestCase):
-	class _UnsupportedType(object):
-		pass
-
-	def test_datatype_from_type(self):
-		self.assertIs(ast.DataType.from_type(bool), ast.DataType.BOOLEAN)
-		self.assertIs(ast.DataType.from_type(int), ast.DataType.FLOAT)
-		self.assertIs(ast.DataType.from_type(float), ast.DataType.FLOAT)
-		self.assertIs(ast.DataType.from_type(str), ast.DataType.STRING)
-
-	def test_datatype_from_type_exceptions(self):
-		with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be type, not _UnsupportedType$'):
-			ast.DataType.from_type(self._UnsupportedType())
-		with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
-			ast.DataType.from_type(self._UnsupportedType)
-
-	def test_datatype_from_value(self):
-		self.assertIs(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
-		self.assertIs(ast.DataType.from_value(0), ast.DataType.FLOAT)
-		self.assertIs(ast.DataType.from_value(0.0), ast.DataType.FLOAT)
-		self.assertIs(ast.DataType.from_value(''), ast.DataType.STRING)
-
-	def test_datatype_from_value_exceptions(self):
-		with self.assertRaisesRegex(TypeError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
-			ast.DataType.from_value(self._UnsupportedType())
-
-class ValueTests(unittest.TestCase):
-	_Case = collections.namedtuple('_Case', ('value', 'numeric', 'real', 'natural'))
-	cases = (
-		#     value   numeric  real    natural
-		_Case(-inf,   True,    False,  False),
-		_Case(-1.5,   True,    True,   False),
-		_Case(-1.0,   True,    True,   False),
-		_Case(-1,     True,    True,   False),
-		_Case(0,      True,    True,   True ),
-		_Case(1,      True,    True,   True ),
-		_Case(1.0,    True,    True,   True ),
-		_Case(1.5,    True,    True,   False),
-		_Case(inf,    True,    False,  False),
-		_Case(nan,    True,    False,  False),
-		_Case(True,   False,   False,  False),
-		_Case(False,  False,   False,  False),
-		_Case('',     False,   False,  False),
-		_Case(None,   False,   False,  False),
-	)
-	def test_value_is_natural_number(self):
-		for case in self.cases:
-			self.assertEqual(ast.is_natural_number(case.value), case.natural)
-
-	def test_value_is_numeric(self):
-		for case in self.cases:
-			self.assertEqual(ast.is_numeric(case.value), case.numeric)
-
-	def test_value_is_real_number(self):
-		for case in self.cases:
-			self.assertEqual(ast.is_real_number(case.value), case.real)
 
 if __name__ == '__main__':
 	unittest.main()

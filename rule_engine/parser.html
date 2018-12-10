@@ -88,7 +88,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../grammar.html">Grammar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../syntax.html">Syntax</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ast.html"><code class="docutils literal notranslate"><span class="pre">ast</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="engine.html"><code class="docutils literal notranslate"><span class="pre">engine</span></code></a></li>
@@ -183,6 +183,20 @@ more efficient, nodes within the AST that are able to be reduced are while
 the parsing is taking place. This reduction phase involves evaluation,
 causing <a class="reference internal" href="errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> exceptions to be
 raised during parsing.</p>
+<dl class="method">
+<dt id="rule_engine.parser.Parser.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.parser.Parser.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether or not to enable debugging features when
+using the ply API.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">

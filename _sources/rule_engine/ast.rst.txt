@@ -12,6 +12,8 @@ Functions
 
 .. autofunction:: rule_engine.ast.is_natural_number
 
+.. autofunction:: rule_engine.ast.is_numeric
+
 .. autofunction:: rule_engine.ast.is_real_number
 
 Classes
@@ -29,6 +31,10 @@ Classes
 
    .. autoattribute:: STRING
       :annotation:
+
+   .. automethod:: from_type
+
+   .. automethod:: from_value
 
 .. autoclass:: rule_engine.ast.Statement
    :show-inheritance:

@@ -89,7 +89,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../grammar.html">Grammar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../syntax.html">Syntax</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ast.html"><code class="docutils literal notranslate"><span class="pre">ast</span></code></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">engine</span></code></a><ul>
@@ -176,7 +176,7 @@
 <code class="descname">resolve_attribute</code><span class="sig-paren">(</span><em>thing</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#resolve_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.resolve_attribute" title="Permalink to this definition">¶</a></dt>
 <dd><p>A replacement resolver function for looking up symbols as members of
 <em>thing</em>. This is effectively the same as <code class="docutils literal notranslate"><span class="pre">thing.name</span></code>. The <em>thing</em> object
-can be a <code class="xref py py-class docutils literal notranslate"><span class="pre">namedtuple</span></code> a custom Python class or any
+can be a <code class="xref py py-class docutils literal notranslate"><span class="pre">namedtuple</span></code>, a custom Python class or any
 other object. Each of the members of <em>thing</em> must be of a compatible data
 type.</p>
 <div class="admonition warning">
@@ -232,7 +232,7 @@ values in <em>thing</em> must be of a compatible data type.</p>
 <dd><p>Return a function suitable for use as the <em>type_resolver</em> for a
 <a class="reference internal" href="#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance from a dictionary. If any of the values within
 the dictionary are not of a compatible data type, a <a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> will
-be raised. Additionally the resulting function will raise a
+be raised. Additionally, the resulting function will raise a
 <a class="reference internal" href="errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> if the symbol name does
 not exist within the dictionary.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -446,7 +446,18 @@ evaluation.</p>
 <dl class="method">
 <dt id="rule_engine.engine.Rule.to_graphviz">
 <code class="descname">to_graphviz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Rule.to_graphviz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Rule.to_graphviz" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Generate a diagram of the parsed rule’s AST using GraphViz.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The rule diagram.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">graphviz.Digraph</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 

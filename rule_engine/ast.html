@@ -89,7 +89,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../grammar.html">Grammar</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../syntax.html">Syntax</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ast</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
@@ -183,7 +183,7 @@ from parsed grammar text.</p>
 <code class="descname">is_natural_number</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_natural_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_natural_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a natural number (i.e. a whole, non-negative
 number). This can, for example, be used to check if a floating point number
-such as <code class="docutils literal notranslate"><span class="pre">3.0</span></code> can safely be converted to an integer without lose of
+such as <code class="docutils literal notranslate"><span class="pre">3.0</span></code> can safely be converted to an integer without loss of
 information.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -200,12 +200,31 @@ information.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="rule_engine.ast.is_numeric">
+<code class="descname">is_numeric</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_numeric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_numeric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether <em>value</em> is a numeric value (i.e. capable of being represented
+as a floating point value without loss of information).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> – The value to check. This value is a native Python type.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Whether or not the value is numeric.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="rule_engine.ast.is_real_number">
 <code class="descname">is_real_number</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_real_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_real_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a real number (i.e. capable of being represented as
-a floating point value without lose of information). Despite being able to
-be represented as a float, <code class="docutils literal notranslate"><span class="pre">NaN</span></code> is not considered a real number for the
-purposes of this function.</p>
+a floating point value without loss of information as well as being finite).
+Despite being able to be represented as a float, <code class="docutils literal notranslate"><span class="pre">NaN</span></code> is not considered a
+real number for the purposes of this function.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -242,6 +261,46 @@ purposes of this function.</p>
 <dt id="rule_engine.ast.DataType.STRING">
 <code class="descname">STRING</code><a class="headerlink" href="#rule_engine.ast.DataType.STRING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="rule_engine.ast.DataType.from_type">
+<em class="property">classmethod </em><code class="descname">from_type</code><span class="sig-paren">(</span><em>python_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.from_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.from_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the supported data type constant for the specified Python type. If
+the type can not be mapped to a supported data type, then a
+<a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised. This function will not
+return <a class="reference internal" href="#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>python_type</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#type" title="(in Python v3.6)"><em>type</em></a>) – The native Python type to retrieve the
+corresponding type constant for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">One of the constants.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="rule_engine.ast.DataType.from_value">
+<em class="property">classmethod </em><code class="descname">from_value</code><span class="sig-paren">(</span><em>python_value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.from_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.from_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the supported data type constant for the specified Python value. If
+the value can not be mapped to a supported data type, then a
+<a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> exception will be raised. This function will not
+return <a class="reference internal" href="#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>python_value</strong> – The native Python value to retrieve the
+corresponding data type constant for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">One of the constants.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="rule_engine.ast.DataType.UNDEFINED">

@@ -195,7 +195,7 @@
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A replacement resolver function for looking up symbols as members of</span>
 <span class="sd">	*thing*. This is effectively the same as ``thing.name``. The *thing* object</span>
-<span class="sd">	can be a :py:class:`~collections.namedtuple` a custom Python class or any</span>
+<span class="sd">	can be a :py:class:`~collections.namedtuple`, a custom Python class or any</span>
 <span class="sd">	other object. Each of the members of *thing* must be of a compatible data</span>
 <span class="sd">	type.</span>
 
@@ -239,7 +239,7 @@
 <span class="sd">	Return a function suitable for use as the *type_resolver* for a</span>
 <span class="sd">	:py:class:`.Context` instance from a dictionary. If any of the values within</span>
 <span class="sd">	the dictionary are not of a compatible data type, a :py:exc:`TypeError` will</span>
-<span class="sd">	be raised. Additionally the resulting function will raise a</span>
+<span class="sd">	be raised. Additionally, the resulting function will raise a</span>
 <span class="sd">	:py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol name does</span>
 <span class="sd">	not exist within the dictionary.</span>
 
@@ -383,6 +383,12 @@
 		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Rule.to_graphviz"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz">[docs]</a>	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Generate a diagram of the parsed rule&#39;s AST using GraphViz.</span>
+
+<span class="sd">		:return: The rule diagram.</span>
+<span class="sd">		:rtype: :py:class:`graphviz.Digraph`</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="kn">import</span> <span class="nn">graphviz</span>
 		<span class="n">digraph</span> <span class="o">=</span> <span class="n">graphviz</span><span class="o">.</span><span class="n">Digraph</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">)</span>

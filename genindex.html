@@ -183,13 +183,19 @@
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase.__init__">(LiteralExpressionBase method)</a>
 </li>
+        <li><a href="rule_engine/parser.html#rule_engine.parser.Parser.__init__">(Parser method)</a>
+</li>
         <li><a href="rule_engine/parser.html#rule_engine.parser.ParserBase.__init__">(ParserBase method)</a>
+</li>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.__init__">(RegexSyntaxError method)</a>
 </li>
         <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.__init__">(Rule method)</a>
 </li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.RuleSyntaxError.__init__">(RuleSyntaxError method)</a>
 </li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.__init__">(SymbolResolutionError method)</a>
+</li>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.__init__">(SymbolTypeError method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -248,10 +254,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.EngineError">EngineError</a>
 </li>
-      <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase.evaluate">evaluate() (ExpressionBase method)</a>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.error">error (RegexSyntaxError attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase.evaluate">evaluate() (ExpressionBase method)</a>
+</li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.EvaluationError">EvaluationError</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase">ExpressionBase (class in rule_engine.ast)</a>
@@ -264,11 +272,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.filter">filter() (Rule method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT">FLOAT (DataType attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.FloatExpression">FloatExpression (class in rule_engine.ast)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_type">from_type() (rule_engine.ast.DataType class method)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_value">from_value() (rule_engine.ast.DataType class method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -277,6 +289,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.is_natural_number">is_natural_number() (in module rule_engine.ast)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.is_numeric">is_numeric() (in module rule_engine.ast)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -335,6 +349,8 @@
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.regex_flags">regex_flags (Context attribute)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.RegexComparisonExpression">RegexComparisonExpression (class in rule_engine.ast)</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.RegexSyntaxError">RegexSyntaxError</a>
 </li>
       <li><a href="rule_engine/parser.html#rule_engine.parser.ParserBase.reserved_words">reserved_words (ParserBase attribute)</a>
 </li>
@@ -400,15 +416,19 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.StringExpression">StringExpression (class in rule_engine.ast)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.symbol_name">symbol_name (SymbolResolutionError attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.SymbolExpression">SymbolExpression (class in rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError">SymbolResolutionError</a>
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.symbols">symbols (Context attribute)</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError">SymbolTypeError</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.SyntaxError">SyntaxError</a>
 </li>
   </ul></td>
 </tr></table>

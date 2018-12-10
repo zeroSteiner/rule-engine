@@ -197,7 +197,7 @@
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check whether *value* is a natural number (i.e. a whole, non-negative</span>
 <span class="sd">	number). This can, for example, be used to check if a floating point number</span>
-<span class="sd">	such as ``3.0`` can safely be converted to an integer without lose of</span>
+<span class="sd">	such as ``3.0`` can safely be converted to an integer without loss of</span>
 <span class="sd">	information.</span>
 
 <span class="sd">	:param value: The value to check. This value is a native Python type.</span>
@@ -206,34 +206,57 @@
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="kc">False</span>
-	<span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span></div>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="is_real_number"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_real_number">[docs]</a><span class="k">def</span> <span class="nf">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check whether *value* is a real number (i.e. capable of being represented as</span>
-<span class="sd">	a floating point value without lose of information). Despite being able to</span>
-<span class="sd">	be represented as a float, ``NaN`` is not considered a real number for the</span>
-<span class="sd">	purposes of this function.</span>
+<span class="sd">	a floating point value without loss of information as well as being finite).</span>
+<span class="sd">	Despite being able to be represented as a float, ``NaN`` is not considered a</span>
+<span class="sd">	real number for the purposes of this function.</span>
 
 <span class="sd">	:param value: The value to check. This value is a native Python type.</span>
 <span class="sd">	:return: Whether or not the value is a natural number.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="is_numeric"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_numeric">[docs]</a><span class="k">def</span> <span class="nf">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Check whether *value* is a numeric value (i.e. capable of being represented</span>
+<span class="sd">	as a floating point value without loss of information).</span>
+
+<span class="sd">	:param value: The value to check. This value is a native Python type.</span>
+<span class="sd">	:return: Whether or not the value is numeric.</span>
 <span class="sd">	:rtype: bool</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
 		<span class="k">return</span> <span class="kc">False</span>
 	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
 		<span class="k">return</span> <span class="kc">False</span>
-	<span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">):</span>
-		<span class="k">return</span> <span class="kc">False</span>
 	<span class="k">return</span> <span class="kc">True</span></div>
 
 <span class="k">def</span> <span class="nf">_assert_is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a natural number)&#39;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_assert_is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a real number)&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_assert_is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a numeric value)&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DataType"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DataType">[docs]</a><span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -247,25 +270,49 @@
 <span class="sd">	Undefined values. This constant can be used to indicate that a particular</span>
 <span class="sd">	symbol is valid, but it&#39;s data type is currently unknown.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="nd">@classmethod</span>
-	<span class="k">def</span> <span class="nf">from_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="DataType.from_type"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DataType.from_type">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">from_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">python_type</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Get the supported data type constant for the specified Python type. If</span>
+<span class="sd">		the type can not be mapped to a supported data type, then a</span>
+<span class="sd">		:py:exc:`ValueError` exception will be raised. This function will not</span>
+<span class="sd">		return :py:attr:`.UNDEFINED`.</span>
+
+<span class="sd">		:param type python_type: The native Python type to retrieve the</span>
+<span class="sd">			corresponding type constant for.</span>
+<span class="sd">		:return: One of the constants.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;from_type argument 1 must be type, not &#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="n">python_type</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span>
+		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DataType.from_value"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DataType.from_value">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">from_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">python_value</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Get the supported data type constant for the specified Python value. If</span>
 <span class="sd">		the value can not be mapped to a supported data type, then a</span>
 <span class="sd">		:py:exc:`TypeError` exception will be raised. This function will not</span>
 <span class="sd">		return :py:attr:`.UNDEFINED`.</span>
 
-<span class="sd">		:param value: The native Python type to retrieve the corresponding data</span>
-<span class="sd">			type constant for.</span>
+<span class="sd">		:param python_value: The native Python value to retrieve the</span>
+<span class="sd">			corresponding data type constant for.</span>
 <span class="sd">		:return: One of the constants.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
-		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
-		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,)):</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,)):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span>
-		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">python_value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div></div>
 
 <span class="k">class</span> <span class="nc">ASTNodeBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">):</span>
@@ -311,7 +358,9 @@
 <span class="sd">		:param value: The native Python value.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;__init__ argument 2 must be </span><span class="si">{}</span><span class="s2">, not </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span></div>
 
 	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> value=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
@@ -404,9 +453,9 @@
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
 	<span class="k">def</span> <span class="nf">__op_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+		<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
 		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
 		<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="n">_op_add</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">)</span>
@@ -464,11 +513,25 @@
 <span class="sd">	A class for representing comparison expressions from the grammar text such</span>
 <span class="sd">	as equality checks.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">def</span> <span class="nf">__op_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
-		<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span>
+	<span class="k">def</span> <span class="nf">_op_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
+				<span class="k">return</span> <span class="kc">False</span>
+		<span class="n">left_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="n">right_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">left_value</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">right_value</span><span class="p">):</span>
+			<span class="k">return</span> <span class="kc">False</span>
+		<span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
 
-	<span class="n">_op_eq</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_comparison</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">)</span>
-	<span class="n">_op_ne</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_comparison</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">)</span></div>
+	<span class="k">def</span> <span class="nf">_op_ne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
+				<span class="k">return</span> <span class="kc">True</span>
+		<span class="n">left_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="n">right_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">left_value</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">right_value</span><span class="p">):</span>
+			<span class="k">return</span> <span class="kc">True</span>
+		<span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ArithmeticComparisonExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ArithmeticComparisonExpression">[docs]</a><span class="k">class</span> <span class="nc">ArithmeticComparisonExpression</span><span class="p">(</span><span class="n">ComparisonExpression</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -478,10 +541,10 @@
 	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,)</span>
 	<span class="k">def</span> <span class="nf">__op_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+		<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
 		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
-		<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">left</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">right</span><span class="p">))</span>
+		<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
 
 	<span class="n">_op_ge</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">)</span>
 	<span class="n">_op_gt</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">)</span>
@@ -497,7 +560,14 @@
 	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">RegexComparisonExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">StringExpression</span><span class="p">):</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">_right</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">),</span> <span class="n">flags</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">regex_flags</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compile_regex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+
+	<span class="k">def</span> <span class="nf">_compile_regex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex</span><span class="p">):</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">regex_flags</span><span class="p">)</span>
+		<span class="k">except</span> <span class="n">re</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RegexSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid regex&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">None</span>
+		<span class="k">return</span> <span class="n">result</span>
 
 	<span class="k">def</span> <span class="nf">__op_regex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_function</span><span class="p">,</span> <span class="n">modifier</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">left_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
@@ -509,7 +579,7 @@
 			<span class="n">regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
 			<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
-			<span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">regex_flags</span><span class="p">)</span>
+			<span class="n">regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compile_regex</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
 		<span class="n">match</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">regex_function</span><span class="p">)(</span><span class="n">left_string</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">modifier</span><span class="p">(</span><span class="n">match</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -547,7 +617,9 @@
 		<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 		<span class="c1"># use DataType.from_value to raise a TypeError if value is not of a</span>
 		<span class="c1"># compatible data type</span>
-		<span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+		<span class="n">value_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">value_type</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolTypeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="Statement"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Statement">[docs]</a><span class="k">class</span> <span class="nc">Statement</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
@@ -640,7 +712,7 @@
 
 	<span class="k">def</span> <span class="nf">__op_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="n">_assert_is_real_number</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
 
 	<span class="n">_op_uminus</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">neg</span><span class="p">)</span>

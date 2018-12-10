@@ -204,7 +204,10 @@
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="k">pass</span></div>
 
-<div class="viewcode-block" id="RuleSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RuleSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RuleSyntaxError</span><span class="p">(</span><span class="n">EngineError</span><span class="p">):</span>
+<div class="viewcode-block" id="SyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SyntaxError">[docs]</a><span class="k">class</span> <span class="nc">SyntaxError</span><span class="p">(</span><span class="n">EngineError</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;A base error for syntax related issues.&quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="RuleSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RuleSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RuleSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	An error raised for issues identified in while parsing the grammar of the</span>
 <span class="sd">	rule text.</span>
@@ -219,6 +222,15 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">token</span>
 		<span class="sd">&quot;&quot;&quot;The PLY token (if available) which is related to the syntax error.&quot;&quot;&quot;</span></div></div>
 
+<div class="viewcode-block" id="RegexSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RegexSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RegexSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised for issues regarding the use of improper regular expression syntax.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RegexSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">RegexSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">error</span>
+		<span class="sd">&quot;&quot;&quot;The :py:exc:`re.error` exception from which this error was triggered.&quot;&quot;&quot;</span></div></div>
+
 <div class="viewcode-block" id="SymbolResolutionError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolResolutionError">[docs]</a><span class="k">class</span> <span class="nc">SymbolResolutionError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	An error raised when a symbol name is not able to be resolved to a value.</span>
@@ -229,7 +241,21 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">symbol_name</span> <span class="o">=</span> <span class="n">symbol_name</span>
 		<span class="sd">&quot;&quot;&quot;The name of the symbol that can not be resolved.&quot;&quot;&quot;</span>
-		<span class="nb">super</span><span class="p">(</span><span class="n">SymbolResolutionError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;unknown symbol: &#39;</span> <span class="o">+</span> <span class="n">symbol_name</span><span class="p">)</span></div></div>
+		<span class="nb">super</span><span class="p">(</span><span class="n">SymbolResolutionError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;unknown symbol: </span><span class="si">{0!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol_name</span><span class="p">))</span></div></div>
+
+<div class="viewcode-block" id="SymbolTypeError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolTypeError">[docs]</a><span class="k">class</span> <span class="nc">SymbolTypeError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised when a symbol with type information is resolved to a python</span>
+<span class="sd">	value that is not of that type.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SymbolTypeError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolTypeError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">is_value</span><span class="p">,</span> <span class="n">is_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">symbol_name</span> <span class="o">=</span> <span class="n">symbol_name</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">is_value</span> <span class="o">=</span> <span class="n">is_value</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">is_type</span> <span class="o">=</span> <span class="n">is_type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">expected_type</span> <span class="o">=</span> <span class="n">expected_type</span>
+		<span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;symbol </span><span class="si">{0!r}</span><span class="s2"> resolved to incorrect datatype (is: </span><span class="si">{1}</span><span class="s2">, expected: </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol_name</span><span class="p">,</span> <span class="n">is_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">SymbolTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div></div>
+
 </pre></div>
 
            </div>

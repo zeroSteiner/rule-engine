@@ -447,6 +447,7 @@ class SymbolExpression(ExpressionBase):
 		:param str name: The name of the symbol. This will be resolved with a
 			given context object on the specified *thing*.
 		"""
+		context.symbols.add(name)
 		self.context = context
 		self.name = name
 		type_hint = context.resolve_type(name)

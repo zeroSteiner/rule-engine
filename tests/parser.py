@@ -207,6 +207,9 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual("'Alice'", ast.StringExpression, 'Alice')
 		self.assertLiteralStatementEqual('"Alice"', ast.StringExpression, 'Alice')
 
+		self.assertLiteralStatementEqual("s'Alice'", ast.StringExpression, 'Alice')
+		self.assertLiteralStatementEqual('s"Alice"', ast.StringExpression, 'Alice')
+
 	def test_parse_string_escapes(self):
 		self.assertLiteralStatementEqual("'Alice\\\'s'", ast.StringExpression, 'Alice\'s')
 		self.assertLiteralStatementEqual('"Alice\'s"', ast.StringExpression, 'Alice\'s')

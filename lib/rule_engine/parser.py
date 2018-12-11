@@ -143,7 +143,6 @@ class Parser(ParserBase):
 	t_SUB              = r'\-'
 	t_MOD              = r'\%'
 	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
-	t_STRING           = r'(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear
 	# later are effectively evaluated first
@@ -196,6 +195,12 @@ class Parser(ParserBase):
 		r'!~~?'
 		if t.value == '!~':
 			t.type = 'NE_REM'
+		return t
+
+	def t_STRING(self, t):
+		r's?(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
+		if t.value[0] == 's':
+			t.value = t.value[1:]
 		return t
 
 	def t_SYMBOL(self, t):
@@ -302,7 +307,6 @@ class Parser(ParserBase):
 	def p_expression_symbol(self, p):
 		'expression : SYMBOL'
 		name = p[1]
-		self.context.symbols.add(name)
 		p[0] = ast.SymbolExpression(self.context, name).reduce()
 
 	def p_expression_uminus(self, p):

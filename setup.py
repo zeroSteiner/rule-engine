@@ -68,7 +68,8 @@ setup(
 	license='BSD',
 	# these are duplicated in requirements.txt
 	install_requires=[
-		'ply>=3.9'
+		'ply>=3.9',
+		'python-dateutil~=2.7'
 	],
 	package_dir={'': 'lib'},
 	packages=find_packages('lib'),

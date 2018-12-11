@@ -52,6 +52,19 @@ class EvaluationError(EngineError):
 class SyntaxError(EngineError):
 	"""A base error for syntax related issues."""
 
+class DatetimeSyntaxError(SyntaxError):
+	"""
+	An error raised for issues regarding the use of improperly formatted
+	datetime expressions.
+	"""
+	def __init__(self, message, value):
+		super(DatetimeSyntaxError, self).__init__(message)
+		self.value = value
+		"""
+		The datetime value which contains the syntax error which caused this
+		exception to be raised.
+		"""
+
 class RuleSyntaxError(SyntaxError):
 	"""
 	An error raised for issues identified in while parsing the grammar of the
@@ -69,12 +82,21 @@ class RuleSyntaxError(SyntaxError):
 
 class RegexSyntaxError(SyntaxError):
 	"""
-	An error raised for issues regarding the use of improper regular expression syntax.
+	An error raised for issues regarding the use of improper regular expression
+	syntax.
 	"""
 	def __init__(self, message, error):
 		super(RegexSyntaxError, self).__init__(message)
 		self.error = error
 		"""The :py:exc:`re.error` exception from which this error was triggered."""
+
+	@property
+	def value(self):
+		"""
+		The regular expression value which contains the syntax error which
+		caused this exception to be raised.
+		"""
+		return self.error.pattern
 
 class SymbolResolutionError(EvaluationError):
 	"""

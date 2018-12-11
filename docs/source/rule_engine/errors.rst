@@ -9,6 +9,11 @@ This module contains the exceptions raised by the package.
 Exceptions
 ----------
 
+.. autoexception:: DatetimeSyntaxError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: EngineError
    :members:
    :show-inheritance:

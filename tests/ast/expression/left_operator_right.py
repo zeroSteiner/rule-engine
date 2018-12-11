@@ -231,5 +231,9 @@ class RegexComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 
 	def test_ast_expression_left_operator_right_regexcomparison_syntax_errors(self):
 		for operation in ('eq_rem', 'eq_res', 'ne_rem', 'ne_res'):
-			with self.assertRaises(errors.RegexSyntaxError):
+			try:
 				self.assertExpressionTests(operation, right_value=ast.StringExpression(context, '*'))
+			except errors.RegexSyntaxError as error:
+				self.assertEqual(error.value, '*')
+			else:
+				self.fail('RegexSyntaxError was not raised')

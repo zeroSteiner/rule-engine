@@ -6,6 +6,7 @@ data types which can be defined as constants or resolved using the Python object
 on which the rule is being applied.
 
 * :py:attr:`~rule_engine.ast.DataType.BOOLEAN`
+* :py:attr:`~rule_engine.ast.DataType.DATETIME`
 * :py:attr:`~rule_engine.ast.DataType.FLOAT`
 * :py:attr:`~rule_engine.ast.DataType.STRING`
 

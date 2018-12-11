@@ -143,10 +143,19 @@ class AstTests(unittest.TestCase):
 			parser_.parse('"string" =~ true', self.context)
 
 	def test_ast_reduces_arithmetic(self):
+		thing = {'one': 1, 'two': 2}
 		parser_ = parser.Parser()
 		statement = parser_.parse('1 + 2', self.context)
 		self.assertIsInstance(statement.expression, ast.FloatExpression)
 		self.assertEqual(statement.evaluate(None), 3)
+
+		statement = parser_.parse('one + 2', self.context)
+		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
+		self.assertEqual(statement.evaluate(thing), 3)
+
+		statement = parser_.parse('1 + two', self.context)
+		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
+		self.assertEqual(statement.evaluate(thing), 3)
 
 	def test_ast_reduces_bitwise(self):
 		parser_ = parser.Parser()

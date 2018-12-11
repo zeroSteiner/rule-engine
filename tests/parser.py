@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import math
 import unittest
 
@@ -162,6 +163,18 @@ class ParserLiteralTests(ParserTestsBase):
 	def test_parse_boolean(self):
 		self.assertLiteralStatementEqual('true', ast.BooleanExpression, True)
 		self.assertLiteralStatementEqual('false', ast.BooleanExpression, False)
+
+	def test_parse_datetime(self):
+		self.assertLiteralStatementEqual('d"2016-10-15"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15))
+		self.assertLiteralStatementEqual('d"2016-10-15 12:30"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, 12, 30))
+
+	def test_parse_datetime_syntax_errors(self):
+		try:
+			self._parse('d"this is wrong"', self.context)
+		except errors.DatetimeSyntaxError as error:
+			self.assertEqual(error.value, 'this is wrong')
+		else:
+			self.fail('DatetimeSyntaxError was not raised')
 
 	def test_parse_float(self):
 		self.assertLiteralStatementEqual('3.14', ast.FloatExpression, 3.14)

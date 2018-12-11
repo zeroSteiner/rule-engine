@@ -124,7 +124,7 @@ class Parser(ParserBase):
 		'not': 'NOT',
 	}
 	tokens = (
-		'FLOAT', 'STRING', 'SYMBOL',
+		'DATETIME', 'FLOAT', 'STRING', 'SYMBOL',
 		'LPAREN', 'RPAREN', 'QMARK', 'COLON'
 	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
 
@@ -195,6 +195,11 @@ class Parser(ParserBase):
 		r'!~~?'
 		if t.value == '!~':
 			t.type = 'NE_REM'
+		return t
+
+	def t_DATETIME(self, t):
+		r'd(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
+		t.value = t.value[1:]
 		return t
 
 	def t_STRING(self, t):
@@ -321,6 +326,10 @@ class Parser(ParserBase):
 				   | FALSE
 		"""
 		p[0] = ast.BooleanExpression(self.context, p[1] == 'true')
+
+	def p_expression_datetime(self, p):
+		'expression : DATETIME'
+		p[0] = ast.DatetimeExpression.from_string(self.context, literal_eval(p[1]))
 
 	def p_expression_float(self, p):
 		'expression : FLOAT'

@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import enum
 import functools
 import math
@@ -37,6 +38,8 @@ import operator
 import re
 
 from . import errors
+
+import dateutil.parser
 
 def is_natural_number(value):
 	"""
@@ -93,10 +96,6 @@ def _assert_is_natural_number(value):
 	if not is_natural_number(value):
 		raise errors.EvaluationError('data type mismatch (not a natural number)')
 
-def _assert_is_real_number(value):
-	if not is_real_number(value):
-		raise errors.EvaluationError('data type mismatch (not a real number)')
-
 def _assert_is_numeric(value):
 	if not is_numeric(value):
 		raise errors.EvaluationError('data type mismatch (not a numeric value)')
@@ -106,6 +105,7 @@ class DataType(enum.Enum):
 	A collection of constants representing the different supported data types.
 	"""
 	BOOLEAN = bool
+	DATETIME = datetime.datetime
 	FLOAT = float
 	STRING = str
 	UNDEFINED = None
@@ -129,9 +129,9 @@ class DataType(enum.Enum):
 			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
 		if python_type == bool:
 			return cls.BOOLEAN
-		elif python_type == float:
-			return cls.FLOAT
-		elif python_type == int:
+		elif python_type in (datetime.date, datetime.datetime):
+			return cls.DATETIME
+		elif python_type in (float, int):
 			return cls.FLOAT
 		elif python_type == str:
 			return cls.STRING
@@ -151,6 +151,8 @@ class DataType(enum.Enum):
 		"""
 		if isinstance(python_value, bool):
 			return cls.BOOLEAN
+		elif isinstance(python_value, (datetime.date, datetime.datetime)):
+			return cls.DATETIME
 		elif isinstance(python_value, (float, int)):
 			return cls.FLOAT
 		elif isinstance(python_value, (str,)):
@@ -218,6 +220,18 @@ class BooleanExpression(LiteralExpressionBase):
 	"""Literal boolean expressions representing True or False."""
 	result_type = DataType.BOOLEAN
 
+class DatetimeExpression(LiteralExpressionBase):
+	"""Literal datetime expressions representing a specific point in time."""
+	result_type = DataType.DATETIME
+
+	@classmethod
+	def from_string(cls, context, string):
+		try:
+			dt = dateutil.parser.isoparse(string)
+		except ValueError:
+			raise errors.DatetimeSyntaxError('invalid datetime', string)
+		return cls(context, dt)
+
 class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
@@ -234,7 +248,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A base class for representing complex expressions composed of a left side
 	and a right side, separated by an operator.
 	"""
-	compatible_types = (DataType.BOOLEAN, DataType.FLOAT, DataType.STRING)
+	compatible_types = (DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.STRING)
 	"""
 	A tuple containing the compatible data types that the left and right
 	expressions must return. This can for example be used to indicate that
@@ -409,7 +423,7 @@ class RegexComparisonExpression(ComparisonExpression):
 		try:
 			result = re.compile(regex, flags=self.context.regex_flags)
 		except re.error as error:
-			raise errors.RegexSyntaxError('invalid regex', error=error) from None
+			raise errors.RegexSyntaxError('invalid regular expression', error=error) from None
 		return result
 
 	def __op_regex(self, regex_function, modifier, thing):
@@ -563,8 +577,6 @@ class UnaryExpression(ExpressionBase):
 
 	def reduce(self):
 		type_ = self.type.lower()
-		if type_ not in ('not', 'uminus'):
-			raise NotImplementedError()
 		if not isinstance(self.right, LiteralExpressionBase):
 			return self
 		if type_ == 'not':

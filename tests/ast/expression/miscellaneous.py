@@ -108,5 +108,13 @@ class UnaryExpressionTests(unittest.TestCase):
 			self.assertFalse(result)
 			self.assertEqual(result, value.value)
 
+	def test_ast_expresison_unary_minus_type_errors(self):
+		for value in trueish + falseish:
+			if isinstance(value, ast.FloatExpression):
+				continue
+			unary = ast.UnaryExpression(context, 'uminus', value)
+			with self.assertRaises(errors.EvaluationError):
+				unary.evaluate(None)
+
 if __name__ == '__main__':
 	unittest.main()

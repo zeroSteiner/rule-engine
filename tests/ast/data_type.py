@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import unittest
 
 import rule_engine.ast as ast
@@ -42,8 +43,10 @@ class DataTypeTests(unittest.TestCase):
 
 	def test_datatype_from_type(self):
 		self.assertIs(ast.DataType.from_type(bool), ast.DataType.BOOLEAN)
-		self.assertIs(ast.DataType.from_type(int), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_type(datetime.date), ast.DataType.DATETIME)
+		self.assertIs(ast.DataType.from_type(datetime.datetime), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_type(float), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_type(int), ast.DataType.FLOAT)
 		self.assertIs(ast.DataType.from_type(str), ast.DataType.STRING)
 
 	def test_datatype_from_type_exceptions(self):
@@ -54,6 +57,8 @@ class DataTypeTests(unittest.TestCase):
 
 	def test_datatype_from_value(self):
 		self.assertIs(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
+		self.assertIs(ast.DataType.from_value(datetime.date.today()), ast.DataType.DATETIME)
+		self.assertIs(ast.DataType.from_value(datetime.datetime.now()), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_value(0), ast.DataType.FLOAT)
 		self.assertIs(ast.DataType.from_value(0.0), ast.DataType.FLOAT)
 		self.assertIs(ast.DataType.from_value(''), ast.DataType.STRING)

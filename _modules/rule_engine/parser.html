@@ -24,26 +24,17 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="Rule Engine 0.9 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -100,7 +91,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Rule Engine</a>
@@ -108,9 +99,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -139,8 +131,6 @@
     
     
       <li class="wy-breadcrumbs-aside">
-        
-            
         
       </li>
     
@@ -196,7 +186,7 @@
 
 <span class="n">literal_eval</span> <span class="o">=</span> <span class="n">ast_</span><span class="o">.</span><span class="n">literal_eval</span>
 
-<div class="viewcode-block" id="ParserBase"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.engine.ParserBase">[docs]</a><span class="k">class</span> <span class="nc">ParserBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ParserBase"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase">[docs]</a><span class="k">class</span> <span class="nc">ParserBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A base class for parser objects to inherit from. This does not provide any</span>
 <span class="sd">	grammar related definitions.</span>
@@ -210,7 +200,7 @@
 <span class="sd">	names.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">__mutex</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
-<div class="viewcode-block" id="ParserBase.__init__"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.engine.ParserBase.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ParserBase.__init__"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param bool debug: Whether or not to enable debugging features when</span>
 <span class="sd">			using the ply API.</span>
@@ -221,7 +211,7 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">_lexer</span> <span class="o">=</span> <span class="n">lex</span><span class="o">.</span><span class="n">lex</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">_parser</span> <span class="o">=</span> <span class="n">yacc</span><span class="o">.</span><span class="n">yacc</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">write_tables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ParserBase.parse"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.engine.ParserBase.parse">[docs]</a>	<span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="ParserBase.parse"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase.parse">[docs]</a>	<span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Parse the specified text in an abstract syntax tree of nodes that can</span>
 <span class="sd">		later be evaluated.</span>
@@ -239,7 +229,7 @@
 			<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
 		<span class="k">return</span> <span class="n">result</span></div></div>
 
-<div class="viewcode-block" id="Parser"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.engine.Parser">[docs]</a><span class="k">class</span> <span class="nc">Parser</span><span class="p">(</span><span class="n">ParserBase</span><span class="p">):</span>
+<div class="viewcode-block" id="Parser"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.Parser">[docs]</a><span class="k">class</span> <span class="nc">Parser</span><span class="p">(</span><span class="n">ParserBase</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	The parser class for the rule grammar. This class contains many ply specific</span>
 <span class="sd">	members to define the various components of the grammar allowing it to be</span>
@@ -279,7 +269,7 @@
 		<span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span>
 	<span class="p">}</span>
 	<span class="n">tokens</span> <span class="o">=</span> <span class="p">(</span>
-		<span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span> <span class="s1">&#39;STRING&#39;</span><span class="p">,</span> <span class="s1">&#39;SYMBOL&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;DATETIME&#39;</span><span class="p">,</span> <span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span> <span class="s1">&#39;STRING&#39;</span><span class="p">,</span> <span class="s1">&#39;SYMBOL&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;LPAREN&#39;</span><span class="p">,</span> <span class="s1">&#39;RPAREN&#39;</span><span class="p">,</span> <span class="s1">&#39;QMARK&#39;</span><span class="p">,</span> <span class="s1">&#39;COLON&#39;</span>
 	<span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">reserved_words</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">op_names</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
 
@@ -298,7 +288,6 @@
 	<span class="n">t_SUB</span>              <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\-&#39;</span>
 	<span class="n">t_MOD</span>              <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\%&#39;</span>
 	<span class="n">t_FLOAT</span>            <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?&#39;</span>
-	<span class="n">t_STRING</span>           <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?P&lt;quote&gt;[&quot;</span><span class="se">\&#39;</span><span class="s1">])([^</span><span class="se">\\</span><span class="s1">\n]|(</span><span class="se">\\</span><span class="s1">.))*?(?P=quote)&#39;</span>
 
 	<span class="c1"># tokens are listed from lowest to highest precedence, ones that appear</span>
 	<span class="c1"># later are effectively evaluated first</span>
@@ -351,6 +340,17 @@
 		<span class="sa">r</span><span class="s1">&#39;!~~?&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;!~&#39;</span><span class="p">:</span>
 			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;NE_REM&#39;</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_DATETIME</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;d(?P&lt;quote&gt;[&quot;</span><span class="se">\&#39;</span><span class="s1">])([^</span><span class="se">\\</span><span class="s1">\n]|(</span><span class="se">\\</span><span class="s1">.))*?(?P=quote)&#39;</span>
+		<span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+		<span class="k">return</span> <span class="n">t</span>
+
+	<span class="k">def</span> <span class="nf">t_STRING</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+		<span class="sa">r</span><span class="s1">&#39;s?(?P&lt;quote&gt;[&quot;</span><span class="se">\&#39;</span><span class="s1">])([^</span><span class="se">\\</span><span class="s1">\n]|(</span><span class="se">\\</span><span class="s1">.))*?(?P=quote)&#39;</span>
+		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+			<span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 		<span class="k">return</span> <span class="n">t</span>
 
 	<span class="k">def</span> <span class="nf">t_SYMBOL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
@@ -457,7 +457,6 @@
 	<span class="k">def</span> <span class="nf">p_expression_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : SYMBOL&#39;</span>
 		<span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">SymbolExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_uminus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -472,6 +471,10 @@
 <span class="sd">				   | FALSE</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="s1">&#39;expression : DATETIME&#39;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">DatetimeExpression</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : FLOAT&#39;</span>
@@ -491,9 +494,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -502,11 +503,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre.
+        &copy; Copyright 2018, Spencer McIntyre
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -521,35 +522,23 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.9',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

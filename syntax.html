@@ -24,27 +24,19 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="Rule Engine 0.9 documentation" href="index.html"/>
-        <link rel="next" title="rule_engine" href="rule_engine/index.html"/>
-        <link rel="prev" title="Rule Engine Documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="rule_engine" href="rule_engine/index.html" />
+    <link rel="prev" title="Rule Engine Documentation" href="index.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -108,7 +100,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Rule Engine</a>
@@ -116,9 +108,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -168,6 +161,7 @@ data types which can be defined as constants or resolved using the Python object
 on which the rule is being applied.</p>
 <ul class="simple">
 <li><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.BOOLEAN" title="rule_engine.ast.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></li>
+<li><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></li>
 <li><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></li>
 <li><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></li>
 </ul>
@@ -182,9 +176,9 @@ are type aware and will raise an exception when an incompatible type is used.</p
 <h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this headline">¶</a></h3>
 <table border="1" class="docutils">
 <colgroup>
-<col width="13%" />
-<col width="35%" />
-<col width="52%" />
+<col width="12%" />
+<col width="34%" />
+<col width="54%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td>Operation</td>
@@ -241,19 +235,23 @@ are type aware and will raise an exception when an incompatible type is used.</p
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&gt;</span></code></td>
 <td>Greater than</td>
-<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&gt;=</span></code></td>
 <td>Greater than or equal to</td>
-<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&lt;</span></code></td>
 <td>Less than</td>
-<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&lt;=</span></code></td>
 <td>Less than or equal to</td>
-<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">==</span></code></td>
 <td>Equal to</td>
@@ -307,7 +305,7 @@ to use for either the match or search operation.</p>
 <tr class="row-odd"><td>Keyword</td>
 <td>Description</td>
 </tr>
-<tr class="row-even"><td colspan="2">Booleans</td>
+<tr class="row-even"><td colspan="2"><strong>Booleans</strong></td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">true</span></code></td>
 <td>The “True” boolean value</td>
@@ -315,7 +313,7 @@ to use for either the match or search operation.</p>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">false</span></code></td>
 <td>The “False” boolean value</td>
 </tr>
-<tr class="row-odd"><td colspan="2">Floats</td>
+<tr class="row-odd"><td colspan="2"><strong>Floats</strong></td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">inf</span></code></td>
 <td>Floating point value for infinity</td>
@@ -323,7 +321,7 @@ to use for either the match or search operation.</p>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">nan</span></code></td>
 <td>Floating point value for not-a-number</td>
 </tr>
-<tr class="row-even"><td colspan="2">Logical Operators</td>
+<tr class="row-even"><td colspan="2"><strong>Logical Operators</strong></td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">and</span></code></td>
 <td>Logical “and” operator</td>
@@ -342,9 +340,7 @@ to use for either the match or search operation.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -362,11 +358,11 @@ to use for either the match or search operation.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre.
+        &copy; Copyright 2018, Spencer McIntyre
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -381,35 +377,23 @@ to use for either the match or search operation.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.9',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

@@ -24,26 +24,17 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="Rule Engine 0.9 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -100,7 +91,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Rule Engine</a>
@@ -108,9 +99,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -139,8 +131,6 @@
     
     
       <li class="wy-breadcrumbs-aside">
-        
-            
         
       </li>
     
@@ -207,6 +197,19 @@
 <div class="viewcode-block" id="SyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SyntaxError">[docs]</a><span class="k">class</span> <span class="nc">SyntaxError</span><span class="p">(</span><span class="n">EngineError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;A base error for syntax related issues.&quot;&quot;&quot;</span></div>
 
+<div class="viewcode-block" id="DatetimeSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">DatetimeSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised for issues regarding the use of improperly formatted</span>
+<span class="sd">	datetime expressions.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DatetimeSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">DatetimeSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		The datetime value which contains the syntax error which caused this</span>
+<span class="sd">		exception to be raised.</span>
+<span class="sd">		&quot;&quot;&quot;</span></div></div>
+
 <div class="viewcode-block" id="RuleSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RuleSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RuleSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	An error raised for issues identified in while parsing the grammar of the</span>
@@ -224,12 +227,21 @@
 
 <div class="viewcode-block" id="RegexSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RegexSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RegexSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	An error raised for issues regarding the use of improper regular expression syntax.</span>
+<span class="sd">	An error raised for issues regarding the use of improper regular expression</span>
+<span class="sd">	syntax.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="RegexSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">RegexSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">error</span>
-		<span class="sd">&quot;&quot;&quot;The :py:exc:`re.error` exception from which this error was triggered.&quot;&quot;&quot;</span></div></div>
+		<span class="sd">&quot;&quot;&quot;The :py:exc:`re.error` exception from which this error was triggered.&quot;&quot;&quot;</span></div>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		The regular expression value which contains the syntax error which</span>
+<span class="sd">		caused this exception to be raised.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">pattern</span></div>
 
 <div class="viewcode-block" id="SymbolResolutionError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolResolutionError">[docs]</a><span class="k">class</span> <span class="nc">SymbolResolutionError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -259,9 +271,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -270,11 +280,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre.
+        &copy; Copyright 2018, Spencer McIntyre
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -289,35 +299,23 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.9',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

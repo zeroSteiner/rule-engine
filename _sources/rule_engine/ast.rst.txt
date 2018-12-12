@@ -26,6 +26,9 @@ Classes
    .. autoattribute:: BOOLEAN
       :annotation:
 
+   .. autoattribute:: DATETIME
+      :annotation:
+
    .. autoattribute:: FLOAT
       :annotation:
 

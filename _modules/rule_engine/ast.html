@@ -24,26 +24,17 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="Rule Engine 0.9 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -100,7 +91,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Rule Engine</a>
@@ -108,9 +99,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -139,8 +131,6 @@
     
     
       <li class="wy-breadcrumbs-aside">
-        
-            
         
       </li>
     
@@ -185,6 +175,7 @@
 <span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 
+<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">math</span>
@@ -192,6 +183,8 @@
 <span class="kn">import</span> <span class="nn">re</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">errors</span>
+
+<span class="kn">import</span> <span class="nn">dateutil.parser</span>
 
 <div class="viewcode-block" id="is_natural_number"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_natural_number">[docs]</a><span class="k">def</span> <span class="nf">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -205,8 +198,6 @@
 <span class="sd">	:rtype: bool</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-		<span class="k">return</span> <span class="kc">False</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="kc">False</span>
 	<span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
 		<span class="k">return</span> <span class="kc">False</span>
@@ -250,10 +241,6 @@
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a natural number)&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_assert_is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a real number)&#39;</span><span class="p">)</span>
-
 <span class="k">def</span> <span class="nf">_assert_is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a numeric value)&#39;</span><span class="p">)</span>
@@ -263,6 +250,7 @@
 <span class="sd">	A collection of constants representing the different supported data types.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">BOOLEAN</span> <span class="o">=</span> <span class="nb">bool</span>
+	<span class="n">DATETIME</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
 	<span class="n">FLOAT</span> <span class="o">=</span> <span class="nb">float</span>
 	<span class="n">STRING</span> <span class="o">=</span> <span class="nb">str</span>
 	<span class="n">UNDEFINED</span> <span class="o">=</span> <span class="kc">None</span>
@@ -286,9 +274,9 @@
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;from_type argument 1 must be type, not &#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="n">python_type</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 		<span class="k">if</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
-		<span class="k">elif</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
-			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
-		<span class="k">elif</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATETIME</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
 		<span class="k">elif</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span>
@@ -308,6 +296,8 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATETIME</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,)):</span>
@@ -375,6 +365,18 @@
 	<span class="sd">&quot;&quot;&quot;Literal boolean expressions representing True or False.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span></div>
 
+<span class="k">class</span> <span class="nc">DatetimeExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;Literal datetime expressions representing a specific point in time.&quot;&quot;&quot;</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
+
+	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">dt</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">isoparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
 <div class="viewcode-block" id="FloatExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FloatExpression">[docs]</a><span class="k">class</span> <span class="nc">FloatExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;Literal float expressions representing numerical values.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span></div>
@@ -391,7 +393,7 @@
 <span class="sd">	A base class for representing complex expressions composed of a left side</span>
 <span class="sd">	and a right side, separated by an operator.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
+	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A tuple containing the compatible data types that the left and right</span>
 <span class="sd">	expressions must return. This can for example be used to indicate that</span>
@@ -538,12 +540,16 @@
 <span class="sd">	A class for representing arithmetic comparison expressions from the grammar</span>
 <span class="sd">	text such as less-than-or-equal-to and greater-than.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,)</span>
+	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">__op_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+			<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
 		<span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+			<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+		<span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">right</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
 
 	<span class="n">_op_ge</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">)</span>
@@ -566,7 +572,7 @@
 		<span class="k">try</span><span class="p">:</span>
 			<span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">regex_flags</span><span class="p">)</span>
 		<span class="k">except</span> <span class="n">re</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
-			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RegexSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid regex&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">None</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RegexSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid regular expression&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">None</span>
 		<span class="k">return</span> <span class="n">result</span>
 
 	<span class="k">def</span> <span class="nf">__op_regex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_function</span><span class="p">,</span> <span class="n">modifier</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
@@ -604,6 +610,7 @@
 <span class="sd">		:param str name: The name of the symbol. This will be resolved with a</span>
 <span class="sd">			given context object on the specified *thing*.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">context</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 		<span class="n">type_hint</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -615,6 +622,15 @@
 
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+		<span class="c1"># convert the value from one of the supported types if necessary</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+			<span class="k">pass</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+			<span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+			<span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
 		<span class="c1"># use DataType.from_value to raise a TypeError if value is not of a</span>
 		<span class="c1"># compatible data type</span>
 		<span class="n">value_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -719,8 +735,6 @@
 
 	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="n">type_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-		<span class="k">if</span> <span class="n">type_</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;not&#39;</span><span class="p">,</span> <span class="s1">&#39;uminus&#39;</span><span class="p">):</span>
-			<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">self</span>
 		<span class="k">if</span> <span class="n">type_</span> <span class="o">==</span> <span class="s1">&#39;not&#39;</span><span class="p">:</span>
@@ -737,9 +751,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -748,11 +760,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre.
+        &copy; Copyright 2018, Spencer McIntyre
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -767,35 +779,23 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.9',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

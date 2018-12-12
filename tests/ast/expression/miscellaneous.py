@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import random
 import string
 import unittest
@@ -63,6 +64,20 @@ class SymbolExpressionTests(unittest.TestCase):
 		self.assertIs(symbol.result_type, ast.DataType.STRING)
 		self.assertEqual(symbol.name, self.sym_name)
 		self.assertEqual(symbol.evaluate({self.sym_name: self.sym_value}), self.sym_value)
+
+	def test_ast_expression_symbol_type_date_conversion(self):
+		symbol = ast.SymbolExpression(context, self.sym_name)
+		self.assertEqual(symbol.name, self.sym_name)
+		result = symbol.evaluate({self.sym_name: datetime.date(2016, 10, 15)})
+		self.assertIsInstance(result, datetime.datetime)
+		self.assertEqual(result, datetime.datetime(2016, 10, 15))
+
+	def test_ast_expression_symbol_type_int_conversion(self):
+		symbol = ast.SymbolExpression(context, self.sym_name)
+		self.assertEqual(symbol.name, self.sym_name)
+		result = symbol.evaluate({self.sym_name: 1})
+		self.assertIsInstance(result, float)
+		self.assertEqual(result, 1.0)
 
 	def test_ast_expression_symbol_type_errors(self):
 		context = engine.Context(type_resolver=self._type_resolver)

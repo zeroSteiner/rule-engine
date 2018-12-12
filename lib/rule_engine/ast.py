@@ -477,6 +477,15 @@ class SymbolExpression(ExpressionBase):
 
 	def evaluate(self, thing):
 		value = self.context.resolve(thing, self.name)
+
+		# convert the value from one of the supported types if necessary
+		if isinstance(value, bool):
+			pass
+		elif isinstance(value, datetime.date):
+			value = datetime.datetime(value.year, value.month, value.day)
+		elif isinstance(value, int):
+			value = float(value)
+
 		# use DataType.from_value to raise a TypeError if value is not of a
 		# compatible data type
 		value_type = DataType.from_value(value)

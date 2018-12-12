@@ -209,7 +209,7 @@ class Parser(ParserBase):
 		return t
 
 	def t_SYMBOL(self, t):
-		r'[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*'
+		r'\$?[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*'
 		t.type = self.reserved_words.get(t.value, 'SYMBOL')
 		return t
 
@@ -312,7 +312,11 @@ class Parser(ParserBase):
 	def p_expression_symbol(self, p):
 		'expression : SYMBOL'
 		name = p[1]
-		p[0] = ast.SymbolExpression(self.context, name).reduce()
+		scope = None
+		if name[0] == '$':
+			scope = 'built-in'
+			name = name[1:]
+		p[0] = ast.SymbolExpression(self.context, name, scope=scope).reduce()
 
 	def p_expression_uminus(self, p):
 		'expression : SUB expression %prec UMINUS'

@@ -102,12 +102,14 @@ class SymbolResolutionError(EvaluationError):
 	"""
 	An error raised when a symbol name is not able to be resolved to a value.
 	"""
-	def __init__(self, symbol_name):
+	def __init__(self, symbol_name, symbol_scope=None):
 		"""
 		:param str symbol_name: The name of the symbol that can not be resolved.
 		"""
 		self.symbol_name = symbol_name
 		"""The name of the symbol that can not be resolved."""
+		self.symbol_scope = symbol_scope
+		"""The scope of where the symbol should be valid for resolution."""
 		super(SymbolResolutionError, self).__init__("unknown symbol: {0!r}".format(symbol_name))
 
 class SymbolTypeError(EvaluationError):

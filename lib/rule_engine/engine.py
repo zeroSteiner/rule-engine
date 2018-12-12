@@ -30,7 +30,9 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import functools
+import math
 
 from . import ast
 from . import errors
@@ -127,17 +129,32 @@ class Context(object):
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
 
-	def resolve(self, thing, name):
+	def resolve(self, thing, name, scope=None):
 		"""
 		The method to use for resolving symbols names to values. This function
-		must return a compatible value for the specified symbol name. This
-		function defaults to :py:func:`resolve_item`.
+		must return a compatible value for the specified symbol name. When a
+		*scope* is defined, this function handles the resolution itself, however
+		when the *scope* is ``None`` the resolver specified in
+		:py:meth:`~.Context.__init__` is used which defaults to
+		:py:func:`resolve_item`. This function must return a compatible value
+		for the specified symbol name.
 
 		:param thing: The object from which the *name* item will be accessed.
 		:param str name: The symbol name that is being resolved.
 		:return: The value for the corresponding attribute *name*.
 		"""
-		return self.__resolver(thing, name)
+		if scope is None:
+			return self.__resolver(thing, name)
+		if scope == 'built-in':
+			if name == 'f.e':
+				return math.e
+			elif name == 'f.pi':
+				return math.pi
+			elif name == 'd.now':
+				return datetime.datetime.now()
+			elif name == 'd.today':
+				return datetime.date.today()
+		raise errors.SymbolResolutionError(name, symbol_scope=scope)
 
 	def resolve_type(self, name):
 		"""

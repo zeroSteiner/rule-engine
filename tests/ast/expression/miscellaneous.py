@@ -58,6 +58,25 @@ class SymbolExpressionTests(unittest.TestCase):
 		self.assertEqual(symbol.name, self.sym_name)
 		self.assertEqual(symbol.evaluate({self.sym_name: self.sym_value}), self.sym_value)
 
+	def test_ast_expression_symbol_scope(self):
+		for name in ('f.e', 'f.pi', 'd.now', 'd.today'):
+			symbol = ast.SymbolExpression(context, name, scope='built-in')
+			value = symbol.evaluate(None)
+			if name.startswith('d.'):
+				self.assertIsInstance(value, datetime.datetime)
+			elif name.startswith('f.'):
+				self.assertIsInstance(value, float)
+
+	def test_ast_expression_symbol_scope_error(self):
+		symbol = ast.SymbolExpression(context, 'fake-name', scope='fake-scope')
+		try:
+			symbol.evaluate(None)
+		except errors.SymbolResolutionError as error:
+			self.assertEqual(error.symbol_name, 'fake-name')
+			self.assertEqual(error.symbol_scope, 'fake-scope')
+		else:
+			self.fail('SymbolResolutionError was not raised')
+
 	def test_ast_expression_symbol_type(self):
 		context = engine.Context(type_resolver=self._type_resolver)
 		symbol = ast.SymbolExpression(context, self.sym_name)

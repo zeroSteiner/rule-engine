@@ -457,13 +457,14 @@ class SymbolExpression(ExpressionBase):
 	A class representing a symbol name to be resolved at evaluation time with
 	the help of a :py:class:`~rule_engine.engine.Context` object.
 	"""
-	__slots__ = ('name', 'result_type')
-	def __init__(self, context, name):
+	__slots__ = ('name', 'result_type', 'scope')
+	def __init__(self, context, name, scope=None):
 		"""
 		:param context: The context to use for evaluating the expression.
 		:type context: :py:class:`~rule_engine.engine.Context`
 		:param str name: The name of the symbol. This will be resolved with a
 			given context object on the specified *thing*.
+		:param str scope: The optional scope to use while resolving the symbol.
 		"""
 		context.symbols.add(name)
 		self.context = context
@@ -471,19 +472,18 @@ class SymbolExpression(ExpressionBase):
 		type_hint = context.resolve_type(name)
 		if type_hint is not None:
 			self.result_type = type_hint
+		self.scope = scope
 
 	def __repr__(self):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
 	def evaluate(self, thing):
-		value = self.context.resolve(thing, self.name)
+		value = self.context.resolve(thing, self.name, scope=self.scope)
 
 		# convert the value from one of the supported types if necessary
-		if isinstance(value, bool):
-			pass
-		elif isinstance(value, datetime.date):
+		if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
 			value = datetime.datetime(value.year, value.month, value.day)
-		elif isinstance(value, int):
+		elif isinstance(value, int) and not isinstance(value, bool):
 			value = float(value)
 
 		# use DataType.from_value to raise a TypeError if value is not of a

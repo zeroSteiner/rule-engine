@@ -74,9 +74,16 @@ class ParserTests(ParserTestsBase):
 		self.assertIsInstance(expression, ast.Statement)
 
 	def test_parser_symbol_expressions(self):
-		expressions = ('a', 'b')
-		for expression in expressions:
-			self.assertStatementType(expression, ast.SymbolExpression)
+		symbols = ('a', 'b')
+		for text in symbols:
+			expression = self.assertStatementType(text, ast.SymbolExpression).expression
+			self.assertEqual(expression.name, text)
+			self.assertIsNone(expression.scope)
+
+			expression = self.assertStatementType('$' + text, ast.SymbolExpression).expression
+			self.assertEqual(expression.name, text)
+			self.assertEqual(expression.scope, 'built-in')
+
 
 	def test_parser_ternary_expressions(self):
 		statement = self.assertStatementType('condition ? case_true : case_false', ast.TernaryExpression)

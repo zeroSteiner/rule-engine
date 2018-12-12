@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import functools
 import itertools
 import unittest
@@ -154,12 +155,20 @@ class ComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 
 class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.ArithmeticComparisonExpression
-	def test_ast_expression_left_operator_right_arithmeticcomparison(self):
+	def test_ast_expression_left_operator_right_arithmeticcomparison_datetime(self):
+		past_date = ast.DatetimeExpression(context, datetime.datetime(2016, 10, 15))
+		now = ast.DatetimeExpression(context, datetime.datetime.now())
+		self.assertExpressionTests('ge', past_date, now, False)
+		self.assertExpressionTests('gt', past_date, now, False)
+		self.assertExpressionTests('le', past_date, now, True)
+		self.assertExpressionTests('lt', past_date, now, True)
+
+	def test_ast_expression_left_operator_right_arithmeticcomparison_numeric(self):
 		neg_one = ast.FloatExpression(context, -1.0)
 		zero = ast.FloatExpression(context, 0.0)
 		one = ast.FloatExpression(context, 1.0)
-		numbers = (neg_one, zero, one)
-		for number in numbers:
+		values = (neg_one, zero, one)
+		for number in values:
 			self.assertExpressionTests('ge', number, zero, number is zero or number is one)
 			self.assertExpressionTests('gt', number, zero, number is one)
 			self.assertExpressionTests('le', number, zero, number is zero or number is neg_one)

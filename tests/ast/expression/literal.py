@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import unittest
 
 import rule_engine.ast as ast
@@ -47,6 +48,7 @@ falseish = (
 # literal expressions which should evaluate to true
 trueish = (
 	ast.BooleanExpression(context, True),
+	ast.DatetimeExpression(context, datetime.datetime.now()),
 	ast.FloatExpression(context, float('-inf')),
 	ast.FloatExpression(context, -1.0),
 	ast.FloatExpression(context, 1.0),

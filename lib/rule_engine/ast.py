@@ -395,12 +395,16 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 	A class for representing arithmetic comparison expressions from the grammar
 	text such as less-than-or-equal-to and greater-than.
 	"""
-	compatible_types = (DataType.FLOAT,)
+	compatible_types = (DataType.DATETIME, DataType.FLOAT)
 	def __op_arithmetic(self, op, thing):
 		left = self.left.evaluate(thing)
-		_assert_is_numeric(left)
+		if not isinstance(left, datetime.datetime):
+			_assert_is_numeric(left)
 		right = self.right.evaluate(thing)
-		_assert_is_numeric(right)
+		if not isinstance(right, datetime.datetime):
+			_assert_is_numeric(right)
+		if type(left) is not type(right):
+			raise errors.EvaluationError('data type mismatch')
 		return op(left, right)
 
 	_op_ge = functools.partialmethod(__op_arithmetic, operator.ge)

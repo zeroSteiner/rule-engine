@@ -46,7 +46,7 @@ nan = float('nan')
 
 class AstTests(unittest.TestCase):
 	context = engine.Context()
-	thing = {'age': 21, 'name': 'Alice'}
+	thing = {'age': 21.0, 'name': 'Alice'}
 	def test_ast_evaluates_arithmetic_comparisons(self):
 		parser_ = parser.Parser()
 		statement = parser_.parse('age >= 21', self.context)
@@ -100,7 +100,7 @@ class AstTests(unittest.TestCase):
 			statement.evaluate({'symbol': 'string'})
 		with self.assertRaises(errors.EvaluationError):
 			statement.evaluate({'symbol': True})
-		self.assertTrue(statement.evaluate({'symbol': 0}))
+		self.assertTrue(statement.evaluate({'symbol': 0.0}))
 
 	def test_ast_raises_type_mismatch_bitwise(self):
 		parser_ = parser.Parser()

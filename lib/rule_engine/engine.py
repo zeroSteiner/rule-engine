@@ -38,6 +38,8 @@ from . import ast
 from . import errors
 from . import parser
 
+import dateutil.tz
+
 def resolve_attribute(thing, name):
 	"""
 	A replacement resolver function for looking up symbols as members of
@@ -105,7 +107,7 @@ class Context(object):
 	change the behavior of certain aspects of the rule such as how symbols are
 	resolved and what regex flags should be used.
 	"""
-	def __init__(self, regex_flags=0, resolver=None, type_resolver=None):
+	def __init__(self, regex_flags=0, resolver=None, type_resolver=None, default_timezone='local'):
 		"""
 		:param int regex_flags: The flags to provide to functions in the
 			:py:mod:`re` module.
@@ -113,6 +115,13 @@ class Context(object):
 			:py:meth:`.resolve`.
 		:param type_resolver: An optional callback function to use in place of
 			:py:meth:`.resolve_type`.
+		:param default_timezone: The default timezone to apply to
+			:py:class:`~datetime.datetime` instances which do not have one
+			specified. This is necessary for comparison operations. The value
+			should either be a :py:class:`~datetime.tzinfo` instance, or a
+			string. If *default_timzezone* is a string it must be one of the
+			specially supported (case-insensitive) values of "local" or "utc".
+		:type default_timezone: str, :py:class:`~datetime.tzinfo`
 		"""
 		self.regex_flags = regex_flags
 		"""
@@ -126,6 +135,17 @@ class Context(object):
 		a rule is generated to ensure that all symbols are valid before it is
 		evaluated.
 		"""
+		if isinstance(default_timezone, str):
+			default_timezone = default_timezone.lower()
+			if default_timezone == 'local':
+				default_timezone = dateutil.tz.tzlocal()
+			elif default_timezone == 'utc':
+				default_timezone = dateutil.tz.tzutc()
+			else:
+				raise ValueError('unsupported timezone: ' + default_timezone)
+		elif not isinstance(default_timezone, datetime.tzinfo):
+			raise TypeError('invalid default_timezone type')
+		self.default_timezone = default_timezone
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
 
@@ -163,7 +183,7 @@ class Context(object):
 		types are appropriate for the operations being performed. It must then
 		return one of the compatible data type constants if the symbol is valid
 		or raise an exception. The default behavior is to return
-		:py:data:`rule_engine.ast.DataType.UNDEFINED` for all symbols.
+		:py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.
 
 		:param str name: The symbol name to provide a type hint for.
 		:return: The type of the specified symbol

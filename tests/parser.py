@@ -39,6 +39,8 @@ import rule_engine.engine as engine
 import rule_engine.errors as errors
 import rule_engine.parser as parser
 
+import dateutil.tz
+
 class ParserTestsBase(unittest.TestCase):
 	_parser = parser.Parser()
 	context = engine.Context()
@@ -172,8 +174,8 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual('false', ast.BooleanExpression, False)
 
 	def test_parse_datetime(self):
-		self.assertLiteralStatementEqual('d"2016-10-15"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15))
-		self.assertLiteralStatementEqual('d"2016-10-15 12:30"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, 12, 30))
+		self.assertLiteralStatementEqual('d"2016-10-15"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, tzinfo=dateutil.tz.tzlocal()))
+		self.assertLiteralStatementEqual('d"2016-10-15 12:30"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, 12, 30, tzinfo=dateutil.tz.tzlocal()))
 
 	def test_parse_datetime_syntax_errors(self):
 		try:

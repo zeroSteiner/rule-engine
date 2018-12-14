@@ -230,6 +230,8 @@ class DatetimeExpression(LiteralExpressionBase):
 			dt = dateutil.parser.isoparse(string)
 		except ValueError:
 			raise errors.DatetimeSyntaxError('invalid datetime', string)
+		if dt.tzinfo is None:
+			dt = dt.replace(tzinfo=context.default_timezone)
 		return cls(context, dt)
 
 class FloatExpression(LiteralExpressionBase):
@@ -485,6 +487,9 @@ class SymbolExpression(ExpressionBase):
 			value = datetime.datetime(value.year, value.month, value.day)
 		elif isinstance(value, int) and not isinstance(value, bool):
 			value = float(value)
+
+		if isinstance(value, datetime.datetime) and value.tzinfo is None:
+			value = value.replace(tzinfo=self.context.default_timezone)
 
 		# use DataType.from_value to raise a TypeError if value is not of a
 		# compatible data type

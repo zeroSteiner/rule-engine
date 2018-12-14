@@ -40,6 +40,8 @@ import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 
+import dateutil.tz
+
 __all__ = ('SymbolExpressionTests', 'TernaryExpressionTests', 'UnaryExpressionTests')
 
 class SymbolExpressionTests(unittest.TestCase):
@@ -89,7 +91,7 @@ class SymbolExpressionTests(unittest.TestCase):
 		self.assertEqual(symbol.name, self.sym_name)
 		result = symbol.evaluate({self.sym_name: datetime.date(2016, 10, 15)})
 		self.assertIsInstance(result, datetime.datetime)
-		self.assertEqual(result, datetime.datetime(2016, 10, 15))
+		self.assertEqual(result, datetime.datetime(2016, 10, 15, tzinfo=dateutil.tz.tzlocal()))
 
 	def test_ast_expression_symbol_type_int_conversion(self):
 		symbol = ast.SymbolExpression(context, self.sym_name)

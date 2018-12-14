@@ -39,12 +39,28 @@ import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 
+import dateutil.tz
+
 try:
 	import graphviz
 except ImportError:
 	has_graphviz = False
 else:
 	has_graphviz = True
+
+class ContextTests(unittest.TestCase):
+	def test_context_default_timezone(self):
+		context = engine.Context(default_timezone='Local')
+		self.assertEqual(context.default_timezone, dateutil.tz.tzlocal())
+
+		context = engine.Context(default_timezone='UTC')
+		self.assertEqual(context.default_timezone, dateutil.tz.tzutc())
+
+	def test_context_default_timezone_errors(self):
+		with self.assertRaises(ValueError):
+			engine.Context(default_timezone='doesnotexist')
+		with self.assertRaises(TypeError):
+			engine.Context(default_timezone=600)
 
 class EngineTests(unittest.TestCase):
 	def test_engine_resolve_attribute(self):

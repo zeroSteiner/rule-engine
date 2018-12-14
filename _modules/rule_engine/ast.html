@@ -602,13 +602,14 @@
 <span class="sd">	A class representing a symbol name to be resolved at evaluation time with</span>
 <span class="sd">	the help of a :py:class:`~rule_engine.engine.Context` object.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;result_type&#39;</span><span class="p">)</span>
-	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;result_type&#39;</span><span class="p">,</span> <span class="s1">&#39;scope&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param context: The context to use for evaluating the expression.</span>
 <span class="sd">		:type context: :py:class:`~rule_engine.engine.Context`</span>
 <span class="sd">		:param str name: The name of the symbol. This will be resolved with a</span>
 <span class="sd">			given context object on the specified *thing*.</span>
+<span class="sd">		:param str scope: The optional scope to use while resolving the symbol.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">context</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
@@ -616,19 +617,18 @@
 		<span class="n">type_hint</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 		<span class="k">if</span> <span class="n">type_hint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">type_hint</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
 
 	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> name=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
-		<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
 
 		<span class="c1"># convert the value from one of the supported types if necessary</span>
-		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-			<span class="k">pass</span>
-		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
-		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 		<span class="c1"># use DataType.from_value to raise a TypeError if value is not of a</span>

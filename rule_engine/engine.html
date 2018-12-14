@@ -24,28 +24,19 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="Rule Engine 0.9 documentation" href="../index.html"/>
-        <link rel="up" title="rule_engine" href="index.html"/>
-        <link rel="next" title="errors" href="errors.html"/>
-        <link rel="prev" title="ast" href="ast.html"/> 
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="errors" href="errors.html" />
+    <link rel="prev" title="ast" href="ast.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -112,7 +103,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Rule Engine</a>
@@ -120,9 +111,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -256,14 +248,14 @@ callback function.</td>
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="rule_engine.engine.Context">
-<em class="property">class </em><code class="descname">Context</code><span class="sig-paren">(</span><em>regex_flags=0</em>, <em>resolver=None</em>, <em>type_resolver=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">Context</code><span class="sig-paren">(</span><em>regex_flags=0</em>, <em>resolver=None</em>, <em>type_resolver=None</em>, <em>default_timezone='local'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An object defining the context for a rule’s evaluation. This can be used to
 change the behavior of certain aspects of the rule such as how symbols are
 resolved and what regex flags should be used.</p>
 <dl class="method">
 <dt id="rule_engine.engine.Context.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>regex_flags=0</em>, <em>resolver=None</em>, <em>type_resolver=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>regex_flags=0</em>, <em>resolver=None</em>, <em>type_resolver=None</em>, <em>default_timezone='local'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -275,6 +267,12 @@ resolved and what regex flags should be used.</p>
 <a class="reference internal" href="#rule_engine.engine.Context.resolve" title="rule_engine.engine.Context.resolve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resolve()</span></code></a>.</li>
 <li><strong>type_resolver</strong> – An optional callback function to use in place of
 <a class="reference internal" href="#rule_engine.engine.Context.resolve_type" title="rule_engine.engine.Context.resolve_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resolve_type()</span></code></a>.</li>
+<li><strong>default_timezone</strong> (str, <a class="reference external" href="https://docs.python.org/3.6/library/datetime.html#datetime.tzinfo" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a>) – The default timezone to apply to
+<a class="reference external" href="https://docs.python.org/3.6/library/datetime.html#datetime.datetime" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> instances which do not have one
+specified. This is necessary for comparison operations. The value
+should either be a <a class="reference external" href="https://docs.python.org/3.6/library/datetime.html#datetime.tzinfo" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> instance, or a
+string. If <em>default_timzezone</em> is a string it must be one of the
+specially supported (case-insensitive) values of “local” or “utc”.</li>
 </ul>
 </td>
 </tr>
@@ -291,10 +289,14 @@ resolved and what regex flags should be used.</p>
 
 <dl class="method">
 <dt id="rule_engine.engine.Context.resolve">
-<code class="descname">resolve</code><span class="sig-paren">(</span><em>thing</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.resolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context.resolve" title="Permalink to this definition">¶</a></dt>
+<code class="descname">resolve</code><span class="sig-paren">(</span><em>thing</em>, <em>name</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.resolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context.resolve" title="Permalink to this definition">¶</a></dt>
 <dd><p>The method to use for resolving symbols names to values. This function
-must return a compatible value for the specified symbol name. This
-function defaults to <a class="reference internal" href="#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_item()</span></code></a>.</p>
+must return a compatible value for the specified symbol name. When a
+<em>scope</em> is defined, this function handles the resolution itself, however
+when the <em>scope</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code> the resolver specified in
+<a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a> is used which defaults to
+<a class="reference internal" href="#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_item()</span></code></a>. This function must return a compatible value
+for the specified symbol name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -320,7 +322,7 @@ This can be used to ensure that all symbol names are valid and that the
 types are appropriate for the operations being performed. It must then
 return one of the compatible data type constants if the symbol is valid
 or raise an exception. The default behavior is to return
-<a class="reference internal" href="ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-data docutils literal notranslate"><span class="pre">rule_engine.ast.DataType.UNDEFINED</span></code></a> for all symbols.</p>
+<a class="reference internal" href="ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-data docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> for all symbols.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -466,9 +468,7 @@ evaluation.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -486,11 +486,11 @@ evaluation.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre.
+        &copy; Copyright 2018, Spencer McIntyre
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -505,35 +505,23 @@ evaluation.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.9',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

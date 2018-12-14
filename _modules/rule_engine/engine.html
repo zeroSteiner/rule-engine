@@ -175,11 +175,15 @@
 <span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 
+<span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">math</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">ast</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">errors</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">parser</span>
+
+<span class="kn">import</span> <span class="nn">dateutil.tz</span>
 
 <div class="viewcode-block" id="resolve_attribute"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_attribute">[docs]</a><span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -248,7 +252,7 @@
 <span class="sd">	change the behavior of certain aspects of the rule such as how symbols are</span>
 <span class="sd">	resolved and what regex flags should be used.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_flags</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_flags</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_timezone</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param int regex_flags: The flags to provide to functions in the</span>
 <span class="sd">			:py:mod:`re` module.</span>
@@ -256,6 +260,13 @@
 <span class="sd">			:py:meth:`.resolve`.</span>
 <span class="sd">		:param type_resolver: An optional callback function to use in place of</span>
 <span class="sd">			:py:meth:`.resolve_type`.</span>
+<span class="sd">		:param default_timezone: The default timezone to apply to</span>
+<span class="sd">			:py:class:`~datetime.datetime` instances which do not have one</span>
+<span class="sd">			specified. This is necessary for comparison operations. The value</span>
+<span class="sd">			should either be a :py:class:`~datetime.tzinfo` instance, or a</span>
+<span class="sd">			string. If *default_timzezone* is a string it must be one of the</span>
+<span class="sd">			specially supported (case-insensitive) values of &quot;local&quot; or &quot;utc&quot;.</span>
+<span class="sd">		:type default_timezone: str, :py:class:`~datetime.tzinfo`</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">regex_flags</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -269,20 +280,46 @@
 <span class="sd">		a rule is generated to ensure that all symbols are valid before it is</span>
 <span class="sd">		evaluated.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_timezone</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+			<span class="n">default_timezone</span> <span class="o">=</span> <span class="n">default_timezone</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+			<span class="k">if</span> <span class="n">default_timezone</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+				<span class="n">default_timezone</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">tz</span><span class="o">.</span><span class="n">tzlocal</span><span class="p">()</span>
+			<span class="k">elif</span> <span class="n">default_timezone</span> <span class="o">==</span> <span class="s1">&#39;utc&#39;</span><span class="p">:</span>
+				<span class="n">default_timezone</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">tz</span><span class="o">.</span><span class="n">tzutc</span><span class="p">()</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unsupported timezone: &#39;</span> <span class="o">+</span> <span class="n">default_timezone</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_timezone</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;invalid default_timezone type&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span> <span class="o">=</span> <span class="n">default_timezone</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">resolver</span> <span class="ow">or</span> <span class="n">resolve_item</span></div>
 
-<div class="viewcode-block" id="Context.resolve"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve">[docs]</a>	<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="Context.resolve"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve">[docs]</a>	<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		The method to use for resolving symbols names to values. This function</span>
-<span class="sd">		must return a compatible value for the specified symbol name. This</span>
-<span class="sd">		function defaults to :py:func:`resolve_item`.</span>
+<span class="sd">		must return a compatible value for the specified symbol name. When a</span>
+<span class="sd">		*scope* is defined, this function handles the resolution itself, however</span>
+<span class="sd">		when the *scope* is ``None`` the resolver specified in</span>
+<span class="sd">		:py:meth:`~.Context.__init__` is used which defaults to</span>
+<span class="sd">		:py:func:`resolve_item`. This function must return a compatible value</span>
+<span class="sd">		for the specified symbol name.</span>
 
 <span class="sd">		:param thing: The object from which the *name* item will be accessed.</span>
 <span class="sd">		:param str name: The symbol name that is being resolved.</span>
 <span class="sd">		:return: The value for the corresponding attribute *name*.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+		<span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="s1">&#39;built-in&#39;</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;f.e&#39;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">e</span>
+			<span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;f.pi&#39;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+			<span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;d.now&#39;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+			<span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;d.today&#39;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Context.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -291,7 +328,7 @@
 <span class="sd">		types are appropriate for the operations being performed. It must then</span>
 <span class="sd">		return one of the compatible data type constants if the symbol is valid</span>
 <span class="sd">		or raise an exception. The default behavior is to return</span>
-<span class="sd">		:py:data:`rule_engine.ast.DataType.UNDEFINED` for all symbols.</span>
+<span class="sd">		:py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.</span>
 
 <span class="sd">		:param str name: The symbol name to provide a type hint for.</span>
 <span class="sd">		:return: The type of the specified symbol</span>

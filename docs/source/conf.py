@@ -14,7 +14,7 @@ _prj_root = os.path.dirname(__file__)
 _prj_root = os.path.relpath(os.path.join('..', '..', 'lib'), _prj_root)
 _prj_root = os.path.abspath(_prj_root)
 sys.path.insert(1, _prj_root)
-
+import rule_engine
 
 # -- Project information -----------------------------------------------------
 
@@ -23,9 +23,9 @@ copyright = '2018, Spencer McIntyre'
 author = 'Spencer McIntyre'
 
 # The short X.Y version
-version = ''
+version = rule_engine.__version__
 # The full version, including alpha/beta/rc tags
-release = '0.9'
+release = version
 
 
 # -- General configuration ---------------------------------------------------

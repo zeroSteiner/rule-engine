@@ -76,13 +76,17 @@ Supported Operations
 +-----------+------------------------------+------------------------------------------------+
 | **Fuzzy-Comparison Operators**                                                            |
 +-----------+------------------------------+------------------------------------------------+
-| ``=~``    | Regex match :sup:`2`         | :py:attr:`~rule_engine.ast.DataType.STRING`    |
+| ``=~``    | Regex match :sup:`2`         | :py:attr:`~rule_engine.ast.DataType.NULL`,     |
+|           |                              | :py:attr:`~rule_engine.ast.DataType.STRING`    |
 +-----------+------------------------------+------------------------------------------------+
-| ``=~~``   | Regex search :sup:`2`        | :py:attr:`~rule_engine.ast.DataType.STRING`    |
+| ``=~~``   | Regex search :sup:`2`        | :py:attr:`~rule_engine.ast.DataType.NULL`,     |
+|           |                              | :py:attr:`~rule_engine.ast.DataType.STRING`    |
 +-----------+------------------------------+------------------------------------------------+
-| ``!~``    | Regex match fails :sup:`2`   | :py:attr:`~rule_engine.ast.DataType.STRING`    |
+| ``!~``    | Regex match fails :sup:`2`   | :py:attr:`~rule_engine.ast.DataType.NULL`,     |
+|           |                              | :py:attr:`~rule_engine.ast.DataType.STRING`    |
 +-----------+------------------------------+------------------------------------------------+
-| ``!~~``   | Regex search fails :sup:`2`  | :py:attr:`~rule_engine.ast.DataType.STRING`    |
+| ``!~~``   | Regex search fails :sup:`2`  | :py:attr:`~rule_engine.ast.DataType.NULL`,     |
+|           |                              | :py:attr:`~rule_engine.ast.DataType.STRING`    |
 +-----------+------------------------------+------------------------------------------------+
 | **Logical Operators**                                                                     |
 +-----------+------------------------------+------------------------------------------------+

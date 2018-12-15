@@ -204,6 +204,14 @@ class FuzzyComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('ne_fzs', right_value=fuzzy('Skywalker'), equals_value=False)
 		self.assertExpressionTests('ne_fzs', right_value=darth, equals_value=True)
 
+	def test_ast_expression_left_operator_right_fuzzycomparison_nulls(self):
+		darth = ast.StringExpression(context, 'Darth Vader')
+		null = ast.NullExpression(context)
+		for operation, left, right in itertools.product(('eq_fzm', 'eq_fzs'), (darth, null), (darth, null)):
+			self.assertExpressionTests(operation, left_value=left, right_value=right, equals_value=left is right)
+		for operation, left, right in itertools.product(('ne_fzm', 'ne_fzs'), (darth, null), (darth, null)):
+			self.assertExpressionTests(operation, left_value=left, right_value=right, equals_value=left is not right)
+
 	def test_ast_expression_left_operator_right_fuzzycomparison_symbolic(self):
 		fuzzy = functools.partial(ast.SymbolExpression, context)
 		darth = ast.SymbolExpression(context, 'darth')
@@ -226,7 +234,7 @@ class FuzzyComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	def test_ast_expression_left_operator_right_fuzzycomparison_type_errors(self):
 		operations = ('eq_fzm', 'eq_fzs', 'ne_fzm', 'ne_fzs')
 		for operation, left, right in itertools.product(operations, trueish, falseish):
-			if isinstance(left, ast.StringExpression) and isinstance(right, ast.StringExpression):
+			if isinstance(left, (ast.NullExpression, ast.StringExpression)) and isinstance(right, (ast.NullExpression, ast.StringExpression)):
 				continue
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, left, right)

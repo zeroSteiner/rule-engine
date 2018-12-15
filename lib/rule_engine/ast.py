@@ -432,7 +432,7 @@ class FuzzyComparisonExpression(ComparisonExpression):
 	A class for representing regular expression comparison expressions from the
 	grammar text such as search and does not match.
 	"""
-	compatible_types = (DataType.STRING,)
+	compatible_types = (DataType.NULL, DataType.STRING)
 	def __init__(self, *args, **kwargs):
 		super(FuzzyComparisonExpression, self).__init__(*args, **kwargs)
 		if isinstance(self.right, StringExpression):
@@ -446,17 +446,20 @@ class FuzzyComparisonExpression(ComparisonExpression):
 		return result
 
 	def __op_regex(self, regex_function, modifier, thing):
-		left_string = self.left.evaluate(thing)
-		if not isinstance(left_string, str):
+		left = self.left.evaluate(thing)
+		if not isinstance(left, str) and left is not None:
 			raise errors.EvaluationError('data type mismatch')
 		if isinstance(self.right, StringExpression):
 			regex = self._right
 		else:
 			regex = self.right.evaluate(thing)
-			if not isinstance(regex, str):
+			if isinstance(regex, str):
+				regex = self._compile_regex(regex)
+			elif regex is not None:
 				raise errors.EvaluationError('data type mismatch')
-			regex = self._compile_regex(regex)
-		match = getattr(regex, regex_function)(left_string)
+		if left is None or regex is None:
+			return not modifier(left, regex)
+		match = getattr(regex, regex_function)(left)
 		return modifier(match, None)
 
 	_op_eq_fzm = functools.partialmethod(__op_regex, 'match', operator.is_not)

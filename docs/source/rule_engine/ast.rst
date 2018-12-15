@@ -123,6 +123,12 @@ Literal Expressions
    .. autoattribute:: result_type
       :annotation: = FLOAT
 
+.. autoclass:: rule_engine.ast.NullExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = NULL
+
 .. autoclass:: rule_engine.ast.StringExpression
    :show-inheritance:
 

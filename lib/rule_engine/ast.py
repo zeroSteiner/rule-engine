@@ -228,7 +228,10 @@ class BooleanExpression(LiteralExpressionBase):
 	result_type = DataType.BOOLEAN
 
 class DatetimeExpression(LiteralExpressionBase):
-	"""Literal datetime expressions representing a specific point in time."""
+	"""
+	Literal datetime expressions representing a specific point in time. This
+	expression type always evaluates to true.
+	"""
 	result_type = DataType.DATETIME
 
 	@classmethod
@@ -246,7 +249,10 @@ class FloatExpression(LiteralExpressionBase):
 	result_type = DataType.FLOAT
 
 class NullExpression(LiteralExpressionBase):
-	"""Literal null expressions representing null values."""
+	"""
+	Literal null expressions representing null values. This expression type
+	always evaluates to false.
+	"""
 	result_type = DataType.NULL
 	def __init__(self, context):
 		super(NullExpression, self).__init__(context, value=None)

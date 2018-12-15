@@ -57,7 +57,7 @@ whether or not they match.\
 
 setup(
 	name='rule-engine',
-	version='1.0.0',
+	version='1.0.1',
 	author='Spencer McIntyre',
 	author_email='zeroSteiner@gmail.com',
 	maintainer='Spencer McIntyre',
@@ -74,7 +74,7 @@ setup(
 	package_dir={'': 'lib'},
 	packages=find_packages('lib'),
 	classifiers=[
-		'Development Status :: 4 - Beta',
+		'Development Status :: 5 - Production/Stable',
 		'Environment :: Console',
 		'Intended Audience :: Developers',
 		'License :: OSI Approved :: BSD License',

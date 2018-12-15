@@ -118,6 +118,8 @@ class Parser(ParserBase):
 		# float constants
 		'inf': 'FLOAT_INF',
 		'nan': 'FLOAT_NAN',
+		# null
+		'null': 'NULL',
 		# operators
 		'and': 'AND',
 		'or': 'OR',
@@ -346,6 +348,10 @@ class Parser(ParserBase):
 	def p_expression_float_inf(self, p):
 		'expression : FLOAT_INF'
 		p[0] = ast.FloatExpression(self.context, float('inf'))
+
+	def p_expression_null(self, p):
+		"""expression : NULL"""
+		p[0] = ast.NullExpression(self.context)
 
 	def p_expression_string(self, p):
 		'expression : STRING'

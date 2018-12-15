@@ -8,6 +8,7 @@ on which the rule is being applied.
 * :py:attr:`~rule_engine.ast.DataType.BOOLEAN`
 * :py:attr:`~rule_engine.ast.DataType.DATETIME`
 * :py:attr:`~rule_engine.ast.DataType.FLOAT`
+* :py:attr:`~rule_engine.ast.DataType.NULL`
 * :py:attr:`~rule_engine.ast.DataType.STRING`
 
 Not all supported operations work with all data types as noted in the table
@@ -25,6 +26,8 @@ Supported Operations
 +-----------+------------------------------+------------------------------------------------+
 | Operation | Description                  | Compatible Data Types                          |
 +-----------+------------------------------+------------------------------------------------+
+| **Arithmetic Operators**                                                                  |
++-----------+------------------------------+------------------------------------------------+
 | ``+``     | Addition                     | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
 +-----------+------------------------------+------------------------------------------------+
 | ``-``     | Subtraction                  | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
@@ -39,6 +42,8 @@ Supported Operations
 +-----------+------------------------------+------------------------------------------------+
 | ``%``     | Modulo                       | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
 +-----------+------------------------------+------------------------------------------------+
+| **Bitwise-Arithmetic Operators**                                                          |
++-----------+------------------------------+------------------------------------------------+
 | ``&``     | Bitwise-and :sup:`1`         | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
 +-----------+------------------------------+------------------------------------------------+
 | ``|``     | Bitwise-or :sup:`1`          | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
@@ -48,6 +53,14 @@ Supported Operations
 | ``>>``    | Bitwise right shift :sup:`1` | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
 +-----------+------------------------------+------------------------------------------------+
 | ``<<``    | Bitwise left shift :sup:`1`  | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
++-----------+------------------------------+------------------------------------------------+
+| **Comparison Operators**                                                                  |
++-----------+------------------------------+------------------------------------------------+
+| ``==``    | Equal to                     | *ANY*                                          |
++-----------+------------------------------+------------------------------------------------+
+| ``!=``    | Not equal to                 | *ANY*                                          |
++-----------+------------------------------+------------------------------------------------+
+| **Arithmetic-Comparison Operators**                                                       |
 +-----------+------------------------------+------------------------------------------------+
 | ``>``     | Greater than                 | :py:attr:`~rule_engine.ast.DataType.DATETIME`, |
 |           |                              | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
@@ -61,9 +74,7 @@ Supported Operations
 | ``<=``    | Less than or equal to        | :py:attr:`~rule_engine.ast.DataType.DATETIME`, |
 |           |                              | :py:attr:`~rule_engine.ast.DataType.FLOAT`     |
 +-----------+------------------------------+------------------------------------------------+
-| ``==``    | Equal to                     | *ANY*                                          |
-+-----------+------------------------------+------------------------------------------------+
-| ``!=``    | Not equal to                 | *ANY*                                          |
+| **Fuzzy-Comparison Operators**                                                            |
 +-----------+------------------------------+------------------------------------------------+
 | ``=~``    | Regex match :sup:`2`         | :py:attr:`~rule_engine.ast.DataType.STRING`    |
 +-----------+------------------------------+------------------------------------------------+
@@ -73,13 +84,17 @@ Supported Operations
 +-----------+------------------------------+------------------------------------------------+
 | ``!~~``   | Regex search fails :sup:`2`  | :py:attr:`~rule_engine.ast.DataType.STRING`    |
 +-----------+------------------------------+------------------------------------------------+
+| **Logical Operators**                                                                     |
++-----------+------------------------------+------------------------------------------------+
 | ``and``   | Logical and                  | *ANY*                                          |
++-----------+------------------------------+------------------------------------------------+
+| ``not``   | Logical not                  | *ANY*                                          |
 +-----------+------------------------------+------------------------------------------------+
 | ``or``    | Logical or                   | *ANY*                                          |
 +-----------+------------------------------+------------------------------------------------+
 
 :sup:`1` Bitwise operations support floating point values, but if the value is
-not a natural number a :py:class:`~rule_engine.errors.EvaluationError` will be
+not a natural number, an :py:class:`~rule_engine.errors.EvaluationError` will be
 raised.
 
 :sup:`2` When using regular expression operations, the expression on the left is
@@ -91,6 +106,8 @@ Reserved Keywords
 
 +-----------+---------------------------------------+
 | Keyword   | Description                           |
++-----------+---------------------------------------+
+| ``null``  | The null value                        |
 +-----------+---------------------------------------+
 | **Booleans**                                      |
 +-----------+---------------------------------------+

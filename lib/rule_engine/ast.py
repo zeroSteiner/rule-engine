@@ -41,6 +41,8 @@ from . import errors
 
 import dateutil.parser
 
+NONE_TYPE = type(None)
+
 def is_natural_number(value):
 	"""
 	Check whether *value* is a natural number (i.e. a whole, non-negative
@@ -107,6 +109,7 @@ class DataType(enum.Enum):
 	BOOLEAN = bool
 	DATETIME = datetime.datetime
 	FLOAT = float
+	NULL = NONE_TYPE
 	STRING = str
 	UNDEFINED = None
 	"""
@@ -127,13 +130,15 @@ class DataType(enum.Enum):
 		"""
 		if not isinstance(python_type, type):
 			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
-		if python_type == bool:
+		if python_type is bool:
 			return cls.BOOLEAN
-		elif python_type in (datetime.date, datetime.datetime):
+		elif python_type is datetime.date or python_type is datetime.datetime:
 			return cls.DATETIME
-		elif python_type in (float, int):
+		elif python_type is float or python_type is int:
 			return cls.FLOAT
-		elif python_type == str:
+		elif python_type is NONE_TYPE:
+			return cls.NULL
+		elif python_type is str:
 			return cls.STRING
 		raise ValueError("can not map python type {0!r} to a compatible data type".format(python_type.__name__))
 
@@ -155,6 +160,8 @@ class DataType(enum.Enum):
 			return cls.DATETIME
 		elif isinstance(python_value, (float, int)):
 			return cls.FLOAT
+		elif python_value is None:
+			return cls.NULL
 		elif isinstance(python_value, (str,)):
 			return cls.STRING
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
@@ -238,6 +245,12 @@ class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
 
+class NullExpression(LiteralExpressionBase):
+	"""Literal null expressions representing null values."""
+	result_type = DataType.NULL
+	def __init__(self, context):
+		super(NullExpression, self).__init__(context, value=None)
+
 class StringExpression(LiteralExpressionBase):
 	"""Literal string expressions representing an array of characters."""
 	result_type = DataType.STRING
@@ -250,7 +263,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A base class for representing complex expressions composed of a left side
 	and a right side, separated by an operator.
 	"""
-	compatible_types = (DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.STRING)
+	compatible_types = (DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
 	"""
 	A tuple containing the compatible data types that the left and right
 	expressions must return. This can for example be used to indicate that

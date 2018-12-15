@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.parser &mdash; Rule Engine 0.9 documentation</title>
+  <title>rule_engine.parser &mdash; Rule Engine 1.0.0 documentation</title>
   
 
   
@@ -54,6 +54,10 @@
 
           
             
+            
+              <div class="version">
+                1.0.0
+              </div>
             
           
 
@@ -249,8 +253,8 @@
 		<span class="s1">&#39;&amp;&#39;</span><span class="p">:</span>   <span class="s1">&#39;BWAND&#39;</span><span class="p">,</span> <span class="s1">&#39;|&#39;</span><span class="p">:</span>  <span class="s1">&#39;BWOR&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">:</span> <span class="s1">&#39;BWXOR&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;&lt;&lt;&#39;</span><span class="p">:</span>  <span class="s1">&#39;BWLSH&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;BWRSH&#39;</span><span class="p">,</span>
 		<span class="c1"># comparison operators</span>
-		<span class="s1">&#39;==&#39;</span><span class="p">:</span>  <span class="s1">&#39;EQ&#39;</span><span class="p">,</span>    <span class="s1">&#39;=~&#39;</span><span class="p">:</span> <span class="s1">&#39;EQ_REM&#39;</span><span class="p">,</span> <span class="s1">&#39;=~~&#39;</span><span class="p">:</span> <span class="s1">&#39;EQ_RES&#39;</span><span class="p">,</span>
-		<span class="s1">&#39;!=&#39;</span><span class="p">:</span>  <span class="s1">&#39;NE&#39;</span><span class="p">,</span>    <span class="s1">&#39;!~&#39;</span><span class="p">:</span> <span class="s1">&#39;NE_REM&#39;</span><span class="p">,</span> <span class="s1">&#39;!~~&#39;</span><span class="p">:</span> <span class="s1">&#39;NE_RES&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;==&#39;</span><span class="p">:</span>  <span class="s1">&#39;EQ&#39;</span><span class="p">,</span>    <span class="s1">&#39;=~&#39;</span><span class="p">:</span> <span class="s1">&#39;EQ_FZM&#39;</span><span class="p">,</span> <span class="s1">&#39;=~~&#39;</span><span class="p">:</span> <span class="s1">&#39;EQ_FZS&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;!=&#39;</span><span class="p">:</span>  <span class="s1">&#39;NE&#39;</span><span class="p">,</span>    <span class="s1">&#39;!~&#39;</span><span class="p">:</span> <span class="s1">&#39;NE_FZM&#39;</span><span class="p">,</span> <span class="s1">&#39;!~~&#39;</span><span class="p">:</span> <span class="s1">&#39;NE_FZS&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>   <span class="s1">&#39;GT&#39;</span><span class="p">,</span>    <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;&lt;&#39;</span><span class="p">:</span>   <span class="s1">&#39;LT&#39;</span><span class="p">,</span>    <span class="s1">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span>
 		<span class="c1"># logical operators</span>
@@ -263,6 +267,8 @@
 		<span class="c1"># float constants</span>
 		<span class="s1">&#39;inf&#39;</span><span class="p">:</span> <span class="s1">&#39;FLOAT_INF&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;nan&#39;</span><span class="p">:</span> <span class="s1">&#39;FLOAT_NAN&#39;</span><span class="p">,</span>
+		<span class="c1"># null</span>
+		<span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="s1">&#39;NULL&#39;</span><span class="p">,</span>
 		<span class="c1"># operators</span>
 		<span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="s1">&#39;AND&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;or&#39;</span><span class="p">:</span> <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
@@ -300,7 +306,7 @@
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWXOR&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWAND&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>    <span class="s1">&#39;QMARK&#39;</span><span class="p">,</span> <span class="s1">&#39;COLON&#39;</span><span class="p">),</span>
-		<span class="p">(</span><span class="s1">&#39;nonassoc&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ&#39;</span><span class="p">,</span> <span class="s1">&#39;NE&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_REM&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_RES&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_REM&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_RES&#39;</span><span class="p">,</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span> <span class="s1">&#39;GT&#39;</span><span class="p">,</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">),</span>  <span class="c1"># Nonassociative operators</span>
+		<span class="p">(</span><span class="s1">&#39;nonassoc&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ&#39;</span><span class="p">,</span> <span class="s1">&#39;NE&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_FZM&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_FZS&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_FZM&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_FZS&#39;</span><span class="p">,</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span> <span class="s1">&#39;GT&#39;</span><span class="p">,</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">),</span>  <span class="c1"># Nonassociative operators</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;ADD&#39;</span><span class="p">,</span> <span class="s1">&#39;SUB&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWLSH&#39;</span><span class="p">,</span> <span class="s1">&#39;BWRSH&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;MUL&#39;</span><span class="p">,</span> <span class="s1">&#39;TDIV&#39;</span><span class="p">,</span> <span class="s1">&#39;FDIV&#39;</span><span class="p">,</span> <span class="s1">&#39;MOD&#39;</span><span class="p">),</span>
@@ -330,16 +336,16 @@
 		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;GT&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;BWRSH&#39;</span><span class="p">}[</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_EQ_RES</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">t_EQ_FZS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;=~~?&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;=~&#39;</span><span class="p">:</span>
-			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;EQ_REM&#39;</span>
+			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;EQ_FZM&#39;</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_NE_RES</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">t_NE_FZS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;!~~?&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;!~&#39;</span><span class="p">:</span>
-			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;NE_REM&#39;</span>
+			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;NE_FZM&#39;</span>
 		<span class="k">return</span> <span class="n">t</span>
 
 	<span class="k">def</span> <span class="nf">t_DATETIME</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
@@ -426,16 +432,16 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticComparisonExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_regex_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">p_expression_fuzzy_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		expression : expression EQ_REM expression</span>
-<span class="sd">				   | expression EQ_RES expression</span>
-<span class="sd">				   | expression NE_REM expression</span>
-<span class="sd">				   | expression NE_RES expression</span>
+<span class="sd">		expression : expression EQ_FZM expression</span>
+<span class="sd">				   | expression EQ_FZS expression</span>
+<span class="sd">				   | expression NE_FZM expression</span>
+<span class="sd">				   | expression NE_FZS expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">RegexComparisonExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">FuzzyComparisonExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -491,6 +497,10 @@
 	<span class="k">def</span> <span class="nf">p_expression_float_inf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : FLOAT_INF&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">FloatExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_null</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;expression : NULL&quot;&quot;&quot;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">NullExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : STRING&#39;</span>

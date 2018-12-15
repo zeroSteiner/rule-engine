@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.ast &mdash; Rule Engine 0.9 documentation</title>
+  <title>rule_engine.ast &mdash; Rule Engine 1.0.0 documentation</title>
   
 
   
@@ -54,6 +54,10 @@
 
           
             
+            
+              <div class="version">
+                1.0.0
+              </div>
             
           
 
@@ -186,6 +190,8 @@
 
 <span class="kn">import</span> <span class="nn">dateutil.parser</span>
 
+<span class="n">NONE_TYPE</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
 <div class="viewcode-block" id="is_natural_number"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_natural_number">[docs]</a><span class="k">def</span> <span class="nf">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check whether *value* is a natural number (i.e. a whole, non-negative</span>
@@ -252,6 +258,7 @@
 	<span class="n">BOOLEAN</span> <span class="o">=</span> <span class="nb">bool</span>
 	<span class="n">DATETIME</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
 	<span class="n">FLOAT</span> <span class="o">=</span> <span class="nb">float</span>
+	<span class="n">NULL</span> <span class="o">=</span> <span class="n">NONE_TYPE</span>
 	<span class="n">STRING</span> <span class="o">=</span> <span class="nb">str</span>
 	<span class="n">UNDEFINED</span> <span class="o">=</span> <span class="kc">None</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -272,13 +279,15 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;from_type argument 1 must be type, not &#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="n">python_type</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-		<span class="k">if</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">bool</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
-		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span> <span class="ow">or</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATETIME</span>
-		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">float</span> <span class="ow">or</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
-		<span class="k">elif</span> <span class="n">python_type</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">NONE_TYPE</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">NULL</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span>
 		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
 
@@ -300,6 +309,8 @@
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATETIME</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
+		<span class="k">elif</span> <span class="n">python_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">NULL</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,)):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span>
 		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">python_value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div></div>
@@ -366,7 +377,10 @@
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span></div>
 
 <span class="k">class</span> <span class="nc">DatetimeExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;Literal datetime expressions representing a specific point in time.&quot;&quot;&quot;</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Literal datetime expressions representing a specific point in time. This</span>
+<span class="sd">	expression type always evaluates to true.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
 
 	<span class="nd">@classmethod</span>
@@ -375,11 +389,22 @@
 			<span class="n">dt</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">isoparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
 		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">default_timezone</span><span class="p">)</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FloatExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FloatExpression">[docs]</a><span class="k">class</span> <span class="nc">FloatExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;Literal float expressions representing numerical values.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span></div>
+
+<div class="viewcode-block" id="NullExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.NullExpression">[docs]</a><span class="k">class</span> <span class="nc">NullExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Literal null expressions representing null values. This expression type</span>
+<span class="sd">	always evaluates to false.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">NullExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StringExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.StringExpression">[docs]</a><span class="k">class</span> <span class="nc">StringExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;Literal string expressions representing an array of characters.&quot;&quot;&quot;</span>
@@ -393,7 +418,7 @@
 <span class="sd">	A base class for representing complex expressions composed of a left side</span>
 <span class="sd">	and a right side, separated by an operator.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
+	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A tuple containing the compatible data types that the left and right</span>
 <span class="sd">	expressions must return. This can for example be used to indicate that</span>
@@ -557,14 +582,14 @@
 	<span class="n">_op_le</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">)</span>
 	<span class="n">_op_lt</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RegexComparisonExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.RegexComparisonExpression">[docs]</a><span class="k">class</span> <span class="nc">RegexComparisonExpression</span><span class="p">(</span><span class="n">ComparisonExpression</span><span class="p">):</span>
+<div class="viewcode-block" id="FuzzyComparisonExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FuzzyComparisonExpression">[docs]</a><span class="k">class</span> <span class="nc">FuzzyComparisonExpression</span><span class="p">(</span><span class="n">ComparisonExpression</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class for representing regular expression comparison expressions from the</span>
 <span class="sd">	grammar text such as search and does not match.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,)</span>
+	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-		<span class="nb">super</span><span class="p">(</span><span class="n">RegexComparisonExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">FuzzyComparisonExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">StringExpression</span><span class="p">):</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compile_regex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
 
@@ -576,23 +601,26 @@
 		<span class="k">return</span> <span class="n">result</span>
 
 	<span class="k">def</span> <span class="nf">__op_regex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_function</span><span class="p">,</span> <span class="n">modifier</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
-		<span class="n">left_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+		<span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">StringExpression</span><span class="p">):</span>
 			<span class="n">regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right</span>
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-			<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+			<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+				<span class="n">regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compile_regex</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
+			<span class="k">elif</span> <span class="n">regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
-			<span class="n">regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compile_regex</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
-		<span class="n">match</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">regex_function</span><span class="p">)(</span><span class="n">left_string</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">left</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">regex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">return</span> <span class="ow">not</span> <span class="n">modifier</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">regex</span><span class="p">)</span>
+		<span class="n">match</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">regex_function</span><span class="p">)(</span><span class="n">left</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">modifier</span><span class="p">(</span><span class="n">match</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-	<span class="n">_op_eq_rem</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;match&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_not</span><span class="p">)</span>
-	<span class="n">_op_eq_res</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;search&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_not</span><span class="p">)</span>
-	<span class="n">_op_ne_rem</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;match&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_</span><span class="p">)</span>
-	<span class="n">_op_ne_res</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;search&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_</span><span class="p">)</span></div>
+	<span class="n">_op_eq_fzm</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;match&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_not</span><span class="p">)</span>
+	<span class="n">_op_eq_fzs</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;search&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_not</span><span class="p">)</span>
+	<span class="n">_op_ne_fzm</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;match&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_</span><span class="p">)</span>
+	<span class="n">_op_ne_fzs</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;search&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_</span><span class="p">)</span></div>
 
 <span class="c1">################################################################################</span>
 <span class="c1"># Miscellaneous Expressions</span>
@@ -630,6 +658,9 @@
 			<span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">default_timezone</span><span class="p">)</span>
 
 		<span class="c1"># use DataType.from_value to raise a TypeError if value is not of a</span>
 		<span class="c1"># compatible data type</span>

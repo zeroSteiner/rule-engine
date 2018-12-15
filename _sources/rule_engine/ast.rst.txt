@@ -32,6 +32,9 @@ Classes
    .. autoattribute:: FLOAT
       :annotation:
 
+   .. autoattribute:: NULL
+      :annotation:
+
    .. autoattribute:: STRING
       :annotation:
 
@@ -99,7 +102,7 @@ Left-Operator-Right Expressions
    .. autoattribute:: result_type
       :annotation: = BOOLEAN
 
-.. autoclass:: rule_engine.ast.RegexComparisonExpression
+.. autoclass:: rule_engine.ast.FuzzyComparisonExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
@@ -119,6 +122,12 @@ Literal Expressions
 
    .. autoattribute:: result_type
       :annotation: = FLOAT
+
+.. autoclass:: rule_engine.ast.NullExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = NULL
 
 .. autoclass:: rule_engine.ast.StringExpression
    :show-inheritance:

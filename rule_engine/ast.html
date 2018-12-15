@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ast &mdash; Rule Engine 0.9 documentation</title>
+  <title>ast &mdash; Rule Engine 1.0.0 documentation</title>
   
 
   
@@ -56,6 +56,10 @@
 
           
             
+            
+              <div class="version">
+                1.0.0
+              </div>
             
           
 
@@ -252,6 +256,11 @@ real number for the purposes of this function.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.DataType.FLOAT">
 <code class="descname">FLOAT</code><a class="headerlink" href="#rule_engine.ast.DataType.FLOAT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="rule_engine.ast.DataType.NULL">
+<code class="descname">NULL</code><a class="headerlink" href="#rule_engine.ast.DataType.NULL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -500,14 +509,14 @@ as “and” and “or”.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="rule_engine.ast.RegexComparisonExpression">
-<em class="property">class </em><code class="descname">RegexComparisonExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#RegexComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.RegexComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<dt id="rule_engine.ast.FuzzyComparisonExpression">
+<em class="property">class </em><code class="descname">FuzzyComparisonExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FuzzyComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ComparisonExpression" title="rule_engine.ast.ComparisonExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ComparisonExpression</span></code></a></p>
 <p>A class for representing regular expression comparison expressions from the
 grammar text such as search and does not match.</p>
 <dl class="attribute">
-<dt id="rule_engine.ast.RegexComparisonExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.RegexComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<dt id="rule_engine.ast.FuzzyComparisonExpression.result_type">
+<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -535,6 +544,19 @@ grammar text such as search and does not match.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.FloatExpression.result_type">
 <code class="descname">result_type</code><em class="property"> = FLOAT</em><a class="headerlink" href="#rule_engine.ast.FloatExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rule_engine.ast.NullExpression">
+<em class="property">class </em><code class="descname">NullExpression</code><span class="sig-paren">(</span><em>context</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#NullExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.NullExpression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
+<p>Literal null expressions representing null values. This expression type
+always evaluates to false.</p>
+<dl class="attribute">
+<dt id="rule_engine.ast.NullExpression.result_type">
+<code class="descname">result_type</code><em class="property"> = NULL</em><a class="headerlink" href="#rule_engine.ast.NullExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

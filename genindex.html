@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Rule Engine 0.9 documentation</title>
+  <title>Index &mdash; Rule Engine 1.0.0 documentation</title>
   
 
   
@@ -55,6 +55,10 @@
 
           
             
+            
+              <div class="version">
+                1.0.0
+              </div>
             
           
 
@@ -157,6 +161,7 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -276,13 +281,15 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT">FLOAT (DataType attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.FloatExpression">FloatExpression (class in rule_engine.ast)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_type">from_type() (rule_engine.ast.DataType class method)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_value">from_value() (rule_engine.ast.DataType class method)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.FuzzyComparisonExpression">FuzzyComparisonExpression (class in rule_engine.ast)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -325,6 +332,18 @@
   </ul></td>
 </tr></table>
 
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.NULL">NULL (DataType attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.NullExpression">NullExpression (class in rule_engine.ast)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -349,8 +368,6 @@
       <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase.reduce">reduce() (ExpressionBase method)</a>
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.regex_flags">regex_flags (Context attribute)</a>
-</li>
-      <li><a href="rule_engine/ast.html#rule_engine.ast.RegexComparisonExpression">RegexComparisonExpression (class in rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.RegexSyntaxError">RegexSyntaxError</a>
 </li>
@@ -379,9 +396,11 @@
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.FloatExpression.result_type">(FloatExpression attribute)</a>
 </li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.FuzzyComparisonExpression.result_type">(FuzzyComparisonExpression attribute)</a>
+</li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.LogicExpression.result_type">(LogicExpression attribute)</a>
 </li>
-        <li><a href="rule_engine/ast.html#rule_engine.ast.RegexComparisonExpression.result_type">(RegexComparisonExpression attribute)</a>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.NullExpression.result_type">(NullExpression attribute)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.StringExpression.result_type">(StringExpression attribute)</a>
 </li>

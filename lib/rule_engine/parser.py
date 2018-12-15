@@ -104,8 +104,8 @@ class Parser(ParserBase):
 		'&':   'BWAND', '|':  'BWOR', '^': 'BWXOR',
 		'<<':  'BWLSH', '>>': 'BWRSH',
 		# comparison operators
-		'==':  'EQ',    '=~': 'EQ_REM', '=~~': 'EQ_RES',
-		'!=':  'NE',    '!~': 'NE_REM', '!~~': 'NE_RES',
+		'==':  'EQ',    '=~': 'EQ_FZM', '=~~': 'EQ_FZS',
+		'!=':  'NE',    '!~': 'NE_FZM', '!~~': 'NE_FZS',
 		'>':   'GT',    '>=': 'GE',
 		'<':   'LT',    '<=': 'LE',
 		# logical operators
@@ -157,7 +157,7 @@ class Parser(ParserBase):
 		('left',     'BWXOR'),
 		('left',     'BWAND'),
 		('right',    'QMARK', 'COLON'),
-		('nonassoc', 'EQ', 'NE', 'EQ_REM', 'EQ_RES', 'NE_REM', 'NE_RES', 'GE', 'GT', 'LE', 'LT'),  # Nonassociative operators
+		('nonassoc', 'EQ', 'NE', 'EQ_FZM', 'EQ_FZS', 'NE_FZM', 'NE_FZS', 'GE', 'GT', 'LE', 'LT'),  # Nonassociative operators
 		('left',     'ADD', 'SUB'),
 		('left',     'BWLSH', 'BWRSH'),
 		('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
@@ -187,16 +187,16 @@ class Parser(ParserBase):
 		t.type = {'>': 'GT', '>=': 'GE', '>>': 'BWRSH'}[t.value]
 		return t
 
-	def t_EQ_RES(self, t):
+	def t_EQ_FZS(self, t):
 		r'=~~?'
 		if t.value == '=~':
-			t.type = 'EQ_REM'
+			t.type = 'EQ_FZM'
 		return t
 
-	def t_NE_RES(self, t):
+	def t_NE_FZS(self, t):
 		r'!~~?'
 		if t.value == '!~':
-			t.type = 'NE_REM'
+			t.type = 'NE_FZM'
 		return t
 
 	def t_DATETIME(self, t):
@@ -283,16 +283,16 @@ class Parser(ParserBase):
 		op_name = self.op_names[op]
 		p[0] = ast.ArithmeticComparisonExpression(self.context, op_name, left, right).reduce()
 
-	def p_expression_regex_comparison(self, p):
+	def p_expression_fuzzy_comparison(self, p):
 		"""
-		expression : expression EQ_REM expression
-				   | expression EQ_RES expression
-				   | expression NE_REM expression
-				   | expression NE_RES expression
+		expression : expression EQ_FZM expression
+				   | expression EQ_FZS expression
+				   | expression NE_FZM expression
+				   | expression NE_FZS expression
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.RegexComparisonExpression(self.context, op_name, left, right).reduce()
+		p[0] = ast.FuzzyComparisonExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_logic(self, p):
 		"""

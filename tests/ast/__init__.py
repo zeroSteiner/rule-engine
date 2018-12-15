@@ -62,7 +62,7 @@ class AstTests(unittest.TestCase):
 		self.assertTrue(parser_.parse('true or false', self.context).evaluate(None))
 		self.assertFalse(parser_.parse('false or false', self.context).evaluate(None))
 
-	def test_ast_evaluates_regex_comparisons(self):
+	def test_ast_evaluates_fuzzy_comparisons(self):
 		parser_ = parser.Parser()
 		statement = parser_.parse('name =~ ".lic."', self.context)
 		self.assertTrue(statement.evaluate(self.thing))
@@ -128,7 +128,7 @@ class AstTests(unittest.TestCase):
 		with self.assertRaises(errors.EvaluationError):
 			parser_.parse('nan << 1', self.context)
 
-	def test_ast_raises_type_mismatch_regex_comparisons(self):
+	def test_ast_raises_type_mismatch_fuzzy_comparisons(self):
 		parser_ = parser.Parser()
 		statement = parser_.parse('symbol =~ "string"', self.context)
 		with self.assertRaises(errors.EvaluationError):

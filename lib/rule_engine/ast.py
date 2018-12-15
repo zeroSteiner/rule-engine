@@ -427,14 +427,14 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 	_op_le = functools.partialmethod(__op_arithmetic, operator.le)
 	_op_lt = functools.partialmethod(__op_arithmetic, operator.lt)
 
-class RegexComparisonExpression(ComparisonExpression):
+class FuzzyComparisonExpression(ComparisonExpression):
 	"""
 	A class for representing regular expression comparison expressions from the
 	grammar text such as search and does not match.
 	"""
 	compatible_types = (DataType.STRING,)
 	def __init__(self, *args, **kwargs):
-		super(RegexComparisonExpression, self).__init__(*args, **kwargs)
+		super(FuzzyComparisonExpression, self).__init__(*args, **kwargs)
 		if isinstance(self.right, StringExpression):
 			self._right = self._compile_regex(self.right.evaluate(None))
 
@@ -459,10 +459,10 @@ class RegexComparisonExpression(ComparisonExpression):
 		match = getattr(regex, regex_function)(left_string)
 		return modifier(match, None)
 
-	_op_eq_rem = functools.partialmethod(__op_regex, 'match', operator.is_not)
-	_op_eq_res = functools.partialmethod(__op_regex, 'search', operator.is_not)
-	_op_ne_rem = functools.partialmethod(__op_regex, 'match', operator.is_)
-	_op_ne_res = functools.partialmethod(__op_regex, 'search', operator.is_)
+	_op_eq_fzm = functools.partialmethod(__op_regex, 'match', operator.is_not)
+	_op_eq_fzs = functools.partialmethod(__op_regex, 'search', operator.is_not)
+	_op_ne_fzm = functools.partialmethod(__op_regex, 'match', operator.is_)
+	_op_ne_fzs = functools.partialmethod(__op_regex, 'search', operator.is_)
 
 ################################################################################
 # Miscellaneous Expressions

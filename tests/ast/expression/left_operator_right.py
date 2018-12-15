@@ -46,7 +46,7 @@ __all__ = (
 	# comparison expressions
 	'ComparisonExpressionTests',
 	'ArithmeticComparisonExpressionTests',
-	'RegexComparisonExpressionTests'
+	'FuzzyComparisonExpressionTests'
 )
 
 class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):
@@ -181,50 +181,50 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, left, right)
 
-class RegexComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
-	ExpressionClass = ast.RegexComparisonExpression
+class FuzzyComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
+	ExpressionClass = ast.FuzzyComparisonExpression
 	left_value = luke = ast.StringExpression(context, 'Luke Skywalker')
 	thing = {'darth': 'Vader', 'luke': 'Skywalker', 'zero': 0.0}
-	def test_ast_expression_left_operator_right_regexcomparison_literal(self):
-		regex = functools.partial(ast.StringExpression, context)
+	def test_ast_expression_left_operator_right_fuzzycomparison_literal(self):
+		fuzzy = functools.partial(ast.StringExpression, context)
 		darth = ast.StringExpression(context, 'Darth Vader')
-		self.assertExpressionTests('eq_rem', right_value=self.luke, equals_value=True)
-		self.assertExpressionTests('eq_rem', right_value=regex('Skywalker'), equals_value=False)
-		self.assertExpressionTests('eq_rem', right_value=darth, equals_value=False)
+		self.assertExpressionTests('eq_fzm', right_value=self.luke, equals_value=True)
+		self.assertExpressionTests('eq_fzm', right_value=fuzzy('Skywalker'), equals_value=False)
+		self.assertExpressionTests('eq_fzm', right_value=darth, equals_value=False)
 
-		self.assertExpressionTests('eq_res', right_value=self.luke, equals_value=True)
-		self.assertExpressionTests('eq_res', right_value=regex('Skywalker'), equals_value=True)
-		self.assertExpressionTests('eq_res', right_value=darth, equals_value=False)
+		self.assertExpressionTests('eq_fzs', right_value=self.luke, equals_value=True)
+		self.assertExpressionTests('eq_fzs', right_value=fuzzy('Skywalker'), equals_value=True)
+		self.assertExpressionTests('eq_fzs', right_value=darth, equals_value=False)
 
-		self.assertExpressionTests('ne_rem', right_value=self.luke, equals_value=False)
-		self.assertExpressionTests('ne_rem', right_value=regex('Skywalker'), equals_value=True)
-		self.assertExpressionTests('ne_rem', right_value=darth, equals_value=True)
+		self.assertExpressionTests('ne_fzm', right_value=self.luke, equals_value=False)
+		self.assertExpressionTests('ne_fzm', right_value=fuzzy('Skywalker'), equals_value=True)
+		self.assertExpressionTests('ne_fzm', right_value=darth, equals_value=True)
 
-		self.assertExpressionTests('ne_res', right_value=self.luke, equals_value=False)
-		self.assertExpressionTests('ne_res', right_value=regex('Skywalker'), equals_value=False)
-		self.assertExpressionTests('ne_res', right_value=darth, equals_value=True)
+		self.assertExpressionTests('ne_fzs', right_value=self.luke, equals_value=False)
+		self.assertExpressionTests('ne_fzs', right_value=fuzzy('Skywalker'), equals_value=False)
+		self.assertExpressionTests('ne_fzs', right_value=darth, equals_value=True)
 
-	def test_ast_expression_left_operator_right_regexcomparison_symbolic(self):
-		regex = functools.partial(ast.SymbolExpression, context)
+	def test_ast_expression_left_operator_right_fuzzycomparison_symbolic(self):
+		fuzzy = functools.partial(ast.SymbolExpression, context)
 		darth = ast.SymbolExpression(context, 'darth')
-		self.assertExpressionTests('eq_rem', right_value=self.luke, equals_value=True)
-		self.assertExpressionTests('eq_rem', right_value=regex('luke'), equals_value=False)
-		self.assertExpressionTests('eq_rem', right_value=darth, equals_value=False)
+		self.assertExpressionTests('eq_fzm', right_value=self.luke, equals_value=True)
+		self.assertExpressionTests('eq_fzm', right_value=fuzzy('luke'), equals_value=False)
+		self.assertExpressionTests('eq_fzm', right_value=darth, equals_value=False)
 
-		self.assertExpressionTests('eq_res', right_value=self.luke, equals_value=True)
-		self.assertExpressionTests('eq_res', right_value=regex('luke'), equals_value=True)
-		self.assertExpressionTests('eq_res', right_value=darth, equals_value=False)
+		self.assertExpressionTests('eq_fzs', right_value=self.luke, equals_value=True)
+		self.assertExpressionTests('eq_fzs', right_value=fuzzy('luke'), equals_value=True)
+		self.assertExpressionTests('eq_fzs', right_value=darth, equals_value=False)
 
-		self.assertExpressionTests('ne_rem', right_value=self.luke, equals_value=False)
-		self.assertExpressionTests('ne_rem', right_value=regex('luke'), equals_value=True)
-		self.assertExpressionTests('ne_rem', right_value=darth, equals_value=True)
+		self.assertExpressionTests('ne_fzm', right_value=self.luke, equals_value=False)
+		self.assertExpressionTests('ne_fzm', right_value=fuzzy('luke'), equals_value=True)
+		self.assertExpressionTests('ne_fzm', right_value=darth, equals_value=True)
 
-		self.assertExpressionTests('ne_res', right_value=self.luke, equals_value=False)
-		self.assertExpressionTests('ne_res', right_value=regex('luke'), equals_value=False)
-		self.assertExpressionTests('ne_res', right_value=darth, equals_value=True)
+		self.assertExpressionTests('ne_fzs', right_value=self.luke, equals_value=False)
+		self.assertExpressionTests('ne_fzs', right_value=fuzzy('luke'), equals_value=False)
+		self.assertExpressionTests('ne_fzs', right_value=darth, equals_value=True)
 
-	def test_ast_expression_left_operator_right_regexcomparison_type_errors(self):
-		operations = ('eq_rem', 'eq_res', 'ne_rem', 'ne_res')
+	def test_ast_expression_left_operator_right_fuzzycomparison_type_errors(self):
+		operations = ('eq_fzm', 'eq_fzs', 'ne_fzm', 'ne_fzs')
 		for operation, left, right in itertools.product(operations, trueish, falseish):
 			if isinstance(left, ast.StringExpression) and isinstance(right, ast.StringExpression):
 				continue
@@ -238,11 +238,11 @@ class RegexComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, symbol, string)
 
-	def test_ast_expression_left_operator_right_regexcomparison_syntax_errors(self):
-		for operation in ('eq_rem', 'eq_res', 'ne_rem', 'ne_res'):
+	def test_ast_expression_left_operator_right_fuzzycomparison_syntax_errors(self):
+		for operation in ('eq_fzm', 'eq_fzs', 'ne_fzm', 'ne_fzs'):
 			try:
 				self.assertExpressionTests(operation, right_value=ast.StringExpression(context, '*'))
 			except errors.RegexSyntaxError as error:
 				self.assertEqual(error.value, '*')
 			else:
-				self.fail('RegexSyntaxError was not raised')
+				self.fail('fuzzySyntaxError was not raised')

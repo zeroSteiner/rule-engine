@@ -102,7 +102,7 @@ Left-Operator-Right Expressions
    .. autoattribute:: result_type
       :annotation: = BOOLEAN
 
-.. autoclass:: rule_engine.ast.RegexComparisonExpression
+.. autoclass:: rule_engine.ast.FuzzyComparisonExpression
    :show-inheritance:
 
    .. autoattribute:: result_type

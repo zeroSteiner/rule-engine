@@ -157,10 +157,10 @@ class ParserLeftOperatorRightTests(ParserTestsBase):
 		for expression in expressions:
 			self.assertStatementType(expression, ast.ComparisonExpression)
 
-	def test_parser_comparison_regex_expressions(self):
+	def test_parser_comparison_fuzzy_expressions(self):
 		expressions = ('left =~ right', 'left =~~ right', 'left !~ right', 'left !~~ right')
 		for expression in expressions:
-			self.assertStatementType(expression, ast.RegexComparisonExpression)
+			self.assertStatementType(expression, ast.FuzzyComparisonExpression)
 
 class ParserLiteralTests(ParserTestsBase):
 	def assertLiteralStatementEqual(self, string, ast_expression, python_value, msg=None):

@@ -43,6 +43,7 @@ context = engine.Context()
 falseish = (
 	ast.BooleanExpression(context, False),
 	ast.FloatExpression(context, 0.0),
+	ast.NullExpression(context),
 	ast.StringExpression(context, '')
 )
 # literal expressions which should evaluate to true
@@ -73,15 +74,19 @@ class LiteralExpressionTests(unittest.TestCase):
 			expression = ExpressionClass(self.context, true_value)
 			self.assertTrue(expression.evaluate(None))
 
-	def test_ast_expression_literal_string(self):
-		self.assertLiteralTests(ast.StringExpression, '', 'non-empty')
+	def test_ast_expression_literal_boolean(self):
+		self.assertLiteralTests(ast.BooleanExpression, False, True)
 
 	def test_ast_expression_literal_float(self):
 		trueish_floats = (expression.value for expression in trueish if isinstance(expression, ast.FloatExpression))
 		self.assertLiteralTests(ast.FloatExpression, 0.0, float('nan'), *trueish_floats)
 
-	def test_ast_expression_literal_boolean(self):
-		self.assertLiteralTests(ast.BooleanExpression, False, True)
+	def test_ast_expression_literal_null(self):
+		expression = ast.NullExpression(self.context)
+		self.assertIsNone(expression.evaluate(None))
+
+	def test_ast_expression_literal_string(self):
+		self.assertLiteralTests(ast.StringExpression, '', 'non-empty')
 
 if __name__ == '__main__':
 	unittest.main()

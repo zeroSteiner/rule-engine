@@ -100,11 +100,17 @@ class EngineRuleTests(unittest.TestCase):
 			engine.Rule('test ==')
 
 	@unittest.skipUnless(has_graphviz, 'graphviz is unavailable')
-	def test_engine_rule_to_graphviz(self):
+	def test_engine_rule_to_graphviz_1(self):
 		rule = engine.Rule(self.rule_text)
 		digraph = rule.to_graphviz()
 		self.assertIsInstance(digraph, graphviz.Digraph)
 		self.assertEqual(digraph.comment, self.rule_text)
+
+	@unittest.skipUnless(has_graphviz, 'graphviz is unavailable')
+	def test_engin_rule_to_graphviz_2(self):
+		rule = engine.Rule('foo ? (bar > baz) : (bar < -baz)')
+		digraph = rule.to_graphviz()
+		self.assertIsInstance(digraph, graphviz.Digraph)
 
 	def test_engine_rule_to_strings(self):
 		rule = engine.Rule(self.rule_text)

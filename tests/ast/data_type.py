@@ -47,6 +47,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(ast.DataType.from_type(datetime.datetime), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_type(float), ast.DataType.FLOAT)
 		self.assertIs(ast.DataType.from_type(int), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_type(type(None)), ast.DataType.NULL)
 		self.assertIs(ast.DataType.from_type(str), ast.DataType.STRING)
 
 	def test_datatype_from_type_exceptions(self):
@@ -61,6 +62,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(ast.DataType.from_value(datetime.datetime.now()), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_value(0), ast.DataType.FLOAT)
 		self.assertIs(ast.DataType.from_value(0.0), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_value(None), ast.DataType.NULL)
 		self.assertIs(ast.DataType.from_value(''), ast.DataType.STRING)
 
 	def test_datatype_from_value_exceptions(self):

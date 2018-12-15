@@ -32,6 +32,9 @@ Classes
    .. autoattribute:: FLOAT
       :annotation:
 
+   .. autoattribute:: NULL
+      :annotation:
+
    .. autoattribute:: STRING
       :annotation:
 

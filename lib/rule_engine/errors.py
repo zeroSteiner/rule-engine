@@ -40,6 +40,7 @@ class EngineError(Exception):
 		:param str message: A text description of what error occurred.
 		"""
 		self.message = message
+		"""The message describing the error that occurred."""
 
 class EvaluationError(EngineError):
 	"""
@@ -105,6 +106,7 @@ class SymbolResolutionError(EvaluationError):
 	def __init__(self, symbol_name, symbol_scope=None):
 		"""
 		:param str symbol_name: The name of the symbol that can not be resolved.
+		:param str symbol_scope: The scope of where the symbol should be valid for resolution.
 		"""
 		self.symbol_name = symbol_name
 		"""The name of the symbol that can not be resolved."""
@@ -119,9 +121,13 @@ class SymbolTypeError(EvaluationError):
 	"""
 	def __init__(self, symbol_name, is_value, is_type, expected_type):
 		self.symbol_name = symbol_name
+		"""The name of the symbol that is of an incompatible type."""
 		self.is_value = is_value
+		"""The native Python value of the incompatible symbol."""
 		self.is_type = is_type
+		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` of the incompatible symbol."""
 		self.expected_type = expected_type
+		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this symbol."""
 		message = "symbol {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(symbol_name, is_type.name, expected_type.name)
 		super(SymbolTypeError, self).__init__(message)
 

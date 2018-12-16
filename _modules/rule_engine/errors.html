@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.errors &mdash; Rule Engine 1.0.0 documentation</title>
+  <title>rule_engine.errors &mdash; Rule Engine 1.0.1 documentation</title>
   
 
   
@@ -56,7 +56,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0.1
               </div>
             
           
@@ -188,7 +188,8 @@
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param str message: A text description of what error occurred.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+		<span class="sd">&quot;&quot;&quot;The message describing the error that occurred.&quot;&quot;&quot;</span></div></div>
 
 <div class="viewcode-block" id="EvaluationError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.EvaluationError">[docs]</a><span class="k">class</span> <span class="nc">EvaluationError</span><span class="p">(</span><span class="n">EngineError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -268,9 +269,13 @@
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="SymbolTypeError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolTypeError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">is_value</span><span class="p">,</span> <span class="n">is_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">symbol_name</span> <span class="o">=</span> <span class="n">symbol_name</span>
+		<span class="sd">&quot;&quot;&quot;The name of the symbol that is of an incompatible type.&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">is_value</span> <span class="o">=</span> <span class="n">is_value</span>
+		<span class="sd">&quot;&quot;&quot;The native Python value of the incompatible symbol.&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">is_type</span> <span class="o">=</span> <span class="n">is_type</span>
+		<span class="sd">&quot;&quot;&quot;The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` of the incompatible symbol.&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">expected_type</span> <span class="o">=</span> <span class="n">expected_type</span>
+		<span class="sd">&quot;&quot;&quot;The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` that was expected for this symbol.&quot;&quot;&quot;</span>
 		<span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;symbol </span><span class="si">{0!r}</span><span class="s2"> resolved to incorrect datatype (is: </span><span class="si">{1}</span><span class="s2">, expected: </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol_name</span><span class="p">,</span> <span class="n">is_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">SymbolTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div></div>
 

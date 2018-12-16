@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Rule Engine Documentation &mdash; Rule Engine 1.0.0 documentation</title>
+  <title>Rule Engine Documentation &mdash; Rule Engine 1.0.1 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0.1
               </div>
             
           
@@ -170,11 +170,11 @@ dictionaries) and one for resolving symbols
 <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance and will be used for
 compatibility testing. With type information, the engine will raise an
 <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> when an incompatible operation
-is detected such a regex match (<code class="docutils literal notranslate"><span class="pre">=~</span></code>) using an integer on either side. This
+is detected such as a regex match (<code class="docutils literal notranslate"><span class="pre">=~</span></code>) using an integer on either side. This
 makes it easier to detect errors in a rule’s syntax prior to it being applied to
 an object.</p>
 <p>Alternatively, a function can be specified that simply returns
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> for valid symbols. In both cases
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> for valid symbols. In both cases,
 the engine will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a>
 when an invalid symbol is specified in a rule.</p>
 </div>

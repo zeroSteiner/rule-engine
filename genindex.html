@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Rule Engine 1.0.0 documentation</title>
+  <title>Index &mdash; Rule Engine 1.0.1 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                1.0.0
+                1.0.1
               </div>
             
           
@@ -263,11 +263,13 @@
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.error">error (RegexSyntaxError attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase.evaluate">evaluate() (ExpressionBase method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.EvaluationError">EvaluationError</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.expected_type">expected_type (SymbolTypeError attribute)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase">ExpressionBase (class in rule_engine.ast)</a>
 </li>
@@ -301,11 +303,15 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.is_numeric">is_numeric() (in module rule_engine.ast)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.is_real_number">is_real_number() (in module rule_engine.ast)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.is_type">is_type (SymbolTypeError attribute)</a>
+</li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.is_valid">is_valid() (rule_engine.engine.Rule class method)</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.is_value">is_value (SymbolTypeError attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -328,6 +334,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.matches">matches() (Rule method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.EngineError.message">message (EngineError attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -438,11 +448,15 @@
       <li><a href="rule_engine/ast.html#rule_engine.ast.StringExpression">StringExpression (class in rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.symbol_name">symbol_name (SymbolResolutionError attribute)</a>
+
+      <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.symbol_name">(SymbolTypeError attribute)</a>
 </li>
-      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.symbol_scope">symbol_scope (SymbolResolutionError attribute)</a>
-</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.symbol_scope">symbol_scope (SymbolResolutionError attribute)</a>
+</li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.SymbolExpression">SymbolExpression (class in rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError">SymbolResolutionError</a>

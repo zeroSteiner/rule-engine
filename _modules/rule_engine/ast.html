@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.ast &mdash; Rule Engine 1.0.1 documentation</title>
+  <title>rule_engine.ast &mdash; Rule Engine 1.0.2 documentation</title>
   
 
   
@@ -24,17 +24,26 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Rule Engine 1.0.2 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -56,7 +65,7 @@
             
             
               <div class="version">
-                1.0.1
+                1.0.2
               </div>
             
           
@@ -95,7 +104,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Rule Engine</a>
@@ -103,10 +112,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -135,6 +143,8 @@
     
     
       <li class="wy-breadcrumbs-aside">
+        
+            
         
       </li>
     
@@ -665,9 +675,20 @@
 		<span class="c1"># use DataType.from_value to raise a TypeError if value is not of a</span>
 		<span class="c1"># compatible data type</span>
 		<span class="n">value_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">value_type</span><span class="p">:</span>
-			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolTypeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span>
-		<span class="k">return</span> <span class="n">value</span></div>
+
+		<span class="c1"># if the expected result type is undefined, return the value</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">value</span>
+
+		<span class="c1"># if the type is the expected result type, return the value</span>
+		<span class="k">if</span> <span class="n">value_type</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">value</span>
+
+		<span class="c1"># if the type is null, return the value (treat null as a special case)</span>
+		<span class="k">if</span> <span class="n">value_type</span> <span class="ow">is</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">value</span>
+
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolTypeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Statement"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Statement">[docs]</a><span class="k">class</span> <span class="nc">Statement</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;A class representing the top level statement of the grammar text.&quot;&quot;&quot;</span>
@@ -782,7 +803,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -791,11 +814,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre
+        &copy; Copyright 2018, Spencer McIntyre.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -810,23 +833,35 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0.2',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

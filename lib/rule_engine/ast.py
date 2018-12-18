@@ -516,9 +516,20 @@ class SymbolExpression(ExpressionBase):
 		# use DataType.from_value to raise a TypeError if value is not of a
 		# compatible data type
 		value_type = DataType.from_value(value)
-		if self.result_type is not DataType.UNDEFINED and self.result_type is not value_type:
-			raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
-		return value
+
+		# if the expected result type is undefined, return the value
+		if self.result_type is DataType.UNDEFINED:
+			return value
+
+		# if the type is the expected result type, return the value
+		if value_type is self.result_type:
+			return value
+
+		# if the type is null, return the value (treat null as a special case)
+		if value_type is DataType.NULL:
+			return value
+
+		raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
 
 class Statement(ASTNodeBase):
 	"""A class representing the top level statement of the grammar text."""

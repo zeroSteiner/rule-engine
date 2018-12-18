@@ -24,8 +24,12 @@ Symbol type information can be provided to the
 compatibility testing. With type information, the engine will raise an
 :py:class:`~rule_engine.errors.EvaluationError` when an incompatible operation
 is detected such as a regex match (``=~``) using an integer on either side. This
-makes it easier to detect errors in a rule's syntax prior to it being applied to
-an object.
+makes it possible to detect errors in a rule's syntax prior to it being applied
+to an object. When symbol type information is specified, the value resolved from
+a symbol and object must either match the specified type or be
+:py:attr:`~rule_engine.ast.NULL` otherwise a
+:py:class:`~rule_engine.errors.SymbolTypeError` will be raised when the symbol
+is resolved.
 
 Alternatively, a function can be specified that simply returns
 :py:attr:`~rule_engine.ast.DataType.UNDEFINED` for valid symbols. In both cases,

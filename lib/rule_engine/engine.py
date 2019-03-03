@@ -78,6 +78,20 @@ def resolve_item(thing, name):
 		raise errors.SymbolResolutionError(name)
 	return thing[name]
 
+def to_recursive_resolver(resolver):
+	split_on = '.'
+	@functools.wraps(resolver)
+	def recursive_resolver(thing, name):
+		parts = name.split(split_on)
+		for idx, part in enumerate(parts):
+			try:
+				thing = resolver(thing, part)
+			except errors.SymbolResolutionError as error:
+				symbol_name = split_on.join(parts[:idx + 1])
+				raise errors.SymbolResolutionError(symbol_name, symbol_scope=error.symbol_scope) from None
+		return thing
+	return recursive_resolver
+
 def _type_resolver(type_map, name):
 	if name not in type_map:
 		raise errors.SymbolResolutionError(name)

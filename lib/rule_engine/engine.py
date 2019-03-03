@@ -79,6 +79,18 @@ def resolve_item(thing, name):
 	return thing[name]
 
 def to_recursive_resolver(resolver):
+	"""
+	Convert the specified *resolver* function into one which splits the symbol
+	name on dots and recursively resolves each one on the specified thing
+	parameter.
+
+	.. versionadded:: 1.1.0
+
+	:param resolver: The resolver function to convert.
+	:type resolver: function
+	:return: A new resolver function.
+	:rtype: function
+	"""
 	split_on = '.'
 	@functools.wraps(resolver)
 	def recursive_resolver(thing, name):

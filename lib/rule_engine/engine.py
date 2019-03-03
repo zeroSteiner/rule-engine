@@ -78,6 +78,33 @@ def resolve_item(thing, name):
 		raise errors.SymbolResolutionError(name)
 	return thing[name]
 
+def to_default_resolver(resolver, default_value=None):
+	"""
+	Convert the specified *resolver* function into one which returns the
+	specified *default_value* when the symbol fails to resolve. Converted
+	resolver functions will not raise :py:exc:`~errors.SymbolResolutionError`,
+	instead it will return the default value.
+
+	.. versionadded:: 1.1.0
+
+	:param resolver: The resolver function to convert.
+	:type resolver: function
+	:param default_value: The Python value to use as the default for symbols
+		which can not be resolved.
+	:return: A new resolver function.
+	:rtype: function
+	"""
+	# use DataType.from_value to raise a TypeError if value is not of a
+	# compatible data type
+	ast.DataType.from_value(default_value)
+	@functools.wraps(resolver)
+	def default_resolver(thing, name):
+		try:
+			return resolver(thing, name)
+		except errors.SymbolResolutionError:
+			return default_value
+	return default_resolver
+
 def to_recursive_resolver(resolver):
 	"""
 	Convert the specified *resolver* function into one which splits the symbol

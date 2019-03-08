@@ -80,10 +80,12 @@ def resolve_item(thing, name):
 
 def to_default_resolver(resolver, default_value=None):
 	"""
-	Convert the specified *resolver* function into one which returns the
-	specified *default_value* when the symbol fails to resolve. Converted
-	resolver functions will not raise :py:exc:`~errors.SymbolResolutionError`,
-	instead it will return the default value.
+	Convert the specified *resolver* function (such as
+	:py:func:`~.resolve_attribute` or :py:func:`~.resolve_item`) into one which
+	returns the specified *default_value* when the symbol fails to resolve.
+	Converted resolver functions will not raise
+	:py:exc:`~errors.SymbolResolutionError`, instead they will return the
+	default value.
 
 	.. versionadded:: 1.1.0
 
@@ -107,9 +109,10 @@ def to_default_resolver(resolver, default_value=None):
 
 def to_recursive_resolver(resolver):
 	"""
-	Convert the specified *resolver* function into one which splits the symbol
-	name on dots and recursively resolves each one on the specified thing
-	parameter.
+	Convert the specified *resolver* function (such as
+	:py:func:`~.resolve_attribute` or :py:func:`~.resolve_item`) into one which
+	splits the symbol name on dots and recursively resolves each one on the
+	specified thing parameter.
 
 	.. versionadded:: 1.1.0
 

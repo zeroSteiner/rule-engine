@@ -64,16 +64,44 @@ class ContextTests(unittest.TestCase):
 
 class EngineTests(unittest.TestCase):
 	def test_engine_resolve_attribute(self):
-		thing = collections.namedtuple('Thing', ('name',))(name='alice')
+		thing = collections.namedtuple('Person', ('name',))(name='alice')
 		self.assertEqual(engine.resolve_attribute(thing, 'name'), thing.name)
 		with self.assertRaises(errors.SymbolResolutionError):
 			engine.resolve_attribute(thing, 'email')
+
+	def test_engine_resolve_attribute_recursively(self):
+		thing = collections.namedtuple('People', ('person',))(
+			collections.namedtuple('Person', ('name',))(name='alice')
+		)
+		resolver = engine.to_recursive_resolver(engine.resolve_attribute)
+		self.assertEqual(resolver(thing, 'person.name'), thing.person.name)
+		with self.assertRaises(errors.SymbolResolutionError):
+			resolver(thing, 'person.email')
+
+	def test_engine_resolve_attribute_with_defaults(self):
+		thing = collections.namedtuple('Person', ('name',))(name='alice')
+		resolver = engine.to_default_resolver(engine.resolve_attribute)
+		self.assertEqual(resolver(thing, 'name'), thing.name)
+		self.assertIsNone(resolver(thing, 'email'))
 
 	def test_engine_resolve_item(self):
 		thing = {'name': 'Alice'}
 		self.assertEqual(engine.resolve_item(thing, 'name'), thing['name'])
 		with self.assertRaises(errors.SymbolResolutionError):
 			engine.resolve_item(thing, 'email')
+
+	def test_engine_resolve_item_recursively(self):
+		thing = {'person': {'name': 'Alice'}}
+		resolver = engine.to_recursive_resolver(engine.resolve_item)
+		self.assertEqual(resolver(thing, 'person.name'), thing['person']['name'])
+		with self.assertRaises(errors.SymbolResolutionError):
+			resolver(thing, 'person.email')
+
+	def test_engine_resolve_item_with_defaults(self):
+		thing = {'name': 'Alice'}
+		resolver = engine.to_default_resolver(engine.resolve_item)
+		self.assertEqual(resolver(thing, 'name'), thing['name'])
+		self.assertIsNone(resolver(thing, 'email'))
 
 	def test_engine_type_resolver_from_dict(self):
 		type_resolver = engine.type_resolver_from_dict({

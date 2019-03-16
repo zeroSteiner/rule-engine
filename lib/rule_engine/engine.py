@@ -309,6 +309,17 @@ class Rule(object):
 			return False
 		return True
 
+	def evaluate(self, thing):
+		"""
+		Evaluate the rule against the specified *thing* and return the value.
+		This can be used to, for example, apply the symbol resolver.
+
+		:param thing: The object on which to apply the rule.
+		:return: The value the rule evaluates to. Unlike the :py:meth:`.matches`
+			method, this is not necessarily a boolean.
+		"""
+		return self.statement.evaluate(thing)
+
 	def matches(self, thing):
 		"""
 		Evaluate the rule against the specified *thing*. This will either return

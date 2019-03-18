@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  examples/csv_filter.py
+#  examples/shodan_filter.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -31,9 +31,12 @@
 #
 
 import argparse
-import csv
 import functools
+import gzip
+import json
 import os
+import pprint
+import re
 import sys
 
 get_path = functools.partial(os.path.join, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -41,17 +44,24 @@ sys.path.append(get_path('lib'))
 
 import rule_engine
 
-DESCRIPTION = """\
-Apply a rule to the specified CSV file. The first row of the CSV file must be
-the field names which will be used as the symbols for the rule.
+BLACKLIST = ('_shodan', 'asn', 'hash', 'ip')
+DESCRIPTION = 'Apply a rule to results exported from Shodan.'
+EPILOG = """\
+example rules:
+  * Find all HTTPS servers missing the Strict-Transport-Security header
+    "http and ssl and data !~~ '^Strict-Transport-Security:\s'"
+  * Find OpenSSH servers on non-default ports
+    "product == 'OpenSSH' and port != 22"
 """
 
-# specify a custom resolve function that checks if the symbol is a column name
-# in the csv file and if not replaces underscores with spaces
-def resolve_item(thing, name):
-	if not name in thing:
-		name = name.replace('_', ' ')
-	return rule_engine.resolve_item(thing, name)
+_custom_resolve_item = rule_engine.engine.to_recursive_resolver(rule_engine.engine.resolve_item)
+
+@rule_engine.engine.to_default_resolver
+def custom_resolve_item(thing, name):
+	value = _custom_resolve_item(thing, name)
+	if isinstance(value, (dict, list)):
+		value = len(value) > 0
+	return value
 
 def main():
 	parser = argparse.ArgumentParser(
@@ -59,22 +69,47 @@ def main():
 		description=DESCRIPTION,
 		formatter_class=argparse.RawDescriptionHelpFormatter
 	)
-	parser.add_argument('csv_file', type=argparse.FileType('r'), help='the CSV file to filter')
+	parser.add_argument('-d', '--depth', default=2, type=int, help='the depth to pretty print')
+	parser.add_argument('--gzip', action='store_true', default=False, help='decompress the file')
+	parser.add_argument('--regex-case-sensitive', default=False, action='store_true', help='use case-sensitive regular expressions')
+	parser.add_argument('json_file', type=argparse.FileType('rb'), help='the JSON file to filter')
 	parser.add_argument('rule', help='the rule to apply')
+	parser.epilog = EPILOG
 	arguments = parser.parse_args()
 
-	# need to define a custom context to use a custom resolver function
-	context = rule_engine.Context(resolver=resolve_item)
+	re_flags = re.MULTILINE
+	if arguments.regex_case_sensitive:
+		re_flags &= e.IGNORECASE
+
+	context = rule_engine.Context(regex_flags=re_flags, resolver=custom_resolve_item)
 	try:
 		rule = rule_engine.Rule(arguments.rule, context=context)
 	except rule_engine.RuleSyntaxError as error:
 		print(error.message)
 		return 0
 
-	csv_reader = csv.DictReader(arguments.csv_file)
-	csv_writer = csv.DictWriter(sys.stdout, csv_reader.fieldnames, dialect=csv_reader.dialect)
-	for row in rule.filter(csv_reader):
-		csv_writer.writerow(row)
+	file_object = arguments.json_file
+	if arguments.gzip:
+		file_object = gzip.GzipFile(fileobj=file_object)
+
+	total = 0
+	matches = 0
+	for line in file_object:
+		line = line.decode('utf-8')
+		line = json.loads(line)
+		total += 1
+		if not rule.matches(line):
+			continue
+		matches += 1
+		protocol = line['transport']
+		if 'http' in line:
+			protocol = 'https' if 'ssl' in line else 'http'
+		print("{protocol}://{ip_str}:{port}".format(protocol=protocol, **line))
+		if arguments.depth > 0:
+			for key in BLACKLIST:
+				line.pop(key, None)
+			pprint.pprint(line, depth=arguments.depth)
+	print("rule matched {:,} of {:,} results ({:.2f}%)".format(matches, total, ((matches / total) * 100)))
 	return 0
 
 if __name__ == '__main__':

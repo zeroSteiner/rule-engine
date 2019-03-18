@@ -8,6 +8,7 @@ dist/*
 docs/build/*
 docs/coverage
 docs/html
+examples/*.json
 lib/rule_engine.egg-info/*
 lib/rule_engine/parser.out
 lib/rule_engine/parsetab.py

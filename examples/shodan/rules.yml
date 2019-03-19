@@ -1,0 +1,22 @@
+rules:
+  - description: Anonymous FTP Access is enabled
+    rule: ftp.anonymous
+
+  - description: HTTP server accepts prompts for basic authentication without SSL
+    rule: http and not ssl and data =~~ '^WWW-Authenticate:\s+Basic\s+realm='
+
+  - description: HTTP server missing the 'X-Frame-Options' header
+    rule: http and data =~~ 'HTTP/\d.\d 2\d\d' and data !~~ '^X-Frame-Options:\s'
+
+  - description: HTTPS sseerver missing the 'Strict-Transport-Security' header
+    rule: http and ssl and data !~~ '^Strict-Transport-Security:\s'
+
+  - description: Outdated software - OpenSSH Server < v7.7
+    rule: product == 'OpenSSH' and (version =~ '[1-6]\.\d+' or version =~ '7\.[0-6]')
+    cve: 2018-15473
+    metasploit-module: auxiliary/scanner/ssh/ssh_enumusers
+
+  - description: Outdated software - Allegro RomPager < v4.34
+    rule: product == 'Allegro RomPager' and version =~ '4\.([0-2]\d|3[0-3])'
+    cve: 2014-9222
+    metasploit-module: admin/http/allegro_rompager_auth_bypass

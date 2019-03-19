@@ -2,13 +2,13 @@ rules:
   - description: Anonymous FTP Access is enabled
     rule: ftp.anonymous
 
-  - description: HTTP server accepts prompts for basic authentication without SSL
+  - description: HTTP server prompts for basic authentication without SSL
     rule: http and not ssl and data =~~ '^WWW-Authenticate:\s+Basic\s+realm='
 
   - description: HTTP server missing the 'X-Frame-Options' header
     rule: http and data =~~ 'HTTP/\d.\d 2\d\d' and data !~~ '^X-Frame-Options:\s'
 
-  - description: HTTPS sseerver missing the 'Strict-Transport-Security' header
+  - description: HTTPS server missing the 'Strict-Transport-Security' header
     rule: http and ssl and data !~~ '^Strict-Transport-Security:\s'
 
   - description: Outdated software - OpenSSH Server < v7.7

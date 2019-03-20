@@ -58,7 +58,6 @@ def main():
 		description=DESCRIPTION,
 		formatter_class=argparse.RawDescriptionHelpFormatter
 	)
-	parser.add_argument('-d', '--depth', default=2, type=int, help='the depth to pretty print')
 	parser.add_argument('--gzip', action='store_true', default=False, help='decompress the file')
 	parser.add_argument('json_file', type=argparse.FileType('rb'), help='the JSON file to filter')
 	arguments = parser.parse_args()
@@ -81,7 +80,7 @@ def main():
 			print(error.message)
 			return 0
 
-		matches = rule.filter(results)
+		matches = tuple(rule.filter(results))
 		if not matches:
 			continue
 

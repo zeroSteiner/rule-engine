@@ -17,6 +17,6 @@ rules:
     metasploit-module: auxiliary/scanner/ssh/ssh_enumusers
 
   - description: Outdated software - Allegro RomPager < v4.34
-    rule: product == 'Allegro RomPager' and version =~ '4\.([0-2]\d|3[0-3])'
+    rule: product == 'Allegro RomPager' and version =~ '([1-3]\.\d\d|4\.([0-2]\d|3[0-3]))'
     cve: 2014-9222
     metasploit-module: admin/http/allegro_rompager_auth_bypass

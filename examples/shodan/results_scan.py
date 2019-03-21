@@ -51,6 +51,22 @@ import yaml
 DESCRIPTION = 'Scan results exported from Shodan for vulnerabilities.'
 RULES_FILE = get_path('rules.yml')
 
+def _print_references(references):
+	cves = references.get('cves')
+	if cves and len(cves) == 1:
+		print('CVE: CVE-' + cves[0])
+	elif cves and len(cves) > 1:
+		print('CVEs: ')
+		for cve in cves:
+			print('  * CVE-' + cve)
+
+	msf_modules = references.get('metasploit-modules')
+	if msf_modules and len(msf_modules) == 1:
+		print('Metasploit Module: ' + msf_modules[0])
+	elif msf_modules and len(msf_modules) > 1:
+		print('Metasploit Modules:')
+		for msf_module in msf_modules:
+			print('  * ' + msf_module)
 
 def main():
 	parser = argparse.ArgumentParser(
@@ -71,7 +87,7 @@ def main():
 	results = [json.loads(line.decode('utf-8')) for line in file_object]
 
 	with open(RULES_FILE, 'r') as file_h:
-		rules = yaml.load(file_h)
+		rules = yaml.load(file_h, Loader=yaml.FullLoader)
 
 	for vulnerability in rules['rules']:
 		try:
@@ -85,8 +101,12 @@ def main():
 			continue
 
 		print(vulnerability['description'])
+		references = vulnerability.get('references', {})
+		_print_references(references)
+		print('Hosts:')
 		for match in matches:
 			print("  * {}".format(results_filter.result_to_url(match)))
+		print()
 	return 0
 
 if __name__ == '__main__':

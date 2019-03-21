@@ -13,10 +13,17 @@ rules:
 
   - description: Outdated software - OpenSSH Server < v7.7
     rule: product == 'OpenSSH' and (version =~ '[1-6]\.\d+' or version =~ '7\.[0-6]')
-    cve: 2018-15473
-    metasploit-module: auxiliary/scanner/ssh/ssh_enumusers
+    references:
+      cves:
+        - 2018-15473
+      metasploit-modules:
+        - auxiliary/scanner/ssh/ssh_enumusers
 
   - description: Outdated software - Allegro RomPager < v4.34
     rule: product == 'Allegro RomPager' and version =~ '([1-3]\.\d\d|4\.([0-2]\d|3[0-3]))'
-    cve: 2014-9222
-    metasploit-module: admin/http/allegro_rompager_auth_bypass
+    references:
+      cves:
+        - 2014-9222
+      metasploit-modules:
+        - auxiliary/admin/http/allegro_rompager_auth_bypass
+        - auxiliary/scanner/http/allegro_rompager_misfortune_cookie

@@ -38,6 +38,8 @@ Classes
    .. autoattribute:: STRING
       :annotation:
 
+   .. automethod:: from_name
+
    .. automethod:: from_type
 
    .. automethod:: from_value

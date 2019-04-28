@@ -117,6 +117,23 @@ class DataType(enum.Enum):
 	symbol is valid, but it's data type is currently unknown.
 	"""
 	@classmethod
+	def from_name(cls, name):
+		"""
+		Get the data type from its name.
+
+		.. versionadded:: 1.2.0
+
+		:param str name: The name of the data type to retrieve.
+		:return: One of the constants.
+		"""
+		if not isinstance(name, str):
+			raise TypeError('from_name argument 1 must be str, not ' + type(name).__name__)
+		dt = cls.__members__.get(name)
+		if dt is None:
+			raise ValueError("can not map name {0!r} to a compatible data type".format(name))
+		return dt
+
+	@classmethod
 	def from_type(cls, python_type):
 		"""
 		Get the supported data type constant for the specified Python type. If

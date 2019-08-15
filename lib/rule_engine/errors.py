@@ -30,6 +30,20 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+class _UNDEFINED(object):
+	def __bool__(self):
+		return False
+	__nonzero__ = __bool__
+	def __repr__(self):
+		return 'UNDEFINED'
+UNDEFINED = _UNDEFINED()
+"""
+A sentinel value to specify that something is undefined. When evaluated, the
+value is falsy.
+
+.. versionadded:: 1.2.0
+"""
+
 class EngineError(Exception):
 	"""
 	The base exception class from which other exceptions within this package
@@ -103,15 +117,21 @@ class SymbolResolutionError(EvaluationError):
 	"""
 	An error raised when a symbol name is not able to be resolved to a value.
 	"""
-	def __init__(self, symbol_name, symbol_scope=None):
+	def __init__(self, symbol_name, symbol_scope=None, thing=UNDEFINED):
 		"""
 		:param str symbol_name: The name of the symbol that can not be resolved.
 		:param str symbol_scope: The scope of where the symbol should be valid for resolution.
+		:param thing: The object that was used to resolve *symbol_name*.
+
+		.. versionchanged:: 1.2.0
+			Added the *thing* parameter.
 		"""
 		self.symbol_name = symbol_name
 		"""The name of the symbol that can not be resolved."""
 		self.symbol_scope = symbol_scope
 		"""The scope of where the symbol should be valid for resolution."""
+		self.thing = thing
+		"""The object that was used to resolve the symbol."""
 		super(SymbolResolutionError, self).__init__("unknown symbol: {0!r}".format(symbol_name))
 
 class SymbolTypeError(EvaluationError):

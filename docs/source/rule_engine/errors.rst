@@ -6,6 +6,11 @@
 
 This module contains the exceptions raised by the package.
 
+Data
+----
+
+.. autodata:: UNDEFINED
+
 Exceptions
 ----------
 

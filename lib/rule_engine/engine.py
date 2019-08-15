@@ -59,7 +59,7 @@ def resolve_attribute(thing, name):
 	"""
 	for name_part in name.split('.'):
 		if not hasattr(thing, name_part):
-			raise errors.SymbolResolutionError(name_part)
+			raise errors.SymbolResolutionError(name_part, thing=thing)
 		thing = getattr(thing, name_part)
 	return thing
 
@@ -75,7 +75,7 @@ def resolve_item(thing, name):
 	:return: The value for the corresponding attribute *name*.
 	"""
 	if name not in thing:
-		raise errors.SymbolResolutionError(name)
+		raise errors.SymbolResolutionError(name, thing=thing)
 	return thing[name]
 
 def to_default_resolver(resolver, default_value=None):
@@ -130,7 +130,7 @@ def to_recursive_resolver(resolver):
 				thing = resolver(thing, part)
 			except errors.SymbolResolutionError as error:
 				symbol_name = split_on.join(parts[:idx + 1])
-				raise errors.SymbolResolutionError(symbol_name, symbol_scope=error.symbol_scope) from None
+				raise errors.SymbolResolutionError(symbol_name, symbol_scope=error.symbol_scope, thing=thing) from None
 		return thing
 	return recursive_resolver
 

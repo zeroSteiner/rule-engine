@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/__init__.py
+#  tests/errors.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,7 +30,20 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from .ast import *
-from .engine import *
-from .errors import *
-from .parser import *
+import unittest
+
+import rule_engine.errors as errors
+
+class UndefinedSentinelTests(unittest.TestCase):
+	def test_undefined_has_a_repr(self):
+		self.assertEqual(repr(errors.UNDEFINED), 'UNDEFINED')
+
+	def test_undefined_is_a_sentinel(self):
+		self.assertIsNotNone(errors.UNDEFINED)
+		self.assertIs(errors.UNDEFINED, errors.UNDEFINED)
+
+	def test_undefined_is_falsy(self):
+		self.assertFalse(errors.UNDEFINED)
+
+if __name__ == '__main__':
+	unittest.main()

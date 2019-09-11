@@ -494,10 +494,14 @@ class FuzzyComparisonExpression(ComparisonExpression):
 # Miscellaneous Expressions
 ################################################################################
 class GetAttributeExpression(ExpressionBase):
+	__slots__ = ('name', 'obj')
 	def __init__(self, context, obj, name):
 		self.context = context
 		self.obj = obj
 		self.name = name
+
+	def __repr__(self):
+		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
 	def evaluate(self, thing):
 		if isinstance(self.obj, SymbolExpression):

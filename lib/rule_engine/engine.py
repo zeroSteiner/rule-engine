@@ -160,9 +160,6 @@ def type_resolver_from_dict(dictionary):
 	return functools.partial(_type_resolver, type_map)
 
 class _AttributeResolver(object):
-	def __init__(self):
-		self.data_type_map = self.attribute.data_type_map
-
 	class attribute(object):
 		__slots__ = ('type', 'name')
 		data_type_map = collections.defaultdict(dict)
@@ -176,7 +173,7 @@ class _AttributeResolver(object):
 
 	def __call__(self, thing, value, name):
 		data_type = ast.DataType.from_value(value)
-		attribute_resolvers = self.data_type_map.get(data_type)
+		attribute_resolvers = self.attribute.data_type_map.get(data_type)
 		if attribute_resolvers is None:
 			raise errors.AttributeResolutionError(name, value, thing)
 		resolver = attribute_resolvers.get(name)
@@ -192,6 +189,14 @@ class _AttributeResolver(object):
 	def datetime_hour(self, value):
 		return value.hour
 
+	@attribute(ast.DataType.DATETIME, 'microsecond')
+	def datetime_microsecond(self, value):
+		return value.microsecond
+
+	@attribute(ast.DataType.DATETIME, 'millisecond')
+	def datetime_millisecond(self, value):
+		return value.microsecond / 1000
+
 	@attribute(ast.DataType.DATETIME, 'minute')
 	def datetime_minute(self, value):
 		return value.minute
@@ -206,8 +211,8 @@ class _AttributeResolver(object):
 
 	@attribute(ast.DataType.DATETIME, 'weekday')
 	def datetime_weekday(self, value):
-		days = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
-		return days[value.weekday()]
+		# use strftime %A so the value is localized
+		return value.strftime('%A')
 
 	@attribute(ast.DataType.DATETIME, 'year')
 	def datetime_year(self, value):

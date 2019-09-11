@@ -31,8 +31,10 @@
 #
 
 import argparse
+import datetime
 import functools
 import getpass
+import json
 import os
 import sys
 
@@ -47,6 +49,8 @@ sys.path.append(get_path('lib'))
 
 import rule_engine
 import rule_engine.engine
+
+AUTOMATIC = object()
 
 def _get_github(arguments):
 	if arguments.auth_token:
@@ -63,24 +67,51 @@ def main():
 	auth_type_parser_group = parser.add_mutually_exclusive_group()
 	auth_type_parser_group.add_argument('--auth-token', dest='auth_token', help='authenticate to github with a token')
 	auth_type_parser_group.add_argument('--auth-user', dest='auth_user', help='authenticate to github with credentials')
+	parser.add_argument('--cache', nargs='?', const=AUTOMATIC, help='use a cache file')
 	parser.add_argument('repo_slug', help='the repository to filter')
 	parser.add_argument('type', choices=('issues', 'pulls'), help='thing to filter')
-	parser.add_argument('rule', help='the rule to apply')
+	parser.add_argument('rule', nargs='?', default='true', help='the rule to apply')
 	arguments = parser.parse_args()
 
 	# need to define a custom context to use a custom resolver function
-	context = rule_engine.Context(resolver=rule_engine.engine.resolve_attribute)
+	context = rule_engine.Context(
+		resolver=rule_engine.engine.to_recursive_resolver(rule_engine.engine.resolve_item)
+	)
 	try:
 		rule = rule_engine.Rule(arguments.rule, context=context)
 	except rule_engine.RuleSyntaxError as error:
-		print(error.message)
+		print(error.message, file=sys.stderr)
 		return 0
 
 	gh = _get_github(arguments)
 	repo = gh.get_repo(arguments.repo_slug)
-	things = tuple(getattr(repo, 'get_' + arguments.type)(state='all'))
+
+	cache_file = arguments.cache
+	if cache_file is AUTOMATIC:
+		cache_file = arguments.repo_slug.replace('/', ':') + ':' + arguments.type + '.json'
+	if cache_file is not None and os.path.isfile(cache_file):
+		with open(cache_file, 'r') as file_h:
+			things = json.load(file_h)['objects']
+	else:
+		things = tuple(getattr(repo, 'get_' + arguments.type)(state='all'))
+		things = [thing.raw_data for thing in things]
+		if cache_file:
+			with open(cache_file, 'w') as file_h:
+				json.dump(
+					{
+						'created': datetime.datetime.utcnow().isoformat() + '+00:00',
+						'objects': things
+					},
+					file_h,
+					indent=2,
+					separators=(',', ': '),
+					sort_keys=True
+				)
+	matches = 0
 	for thing in rule.filter(things):
-		print("{0}#{1: <4} - {2}".format(arguments.repo_slug, thing.number, thing.title))
+		matches += 1
+		print("{0}#{1: <4} - {2}".format(arguments.repo_slug, thing['number'], thing['title']))
+	print("summary: rule matched {:,} of {:,} {}".format(matches, len(things), arguments.type))
 	return 0
 
 if __name__ == '__main__':

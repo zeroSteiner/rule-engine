@@ -204,6 +204,11 @@ class _AttributeResolver(object):
 	def datetime_second(self, value):
 		return value.second
 
+	@attribute(ast.DataType.DATETIME, 'weekday')
+	def datetime_weekday(self, value):
+		days = ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+		return days[value.weekday()]
+
 	@attribute(ast.DataType.DATETIME, 'year')
 	def datetime_year(self, value):
 		return value.year

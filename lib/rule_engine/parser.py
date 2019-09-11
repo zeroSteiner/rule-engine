@@ -110,6 +110,8 @@ class Parser(ParserBase):
 		'<':   'LT',    '<=': 'LE',
 		# logical operators
 		'and': 'AND',   'or': 'OR',
+		# other operators
+		'.':   'ATTR'
 	}
 	reserved_words = {
 		# booleans
@@ -145,6 +147,7 @@ class Parser(ParserBase):
 	t_SUB              = r'\-'
 	t_MOD              = r'\%'
 	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
+	t_ATTR             = r'(?<=\S)\.(?=\S)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear
 	# later are effectively evaluated first
@@ -163,6 +166,7 @@ class Parser(ParserBase):
 		('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
 		('left',     'POW'),
 		('right',    'UMINUS'),
+		('left',     'ATTR'),
 	)
 
 	def t_POW(self, t):
@@ -211,7 +215,7 @@ class Parser(ParserBase):
 		return t
 
 	def t_SYMBOL(self, t):
-		r'\$?[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*'
+		r'\$?[a-zA-Z_][a-zA-Z0-9_]*'
 		t.type = self.reserved_words.get(t.value, 'SYMBOL')
 		return t
 
@@ -229,6 +233,20 @@ class Parser(ParserBase):
 	def p_statement_expr(self, p):
 		'statement : expression'
 		p[0] = ast.Statement(self.context, p[1])
+
+	def p_expression_getattr(self, p):
+		"""
+		objectattr : object ATTR SYMBOL
+		           | objectattr ATTR SYMBOL
+		"""
+		p[0] = ast.GetAttributeExpression(self.context, p[1], p[3]).reduce()
+
+	def p_expression_object(self, p):
+		"""
+		expression : object
+		           | objectattr
+		"""
+		p[0] = p[1]
 
 	def p_expression_ternary(self, p):
 		"""
@@ -312,7 +330,7 @@ class Parser(ParserBase):
 		p[0] = ast.UnaryExpression(self.context, 'NOT', p[2]).reduce()
 
 	def p_expression_symbol(self, p):
-		'expression : SYMBOL'
+		'object : SYMBOL'
 		name = p[1]
 		scope = None
 		if name[0] == '$':
@@ -334,7 +352,7 @@ class Parser(ParserBase):
 		p[0] = ast.BooleanExpression(self.context, p[1] == 'true')
 
 	def p_expression_datetime(self, p):
-		'expression : DATETIME'
+		'object : DATETIME'
 		p[0] = ast.DatetimeExpression.from_string(self.context, literal_eval(p[1]))
 
 	def p_expression_float(self, p):
@@ -354,5 +372,5 @@ class Parser(ParserBase):
 		p[0] = ast.NullExpression(self.context)
 
 	def p_expression_string(self, p):
-		'expression : STRING'
+		'object : STRING'
 		p[0] = ast.StringExpression(self.context, literal_eval(p[1]))

@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import collections
 import datetime
 import functools
 import math
@@ -157,6 +158,63 @@ def type_resolver_from_dict(dictionary):
 	type_map = {key: value if isinstance(value, ast.DataType) else ast.DataType.from_value(value) for key, value in dictionary.items()}
 	return functools.partial(_type_resolver, type_map)
 
+class _AttributeResolver(object):
+	def __init__(self):
+		self.data_type_map = self.attribute.data_type_map
+
+	class attribute(object):
+		__slots__ = ('type', 'name')
+		data_type_map = collections.defaultdict(dict)
+		def __init__(self, data_type, name):
+			self.type = data_type
+			self.name = name
+
+		def __call__(self, function):
+			self.data_type_map[self.type][self.name] = function
+			return function
+
+	def __call__(self, thing, value, name):
+		data_type = ast.DataType.from_value(value)
+		attribute_resolvers = self.data_type_map.get(data_type)
+		if attribute_resolvers is None:
+			raise errors.AttributeResolutionError(name, value, thing)
+		resolver = attribute_resolvers.get(name)
+		if resolver is None:
+			raise errors.AttributeResolutionError(name, value, thing)
+		return resolver(self, value)
+
+	@attribute(ast.DataType.DATETIME, 'day')
+	def datetime_day(self, value):
+		return value.day
+
+	@attribute(ast.DataType.DATETIME, 'hour')
+	def datetime_hour(self, value):
+		return value.hour
+
+	@attribute(ast.DataType.DATETIME, 'minute')
+	def datetime_minute(self, value):
+		return value.minute
+
+	@attribute(ast.DataType.DATETIME, 'month')
+	def datetime_month(self, value):
+		return value.month
+
+	@attribute(ast.DataType.DATETIME, 'second')
+	def datetime_second(self, value):
+		return value.second
+
+	@attribute(ast.DataType.DATETIME, 'year')
+	def datetime_year(self, value):
+		return value.year
+
+	@attribute(ast.DataType.DATETIME, 'zone_name')
+	def datetime_zone_name(self, value):
+		return value.tzname()
+
+	@attribute(ast.DataType.STRING, 'length')
+	def string_length(self, value):
+		return len(value)
+
 class Context(object):
 	"""
 	An object defining the context for a rule's evaluation. This can be used to
@@ -231,6 +289,8 @@ class Context(object):
 			elif name == 'd.today':
 				return datetime.date.today()
 		raise errors.SymbolResolutionError(name, symbol_scope=scope)
+
+	resolve_attribute = _AttributeResolver()
 
 	def resolve_type(self, name):
 		"""

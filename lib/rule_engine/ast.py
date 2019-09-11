@@ -493,6 +493,23 @@ class FuzzyComparisonExpression(ComparisonExpression):
 ################################################################################
 # Miscellaneous Expressions
 ################################################################################
+class GetAttributeExpression(ExpressionBase):
+	def __init__(self, context, obj, name):
+		self.context = context
+		self.obj = obj
+		self.name = name
+
+	def evaluate(self, thing):
+		if isinstance(self.obj, SymbolExpression):
+			resolved_obj = self.context.resolve(thing, self.obj.name)
+		else:
+			resolved_obj = self.obj.evaluate(thing)
+		try:
+			value = self.context.resolve(resolved_obj, self.name)
+		except (TypeError, errors.SymbolResolutionError):
+			value = self.context.resolve_attribute(thing, resolved_obj, self.name)
+		return value
+
 class SymbolExpression(ExpressionBase):
 	"""
 	A class representing a symbol name to be resolved at evaluation time with

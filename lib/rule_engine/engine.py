@@ -31,6 +31,7 @@
 #
 
 import collections
+import collections.abc
 import datetime
 import functools
 import math
@@ -58,11 +59,9 @@ def resolve_attribute(thing, name):
 	:param str name: The symbol name that is being resolved.
 	:return: The value for the corresponding attribute *name*.
 	"""
-	for name_part in name.split('.'):
-		if not hasattr(thing, name_part):
-			raise errors.SymbolResolutionError(name_part, thing=thing)
-		thing = getattr(thing, name_part)
-	return thing
+	if not hasattr(thing, name):
+		raise errors.SymbolResolutionError(name, thing=thing)
+	return getattr(thing, name)
 
 def resolve_item(thing, name):
 	"""
@@ -75,6 +74,8 @@ def resolve_item(thing, name):
 	:param str name: The symbol name that is being resolved.
 	:return: The value for the corresponding attribute *name*.
 	"""
+	if not isinstance(thing, collections.abc.Iterable):
+		raise errors.SymbolResolutionError(name, thing=thing)
 	if name not in thing:
 		raise errors.SymbolResolutionError(name, thing=thing)
 	return thing[name]

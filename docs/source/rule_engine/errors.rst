@@ -14,6 +14,11 @@ Data
 Exceptions
 ----------
 
+.. autoexception:: AttributeResolutionError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: DatetimeSyntaxError
    :members:
    :show-inheritance:

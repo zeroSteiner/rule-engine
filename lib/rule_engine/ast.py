@@ -506,7 +506,7 @@ class GetAttributeExpression(ExpressionBase):
 			resolved_obj = self.obj.evaluate(thing)
 		try:
 			value = self.context.resolve(resolved_obj, self.name)
-		except (TypeError, errors.SymbolResolutionError):
+		except errors.SymbolResolutionError:
 			value = self.context.resolve_attribute(thing, resolved_obj, self.name)
 		return value
 

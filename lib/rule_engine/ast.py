@@ -237,6 +237,9 @@ class LiteralExpressionBase(ExpressionBase):
 	def evaluate(self, thing):
 		return self.value
 
+	def to_graphviz(self, digraph, *args, **kwargs):
+		digraph.node(str(id(self)), "{}\nvalue={!r}".format(self.__class__.__name__, self.value))
+
 ################################################################################
 # Literal Expressions
 ################################################################################
@@ -332,11 +335,11 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		return self.result_expression(self.context, self.evaluate(None))
 
 	def to_graphviz(self, digraph, *args, **kwargs):
-		super(LeftOperatorRightExpressionBase, self).to_graphviz(digraph, *args, **kwargs)
+		digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type.lower()))
 		self.left.to_graphviz(digraph, *args, **kwargs)
 		self.right.to_graphviz(digraph, *args, **kwargs)
-		digraph.edge(str(id(self)), str(id(self.left)))
-		digraph.edge(str(id(self)), str(id(self.right)))
+		digraph.edge(str(id(self)), str(id(self.left)), label='left')
+		digraph.edge(str(id(self)), str(id(self.right)), label='right')
 
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	"""
@@ -514,6 +517,11 @@ class GetAttributeExpression(ExpressionBase):
 			value = self.context.resolve_attribute(thing, resolved_obj, self.name)
 		return value
 
+	def to_graphviz(self, digraph, *args, **kwargs):
+		digraph.node(str(id(self)), "{}\nname={!r}".format(self.__class__.__name__, self.name))
+		self.obj.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.obj)))
+
 class SymbolExpression(ExpressionBase):
 	"""
 	A class representing a symbol name to be resolved at evaluation time with
@@ -568,6 +576,9 @@ class SymbolExpression(ExpressionBase):
 			return value
 
 		raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		digraph.node(str(id(self)), "{}\nname={!r}".format(self.__class__.__name__, self.name))
 
 class Statement(ASTNodeBase):
 	"""A class representing the top level statement of the grammar text."""
@@ -630,9 +641,9 @@ class TernaryExpression(ExpressionBase):
 		self.condition.to_graphviz(digraph, *args, **kwargs)
 		self.case_true.to_graphviz(digraph, *args, **kwargs)
 		self.case_false.to_graphviz(digraph, *args, **kwargs)
-		digraph.edge(str(id(self)), str(id(self.condition)))
-		digraph.edge(str(id(self)), str(id(self.case_true)))
-		digraph.edge(str(id(self)), str(id(self.case_false)))
+		digraph.edge(str(id(self)), str(id(self.condition)), label='condition')
+		digraph.edge(str(id(self)), str(id(self.case_true)), label='true case')
+		digraph.edge(str(id(self)), str(id(self.case_false)), label='false case')
 
 class UnaryExpression(ExpressionBase):
 	def __init__(self, context, type_, right):
@@ -676,6 +687,6 @@ class UnaryExpression(ExpressionBase):
 			return FloatExpression(self.context, self.evaluate(None))
 
 	def to_graphviz(self, digraph, *args, **kwargs):
-		super(UnaryExpression, self).to_graphviz(digraph, *args, **kwargs)
+		digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type.lower()))
 		self.right.to_graphviz(digraph, *args, **kwargs)
 		digraph.edge(str(id(self)), str(id(self.right)))

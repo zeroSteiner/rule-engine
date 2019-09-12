@@ -163,6 +163,13 @@ class ParserLeftOperatorRightTests(ParserTestsBase):
 			self.assertStatementType(expression, ast.FuzzyComparisonExpression)
 
 class ParserLiteralTests(ParserTestsBase):
+	def assertLiteralAttributeStatementEqual(self, string, python_value, msg=None):
+		statement = self._parse(string, self.context)
+		self.assertIsInstance(statement, ast.Statement, msg='the parser did not return a statement')
+		self.assertIsInstance(statement.expression, ast.GetAttributeExpression, msg='the statement expression is not the correct type')
+		value = statement.evaluate(None)
+		self.assertEqual(value, python_value, msg=msg or "{0!r} does not evaluate to {1!r}".format(string, python_value))
+
 	def assertLiteralStatementEqual(self, string, ast_expression, python_value, msg=None):
 		statement = self._parse(string, self.context)
 		self.assertIsInstance(statement, ast.Statement, msg='the parser did not return a statement')
@@ -176,6 +183,18 @@ class ParserLiteralTests(ParserTestsBase):
 	def test_parse_datetime(self):
 		self.assertLiteralStatementEqual('d"2016-10-15"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, tzinfo=dateutil.tz.tzlocal()))
 		self.assertLiteralStatementEqual('d"2016-10-15 12:30"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, 12, 30, tzinfo=dateutil.tz.tzlocal()))
+
+	def test_parse_datetime_attributes(self):
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".day', 11)
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".hour', 20)
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".microsecond', 506406)
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".millisecond', 506.406)
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".minute', 46)
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".month', 9)
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".second', 57)
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".weekday', 'Wednesday')
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".year', 2019)
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".zone_name', 'UTC')
 
 	def test_parse_datetime_syntax_errors(self):
 		try:
@@ -225,12 +244,18 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertIsInstance(statement.expression, ast.FloatExpression, msg='the statement expression is not the correct literal type')
 		self.assertTrue(math.isnan(statement.expression.value), msg='the statement expression is not nan')
 
+	def test_parse_null(self):
+		self.assertLiteralStatementEqual('null', ast.NullExpression, None)
+
 	def test_parse_string(self):
 		self.assertLiteralStatementEqual("'Alice'", ast.StringExpression, 'Alice')
 		self.assertLiteralStatementEqual('"Alice"', ast.StringExpression, 'Alice')
 
 		self.assertLiteralStatementEqual("s'Alice'", ast.StringExpression, 'Alice')
 		self.assertLiteralStatementEqual('s"Alice"', ast.StringExpression, 'Alice')
+
+	def test_parse_string_attributes(self):
+		self.assertLiteralAttributeStatementEqual('s"Alice".length', 5)
 
 	def test_parse_string_escapes(self):
 		self.assertLiteralStatementEqual("'Alice\\\'s'", ast.StringExpression, 'Alice\'s')

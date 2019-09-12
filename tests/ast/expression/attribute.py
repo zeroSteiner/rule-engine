@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/ast/expression/__init__.py
+#  tests/ast/expression/attribute.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,12 +30,48 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import unittest
 
-from .attribute import *
-from .left_operator_right import *
-from .literal import *
-from .miscellaneous import *
+from .literal import context
+import rule_engine.ast as ast
+import rule_engine.engine as engine
+
+import dateutil.tz
+
+__all__ = ('GetAttributeExpressionTests',)
+
+class GetAttributeExpressionTests(unittest.TestCase):
+	def test_ast_expression_datetime_attributes(self):
+		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)
+		symbol = ast.DatetimeExpression(engine.Context(), timestamp)
+
+		attributes = {
+			'day': 11,
+			'hour': 20,
+			'microsecond': 506406,
+			'millisecond': 506.406,
+			'minute': 46,
+			'month': 9,
+			'second': 57,
+			'weekday': timestamp.strftime('%A'),
+			'year': 2019,
+			'zone_name': 'UTC',
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
+
+	def test_ast_expression_string_attributes(self):
+		string = 'Rule Engine'
+		symbol = ast.StringExpression(engine.Context(), string)
+
+		attributes = {
+			'length': len(string),
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
 
 if __name__ == '__main__':
 	unittest.main()

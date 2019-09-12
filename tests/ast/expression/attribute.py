@@ -36,12 +36,19 @@ import unittest
 from .literal import context
 import rule_engine.ast as ast
 import rule_engine.engine as engine
+import rule_engine.errors as errors
 
 import dateutil.tz
 
 __all__ = ('GetAttributeExpressionTests',)
 
 class GetAttributeExpressionTests(unittest.TestCase):
+	def test_ast_expression_attribute_exception(self):
+		symbol = ast.SymbolExpression(context, 'foo')
+		expression = ast.GetAttributeExpression(context, symbol, 'bar')
+		with self.assertRaises(errors.AttributeResolutionError):
+			expression.evaluate({'foo': 'baz'})
+
 	def test_ast_expression_datetime_attributes(self):
 		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)
 		symbol = ast.DatetimeExpression(engine.Context(), timestamp)

@@ -419,6 +419,3 @@ class DebugRule(Rule):
 	def __init__(self, *args, **kwargs):
 		self.parser = parser.Parser(debug=True)
 		super(DebugRule, self).__init__(*args, **kwargs)
-
-	def matches(self, thing):
-		return self.statement.evaluate(thing)

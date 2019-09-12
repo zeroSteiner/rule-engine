@@ -145,8 +145,8 @@ class EngineRuleTests(unittest.TestCase):
 		self.assertEqual(str(rule), self.rule_text)
 		self.assertRegex(repr(rule), "<Rule text='{0}' >".format(re.escape(self.rule_text)))
 
-	def test_engine_rule_matches(self):
-		rule = engine.Rule(self.rule_text)
+	def test_engine_rule_matches(self, rule=None):
+		rule = rule or engine.Rule(self.rule_text)
 		result = rule.matches(self.true_item)
 		self.assertIsInstance(result, bool)
 		self.assertTrue(result)
@@ -154,13 +154,22 @@ class EngineRuleTests(unittest.TestCase):
 		self.assertIsInstance(result, bool)
 		self.assertFalse(result)
 
-	def test_engine_rule_filter(self):
-		rule = engine.Rule(self.rule_text)
+	def test_engine_rule_filter(self, rule=None):
+		rule = rule or engine.Rule(self.rule_text)
 		result = rule.filter([self.true_item, self.false_item])
 		self.assertIsInstance(result, types.GeneratorType)
 		result = tuple(result)
 		self.assertIn(self.true_item, result)
 		self.assertNotIn(self.false_item, result)
+
+	def test_engine_rule_evaluate(self):
+		rule = engine.Rule('"string"')
+		self.assertEqual(rule.evaluate(None), 'string')
+
+	def test_engine_rule_debug_parser(self):
+		debug_rule = engine.DebugRule(self.rule_text)
+		self.test_engine_rule_matches(rule=debug_rule)
+		self.test_engine_rule_filter(rule=debug_rule)
 
 if __name__ == '__main__':
 	unittest.main()

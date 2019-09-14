@@ -552,7 +552,7 @@ class SymbolExpression(ExpressionBase):
 
 		# convert the value from one of the supported types if necessary
 		if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
-			value = datetime.datetime(value.year, value.month, value.day, tzinfo=self.context.default_timezone)
+			value = datetime.datetime(value.year, value.month, value.day)
 		elif isinstance(value, int) and not isinstance(value, bool):
 			value = float(value)
 

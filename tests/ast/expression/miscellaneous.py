@@ -31,6 +31,7 @@
 #
 
 import datetime
+import math
 import random
 import string
 import unittest
@@ -61,13 +62,11 @@ class SymbolExpressionTests(unittest.TestCase):
 		self.assertEqual(symbol.evaluate({self.sym_name: self.sym_value}), self.sym_value)
 
 	def test_ast_expression_symbol_scope(self):
-		for name in ('f.e', 'f.pi', 'd.now', 'd.today'):
-			symbol = ast.SymbolExpression(context, name, scope='built-in')
-			value = symbol.evaluate(None)
-			if name.startswith('d.'):
-				self.assertIsInstance(value, datetime.datetime)
-			elif name.startswith('f.'):
-				self.assertIsInstance(value, float)
+		symbol = ast.SymbolExpression(context, 'f', scope='built-in')
+		expression = ast.GetAttributeExpression(context, symbol, 'pi')
+		value = expression.evaluate(None)
+		self.assertIsInstance(value, float)
+		self.assertEqual(value, math.pi)
 
 	def test_ast_expression_symbol_scope_error(self):
 		symbol = ast.SymbolExpression(context, 'fake-name', scope='fake-scope')
@@ -107,6 +106,7 @@ class SymbolExpressionTests(unittest.TestCase):
 		self.assertEqual(symbol.name, self.sym_name)
 		with self.assertRaises(errors.SymbolTypeError):
 			self.assertEqual(symbol.evaluate({self.sym_name: not self.sym_value}), self.sym_value)
+		self.assertIsNone(symbol.evaluate({self.sym_name: None}))
 
 class TernaryExpressionTests(unittest.TestCase):
 	left_value = ast.StringExpression(context, 'left')

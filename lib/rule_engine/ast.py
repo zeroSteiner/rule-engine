@@ -508,7 +508,7 @@ class GetAttributeExpression(ExpressionBase):
 
 	def evaluate(self, thing):
 		if isinstance(self.obj, SymbolExpression):
-			resolved_obj = self.context.resolve(thing, self.obj.name)
+			resolved_obj = self.context.resolve(thing, self.obj.name, scope=self.obj.scope)
 		else:
 			resolved_obj = self.obj.evaluate(thing)
 		try:
@@ -552,7 +552,7 @@ class SymbolExpression(ExpressionBase):
 
 		# convert the value from one of the supported types if necessary
 		if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
-			value = datetime.datetime(value.year, value.month, value.day)
+			value = datetime.datetime(value.year, value.month, value.day, tzinfo=self.context.default_timezone)
 		elif isinstance(value, int) and not isinstance(value, bool):
 			value = float(value)
 

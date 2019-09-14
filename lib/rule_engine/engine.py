@@ -34,6 +34,7 @@ import collections
 import collections.abc
 import datetime
 import functools
+import inspect
 import math
 
 from . import ast
@@ -41,6 +42,12 @@ from . import errors
 from . import parser
 
 import dateutil.tz
+
+def _now():
+	return datetime.datetime.now(tz=dateutil.tz.UTC)
+
+def _today():
+	return _now().replace(hour=0, minute=0, second=0, microsecond=0)
 
 def resolve_attribute(thing, name):
 	"""
@@ -226,6 +233,32 @@ class _AttributeResolver(object):
 	def string_length(self, value):
 		return len(value)
 
+class Builtins(collections.abc.Mapping):
+	def __init__(self, values, namespace=None):
+		self.__values = values
+		self.namespace = namespace
+
+	def __repr__(self):
+		return "<{} namespace={!r} keys={!r} >".format(self.__class__.__name__, self.namespace, tuple(self.keys()))
+
+	def __getitem__(self, name):
+		value = self.__values[name]
+		if isinstance(value, collections.abc.Mapping):
+			if self.namespace is None:
+				namespace = name
+			else:
+				namespace = self.namespace + name
+			return self.__class__(value, namespace=namespace)
+		elif inspect.isfunction(value):
+			value = value()
+		return value
+
+	def __iter__(self):
+		return iter(self.__values)
+
+	def __len__(self):
+		return len(self.__values)
+
 class Context(object):
 	"""
 	An object defining the context for a rule's evaluation. This can be used to
@@ -288,19 +321,24 @@ class Context(object):
 		:param str name: The symbol name that is being resolved.
 		:return: The value for the corresponding attribute *name*.
 		"""
+		if scope == 'built-in':
+			thing = self.builtins
+		if isinstance(thing, Builtins):
+			return resolve_item(thing, name)
 		if scope is None:
 			return self.__resolver(thing, name)
-		if scope == 'built-in':
-			if name == 'f.e':
-				return math.e
-			elif name == 'f.pi':
-				return math.pi
-			elif name == 'd.now':
-				return datetime.datetime.now()
-			elif name == 'd.today':
-				return datetime.date.today()
 		raise errors.SymbolResolutionError(name, symbol_scope=scope)
 
+	builtins = Builtins({
+		'f': {
+			'e': math.e,
+			'pi': math.pi
+		},
+		'd': {
+			'now': _now,
+			'today':_today
+		}
+	})
 	resolve_attribute = _AttributeResolver()
 
 	def resolve_type(self, name):

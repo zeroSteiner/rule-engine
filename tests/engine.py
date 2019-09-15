@@ -31,6 +31,8 @@
 #
 
 import collections
+import contextlib
+import os
 import re
 import types
 import unittest
@@ -167,7 +169,9 @@ class EngineRuleTests(unittest.TestCase):
 		self.assertEqual(rule.evaluate(None), 'string')
 
 	def test_engine_rule_debug_parser(self):
-		debug_rule = engine.DebugRule(self.rule_text)
+		with open(os.devnull, 'w') as file_h:
+			with contextlib.redirect_stderr(file_h):
+				debug_rule = engine.DebugRule(self.rule_text)
 		self.test_engine_rule_matches(rule=debug_rule)
 		self.test_engine_rule_filter(rule=debug_rule)
 

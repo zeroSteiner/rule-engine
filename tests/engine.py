@@ -32,6 +32,7 @@
 
 import collections
 import contextlib
+import datetime
 import os
 import re
 import types
@@ -115,6 +116,21 @@ class EngineTests(unittest.TestCase):
 		self.assertEqual(type_resolver('float'), ast.DataType.FLOAT)
 		with self.assertRaises(errors.SymbolResolutionError):
 			type_resolver('doesnotexist')
+
+	def test_engine_builtins(self):
+		builtins = engine.Builtins.from_defaults()
+		self.assertIsInstance(builtins, engine.Builtins)
+		self.assertIsNone(builtins.namespace)
+		self.assertRegexpMatches(repr(builtins), r'<Builtins namespace=None keys=\(\'\S+\'(, \'\S+\')*\) >')
+
+		self.assertIn('d', builtins)
+		d_builtins = builtins['d']
+		self.assertIsInstance(builtins, engine.Builtins)
+		self.assertEqual(d_builtins.namespace, 'd')
+
+		self.assertIn('today', d_builtins)
+		today = d_builtins['today']
+		self.assertIsInstance(today, datetime.date)
 
 class EngineRuleTests(unittest.TestCase):
 	rule_text = 'first_name == "Luke" and email =~ ".*@rebels.org$"'

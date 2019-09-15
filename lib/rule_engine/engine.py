@@ -247,7 +247,7 @@ class Builtins(collections.abc.Mapping):
 			if self.namespace is None:
 				namespace = name
 			else:
-				namespace = self.namespace + name
+				namespace = self.namespace + '.' + name
 			return self.__class__(value, namespace=namespace)
 		elif inspect.isfunction(value):
 			value = value()
@@ -258,6 +258,20 @@ class Builtins(collections.abc.Mapping):
 
 	def __len__(self):
 		return len(self.__values)
+
+	@classmethod
+	def from_defaults(cls):
+		instance = cls({
+			'f': {
+				'e': math.e,
+				'pi': math.pi
+			},
+			'd': {
+				'now': _now,
+				'today': _today
+			}
+		})
+		return instance
 
 class Context(object):
 	"""
@@ -329,16 +343,7 @@ class Context(object):
 			return self.__resolver(thing, name)
 		raise errors.SymbolResolutionError(name, symbol_scope=scope)
 
-	builtins = Builtins({
-		'f': {
-			'e': math.e,
-			'pi': math.pi
-		},
-		'd': {
-			'now': _now,
-			'today':_today
-		}
-	})
+	builtins = Builtins.from_defaults()
 	resolve_attribute = _AttributeResolver()
 
 	def resolve_type(self, name):

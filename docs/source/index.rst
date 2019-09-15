@@ -61,6 +61,7 @@ See the `examples`_ folder for more.
 
    syntax.rst
    rule_engine/index.rst
+   change_log.rst
 
 Indices and tables
 ==================

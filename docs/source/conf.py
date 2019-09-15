@@ -36,10 +36,17 @@ add_module_names = False
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
+    'sphinx.ext.extlinks',
     'sphinx.ext.githubpages',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
 ]
+
+extlinks = {
+    'issue':   ("https://github.com/{0}/issues/%s".format(GITHUB_REPO), '#'),
+    'release': ("https://github.com/{0}/releases/tag/v%s".format(GITHUB_REPO), 'v'),
+    'wiki':    ("https://github.com/{0}/wiki/%s".format(GITHUB_REPO), ''),
+}
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3.6', None)}
 

@@ -100,18 +100,15 @@ class RegexSyntaxError(SyntaxError):
 	An error raised for issues regarding the use of improper regular expression
 	syntax.
 	"""
-	def __init__(self, message, error):
+	def __init__(self, message, error, value):
 		super(RegexSyntaxError, self).__init__(message)
 		self.error = error
 		"""The :py:exc:`re.error` exception from which this error was triggered."""
-
-	@property
-	def value(self):
+		self.value = value
 		"""
 		The regular expression value which contains the syntax error which
 		caused this exception to be raised.
 		"""
-		return self.error.pattern
 
 class SymbolResolutionError(EvaluationError):
 	"""

@@ -465,7 +465,7 @@ class FuzzyComparisonExpression(ComparisonExpression):
 		try:
 			result = re.compile(regex, flags=self.context.regex_flags)
 		except re.error as error:
-			raise errors.RegexSyntaxError('invalid regular expression', error=error) from None
+			raise errors.RegexSyntaxError('invalid regular expression', error=error, value=regex) from None
 		return result
 
 	def __op_regex(self, regex_function, modifier, thing):

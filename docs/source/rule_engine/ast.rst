@@ -10,6 +10,8 @@ from parsed grammar text.
 Functions
 ---------
 
+.. autofunction:: rule_engine.ast.coerce_value
+
 .. autofunction:: rule_engine.ast.is_natural_number
 
 .. autofunction:: rule_engine.ast.is_numeric

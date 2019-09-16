@@ -154,7 +154,7 @@ class EngineRuleTests(unittest.TestCase):
 
 	@unittest.skipUnless(has_graphviz, 'graphviz is unavailable')
 	def test_engin_rule_to_graphviz_2(self):
-		rule = engine.Rule('"foo".length % 2 ? (bar > baz) : (bar < -baz)')
+		rule = engine.Rule('foo.length % 2 ? (bar > baz) : (bar < -baz)')
 		digraph = rule.to_graphviz()
 		self.assertIsInstance(digraph, graphviz.Digraph)
 

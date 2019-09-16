@@ -116,14 +116,14 @@ class AttributeResolutionError(EvaluationError):
 
 	..versionadded:: 1.2.0
 	"""
-	def __init__(self, attribute_name, value, thing=UNDEFINED):
+	def __init__(self, attribute_name, object, thing=UNDEFINED):
 		"""
 		:param str attribute_name: The name of the symbol that can not be resolved.
-		:param value: The value that *symbol_name* was used as an attribute for.
+		:param object: The value that *symbol_name* was used as an attribute for.
 		:param thing: The object that was used to resolve *value*.
 		"""
 		self.symbol_name = attribute_name
-		self.value = value
+		self.object = object
 		self.thing = thing
 		super(AttributeResolutionError, self).__init__("unknown attribute: {0!r}".format(attribute_name))
 

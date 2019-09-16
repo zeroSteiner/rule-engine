@@ -178,19 +178,16 @@ class _AttributeResolver(object):
 			self.data_type_map[self.type][self.name] = function
 			return function
 
-	def __call__(self, thing, value, name):
-		data_type = ast.DataType.from_value(value)
+	def __call__(self, thing, object_, name):
+		data_type = ast.DataType.from_value(object_)
 		attribute_resolvers = self.attribute.data_type_map.get(data_type)
 		if attribute_resolvers is None:
-			raise errors.AttributeResolutionError(name, value, thing)
+			raise errors.AttributeResolutionError(name, object_, thing)
 		resolver = attribute_resolvers.get(name)
 		if resolver is None:
-			raise errors.AttributeResolutionError(name, value, thing)
-		resolved_value = resolver(self, value)
-		# todo: switch to unified conversion functions under the data types
-		if isinstance(resolved_value, int):
-			resolved_value = float(resolved_value)
-		return resolved_value
+			raise errors.AttributeResolutionError(name, object_, thing)
+		value = resolver(self, object_)
+		return ast.coerce_value(value)
 
 	@attribute(ast.DataType.DATETIME, 'day')
 	def datetime_day(self, value):

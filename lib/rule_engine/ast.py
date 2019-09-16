@@ -44,6 +44,26 @@ import dateutil.parser
 
 NoneType = type(None)
 
+def coerce_value(value):
+	"""
+	Take a native Python *value* and convert it to a value of a data type which
+	is can be represented by a Rule Engine :py:class:`~.DataType`. This function
+	is useful for converting native Python values at the engine boundaries such
+	as when resolving a symbol from an object external to the engine.
+
+	.. versionadded:: 1.2.0
+
+	:param value: The value to convert.
+	:return: The converted value
+	"""
+	# convert the value from one of the supported types if necessary
+	if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
+		value = datetime.datetime(value.year, value.month, value.day)
+	elif isinstance(value, int) and not isinstance(value, bool):
+		value = float(value)
+	DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
+	return value
+
 def is_natural_number(value):
 	"""
 	Check whether *value* is a natural number (i.e. a whole, non-negative
@@ -566,12 +586,7 @@ class SymbolExpression(ExpressionBase):
 
 	def evaluate(self, thing):
 		value = self.context.resolve(thing, self.name, scope=self.scope)
-
-		# convert the value from one of the supported types if necessary
-		if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
-			value = datetime.datetime(value.year, value.month, value.day)
-		elif isinstance(value, int) and not isinstance(value, bool):
-			value = float(value)
+		value = coerce_value(value)
 
 		if isinstance(value, datetime.datetime) and value.tzinfo is None:
 			value = value.replace(tzinfo=self.context.default_timezone)

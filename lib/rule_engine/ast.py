@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import collections
 import datetime
 import enum
 import functools
@@ -102,15 +103,16 @@ def _assert_is_numeric(value):
 	if not is_numeric(value):
 		raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
+_DataTypeDef = collections.namedtuple('_DataTypeDef', ('python_type',))
 class DataType(enum.Enum):
 	"""
 	A collection of constants representing the different supported data types.
 	"""
-	BOOLEAN = bool
-	DATETIME = datetime.datetime
-	FLOAT = float
-	NULL = NoneType
-	STRING = str
+	BOOLEAN = _DataTypeDef(bool)
+	DATETIME = _DataTypeDef(datetime.datetime)
+	FLOAT = _DataTypeDef(float)
+	NULL = _DataTypeDef(NoneType)
+	STRING = _DataTypeDef(str)
 	UNDEFINED = None
 	"""
 	Undefined values. This constant can be used to indicate that a particular
@@ -227,8 +229,8 @@ class LiteralExpressionBase(ExpressionBase):
 		:param value: The native Python value.
 		"""
 		self.context = context
-		if not isinstance(value, self.result_type.value):
-			raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.value.__name__, type(value).__name__))
+		if not isinstance(value, self.result_type.value.python_type):
+			raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.value.python_type.__name__, type(value).__name__))
 		self.value = value
 
 	def __repr__(self):

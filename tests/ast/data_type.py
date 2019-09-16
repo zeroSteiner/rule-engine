@@ -41,7 +41,20 @@ class DataTypeTests(unittest.TestCase):
 	class _UnsupportedType(object):
 		pass
 
-	def test_datatype_from_type(self):
+	def test_data_type_from_name(self):
+		self.assertIs(ast.DataType.from_name('BOOLEAN'), ast.DataType.BOOLEAN)
+		self.assertIs(ast.DataType.from_name('DATETIME'), ast.DataType.DATETIME)
+		self.assertIs(ast.DataType.from_name('FLOAT'), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_name('NULL'), ast.DataType.NULL)
+		self.assertIs(ast.DataType.from_name('STRING'), ast.DataType.STRING)
+
+	def test_data_type_from_name_exceptions(self):
+		with self.assertRaises(TypeError):
+			ast.DataType.from_name(1)
+		with self.assertRaises(ValueError):
+			ast.DataType.from_name('FOOBAR')
+
+	def test_data_type_from_type(self):
 		self.assertIs(ast.DataType.from_type(bool), ast.DataType.BOOLEAN)
 		self.assertIs(ast.DataType.from_type(datetime.date), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_type(datetime.datetime), ast.DataType.DATETIME)
@@ -50,13 +63,13 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(ast.DataType.from_type(type(None)), ast.DataType.NULL)
 		self.assertIs(ast.DataType.from_type(str), ast.DataType.STRING)
 
-	def test_datatype_from_type_exceptions(self):
+	def test_data_type_from_type_exceptions(self):
 		with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be type, not _UnsupportedType$'):
 			ast.DataType.from_type(self._UnsupportedType())
 		with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
 			ast.DataType.from_type(self._UnsupportedType)
 
-	def test_datatype_from_value(self):
+	def test_data_type_from_value(self):
 		self.assertIs(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
 		self.assertIs(ast.DataType.from_value(datetime.date.today()), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_value(datetime.datetime.now()), ast.DataType.DATETIME)
@@ -65,7 +78,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(ast.DataType.from_value(None), ast.DataType.NULL)
 		self.assertIs(ast.DataType.from_value(''), ast.DataType.STRING)
 
-	def test_datatype_from_value_exceptions(self):
+	def test_data_type_from_value_exceptions(self):
 		with self.assertRaisesRegex(TypeError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
 			ast.DataType.from_value(self._UnsupportedType())
 

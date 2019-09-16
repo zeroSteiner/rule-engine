@@ -186,7 +186,11 @@ class _AttributeResolver(object):
 		resolver = attribute_resolvers.get(name)
 		if resolver is None:
 			raise errors.AttributeResolutionError(name, value, thing)
-		return resolver(self, value)
+		resolved_value = resolver(self, value)
+		# todo: switch to unified conversion functions under the data types
+		if isinstance(resolved_value, int):
+			resolved_value = float(resolved_value)
+		return resolved_value
 
 	@attribute(ast.DataType.DATETIME, 'day')
 	def datetime_day(self, value):

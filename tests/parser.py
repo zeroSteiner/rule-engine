@@ -166,7 +166,7 @@ class ParserLiteralTests(ParserTestsBase):
 	def assertLiteralAttributeStatementEqual(self, string, python_value, msg=None):
 		statement = self._parse(string, self.context)
 		self.assertIsInstance(statement, ast.Statement, msg='the parser did not return a statement')
-		self.assertIsInstance(statement.expression, ast.GetAttributeExpression, msg='the statement expression is not the correct type')
+		self.assertIsInstance(statement.expression, ast.LiteralExpressionBase, msg='the statement expression is not the correct type')
 		value = statement.evaluate(None)
 		self.assertEqual(value, python_value, msg=msg or "{0!r} does not evaluate to {1!r}".format(string, python_value))
 

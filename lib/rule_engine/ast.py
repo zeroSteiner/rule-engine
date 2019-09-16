@@ -41,7 +41,7 @@ from . import errors
 
 import dateutil.parser
 
-NONE_TYPE = type(None)
+NoneType = type(None)
 
 def is_natural_number(value):
 	"""
@@ -109,7 +109,7 @@ class DataType(enum.Enum):
 	BOOLEAN = bool
 	DATETIME = datetime.datetime
 	FLOAT = float
-	NULL = NONE_TYPE
+	NULL = NoneType
 	STRING = str
 	UNDEFINED = None
 	"""
@@ -153,7 +153,7 @@ class DataType(enum.Enum):
 			return cls.DATETIME
 		elif python_type is float or python_type is int:
 			return cls.FLOAT
-		elif python_type is NONE_TYPE:
+		elif python_type is NoneType:
 			return cls.NULL
 		elif python_type is str:
 			return cls.STRING
@@ -233,6 +233,16 @@ class LiteralExpressionBase(ExpressionBase):
 
 	def __repr__(self):
 		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
+
+	@classmethod
+	def from_value(cls, context, value):
+		datatype = DataType.from_value(value)
+		for subclass in cls.__subclasses__():
+			if subclass.result_type == datatype:
+				break
+		else:
+			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
+		return subclass(context, value)
 
 	def evaluate(self, thing):
 		return self.value
@@ -497,30 +507,35 @@ class FuzzyComparisonExpression(ComparisonExpression):
 # Miscellaneous Expressions
 ################################################################################
 class GetAttributeExpression(ExpressionBase):
-	__slots__ = ('name', 'obj')
-	def __init__(self, context, obj, name):
+	__slots__ = ('name', 'object')
+	def __init__(self, context, object_, name):
 		self.context = context
-		self.obj = obj
+		self.object = object_
 		self.name = name
 
 	def __repr__(self):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
 	def evaluate(self, thing):
-		if isinstance(self.obj, SymbolExpression):
-			resolved_obj = self.context.resolve(thing, self.obj.name, scope=self.obj.scope)
+		if isinstance(self.object, SymbolExpression):
+			resolved_obj = self.context.resolve(thing, self.object.name, scope=self.object.scope)
 		else:
-			resolved_obj = self.obj.evaluate(thing)
+			resolved_obj = self.object.evaluate(thing)
 		try:
 			value = self.context.resolve(resolved_obj, self.name)
 		except errors.SymbolResolutionError:
 			value = self.context.resolve_attribute(thing, resolved_obj, self.name)
 		return value
 
+	def reduce(self):
+		if not isinstance(self.object, LiteralExpressionBase):
+			return self
+		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+
 	def to_graphviz(self, digraph, *args, **kwargs):
 		digraph.node(str(id(self)), "{}\nname={!r}".format(self.__class__.__name__, self.name))
-		self.obj.to_graphviz(digraph, *args, **kwargs)
-		digraph.edge(str(id(self)), str(id(self.obj)))
+		self.object.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.object)))
 
 class SymbolExpression(ExpressionBase):
 	"""

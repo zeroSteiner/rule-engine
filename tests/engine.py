@@ -31,10 +31,10 @@
 #
 
 import collections
-import contextlib
 import datetime
 import os
 import re
+import sys
 import types
 import unittest
 
@@ -121,7 +121,7 @@ class EngineTests(unittest.TestCase):
 		builtins = engine.Builtins.from_defaults()
 		self.assertIsInstance(builtins, engine.Builtins)
 		self.assertIsNone(builtins.namespace)
-		self.assertRegexpMatches(repr(builtins), r'<Builtins namespace=None keys=\(\'\S+\'(, \'\S+\')*\) >')
+		self.assertRegex(repr(builtins), r'<Builtins namespace=None keys=\(\'\S+\'(, \'\S+\')*\) >')
 
 		self.assertIn('d', builtins)
 		d_builtins = builtins['d']
@@ -186,8 +186,10 @@ class EngineRuleTests(unittest.TestCase):
 
 	def test_engine_rule_debug_parser(self):
 		with open(os.devnull, 'w') as file_h:
-			with contextlib.redirect_stderr(file_h):
-				debug_rule = engine.DebugRule(self.rule_text)
+			original_stderr = sys.stderr
+			sys.stderr = file_h
+			debug_rule = engine.DebugRule(self.rule_text)
+			sys.stderr = original_stderr
 		self.test_engine_rule_matches(rule=debug_rule)
 		self.test_engine_rule_filter(rule=debug_rule)
 

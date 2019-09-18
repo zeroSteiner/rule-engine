@@ -54,7 +54,7 @@ class EngineError(Exception):
 		:param str message: A text description of what error occurred.
 		"""
 		self.message = message
-		"""The message describing the error that occurred."""
+		"""A text description of what error occurred."""
 
 class EvaluationError(EngineError):
 	"""
@@ -73,6 +73,10 @@ class DatetimeSyntaxError(SyntaxError):
 	datetime expressions.
 	"""
 	def __init__(self, message, value):
+		"""
+		:param str message: A text description of what error occurred.
+		:param str value: The datetime value which contains the syntax error which caused this exception to be raised.
+		"""
 		super(DatetimeSyntaxError, self).__init__(message)
 		self.value = value
 		"""
@@ -86,6 +90,10 @@ class RuleSyntaxError(SyntaxError):
 	rule text.
 	"""
 	def __init__(self, message, token=None):
+		"""
+		:param str message: A text description of what error occurred.
+		:param token: The PLY token (if available) which is related to the syntax error.
+		"""
 		if token is None:
 			position = 'EOF'
 		else:
@@ -101,6 +109,12 @@ class RegexSyntaxError(SyntaxError):
 	syntax.
 	"""
 	def __init__(self, message, error, value):
+		"""
+		:param str message: A text description of what error occurred.
+		:param error: The :py:exc:`re.error` exception from which this error was triggered.
+		:type error: :py:exc:`re.error`
+		:param str value: The regular expression value which contains the syntax error which caused this exception to be raised.
+		"""
 		super(RegexSyntaxError, self).__init__(message)
 		self.error = error
 		"""The :py:exc:`re.error` exception from which this error was triggered."""
@@ -116,15 +130,18 @@ class AttributeResolutionError(EvaluationError):
 
 	..versionadded:: 1.2.0
 	"""
-	def __init__(self, attribute_name, object, thing=UNDEFINED):
+	def __init__(self, attribute_name, object_, thing=UNDEFINED):
 		"""
 		:param str attribute_name: The name of the symbol that can not be resolved.
-		:param object: The value that *symbol_name* was used as an attribute for.
-		:param thing: The object that was used to resolve *value*.
+		:param object_: The value that *attribute_name* was used as an attribute for.
+		:param thing: The root-object that was used to resolve *object*.
 		"""
-		self.symbol_name = attribute_name
-		self.object = object
+		self.attribute_name = attribute_name
+		"""The name of the symbol that can not be resolved."""
+		self.object = object_
+		"""The value that *attribute_name* was used as an attribute for."""
 		self.thing = thing
+		"""The root-object that was used to resolve *object*."""
 		super(AttributeResolutionError, self).__init__("unknown attribute: {0!r}".format(attribute_name))
 
 class SymbolResolutionError(EvaluationError):
@@ -135,7 +152,7 @@ class SymbolResolutionError(EvaluationError):
 		"""
 		:param str symbol_name: The name of the symbol that can not be resolved.
 		:param str symbol_scope: The scope of where the symbol should be valid for resolution.
-		:param thing: The object that was used to resolve *symbol_name*.
+		:param thing: The root-object that was used to resolve the symbol.
 
 		.. versionchanged:: 1.2.0
 			Added the *thing* parameter.
@@ -145,15 +162,21 @@ class SymbolResolutionError(EvaluationError):
 		self.symbol_scope = symbol_scope
 		"""The scope of where the symbol should be valid for resolution."""
 		self.thing = thing
-		"""The object that was used to resolve the symbol."""
+		"""The root-object that was used to resolve the symbol."""
 		super(SymbolResolutionError, self).__init__("unknown symbol: {0!r}".format(symbol_name))
 
 class SymbolTypeError(EvaluationError):
 	"""
-	An error raised when a symbol with type information is resolved to a python
+	An error raised when a symbol with type information is resolved to a Python
 	value that is not of that type.
 	"""
 	def __init__(self, symbol_name, is_value, is_type, expected_type):
+		"""
+		:param str symbol_name: The name of the symbol that is of an incompatible type.
+		:param is_value: The native Python value of the incompatible symbol.
+		:param is_type: The :py:class:`rule-engine type<rule_engine.ast.DataType>` of the incompatible symbol.
+		:param expected_type: The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this symbol.
+		"""
 		self.symbol_name = symbol_name
 		"""The name of the symbol that is of an incompatible type."""
 		self.is_value = is_value
@@ -164,4 +187,3 @@ class SymbolTypeError(EvaluationError):
 		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this symbol."""
 		message = "symbol {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(symbol_name, is_type.name, expected_type.name)
 		super(SymbolTypeError, self).__init__(message)
-

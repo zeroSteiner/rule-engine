@@ -587,7 +587,6 @@ class SymbolExpression(ExpressionBase):
 	def evaluate(self, thing):
 		value = self.context.resolve(thing, self.name, scope=self.scope)
 		value = coerce_value(value)
-
 		if isinstance(value, datetime.datetime) and value.tzinfo is None:
 			value = value.replace(tzinfo=self.context.default_timezone)
 

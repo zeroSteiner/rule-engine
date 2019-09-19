@@ -166,19 +166,32 @@ def type_resolver_from_dict(dictionary):
 	type_map = {key: value if isinstance(value, ast.DataType) else ast.DataType.from_value(value) for key, value in dictionary.items()}
 	return functools.partial(_type_resolver, type_map)
 
+_AttributeResolverFunction = collections.namedtuple('_AttributeResolverFunction', ('function', 'result_type'))
 class _AttributeResolver(object):
 	class attribute(object):
-		__slots__ = ('type', 'name')
+		__slots__ = ('type', 'name', 'result_type')
 		data_type_map = collections.defaultdict(dict)
-		def __init__(self, data_type, name):
+		def __init__(self, data_type, name, result_type=ast.DataType.UNDEFINED):
 			self.type = data_type
 			self.name = name
+			self.result_type = result_type
 
 		def __call__(self, function):
-			self.data_type_map[self.type][self.name] = function
+			self.data_type_map[self.type][self.name] = _AttributeResolverFunction(function, self.result_type)
 			return function
 
 	def __call__(self, thing, object_, name):
+		resolver = self._get_resolver(object_, name, thing=thing)
+		value = resolver.function(self, object_)
+		value = ast.coerce_value(value)
+		if resolver.result_type is ast.DataType.UNDEFINED:
+			return value
+		value_type = ast.DataType.from_value(value)
+		if resolver.result_type is value_type:
+			return value
+		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=resolver.result_type)
+
+	def _get_resolver(self, object_, name, thing=errors.UNDEFINED):
 		data_type = ast.DataType.from_value(object_)
 		attribute_resolvers = self.attribute.data_type_map.get(data_type)
 		if attribute_resolvers is None:
@@ -186,51 +199,50 @@ class _AttributeResolver(object):
 		resolver = attribute_resolvers.get(name)
 		if resolver is None:
 			raise errors.AttributeResolutionError(name, object_, thing)
-		value = resolver(self, object_)
-		return ast.coerce_value(value)
+		return resolver
 
-	@attribute(ast.DataType.DATETIME, 'day')
+	@attribute(ast.DataType.DATETIME, 'day', result_type=ast.DataType.FLOAT)
 	def datetime_day(self, value):
 		return value.day
 
-	@attribute(ast.DataType.DATETIME, 'hour')
+	@attribute(ast.DataType.DATETIME, 'hour', result_type=ast.DataType.FLOAT)
 	def datetime_hour(self, value):
 		return value.hour
 
-	@attribute(ast.DataType.DATETIME, 'microsecond')
+	@attribute(ast.DataType.DATETIME, 'microsecond', result_type=ast.DataType.FLOAT)
 	def datetime_microsecond(self, value):
 		return value.microsecond
 
-	@attribute(ast.DataType.DATETIME, 'millisecond')
+	@attribute(ast.DataType.DATETIME, 'millisecond', result_type=ast.DataType.FLOAT)
 	def datetime_millisecond(self, value):
 		return value.microsecond / 1000
 
-	@attribute(ast.DataType.DATETIME, 'minute')
+	@attribute(ast.DataType.DATETIME, 'minute', result_type=ast.DataType.FLOAT)
 	def datetime_minute(self, value):
 		return value.minute
 
-	@attribute(ast.DataType.DATETIME, 'month')
+	@attribute(ast.DataType.DATETIME, 'month', result_type=ast.DataType.FLOAT)
 	def datetime_month(self, value):
 		return value.month
 
-	@attribute(ast.DataType.DATETIME, 'second')
+	@attribute(ast.DataType.DATETIME, 'second', result_type=ast.DataType.FLOAT)
 	def datetime_second(self, value):
 		return value.second
 
-	@attribute(ast.DataType.DATETIME, 'weekday')
+	@attribute(ast.DataType.DATETIME, 'weekday', result_type=ast.DataType.STRING)
 	def datetime_weekday(self, value):
 		# use strftime %A so the value is localized
 		return value.strftime('%A')
 
-	@attribute(ast.DataType.DATETIME, 'year')
+	@attribute(ast.DataType.DATETIME, 'year', result_type=ast.DataType.FLOAT)
 	def datetime_year(self, value):
 		return value.year
 
-	@attribute(ast.DataType.DATETIME, 'zone_name')
+	@attribute(ast.DataType.DATETIME, 'zone_name', result_type=ast.DataType.STRING)
 	def datetime_zone_name(self, value):
 		return value.tzname()
 
-	@attribute(ast.DataType.STRING, 'length')
+	@attribute(ast.DataType.STRING, 'length', result_type=ast.DataType.FLOAT)
 	def string_length(self, value):
 		return len(value)
 

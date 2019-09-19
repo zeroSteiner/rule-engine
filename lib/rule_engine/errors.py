@@ -144,6 +144,32 @@ class AttributeResolutionError(EvaluationError):
 		"""The root-object that was used to resolve *object*."""
 		super(AttributeResolutionError, self).__init__("unknown attribute: {0!r}".format(attribute_name))
 
+class AttributeTypeError(EvaluationError):
+	"""
+	An error raised when an attribute with type information is resolved to a
+	Python value that is not of that type.
+	"""
+	def __init__(self, attribute_name, object_, is_value, is_type, expected_type):
+		"""
+		:param str attribute_name: The name of the symbol that can not be resolved.
+		:param object_: The value that *attribute_name* was used as an attribute for.
+		:param is_value: The native Python value of the incompatible attribute.
+		:param is_type: The :py:class:`rule-engine type<rule_engine.ast.DataType>` of the incompatible attribute.
+		:param expected_type: The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this attribute.
+		"""
+		self.attribute_name = attribute_name
+		"""The name of the attribute that is of an incompatible type."""
+		self.object = object_
+		"""The object on which the attribute was resolved."""
+		self.is_value = is_value
+		"""The native Python value of the incompatible attribute."""
+		self.is_type = is_type
+		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` of the incompatible attribute."""
+		self.expected_type = expected_type
+		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this attribute."""
+		message = "attribute {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(attribute_name, is_type.name, expected_type.name)
+		super(AttributeTypeError, self).__init__(message)
+
 class SymbolResolutionError(EvaluationError):
 	"""
 	An error raised when a symbol name is not able to be resolved to a value.

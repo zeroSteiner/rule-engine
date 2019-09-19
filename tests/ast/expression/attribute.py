@@ -42,12 +42,30 @@ import dateutil.tz
 
 __all__ = ('GetAttributeExpressionTests',)
 
+class BadAttributeResolver(engine._AttributeResolver):
+	@engine._AttributeResolver.attribute(ast.DataType.STRING, 'undefined')
+	@engine._AttributeResolver.attribute(ast.DataType.STRING, 'unsupported', result_type=ast.DataType.BOOLEAN)
+	def string_attribute(self, value):
+		return None
+
 class GetAttributeExpressionTests(unittest.TestCase):
 	def test_ast_expression_attribute_exception(self):
 		symbol = ast.SymbolExpression(context, 'foo')
 		expression = ast.GetAttributeExpression(context, symbol, 'bar')
 		with self.assertRaises(errors.AttributeResolutionError):
+			expression.evaluate({'foo': 1})
+		with self.assertRaises(errors.AttributeResolutionError):
 			expression.evaluate({'foo': 'baz'})
+
+	def test_ast_expression_atrribute_type_exception(self):
+		symbol = ast.StringExpression(context, 'foo')
+
+		expression = ast.GetAttributeExpression(context, symbol, 'undefined')
+		self.assertIsNone(expression.evaluate(None))
+
+		expression = ast.GetAttributeExpression(context, symbol, 'unsupported')
+		with self.assertRaises(errors.AttributeTypeError):
+			expression.evaluate(None)
 
 	def test_ast_expression_datetime_attributes(self):
 		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)

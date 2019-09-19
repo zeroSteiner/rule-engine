@@ -184,6 +184,11 @@ class EngineRuleTests(unittest.TestCase):
 		rule = engine.Rule('"string"')
 		self.assertEqual(rule.evaluate(None), 'string')
 
+	def test_engine_rule_evaluate_attributes(self):
+		# ensure that multiple levels can be evaluated as attributes
+		rule = engine.Rule('a.b.c')
+		self.assertTrue(rule.evaluate({'a': {'b': {'c': True}}}))
+
 	def test_engine_rule_debug_parser(self):
 		with open(os.devnull, 'w') as file_h:
 			original_stderr = sys.stderr

@@ -15,6 +15,7 @@ Version 2.0.0
 * Removed the :py:func:`~rule_engine.engine.to_recursive_resolver` function
 * Added automatic unit testing using Travis-CI
 * Added additional information to the Graphviz output
+* Added the new :py:class:`~rule_engine.ast.DataType.ARRAY` data type
 
 Version 1.x.x
 -------------

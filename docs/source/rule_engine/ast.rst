@@ -10,20 +10,23 @@ from parsed grammar text.
 Functions
 ---------
 
-.. autofunction:: rule_engine.ast.coerce_value
+.. autofunction:: coerce_value
 
-.. autofunction:: rule_engine.ast.is_natural_number
+.. autofunction:: is_natural_number
 
-.. autofunction:: rule_engine.ast.is_numeric
+.. autofunction:: is_numeric
 
-.. autofunction:: rule_engine.ast.is_real_number
+.. autofunction:: is_real_number
 
 Classes
 -------
 
-.. autoclass:: rule_engine.ast.DataType
+.. autoclass:: DataType
    :members:
    :show-inheritance:
+
+   .. autoattribute:: ARRAY
+      :annotation:
 
    .. autoattribute:: BOOLEAN
       :annotation:
@@ -46,13 +49,13 @@ Classes
 
    .. automethod:: from_value
 
-.. autoclass:: rule_engine.ast.Statement
+.. autoclass:: Statement
    :show-inheritance:
 
 Base Classes
 ~~~~~~~~~~~~
 
-.. autoclass:: rule_engine.ast.ExpressionBase
+.. autoclass:: ExpressionBase
    :members:
    :show-inheritance:
    :special-members: __init__
@@ -60,7 +63,7 @@ Base Classes
    .. autoattribute:: result_type
       :annotation: = UNDEFINED
 
-.. autoclass:: rule_engine.ast.LeftOperatorRightExpressionBase
+.. autoclass:: LeftOperatorRightExpressionBase
    :show-inheritance:
 
    .. autoattribute:: compatible_types
@@ -68,7 +71,7 @@ Base Classes
 
    .. automethod:: __init__
 
-.. autoclass:: rule_engine.ast.LiteralExpressionBase
+.. autoclass:: LiteralExpressionBase
    :show-inheritance:
 
    .. automethod:: __init__
@@ -76,37 +79,37 @@ Base Classes
 Left-Operator-Right Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: rule_engine.ast.ArithmeticExpression
+.. autoclass:: ArithmeticExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = FLOAT
 
-.. autoclass:: rule_engine.ast.ArithmeticComparisonExpression
+.. autoclass:: ArithmeticComparisonExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = BOOLEAN
 
-.. autoclass:: rule_engine.ast.BitwiseExpression
+.. autoclass:: BitwiseExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = FLOAT
 
-.. autoclass:: rule_engine.ast.ComparisonExpression
+.. autoclass:: ComparisonExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = BOOLEAN
 
-.. autoclass:: rule_engine.ast.LogicExpression
+.. autoclass:: LogicExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = BOOLEAN
 
-.. autoclass:: rule_engine.ast.FuzzyComparisonExpression
+.. autoclass:: FuzzyComparisonExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
@@ -115,25 +118,25 @@ Left-Operator-Right Expressions
 Literal Expressions
 ~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: rule_engine.ast.BooleanExpression
+.. autoclass:: BooleanExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = BOOLEAN
 
-.. autoclass:: rule_engine.ast.FloatExpression
+.. autoclass:: FloatExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = FLOAT
 
-.. autoclass:: rule_engine.ast.NullExpression
+.. autoclass:: NullExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = NULL
 
-.. autoclass:: rule_engine.ast.StringExpression
+.. autoclass:: StringExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
@@ -142,19 +145,25 @@ Literal Expressions
 Miscellaneous Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: rule_engine.ast.SymbolExpression
+.. autoclass:: GetAttributeExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = UNDEFINED
 
-.. autoclass:: rule_engine.ast.TernaryExpression
+.. autoclass:: SymbolExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = UNDEFINED
 
-.. autoclass:: rule_engine.ast.UnaryExpression
+.. autoclass:: TernaryExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = UNDEFINED
+
+.. autoclass:: UnaryExpression
    :show-inheritance:
 
    .. autoattribute:: result_type

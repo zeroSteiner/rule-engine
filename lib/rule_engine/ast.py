@@ -265,6 +265,17 @@ class LiteralExpressionBase(ExpressionBase):
 
 	@classmethod
 	def from_value(cls, context, value):
+		"""
+		Create a Literal Expression instance to represent the specified *value*.
+
+		.. versionadded:: 2.0.0
+
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
+		:param value: The value to represent as a Literal Expression.
+		:return: A subclass of :py:class:`~.LiteralExpressionBase`
+			specific to the type of *value*.
+		"""
 		datatype = DataType.from_value(value)
 		for subclass in cls.__subclasses__():
 			if subclass.result_type == datatype:
@@ -538,6 +549,12 @@ class FuzzyComparisonExpression(ComparisonExpression):
 class GetAttributeExpression(ExpressionBase):
 	__slots__ = ('name', 'object')
 	def __init__(self, context, object_, name):
+		"""
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
+		:param object_: The parent object from which to retrieve the attribute.
+		:param str name: The name of the attribute to retrieve.
+		"""
 		self.context = context
 		self.object = object_
 		if self.object.result_type is not DataType.UNDEFINED:

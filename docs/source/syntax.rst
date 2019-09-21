@@ -10,6 +10,9 @@ on which the rule is being applied.
 +-------------------------------+-------------------------------+
 | Rule Engine Data Type         | Compatible Python Types       |
 +-------------------------------+-------------------------------+
+| :py:attr:`~DataType.ARRAY`    | :py:class:`list`,             |
+|                               | :py:class:`tuple`             |
++-------------------------------+-------------------------------+
 | :py:attr:`~DataType.BOOLEAN`  | :py:class:`bool`              |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.DATETIME` | :py:class:`datetime.date`,    |

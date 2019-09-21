@@ -533,6 +533,8 @@ class GetAttributeExpression(ExpressionBase):
 	def __init__(self, context, object_, name):
 		self.context = context
 		self.object = object_
+		if self.object.result_type is not DataType.UNDEFINED:
+			self.result_type = context.resolve_attribute_type(self.object.result_type, name)
 		self.name = name
 
 	def __repr__(self):

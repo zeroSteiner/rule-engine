@@ -143,18 +143,18 @@ _AttributeResolverFunction = collections.namedtuple('_AttributeResolverFunction'
 class _AttributeResolver(object):
 	class attribute(object):
 		__slots__ = ('type', 'name', 'result_type')
-		data_type_map = collections.defaultdict(dict)
+		type_map = collections.defaultdict(dict)
 		def __init__(self, data_type, name, result_type=ast.DataType.UNDEFINED):
 			self.type = data_type
 			self.name = name
 			self.result_type = result_type
 
 		def __call__(self, function):
-			self.data_type_map[self.type][self.name] = _AttributeResolverFunction(function, self.result_type)
+			self.type_map[self.type][self.name] = _AttributeResolverFunction(function, self.result_type)
 			return function
 
 	def __call__(self, thing, object_, name):
-		resolver = self._get_resolver(object_, name, thing=thing)
+		resolver = self._get_resolver(ast.DataType.from_value(object_), name, thing=thing)
 		value = resolver.function(self, object_)
 		value = ast.coerce_value(value)
 		if resolver.result_type is ast.DataType.UNDEFINED:
@@ -164,15 +164,17 @@ class _AttributeResolver(object):
 			return value
 		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=resolver.result_type)
 
-	def _get_resolver(self, object_, name, thing=errors.UNDEFINED):
-		data_type = ast.DataType.from_value(object_)
-		attribute_resolvers = self.attribute.data_type_map.get(data_type)
+	def _get_resolver(self, object_type, name, thing=errors.UNDEFINED):
+		attribute_resolvers = self.attribute.type_map.get(object_type)
 		if attribute_resolvers is None:
-			raise errors.AttributeResolutionError(name, object_, thing)
+			raise errors.AttributeResolutionError(name, object_type, thing)
 		resolver = attribute_resolvers.get(name)
 		if resolver is None:
-			raise errors.AttributeResolutionError(name, object_, thing)
+			raise errors.AttributeResolutionError(name, object_type, thing)
 		return resolver
+
+	def resolve_type(self, object_type, name):
+		return self._get_resolver(object_type, name).result_type
 
 	@attribute(ast.DataType.DATETIME, 'date', result_type=ast.DataType.DATETIME)
 	def datetime_date(self, value):
@@ -336,6 +338,7 @@ class Context(object):
 		raise errors.SymbolResolutionError(name, symbol_scope=scope)
 
 	resolve_attribute = _AttributeResolver()
+	resolve_attribute_type = resolve_attribute.resolve_type
 
 	def resolve_type(self, name):
 		"""

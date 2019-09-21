@@ -142,15 +142,16 @@ def type_resolver_from_dict(dictionary):
 _AttributeResolverFunction = collections.namedtuple('_AttributeResolverFunction', ('function', 'result_type'))
 class _AttributeResolver(object):
 	class attribute(object):
-		__slots__ = ('type', 'name', 'result_type')
+		__slots__ = ('types', 'name', 'result_type')
 		type_map = collections.defaultdict(dict)
-		def __init__(self, data_type, name, result_type=ast.DataType.UNDEFINED):
-			self.type = data_type
+		def __init__(self, name, *data_types, result_type=ast.DataType.UNDEFINED):
+			self.types = data_types
 			self.name = name
 			self.result_type = result_type
 
 		def __call__(self, function):
-			self.type_map[self.type][self.name] = _AttributeResolverFunction(function, self.result_type)
+			for type_ in self.types:
+				self.type_map[type_][self.name] = _AttributeResolverFunction(function, self.result_type)
 			return function
 
 	def __call__(self, thing, object_, name):
@@ -176,57 +177,57 @@ class _AttributeResolver(object):
 	def resolve_type(self, object_type, name):
 		return self._get_resolver(object_type, name).result_type
 
-	@attribute(ast.DataType.ARRAY, 'length', result_type=ast.DataType.FLOAT)
-	def array_length(self, value):
-		return len(value)
-
-	@attribute(ast.DataType.DATETIME, 'date', result_type=ast.DataType.DATETIME)
+	@attribute('date', ast.DataType.DATETIME, result_type=ast.DataType.DATETIME)
 	def datetime_date(self, value):
 		return value.replace(hour=0, minute=0, second=0, microsecond=0)
 
-	@attribute(ast.DataType.DATETIME, 'day', result_type=ast.DataType.FLOAT)
+	@attribute('day', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_day(self, value):
 		return value.day
 
-	@attribute(ast.DataType.DATETIME, 'hour', result_type=ast.DataType.FLOAT)
+	@attribute('hour', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_hour(self, value):
 		return value.hour
 
-	@attribute(ast.DataType.DATETIME, 'microsecond', result_type=ast.DataType.FLOAT)
+	@attribute('microsecond', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_microsecond(self, value):
 		return value.microsecond
 
-	@attribute(ast.DataType.DATETIME, 'millisecond', result_type=ast.DataType.FLOAT)
+	@attribute('millisecond', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_millisecond(self, value):
 		return value.microsecond / 1000
 
-	@attribute(ast.DataType.DATETIME, 'minute', result_type=ast.DataType.FLOAT)
+	@attribute('minute', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_minute(self, value):
 		return value.minute
 
-	@attribute(ast.DataType.DATETIME, 'month', result_type=ast.DataType.FLOAT)
+	@attribute('month', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_month(self, value):
 		return value.month
 
-	@attribute(ast.DataType.DATETIME, 'second', result_type=ast.DataType.FLOAT)
+	@attribute('second', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_second(self, value):
 		return value.second
 
-	@attribute(ast.DataType.DATETIME, 'weekday', result_type=ast.DataType.STRING)
+	@attribute('weekday', ast.DataType.DATETIME, result_type=ast.DataType.STRING)
 	def datetime_weekday(self, value):
 		# use strftime %A so the value is localized
 		return value.strftime('%A')
 
-	@attribute(ast.DataType.DATETIME, 'year', result_type=ast.DataType.FLOAT)
+	@attribute('year', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_year(self, value):
 		return value.year
 
-	@attribute(ast.DataType.DATETIME, 'zone_name', result_type=ast.DataType.STRING)
+	@attribute('zone_name', ast.DataType.DATETIME, result_type=ast.DataType.STRING)
 	def datetime_zone_name(self, value):
 		return value.tzname()
 
-	@attribute(ast.DataType.STRING, 'length', result_type=ast.DataType.FLOAT)
-	def string_length(self, value):
+	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.STRING, result_type=ast.DataType.BOOLEAN)
+	def value_is_empty(self, value):
+		return len(value) == 0
+
+	@attribute('length', ast.DataType.ARRAY, ast.DataType.STRING, result_type=ast.DataType.FLOAT)
+	def value_length(self, value):
 		return len(value)
 
 class Builtins(collections.abc.Mapping):

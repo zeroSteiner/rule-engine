@@ -55,6 +55,8 @@ class DataTypeTests(unittest.TestCase):
 			ast.DataType.from_name('FOOBAR')
 
 	def test_data_type_from_type(self):
+		self.assertIs(ast.DataType.from_type(list), ast.DataType.ARRAY)
+		self.assertIs(ast.DataType.from_type(tuple), ast.DataType.ARRAY)
 		self.assertIs(ast.DataType.from_type(bool), ast.DataType.BOOLEAN)
 		self.assertIs(ast.DataType.from_type(datetime.date), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_type(datetime.datetime), ast.DataType.DATETIME)
@@ -70,6 +72,8 @@ class DataTypeTests(unittest.TestCase):
 			ast.DataType.from_type(self._UnsupportedType)
 
 	def test_data_type_from_value(self):
+		self.assertIs(ast.DataType.from_value([]), ast.DataType.ARRAY)
+		self.assertIs(ast.DataType.from_value(()), ast.DataType.ARRAY)
 		self.assertIs(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
 		self.assertIs(ast.DataType.from_value(datetime.date.today()), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_value(datetime.datetime.now()), ast.DataType.DATETIME)

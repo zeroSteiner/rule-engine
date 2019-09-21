@@ -185,6 +185,7 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual('d"2016-10-15 12:30"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, 12, 30, tzinfo=dateutil.tz.tzlocal()))
 
 	def test_parse_datetime_attributes(self):
+		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".date', datetime.datetime(2019, 9, 11, tzinfo=dateutil.tz.UTC))
 		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".day', 11)
 		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".hour', 20)
 		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".microsecond', 506406)
@@ -255,6 +256,7 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual('s"Alice"', ast.StringExpression, 'Alice')
 
 	def test_parse_string_attributes(self):
+		self.assertLiteralAttributeStatementEqual('s"".is_empty', True)
 		self.assertLiteralAttributeStatementEqual('s"Alice".length', 5)
 
 	def test_parse_string_escapes(self):

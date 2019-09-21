@@ -57,7 +57,9 @@ def coerce_value(value):
 	:return: The converted value
 	"""
 	# convert the value from one of the supported types if necessary
-	if isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
+	if isinstance(value, list):
+		value = tuple(value)
+	elif isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
 		value = datetime.datetime(value.year, value.month, value.day)
 	elif isinstance(value, int) and not isinstance(value, bool):
 		value = float(value)
@@ -128,6 +130,7 @@ class DataType(enum.Enum):
 	"""
 	A collection of constants representing the different supported data types.
 	"""
+	ARRAY = _DataTypeDef(tuple)
 	BOOLEAN = _DataTypeDef(bool)
 	DATETIME = _DataTypeDef(datetime.datetime)
 	FLOAT = _DataTypeDef(float)
@@ -169,7 +172,9 @@ class DataType(enum.Enum):
 		"""
 		if not isinstance(python_type, type):
 			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
-		if python_type is bool:
+		if python_type is list or python_type is tuple:
+			return cls.ARRAY
+		elif python_type is bool:
 			return cls.BOOLEAN
 		elif python_type is datetime.date or python_type is datetime.datetime:
 			return cls.DATETIME
@@ -193,7 +198,9 @@ class DataType(enum.Enum):
 			corresponding data type constant for.
 		:return: One of the constants.
 		"""
-		if isinstance(python_value, bool):
+		if isinstance(python_value, (list, tuple)):
+			return cls.ARRAY
+		elif isinstance(python_value, bool):
 			return cls.BOOLEAN
 		elif isinstance(python_value, (datetime.date, datetime.datetime)):
 			return cls.DATETIME

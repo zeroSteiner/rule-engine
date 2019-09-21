@@ -105,7 +105,7 @@ class EngineTests(unittest.TestCase):
 		builtins = engine.Builtins.from_defaults()
 		self.assertIsInstance(builtins, engine.Builtins)
 		self.assertIsNone(builtins.namespace)
-		self.assertRegex(repr(builtins), r'<Builtins namespace=None keys=\(\'\S+\'(, \'\S+\')*\) >')
+		self.assertRegex(repr(builtins), r'<Builtins namespace=None keys=\(\'\S+\'(, \'\S+\')*\)')
 
 		self.assertIn('d', builtins)
 		d_builtins = builtins['d']

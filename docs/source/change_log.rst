@@ -13,6 +13,8 @@ Version 2.0.0
 * Added proper support for attributes
 * Added a change log
 * Removed the :py:func:`~rule_engine.engine.to_recursive_resolver` function
+* Added automatic unit testing using Travis-CI
+* Added additional information to the Graphviz output
 
 Version 1.x.x
 -------------

@@ -43,11 +43,11 @@ from . import parser
 
 import dateutil.tz
 
-def _now():
-	return datetime.datetime.now(tz=dateutil.tz.UTC)
+def _now(builtins):
+	return datetime.datetime.now(tz=builtins.timezone)
 
-def _today():
-	return _now().replace(hour=0, minute=0, second=0, microsecond=0)
+def _today(builtins):
+	return _now(builtins).replace(hour=0, minute=0, second=0, microsecond=0)
 
 def resolve_attribute(thing, name):
 	"""
@@ -174,6 +174,10 @@ class _AttributeResolver(object):
 			raise errors.AttributeResolutionError(name, object_, thing)
 		return resolver
 
+	@attribute(ast.DataType.DATETIME, 'date', result_type=ast.DataType.DATETIME)
+	def datetime_date(self, value):
+		return value.replace(hour=0, minute=0, second=0, microsecond=0)
+
 	@attribute(ast.DataType.DATETIME, 'day', result_type=ast.DataType.FLOAT)
 	def datetime_day(self, value):
 		return value.day
@@ -220,12 +224,13 @@ class _AttributeResolver(object):
 		return len(value)
 
 class Builtins(collections.abc.Mapping):
-	def __init__(self, values, namespace=None):
+	def __init__(self, values, namespace=None, timezone=None):
 		self.__values = values
 		self.namespace = namespace
+		self.timezone = timezone or dateutil.tz.tzlocal()
 
 	def __repr__(self):
-		return "<{} namespace={!r} keys={!r} >".format(self.__class__.__name__, self.namespace, tuple(self.keys()))
+		return "<{} namespace={!r} keys={!r} timezone={!r} >".format(self.__class__.__name__, self.namespace, tuple(self.keys()), self.timezone)
 
 	def __getitem__(self, name):
 		value = self.__values[name]
@@ -234,9 +239,9 @@ class Builtins(collections.abc.Mapping):
 				namespace = name
 			else:
 				namespace = self.namespace + '.' + name
-			return self.__class__(value, namespace=namespace)
+			return self.__class__(value, namespace=namespace, timezone=self.timezone)
 		elif inspect.isfunction(value):
-			value = value()
+			value = value(self)
 		return value
 
 	def __iter__(self):
@@ -246,7 +251,7 @@ class Builtins(collections.abc.Mapping):
 		return len(self.__values)
 
 	@classmethod
-	def from_defaults(cls):
+	def from_defaults(cls, **kwargs):
 		instance = cls({
 			'f': {
 				'e': math.e,
@@ -256,7 +261,7 @@ class Builtins(collections.abc.Mapping):
 				'now': _now,
 				'today': _today
 			}
-		})
+		}, **kwargs)
 		return instance
 
 class Context(object):
@@ -304,6 +309,7 @@ class Context(object):
 		elif not isinstance(default_timezone, datetime.tzinfo):
 			raise TypeError('invalid default_timezone type')
 		self.default_timezone = default_timezone
+		self.builtins = Builtins.from_defaults(timezone=default_timezone)
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
 
@@ -329,7 +335,6 @@ class Context(object):
 			return self.__resolver(thing, name)
 		raise errors.SymbolResolutionError(name, symbol_scope=scope)
 
-	builtins = Builtins.from_defaults()
 	resolve_attribute = _AttributeResolver()
 
 	def resolve_type(self, name):

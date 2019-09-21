@@ -51,7 +51,7 @@ def coerce_value(value):
 	is useful for converting native Python values at the engine boundaries such
 	as when resolving a symbol from an object external to the engine.
 
-	.. versionadded:: 1.2.0
+	.. versionadded:: 2.0.0
 
 	:param value: The value to convert.
 	:return: The converted value
@@ -143,7 +143,7 @@ class DataType(enum.Enum):
 		"""
 		Get the data type from its name.
 
-		.. versionadded:: 1.2.0
+		.. versionadded:: 2.0.0
 
 		:param str name: The name of the data type to retrieve.
 		:return: One of the constants.

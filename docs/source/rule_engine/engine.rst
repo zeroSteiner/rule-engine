@@ -15,8 +15,6 @@ Functions
 
 .. autofunction:: to_default_resolver
 
-.. autofunction:: to_recursive_resolver
-
 .. autofunction:: type_resolver_from_dict
 
 Classes

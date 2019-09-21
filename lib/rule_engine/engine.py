@@ -116,33 +116,6 @@ def to_default_resolver(resolver, default_value=None):
 			return default_value
 	return default_resolver
 
-def to_recursive_resolver(resolver):
-	"""
-	Convert the specified *resolver* function (such as
-	:py:func:`~.resolve_attribute` or :py:func:`~.resolve_item`) into one which
-	splits the symbol name on dots and recursively resolves each one on the
-	specified thing parameter.
-
-	.. versionadded:: 1.1.0
-
-	:param resolver: The resolver function to convert.
-	:type resolver: function
-	:return: A new resolver function.
-	:rtype: function
-	"""
-	split_on = '.'
-	@functools.wraps(resolver)
-	def recursive_resolver(thing, name):
-		parts = name.split(split_on)
-		for idx, part in enumerate(parts):
-			try:
-				thing = resolver(thing, part)
-			except errors.SymbolResolutionError as error:
-				symbol_name = split_on.join(parts[:idx + 1])
-				raise errors.SymbolResolutionError(symbol_name, symbol_scope=error.symbol_scope, thing=thing) from None
-		return thing
-	return recursive_resolver
-
 def _type_resolver(type_map, name):
 	if name not in type_map:
 		raise errors.SymbolResolutionError(name)

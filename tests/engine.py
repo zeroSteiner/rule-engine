@@ -72,15 +72,6 @@ class EngineTests(unittest.TestCase):
 		with self.assertRaises(errors.SymbolResolutionError):
 			engine.resolve_attribute(thing, 'email')
 
-	def test_engine_resolve_attribute_recursively(self):
-		thing = collections.namedtuple('People', ('person',))(
-			collections.namedtuple('Person', ('name',))(name='alice')
-		)
-		resolver = engine.to_recursive_resolver(engine.resolve_attribute)
-		self.assertEqual(resolver(thing, 'person.name'), thing.person.name)
-		with self.assertRaises(errors.SymbolResolutionError):
-			resolver(thing, 'person.email')
-
 	def test_engine_resolve_attribute_with_defaults(self):
 		thing = collections.namedtuple('Person', ('name',))(name='alice')
 		resolver = engine.to_default_resolver(engine.resolve_attribute)
@@ -92,13 +83,6 @@ class EngineTests(unittest.TestCase):
 		self.assertEqual(engine.resolve_item(thing, 'name'), thing['name'])
 		with self.assertRaises(errors.SymbolResolutionError):
 			engine.resolve_item(thing, 'email')
-
-	def test_engine_resolve_item_recursively(self):
-		thing = {'person': {'name': 'Alice'}}
-		resolver = engine.to_recursive_resolver(engine.resolve_item)
-		self.assertEqual(resolver(thing, 'person.name'), thing['person']['name'])
-		with self.assertRaises(errors.SymbolResolutionError):
-			resolver(thing, 'person.email')
 
 	def test_engine_resolve_item_with_defaults(self):
 		thing = {'name': 'Alice'}

@@ -41,7 +41,7 @@ UNDEFINED = _UNDEFINED()
 A sentinel value to specify that something is undefined. When evaluated, the
 value is falsy.
 
-.. versionadded:: 1.2.0
+.. versionadded:: 2.0.0
 """
 
 class EngineError(Exception):
@@ -128,7 +128,7 @@ class AttributeResolutionError(EvaluationError):
 	"""
 	An error raised with an attribute can not be resolved to a value.
 
-	..versionadded:: 1.2.0
+	..versionadded:: 2.0.0
 	"""
 	def __init__(self, attribute_name, object_, thing=UNDEFINED):
 		"""
@@ -180,7 +180,7 @@ class SymbolResolutionError(EvaluationError):
 		:param str symbol_scope: The scope of where the symbol should be valid for resolution.
 		:param thing: The root-object that was used to resolve the symbol.
 
-		.. versionchanged:: 1.2.0
+		.. versionchanged:: 2.0.0
 			Added the *thing* parameter.
 		"""
 		self.symbol_name = symbol_name

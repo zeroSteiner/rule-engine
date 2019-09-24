@@ -60,6 +60,7 @@ See the `examples`_ folder for more.
    :caption: Contents:
 
    syntax.rst
+   builtins.rst
    rule_engine/index.rst
    change_log.rst
 

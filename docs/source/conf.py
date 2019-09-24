@@ -19,7 +19,7 @@ import rule_engine
 # -- Project information -----------------------------------------------------
 
 project = 'Rule Engine'
-copyright = '2018, Spencer McIntyre'
+copyright = '2019, Spencer McIntyre'
 author = 'Spencer McIntyre'
 
 # The short X.Y version
@@ -167,6 +167,9 @@ intersphinx_mapping = {
     'dateutil': ('https://dateutil.readthedocs.io/en/stable/', None),
     'python': ('https://docs.python.org/3.7', None)
 }
+
+def setup(app):
+    app.add_stylesheet('theme_overrides.css')
 
 def linkcode_resolve(domain, info):
     if domain != 'py':

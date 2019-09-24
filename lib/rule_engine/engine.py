@@ -267,7 +267,7 @@ class Builtins(collections.abc.Mapping):
 		return len(self.__values)
 
 	@classmethod
-	def from_defaults(cls, values, **kwargs):
+	def from_defaults(cls, values=None, **kwargs):
 		"""Initialize a :py:class:`Builtins` instance with a set of default values."""
 		default_values = {
 			'e': math.e,
@@ -275,7 +275,8 @@ class Builtins(collections.abc.Mapping):
 			'now': _now,
 			'today': _today
 		}
-		default_values.update(values)
+		if values is not None:
+			default_values.update(values)
 		return cls(default_values, **kwargs)
 
 class Context(object):

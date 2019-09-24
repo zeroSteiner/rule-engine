@@ -8,7 +8,7 @@ data types which can be defined as constants or resolved using the Python object
 on which the rule is being applied.
 
 +-------------------------------+-------------------------------+
-| Rule Engine Type              | Compatible Python Types       |
+| Rule Engine Data Type         | Compatible Python Types       |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.BOOLEAN`  | :py:class:`bool`              |
 +-------------------------------+-------------------------------+

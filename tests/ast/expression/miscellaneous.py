@@ -31,7 +31,6 @@
 #
 
 import datetime
-import math
 import random
 import string
 import unittest
@@ -62,11 +61,11 @@ class SymbolExpressionTests(unittest.TestCase):
 		self.assertEqual(symbol.evaluate({self.sym_name: self.sym_value}), self.sym_value)
 
 	def test_ast_expression_symbol_scope(self):
-		symbol = ast.SymbolExpression(context, 'f', scope='built-in')
-		expression = ast.GetAttributeExpression(context, symbol, 'pi')
+		symbol = ast.SymbolExpression(context, 'test', scope='built-in')
+		expression = ast.GetAttributeExpression(context, symbol, 'one')
 		value = expression.evaluate(None)
 		self.assertIsInstance(value, float)
-		self.assertEqual(value, math.pi)
+		self.assertEqual(value, 1.0)
 
 	def test_ast_expression_symbol_scope_error(self):
 		symbol = ast.SymbolExpression(context, 'fake-name', scope='fake-scope')

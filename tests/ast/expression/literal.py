@@ -39,6 +39,9 @@ import rule_engine.engine as engine
 __all__ = ('LiteralExpressionTests',)
 
 context = engine.Context()
+context.builtins = engine.Builtins.from_defaults(
+	{'test': {'one': 1.0, 'two': 2.0}}
+)
 # literal expressions which should evaluate to false
 falseish = (
 	ast.BooleanExpression(context, False),

@@ -102,18 +102,18 @@ class EngineTests(unittest.TestCase):
 			type_resolver('doesnotexist')
 
 	def test_engine_builtins(self):
-		builtins = engine.Builtins.from_defaults()
+		builtins = engine.Builtins.from_defaults({'test': {'one': 1.0, 'two': 2.0}})
 		self.assertIsInstance(builtins, engine.Builtins)
 		self.assertIsNone(builtins.namespace)
 		self.assertRegex(repr(builtins), r'<Builtins namespace=None keys=\(\'\S+\'(, \'\S+\')*\)')
 
-		self.assertIn('d', builtins)
-		d_builtins = builtins['d']
-		self.assertIsInstance(builtins, engine.Builtins)
-		self.assertEqual(d_builtins.namespace, 'd')
+		self.assertIn('test', builtins)
+		test_builtins = builtins['test']
+		self.assertIsInstance(test_builtins, engine.Builtins)
+		self.assertEqual(test_builtins.namespace, 'test')
 
-		self.assertIn('today', d_builtins)
-		today = d_builtins['today']
+		self.assertIn('today', builtins)
+		today = builtins['today']
 		self.assertIsInstance(today, datetime.date)
 
 class EngineRuleTests(unittest.TestCase):

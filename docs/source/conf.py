@@ -42,14 +42,6 @@ extensions = [
     'sphinx.ext.viewcode',
 ]
 
-extlinks = {
-    'issue':   ("https://github.com/{0}/issues/%s".format(GITHUB_REPO), '#'),
-    'release': ("https://github.com/{0}/releases/tag/v%s".format(GITHUB_REPO), 'v'),
-    'wiki':    ("https://github.com/{0}/wiki/%s".format(GITHUB_REPO), ''),
-}
-
-intersphinx_mapping = {'python': ('https://docs.python.org/3.6', None)}
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -165,7 +157,16 @@ texinfo_documents = [
 
 
 # -- Extension configuration -------------------------------------------------
-intersphinx_mapping = {'python': ('https://docs.python.org/3.6', None)}
+extlinks = {
+    'issue':   ("https://github.com/{0}/issues/%s".format(GITHUB_REPO), '#'),
+    'release': ("https://github.com/{0}/releases/tag/v%s".format(GITHUB_REPO), 'v'),
+    'wiki':    ("https://github.com/{0}/wiki/%s".format(GITHUB_REPO), ''),
+}
+
+intersphinx_mapping = {
+    'dateutil': ('https://dateutil.readthedocs.io/en/stable/', None),
+    'python': ('https://docs.python.org/3.7', None)
+}
 
 def linkcode_resolve(domain, info):
     if domain != 'py':

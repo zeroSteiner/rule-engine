@@ -119,6 +119,7 @@ to use for either the match or search operation.
 
 Reserved Keywords
 ^^^^^^^^^^^^^^^^^
+The following keywords are reserved and can not be used as the names of symbols.
 
 +-----------+----------------------------------------------+
 | Keyword   | Description                                  |
@@ -145,5 +146,24 @@ Reserved Keywords
 +-----------+----------------------------------------------+
 | ``or``    | Logical "or" operator                        |
 +-----------+----------------------------------------------+
+
+Literal Values
+^^^^^^^^^^^^^^
+STRING and DATETIME literal values are specified in a very similar manner by
+defining the value as a string of characters enclosed in either single or double
+quotes. The difference comes in an optional leading character before the opening
+quote. Either no leading character or a single ``s`` will specify a standard
+STRING value, while a single ``d`` will specify a DATETIME value.
+
+DATETIME literals must be specified in ISO-8601 format. The underlying parsing
+logic is provided by :py:meth:`dateutil.parser.isoparse`. DATETIME values with
+no time specified (e.g. ``d"2019-09-23"``) will evaluate to a DATETIME of the
+specified day at exactly midnight.
+
+Example rules showing equivalent literal expressions:
+
+* ``"foobar" == s"foobar"``
+* ``d"2019-09-23" == d"2019-09-23 00:00:00"``
+
 
 .. _Order of operations: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages

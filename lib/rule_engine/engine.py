@@ -226,7 +226,21 @@ class _AttributeResolver(object):
 		return len(value)
 
 class Builtins(collections.abc.Mapping):
+	"""
+	A class to define and provide variables to within the builtin context of
+	rules. These can be accessed by specifying a symbol name with the ``$``
+	prefix."""
 	def __init__(self, values, namespace=None, timezone=None):
+		"""
+		:param dict values: A mapping of string keys to be used as symbol names
+			with values of either Python literals or a function which will be
+			called when the symbol is accessed. When using a function, it will
+			be passed a single argument, which is the instance of
+			:py:class:`Builtins`.
+		:param str namespace: The namespace of the variables to resolve.
+		:param timezone: A timezone to use when resolving timestamps.
+		:type timezone: :py:class:`~datetime.tzinfo`
+		"""
 		self.__values = values
 		self.namespace = namespace
 		self.timezone = timezone or dateutil.tz.tzlocal()
@@ -253,18 +267,16 @@ class Builtins(collections.abc.Mapping):
 		return len(self.__values)
 
 	@classmethod
-	def from_defaults(cls, **kwargs):
-		instance = cls({
-			'f': {
-				'e': math.e,
-				'pi': math.pi
-			},
-			'd': {
-				'now': _now,
-				'today': _today
-			}
-		}, **kwargs)
-		return instance
+	def from_defaults(cls, values, **kwargs):
+		"""Initialize a :py:class:`Builtins` instance with a set of default values."""
+		default_values = {
+			'e': math.e,
+			'pi': math.pi,
+			'now': _now,
+			'today': _today
+		}
+		default_values.update(values)
+		return cls(default_values, **kwargs)
 
 class Context(object):
 	"""
@@ -312,6 +324,7 @@ class Context(object):
 			raise TypeError('invalid default_timezone type')
 		self.default_timezone = default_timezone
 		self.builtins = Builtins.from_defaults(timezone=default_timezone)
+		"""An instance of :py:class:`Builtins` to provided a default set of builtin symbol values."""
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
 

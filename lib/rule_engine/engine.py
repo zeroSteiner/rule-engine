@@ -222,6 +222,14 @@ class _AttributeResolver(object):
 	def datetime_zone_name(self, value):
 		return value.tzname()
 
+	@attribute('as_lower', ast.DataType.STRING, result_type=ast.DataType.STRING)
+	def string_as_lower(self, value):
+		return value.lower()
+
+	@attribute('as_upper', ast.DataType.STRING, result_type=ast.DataType.STRING)
+	def string_as_upper(self, value):
+		return value.upper()
+
 	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.STRING, result_type=ast.DataType.BOOLEAN)
 	def value_is_empty(self, value):
 		return len(value) == 0

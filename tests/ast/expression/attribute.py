@@ -92,6 +92,8 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		symbol = ast.StringExpression(engine.Context(), string)
 
 		attributes = {
+			'as_lower': string.lower(),
+			'as_upper': string.upper(),
 			'length': len(string),
 		}
 		for attribute_name, value in attributes.items():

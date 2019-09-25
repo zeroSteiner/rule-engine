@@ -30,7 +30,6 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import collections
 import datetime
 import enum
 import functools
@@ -125,12 +124,30 @@ def _assert_is_numeric(value):
 	if not is_numeric(value):
 		raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
-_DataTypeDef = collections.namedtuple('_DataTypeDef', ('python_type',))
+class _DataTypeDef(object):
+	__slots__ = ('python_type', 'is_scalar')
+	def __init__(self, python_type, is_scalar=True):
+		self.python_type = python_type
+		self.is_scalar = is_scalar
+
+	def __eq__(self, other):
+		return hash(other) == hash(self)
+
+	def __hash__(self):
+		return hash((self.python_type, self.is_scalar))
+
+	def __repr__(self):
+		return "<{} python_type={} >".format(self.__class__.__name__, self.python_type.__name__)
+
+	@property
+	def is_compound(self):
+		return not self.is_scalar
+
 class DataType(enum.Enum):
 	"""
 	A collection of constants representing the different supported data types.
 	"""
-	ARRAY = _DataTypeDef(tuple)
+	ARRAY = _DataTypeDef(tuple, is_scalar=False)
 	BOOLEAN = _DataTypeDef(bool)
 	DATETIME = _DataTypeDef(datetime.datetime)
 	FLOAT = _DataTypeDef(float)
@@ -546,6 +563,22 @@ class FuzzyComparisonExpression(ComparisonExpression):
 ################################################################################
 # Miscellaneous Expressions
 ################################################################################
+class ArrayExpression(ExpressionBase):
+	__slots__ = ('members',)
+	result_type = DataType.ARRAY
+	def __init__(self, context, members):
+		self.context = context
+		self.members = tuple(members)
+
+	def evaluate(self, thing):
+		return self.members
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(ArrayExpression, self).to_graphviz(digraph, *args, **kwargs)
+		for member in self.members:
+			member.to_graphviz(digraph, *args, **kwargs)
+			digraph.edge(str(id(self)), str(id(member)))
+
 class GetAttributeExpression(ExpressionBase):
 	__slots__ = ('name', 'object')
 	def __init__(self, context, object_, name):

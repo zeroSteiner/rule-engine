@@ -31,6 +31,7 @@
 #
 
 import ast as ast_
+import collections
 import threading
 
 from . import ast
@@ -129,7 +130,8 @@ class Parser(ParserBase):
 	}
 	tokens = (
 		'DATETIME', 'FLOAT', 'STRING', 'SYMBOL',
-		'LPAREN', 'RPAREN', 'QMARK', 'COLON'
+		'LPAREN', 'RPAREN', 'QMARK', 'COLON', 'COMMA',
+		'LBRACKET', 'RBRACKET'
 	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
 
 	t_ignore = ' \t'
@@ -146,6 +148,9 @@ class Parser(ParserBase):
 	t_ADD              = r'\+'
 	t_SUB              = r'\-'
 	t_MOD              = r'\%'
+	t_COMMA            = r'\,'
+	t_LBRACKET         = r'\['
+	t_RBRACKET         = r'\]'
 	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
 	t_ATTR             = r'(?<=\S)\.(?=\S)'
 
@@ -368,9 +373,29 @@ class Parser(ParserBase):
 		p[0] = ast.FloatExpression(self.context, float('inf'))
 
 	def p_expression_null(self, p):
-		"""expression : NULL"""
+		'expression : NULL'
 		p[0] = ast.NullExpression(self.context)
 
 	def p_expression_string(self, p):
 		'object : STRING'
 		p[0] = ast.StringExpression(self.context, literal_eval(p[1]))
+
+	def p_array(self, p):
+		"""
+		object : LBRACKET members RBRACKET
+			   | LBRACKET members COMMA RBRACKET
+		"""
+		p[0] = ast.ArrayExpression(self.context, p[2]).reduce()
+
+	def p_array_members(self, p):
+		"""
+		members : expression
+				| members COMMA expression
+		"""
+		if len(p) == 2:
+			deque = collections.deque()
+			deque.append(p[1])
+		else:
+			deque = p[1]
+			deque.append(p[3])
+		p[0] = deque

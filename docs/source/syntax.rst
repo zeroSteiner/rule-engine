@@ -168,5 +168,17 @@ Example rules showing equivalent literal expressions:
 * ``"foobar" == s"foobar"``
 * ``d"2019-09-23" == d"2019-09-23 00:00:00"``
 
+FLOAT literals may be expressed in either binary, octal, decimal, or hexadecimal
+formats. The binary, octal and hexadecimal formats use the ``0b``, ``0o``, and
+``0x`` prefixes respectively. Values in the decimal format require no prefix and
+is the default base in which values are represented. Only base-10, decimal
+values may include a decimal place component.
+
+Example rules showing equivalent literal expressions:
+
+* ``0b10 == 2``
+* ``0o10 == 8``
+* ``10.0 == 10``
+* ``0x10 == 16``
 
 .. _Order of operations: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages

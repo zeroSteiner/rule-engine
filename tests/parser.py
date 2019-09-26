@@ -178,8 +178,8 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_array(self):
 		self.assertLiteralAttributeStatementEqual('[ ]', tuple())
-		self.assertLiteralAttributeStatementEqual('[1, 2]', tuple(1.0, 2.0))
-		self.assertLiteralAttributeStatementEqual('[1, 2,]', tuple(1.0, 2.0))
+		self.assertLiteralAttributeStatementEqual('[1, 2]', tuple((1.0, 2.0)))
+		self.assertLiteralAttributeStatementEqual('[1, 2,]', tuple((1.0, 2.0)))
 
 	def test_parse_boolean(self):
 		self.assertLiteralStatementEqual('true', ast.BooleanExpression, True)

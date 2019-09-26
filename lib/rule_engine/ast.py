@@ -319,7 +319,10 @@ class LiteralExpressionBase(ExpressionBase):
 		return self.value
 
 	def to_graphviz(self, digraph, *args, **kwargs):
-		digraph.node(str(id(self)), "{}\nvalue={!r}".format(self.__class__.__name__, self.value))
+		if self.result_type.value.is_compound:
+			digraph.node(str(id(self)), self.__class__.__name__)
+		else:
+			digraph.node(str(id(self)), "{}\nvalue={!r}".format(self.__class__.__name__, self.value))
 
 ################################################################################
 # Literal Expressions
@@ -408,8 +411,9 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		:type right: :py:class:`.ExpressionBase`
 		"""
 		self.context = context
+		type_ = type_.lower()
 		self.type = type_
-		self._evaluator = getattr(self, '_op_' + type_.lower(), None)
+		self._evaluator = getattr(self, '_op_' + type_, None)
 		if self._evaluator is None:
 			raise errors.EngineError('unsupported operator: ' + type_)
 		self.left = left
@@ -420,6 +424,9 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		if self.right.result_type is not DataType.UNDEFINED:
 			if self.right.result_type not in self.compatible_types:
 				raise errors.EvaluationError('data type mismatch')
+
+	def __repr__(self):
+		return "<{} type={!r} >".format(self.__class__.__name__, self.type)
 
 	def evaluate(self, thing):
 		return self._evaluator(thing)
@@ -432,7 +439,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		return self.result_expression(self.context, self.evaluate(None))
 
 	def to_graphviz(self, digraph, *args, **kwargs):
-		digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type.lower()))
+		digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type))
 		self.left.to_graphviz(digraph, *args, **kwargs)
 		self.right.to_graphviz(digraph, *args, **kwargs)
 		digraph.edge(str(id(self)), str(id(self.left)), label='left')
@@ -593,6 +600,38 @@ class FuzzyComparisonExpression(ComparisonExpression):
 ################################################################################
 # Miscellaneous Expressions
 ################################################################################
+class ContainsExpression(ExpressionBase):
+	__slots__ = ('member', 'container')
+	def __init__(self, context, member, container):
+		if container.result_type is DataType.STRING:
+			if member.result_type is not DataType.UNDEFINED and member.result_type is not DataType.STRING:
+				raise errors.EvaluationError('data type mismatch')
+		elif container.result_type.value.is_scalar:
+			raise errors.EvaluationError('data type mismatch')
+		self.context = context
+		self.member = member
+		self.container = container
+
+	def evaluate(self, thing):
+		member_value = self.member.evaluate(None)
+		container_value = self.container.evaluate(None)
+		if DataType.from_value(container_value) is DataType.STRING:
+			if DataType.from_value(member_value) is not DataType.STRING:
+				raise errors.EvaluationError('data type mismatch')
+		return bool(member_value in container_value)
+
+	def reduce(self):
+		if _is_reduced(self.member) and _is_reduced(self.container):
+			return BooleanExpression(self.context, self.evaluate(None))
+		return self
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(ContainsExpression, self).to_graphviz(digraph, *args, **kwargs)
+		self.member.to_graphviz(digraph, *args, **kwargs)
+		self.container.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.member)), label='member')
+		digraph.edge(str(id(self)), str(id(self.container)), label='container')
+
 class GetAttributeExpression(ExpressionBase):
 	__slots__ = ('name', 'object')
 	def __init__(self, context, object_, name):

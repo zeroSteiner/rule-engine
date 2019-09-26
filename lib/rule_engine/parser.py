@@ -110,9 +110,10 @@ class Parser(ParserBase):
 		'>':   'GT',    '>=': 'GE',
 		'<':   'LT',    '<=': 'LE',
 		# logical operators
-		'and': 'AND',   'or': 'OR',
+		'and': 'AND',   'or': 'OR',     'not': 'NOT',
 		# other operators
-		'.':   'ATTR'
+		'.':   'ATTR',
+		'in':  'IN',
 	}
 	reserved_words = {
 		# booleans
@@ -125,6 +126,7 @@ class Parser(ParserBase):
 		'null': 'NULL',
 		# operators
 		'and': 'AND',
+		'in': 'IN',
 		'or': 'OR',
 		'not': 'NOT',
 	}
@@ -165,7 +167,7 @@ class Parser(ParserBase):
 		('left',     'BWXOR'),
 		('left',     'BWAND'),
 		('right',    'QMARK', 'COLON'),
-		('nonassoc', 'EQ', 'NE', 'EQ_FZM', 'EQ_FZS', 'NE_FZM', 'NE_FZS', 'GE', 'GT', 'LE', 'LT'),  # Nonassociative operators
+		('nonassoc', 'EQ', 'NE', 'EQ_FZM', 'EQ_FZS', 'NE_FZM', 'NE_FZS', 'GE', 'GT', 'LE', 'LT', 'IN'),  # Nonassociative operators
 		('left',     'ADD', 'SUB'),
 		('left',     'BWLSH', 'BWRSH'),
 		('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
@@ -286,6 +288,11 @@ class Parser(ParserBase):
 		op_name = self.op_names[op]
 		p[0] = ast.BitwiseExpression(self.context, op_name, left, right).reduce()
 
+	def p_expression_contains(self, p):
+		'expression : expression IN    expression'
+		member, _, container = p[1:4]
+		p[0] = ast.ContainsExpression(self.context, member, container).reduce()
+
 	def p_expression_comparison(self, p):
 		"""
 		expression : expression EQ     expression
@@ -380,7 +387,7 @@ class Parser(ParserBase):
 		'object : STRING'
 		p[0] = ast.StringExpression(self.context, literal_eval(p[1]))
 
-	def p_array(self, p):
+	def p_expression_array(self, p):
 		"""
 		object : LBRACKET RBRACKET
 			   | LBRACKET members RBRACKET
@@ -391,7 +398,7 @@ class Parser(ParserBase):
 		else:
 			p[0] = ast.ArrayExpression(self.context, tuple(p[2])).reduce()
 
-	def p_array_members(self, p):
+	def p_expression_array_members(self, p):
 		"""
 		members : expression
 				| members COMMA expression

@@ -124,6 +124,19 @@ def _assert_is_numeric(value):
 	if not is_numeric(value):
 		raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
+def _is_reduced(value):
+	"""
+	Check if the ast expression *value* is a literal expression and if it is a
+	compound datatype, that all of it's members are reduced literals. A value
+	that causes this to evaluate to True for is able to be evaluated without a
+	*thing*.
+	"""
+	if not isinstance(value, LiteralExpressionBase):
+		return False
+	if not value.is_reduced:
+		return False
+	return True
+
 class _DataTypeDef(object):
 	__slots__ = ('python_type', 'is_scalar')
 	def __init__(self, python_type, is_scalar=True):
@@ -266,6 +279,7 @@ class ExpressionBase(ASTNodeBase):
 class LiteralExpressionBase(ExpressionBase):
 	"""A base class for representing literal values from the grammar text."""
 	__slots__ = ('value',)
+	is_reduced = True
 	def __init__(self, context, value):
 		"""
 		:param context: The context to use for evaluating the expression.
@@ -310,6 +324,22 @@ class LiteralExpressionBase(ExpressionBase):
 ################################################################################
 # Literal Expressions
 ################################################################################
+class ArrayExpression(LiteralExpressionBase):
+	"""Literal array expressions containing 0 or more sub-expressions."""
+	result_type = DataType.ARRAY
+	def evaluate(self, thing):
+		return tuple(member.evaluate(thing) for member in self.value)
+
+	@property
+	def is_reduced(self):
+		return all(_is_reduced(member) for member in self.value)
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(ArrayExpression, self).to_graphviz(digraph, *args, **kwargs)
+		for member in self.value:
+			member.to_graphviz(digraph, *args, **kwargs)
+			digraph.edge(str(id(self)), str(id(member)))
+
 class BooleanExpression(LiteralExpressionBase):
 	"""Literal boolean expressions representing True or False."""
 	result_type = DataType.BOOLEAN
@@ -356,7 +386,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A base class for representing complex expressions composed of a left side
 	and a right side, separated by an operator.
 	"""
-	compatible_types = (DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
+	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
 	"""
 	A tuple containing the compatible data types that the left and right
 	expressions must return. This can for example be used to indicate that
@@ -395,9 +425,9 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		return self._evaluator(thing)
 
 	def reduce(self):
-		if not isinstance(self.left, LiteralExpressionBase):
+		if not _is_reduced(self.left):
 			return self
-		if not isinstance(self.right, LiteralExpressionBase):
+		if not _is_reduced(self.right):
 			return self
 		return self.result_expression(self.context, self.evaluate(None))
 
@@ -441,9 +471,9 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	result_type = DataType.FLOAT
 	def __init__(self, *args, **kwargs):
 		super(BitwiseExpression, self).__init__(*args, **kwargs)
-		if isinstance(self.left, LiteralExpressionBase):
+		if _is_reduced(self.left):
 			_assert_is_natural_number(self.left.evaluate(None))
-		if isinstance(self.right, LiteralExpressionBase):
+		if _is_reduced(self.right):
 			_assert_is_natural_number(self.right.evaluate(None))
 
 	def __op_bitwise(self, op, thing):
@@ -563,22 +593,6 @@ class FuzzyComparisonExpression(ComparisonExpression):
 ################################################################################
 # Miscellaneous Expressions
 ################################################################################
-class ArrayExpression(ExpressionBase):
-	__slots__ = ('members',)
-	result_type = DataType.ARRAY
-	def __init__(self, context, members):
-		self.context = context
-		self.members = tuple(members)
-
-	def evaluate(self, thing):
-		return self.members
-
-	def to_graphviz(self, digraph, *args, **kwargs):
-		super(ArrayExpression, self).to_graphviz(digraph, *args, **kwargs)
-		for member in self.members:
-			member.to_graphviz(digraph, *args, **kwargs)
-			digraph.edge(str(id(self)), str(id(member)))
-
 class GetAttributeExpression(ExpressionBase):
 	__slots__ = ('name', 'object')
 	def __init__(self, context, object_, name):
@@ -609,7 +623,7 @@ class GetAttributeExpression(ExpressionBase):
 		return value
 
 	def reduce(self):
-		if not isinstance(self.object, LiteralExpressionBase):
+		if not _is_reduced(self.object):
 			return self
 		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 
@@ -718,7 +732,7 @@ class TernaryExpression(ExpressionBase):
 		return case.evaluate(thing)
 
 	def reduce(self):
-		if isinstance(self.condition, LiteralExpressionBase):
+		if _is_reduced(self.condition):
 			reduced_condition = bool(self.condition.value)
 		else:
 			reduced_condition = self.condition.reduce()
@@ -767,7 +781,7 @@ class UnaryExpression(ExpressionBase):
 
 	def reduce(self):
 		type_ = self.type.lower()
-		if not isinstance(self.right, LiteralExpressionBase):
+		if not _is_reduced(self.right):
 			return self
 		if type_ == 'not':
 			return BooleanExpression(self.context, self.evaluate(None))

@@ -44,6 +44,7 @@ context.builtins = engine.Builtins.from_defaults(
 )
 # literal expressions which should evaluate to false
 falseish = (
+	ast.ArrayExpression(context, tuple()),
 	ast.BooleanExpression(context, False),
 	ast.FloatExpression(context, 0.0),
 	ast.NullExpression(context),
@@ -51,6 +52,7 @@ falseish = (
 )
 # literal expressions which should evaluate to true
 trueish = (
+	ast.ArrayExpression(context, tuple((ast.NullExpression(context),))),
 	ast.BooleanExpression(context, True),
 	ast.DatetimeExpression(context, datetime.datetime.now()),
 	ast.FloatExpression(context, float('-inf')),
@@ -76,6 +78,9 @@ class LiteralExpressionTests(unittest.TestCase):
 		for true_value in true_values:
 			expression = ExpressionClass(self.context, true_value)
 			self.assertTrue(expression.evaluate(None))
+
+	def test_ast_expression_literal_array(self):
+		self.assertLiteralTests(ast.ArrayExpression, tuple(), tuple((ast.NullExpression(context),)))
 
 	def test_ast_expression_literal_boolean(self):
 		self.assertLiteralTests(ast.BooleanExpression, False, True)

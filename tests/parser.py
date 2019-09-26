@@ -176,6 +176,11 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertIsInstance(statement.expression, ast_expression, msg='the statement expression is not the correct literal type')
 		self.assertEqual(statement.expression.value, python_value, msg=msg or "{0!r} does not evaluate to {1!r}".format(string, python_value))
 
+	def test_parse_array(self):
+		self.assertLiteralAttributeStatementEqual('[ ]', tuple())
+		self.assertLiteralAttributeStatementEqual('[1, 2]', tuple(1.0, 2.0))
+		self.assertLiteralAttributeStatementEqual('[1, 2,]', tuple(1.0, 2.0))
+
 	def test_parse_boolean(self):
 		self.assertLiteralStatementEqual('true', ast.BooleanExpression, True)
 		self.assertLiteralStatementEqual('false', ast.BooleanExpression, False)

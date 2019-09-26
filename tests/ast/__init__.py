@@ -157,6 +157,23 @@ class AstTests(unittest.TestCase):
 		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
 		self.assertEqual(statement.evaluate(thing), 3)
 
+	def test_ast_reduces_array_literals(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('[1, 2, 1 + 2]', self.context)
+		self.assertIsInstance(statement.expression, ast.ArrayExpression)
+		self.assertTrue(statement.expression.is_reduced)
+		self.assertEqual(statement.evaluate(None), (1, 2, 3))
+
+		statement = parser_.parse('[foobar]', self.context)
+		self.assertIsInstance(statement.expression, ast.ArrayExpression)
+		self.assertFalse(statement.expression.is_reduced)
+
+	def test_ast_reduces_attributes(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('"foobar".length', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
+		self.assertEqual(statement.evaluate(None), 6)
+
 	def test_ast_reduces_bitwise(self):
 		parser_ = parser.Parser()
 		statement = parser_.parse('1 << 2', self.context)

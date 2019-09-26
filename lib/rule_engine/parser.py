@@ -382,10 +382,14 @@ class Parser(ParserBase):
 
 	def p_array(self, p):
 		"""
-		object : LBRACKET members RBRACKET
+		object : LBRACKET RBRACKET
+			   | LBRACKET members RBRACKET
 			   | LBRACKET members COMMA RBRACKET
 		"""
-		p[0] = ast.ArrayExpression(self.context, p[2]).reduce()
+		if len(p) < 4:
+			p[0] = ast.ArrayExpression(self.context, tuple()).reduce()
+		else:
+			p[0] = ast.ArrayExpression(self.context, tuple(p[2])).reduce()
 
 	def p_array_members(self, p):
 		"""

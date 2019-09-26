@@ -145,6 +145,12 @@ Literal Expressions
 Miscellaneous Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. autoclass:: ContainsExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = BOOLEAN
+
 .. autoclass:: GetAttributeExpression
    :show-inheritance:
 

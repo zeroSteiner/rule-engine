@@ -601,7 +601,11 @@ class FuzzyComparisonExpression(ComparisonExpression):
 # Miscellaneous Expressions
 ################################################################################
 class ContainsExpression(ExpressionBase):
+	"""
+	An expression used to test whether an item exists within a container.
+	"""
 	__slots__ = ('member', 'container')
+	result_type = DataType.BOOLEAN
 	def __init__(self, context, member, container):
 		if container.result_type is DataType.STRING:
 			if member.result_type is not DataType.UNDEFINED and member.result_type is not DataType.STRING:
@@ -633,6 +637,10 @@ class ContainsExpression(ExpressionBase):
 		digraph.edge(str(id(self)), str(id(self.container)), label='container')
 
 class GetAttributeExpression(ExpressionBase):
+	"""
+	A class representing an expression in which *name* is retrieved as an
+	attribute of *object*.
+	"""
 	__slots__ = ('name', 'object')
 	def __init__(self, context, object_, name):
 		"""

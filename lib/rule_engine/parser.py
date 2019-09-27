@@ -289,9 +289,17 @@ class Parser(ParserBase):
 		p[0] = ast.BitwiseExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_contains(self, p):
-		'expression : expression IN    expression'
-		member, _, container = p[1:4]
-		p[0] = ast.ContainsExpression(self.context, member, container).reduce()
+		"""
+		expression : expression IN     expression
+				   | expression NOT IN expression
+		"""
+		if len(p) == 4:
+			member, _, container = p[1:4]
+			p[0] = ast.ContainsExpression(self.context, member, container).reduce()
+		else:
+			member, _, _, container = p[1:5]
+			p[0] = ast.ContainsExpression(self.context, member, container).reduce()
+			p[0] = ast.UnaryExpression(self.context, 'NOT', p[0]).reduce()
 
 	def p_expression_comparison(self, p):
 		"""

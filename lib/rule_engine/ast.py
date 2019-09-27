@@ -807,9 +807,13 @@ class UnaryExpression(ExpressionBase):
 		:type right: :py:class:`~.ExpressionBase`
 		"""
 		self.context = context
+		type_ = type_.lower()
 		self.type = type_
-		self._evaluator = getattr(self, '_op_' + type_.lower())
+		self._evaluator = getattr(self, '_op_' + type_)
 		self.right = right
+
+	def __repr__(self):
+		return "<{} type={!r} >".format(self.__class__.__name__, self.type)
 
 	def evaluate(self, thing):
 		return self._evaluator(thing)

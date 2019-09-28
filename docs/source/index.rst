@@ -61,6 +61,7 @@ See the `examples`_ folder for more.
 
    syntax.rst
    builtins.rst
+   attributes.rst
    rule_engine/index.rst
    change_log.rst
 

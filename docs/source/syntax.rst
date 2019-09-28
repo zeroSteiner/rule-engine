@@ -1,7 +1,7 @@
 .. py:currentmodule:: rule_engine.ast
 
-Syntax
-======
+Rule Syntax
+===========
 The syntax for creating rules is based off of logical expressions evaluating to
 either True (matching) or False (non-matching). Rules support a small set of
 data types which can be defined as constants or resolved using the Python object
@@ -149,6 +149,10 @@ The following keywords are reserved and can not be used as the names of symbols.
 +-----------+----------------------------------------------+
 | ``or``    | Logical "or" operator                        |
 +-----------+----------------------------------------------+
+| **Membership Operators**                                 |
++-----------+----------------------------------------------+
+| ``in``    | Checks member is in the container            |
++-----------+----------------------------------------------+
 
 Literal Values
 ^^^^^^^^^^^^^^
@@ -180,5 +184,14 @@ Example rules showing equivalent literal expressions:
 * ``0o10 == 8``
 * ``10.0 == 10``
 * ``0x10 == 16``
+
+FLOAT literals may also be expressed in scientific notation using the letter
+``e``.
+
+Example rules show equivalent literal expressions:
+
+* ``1E0 == 1``
+* ``1e0 == 1``
+* ``1.0e0 == 1``
 
 .. _Order of operations: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages

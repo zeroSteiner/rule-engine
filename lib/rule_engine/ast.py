@@ -810,6 +810,10 @@ class UnaryExpression(ExpressionBase):
 		type_ = type_.lower()
 		self.type = type_
 		self._evaluator = getattr(self, '_op_' + type_)
+		self.result_type = {
+			'not':    DataType.BOOLEAN,
+			'uminus': DataType.FLOAT
+		}[type_]
 		self.right = right
 
 	def __repr__(self):

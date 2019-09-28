@@ -313,7 +313,9 @@ class LiteralExpressionBase(ExpressionBase):
 				break
 		else:
 			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
-		return subclass(context, value)
+		if datatype.value.is_compound:
+			value = tuple(cls.from_value(context, val) for val in value)
+		return subclass(context, coerce_value(value))
 
 	def evaluate(self, thing):
 		return self.value
@@ -353,7 +355,6 @@ class DatetimeExpression(LiteralExpressionBase):
 	expression type always evaluates to true.
 	"""
 	result_type = DataType.DATETIME
-
 	@classmethod
 	def from_string(cls, context, string):
 		try:

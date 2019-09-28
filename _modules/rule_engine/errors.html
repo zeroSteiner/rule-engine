@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.errors &mdash; Rule Engine 1.1.0 documentation</title>
+  <title>rule_engine.errors &mdash; Rule Engine 2.0.0 documentation</title>
   
 
   
@@ -17,32 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -56,7 +59,7 @@
             
             
               <div class="version">
-                1.1.0
+                2.0.0
               </div>
             
           
@@ -82,8 +85,11 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../builtins.html">Builtin Symbols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../change_log.html">Change Log</a></li>
 </ul>
 
             
@@ -179,6 +185,20 @@
 <span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 
+<span class="k">class</span> <span class="nc">_UNDEFINED</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="n">__nonzero__</span> <span class="o">=</span> <span class="fm">__bool__</span>
+	<span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s1">&#39;UNDEFINED&#39;</span>
+<span class="n">UNDEFINED</span> <span class="o">=</span> <span class="n">_UNDEFINED</span><span class="p">()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A sentinel value to specify that something is undefined. When evaluated, the</span>
+<span class="sd">value is falsy.</span>
+
+<span class="sd">.. versionadded:: 2.0.0</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="EngineError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.EngineError">[docs]</a><span class="k">class</span> <span class="nc">EngineError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	The base exception class from which other exceptions within this package</span>
@@ -189,7 +209,7 @@
 <span class="sd">		:param str message: A text description of what error occurred.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-		<span class="sd">&quot;&quot;&quot;The message describing the error that occurred.&quot;&quot;&quot;</span></div></div>
+		<span class="sd">&quot;&quot;&quot;A text description of what error occurred.&quot;&quot;&quot;</span></div></div>
 
 <div class="viewcode-block" id="EvaluationError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.EvaluationError">[docs]</a><span class="k">class</span> <span class="nc">EvaluationError</span><span class="p">(</span><span class="n">EngineError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -208,6 +228,10 @@
 <span class="sd">	datetime expressions.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="DatetimeSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str message: A text description of what error occurred.</span>
+<span class="sd">		:param str value: The datetime value which contains the syntax error which caused this exception to be raised.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">DatetimeSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -221,6 +245,10 @@
 <span class="sd">	rule text.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="RuleSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RuleSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str message: A text description of what error occurred.</span>
+<span class="sd">		:param token: The PLY token (if available) which is related to the syntax error.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 			<span class="n">position</span> <span class="o">=</span> <span class="s1">&#39;EOF&#39;</span>
 		<span class="k">else</span><span class="p">:</span>
@@ -235,40 +263,101 @@
 <span class="sd">	An error raised for issues regarding the use of improper regular expression</span>
 <span class="sd">	syntax.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="RegexSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
+<div class="viewcode-block" id="RegexSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str message: A text description of what error occurred.</span>
+<span class="sd">		:param error: The :py:exc:`re.error` exception from which this error was triggered.</span>
+<span class="sd">		:type error: :py:exc:`re.error`</span>
+<span class="sd">		:param str value: The regular expression value which contains the syntax error which caused this exception to be raised.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">RegexSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">error</span>
-		<span class="sd">&quot;&quot;&quot;The :py:exc:`re.error` exception from which this error was triggered.&quot;&quot;&quot;</span></div>
-
-	<span class="nd">@property</span>
-	<span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;The :py:exc:`re.error` exception from which this error was triggered.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		The regular expression value which contains the syntax error which</span>
 <span class="sd">		caused this exception to be raised.</span>
+<span class="sd">		&quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="AttributeResolutionError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.AttributeResolutionError">[docs]</a><span class="k">class</span> <span class="nc">AttributeResolutionError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised with an attribute can not be resolved to a value.</span>
+
+<span class="sd">	..versionadded:: 2.0.0</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AttributeResolutionError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">UNDEFINED</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str attribute_name: The name of the symbol that can not be resolved.</span>
+<span class="sd">		:param object_: The value that *attribute_name* was used as an attribute for.</span>
+<span class="sd">		:param thing: The root-object that was used to resolve *object*.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">pattern</span></div>
+		<span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span> <span class="o">=</span> <span class="n">attribute_name</span>
+		<span class="sd">&quot;&quot;&quot;The name of the symbol that can not be resolved.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="n">object_</span>
+		<span class="sd">&quot;&quot;&quot;The value that *attribute_name* was used as an attribute for.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">thing</span> <span class="o">=</span> <span class="n">thing</span>
+		<span class="sd">&quot;&quot;&quot;The root-object that was used to resolve *object*.&quot;&quot;&quot;</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">AttributeResolutionError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;unknown attribute: </span><span class="si">{0!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">))</span></div></div>
+
+<span class="k">class</span> <span class="nc">AttributeTypeError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised when an attribute with type information is resolved to a</span>
+<span class="sd">	Python value that is not of that type.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">is_value</span><span class="p">,</span> <span class="n">is_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str attribute_name: The name of the symbol that can not be resolved.</span>
+<span class="sd">		:param object_type: The value that *attribute_name* was used as an attribute for.</span>
+<span class="sd">		:param is_value: The native Python value of the incompatible attribute.</span>
+<span class="sd">		:param is_type: The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` of the incompatible attribute.</span>
+<span class="sd">		:param expected_type: The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` that was expected for this attribute.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span> <span class="o">=</span> <span class="n">attribute_name</span>
+		<span class="sd">&quot;&quot;&quot;The name of the attribute that is of an incompatible type.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">object_type</span> <span class="o">=</span> <span class="n">object_type</span>
+		<span class="sd">&quot;&quot;&quot;The object on which the attribute was resolved.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">is_value</span> <span class="o">=</span> <span class="n">is_value</span>
+		<span class="sd">&quot;&quot;&quot;The native Python value of the incompatible attribute.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">is_type</span> <span class="o">=</span> <span class="n">is_type</span>
+		<span class="sd">&quot;&quot;&quot;The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` of the incompatible attribute.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">expected_type</span> <span class="o">=</span> <span class="n">expected_type</span>
+		<span class="sd">&quot;&quot;&quot;The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` that was expected for this attribute.&quot;&quot;&quot;</span>
+		<span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;attribute </span><span class="si">{0!r}</span><span class="s2"> resolved to incorrect datatype (is: </span><span class="si">{1}</span><span class="s2">, expected: </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">is_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">AttributeTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SymbolResolutionError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolResolutionError">[docs]</a><span class="k">class</span> <span class="nc">SymbolResolutionError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	An error raised when a symbol name is not able to be resolved to a value.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="SymbolResolutionError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">symbol_scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SymbolResolutionError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">symbol_scope</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">UNDEFINED</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param str symbol_name: The name of the symbol that can not be resolved.</span>
 <span class="sd">		:param str symbol_scope: The scope of where the symbol should be valid for resolution.</span>
+<span class="sd">		:param thing: The root-object that was used to resolve the symbol.</span>
+
+<span class="sd">		.. versionchanged:: 2.0.0</span>
+<span class="sd">			Added the *thing* parameter.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">symbol_name</span> <span class="o">=</span> <span class="n">symbol_name</span>
 		<span class="sd">&quot;&quot;&quot;The name of the symbol that can not be resolved.&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">symbol_scope</span> <span class="o">=</span> <span class="n">symbol_scope</span>
 		<span class="sd">&quot;&quot;&quot;The scope of where the symbol should be valid for resolution.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">thing</span> <span class="o">=</span> <span class="n">thing</span>
+		<span class="sd">&quot;&quot;&quot;The root-object that was used to resolve the symbol.&quot;&quot;&quot;</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">SymbolResolutionError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;unknown symbol: </span><span class="si">{0!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol_name</span><span class="p">))</span></div></div>
 
 <div class="viewcode-block" id="SymbolTypeError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolTypeError">[docs]</a><span class="k">class</span> <span class="nc">SymbolTypeError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	An error raised when a symbol with type information is resolved to a python</span>
+<span class="sd">	An error raised when a symbol with type information is resolved to a Python</span>
 <span class="sd">	value that is not of that type.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="SymbolTypeError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SymbolTypeError.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">is_value</span><span class="p">,</span> <span class="n">is_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str symbol_name: The name of the symbol that is of an incompatible type.</span>
+<span class="sd">		:param is_value: The native Python value of the incompatible symbol.</span>
+<span class="sd">		:param is_type: The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` of the incompatible symbol.</span>
+<span class="sd">		:param expected_type: The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` that was expected for this symbol.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">symbol_name</span> <span class="o">=</span> <span class="n">symbol_name</span>
 		<span class="sd">&quot;&quot;&quot;The name of the symbol that is of an incompatible type.&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">is_value</span> <span class="o">=</span> <span class="n">is_value</span>
@@ -279,7 +368,6 @@
 		<span class="sd">&quot;&quot;&quot;The :py:class:`rule-engine type&lt;rule_engine.ast.DataType&gt;` that was expected for this symbol.&quot;&quot;&quot;</span>
 		<span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;symbol </span><span class="si">{0!r}</span><span class="s2"> resolved to incorrect datatype (is: </span><span class="si">{1}</span><span class="s2">, expected: </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol_name</span><span class="p">,</span> <span class="n">is_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">SymbolTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div></div>
-
 </pre></div>
 
            </div>
@@ -292,7 +380,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre
+        &copy; Copyright 2019, Spencer McIntyre
 
     </p>
   </div>
@@ -309,25 +397,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

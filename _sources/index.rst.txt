@@ -60,7 +60,10 @@ See the `examples`_ folder for more.
    :caption: Contents:
 
    syntax.rst
+   builtins.rst
+   attributes.rst
    rule_engine/index.rst
+   change_log.rst
 
 Indices and tables
 ==================

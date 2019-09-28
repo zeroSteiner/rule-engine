@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>parser &mdash; Rule Engine 1.1.0 documentation</title>
+  <title>parser &mdash; Rule Engine 2.0.0 documentation</title>
   
 
   
@@ -17,33 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Change Log" href="../change_log.html" />
     <link rel="prev" title="errors" href="errors.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -57,7 +61,7 @@
             
             
               <div class="version">
-                1.1.0
+                2.0.0
               </div>
             
           
@@ -83,17 +87,20 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../syntax.html">Syntax</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="ast.html"><code class="docutils literal notranslate"><span class="pre">ast</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="engine.html"><code class="docutils literal notranslate"><span class="pre">engine</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="docutils literal notranslate"><span class="pre">errors</span></code></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">parser</span></code></a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builtins.html">Builtin Symbols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ast.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="engine.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">engine</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">errors</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../change_log.html">Change Log</a></li>
 </ul>
 
             
@@ -139,9 +146,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a> &raquo;</li>
+          <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a> &raquo;</li>
         
-      <li><code class="docutils literal notranslate"><span class="pre">parser</span></code></li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -161,7 +168,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-rule_engine.parser">
-<span id="parser"></span><h1><a class="reference external" href="https://docs.python.org/3.6/library/parser.html#module-parser" title="(in Python v3.6)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a><a class="headerlink" href="#module-rule_engine.parser" title="Permalink to this headline">¶</a></h1>
+<span id="parser"></span><h1><a class="reference external" href="https://docs.python.org/3.7/library/parser.html#module-parser" title="(in Python v3.7)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a><a class="headerlink" href="#module-rule_engine.parser" title="Permalink to this headline">¶</a></h1>
 <p>This module contains the parsing logic for taking rule text in the specified
 grammar and converting it to an abstract syntax tree that can later be
 evaluated.</p>
@@ -169,7 +176,7 @@ evaluated.</p>
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="rule_engine.parser.Parser">
-<em class="property">class </em><code class="descname">Parser</code><span class="sig-paren">(</span><em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#Parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.Parser" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Parser</code><span class="sig-paren">(</span><em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#Parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.Parser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.parser.ParserBase" title="rule_engine.parser.ParserBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.parser.ParserBase</span></code></a></p>
 <p>The parser class for the rule grammar. This class contains many ply specific
 members to define the various components of the grammar allowing it to be
@@ -181,74 +188,64 @@ causing <a class="reference internal" href="errors.html#rule_engine.errors.Evalu
 raised during parsing.</p>
 <dl class="method">
 <dt id="rule_engine.parser.Parser.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.parser.Parser.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether or not to enable debugging features when
-using the ply API.</td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.parser.Parser.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to enable debugging features when
+using the ply API.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.parser.ParserBase">
-<em class="property">class </em><code class="descname">ParserBase</code><span class="sig-paren">(</span><em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="sig-name descname">ParserBase</code><span class="sig-paren">(</span><em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A base class for parser objects to inherit from. This does not provide any
 grammar related definitions.</p>
 <dl class="method">
 <dt id="rule_engine.parser.ParserBase.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Whether or not to enable debugging features when
-using the ply API.</td>
-</tr>
-</tbody>
-</table>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to enable debugging features when
+using the ply API.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="rule_engine.parser.ParserBase.parse">
-<code class="descname">parse</code><span class="sig-paren">(</span><em>text</em>, <em>context</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.parse" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">context</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the specified text in an abstract syntax tree of nodes that can
 later be evaluated.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The grammar text to parse into an AST.</li>
-<li><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – A context for specifying parsing and evaluation options.</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The grammar text to parse into an AST.</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – A context for specifying parsing and evaluation options.</p></li>
 </ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The parsed AST statement.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="ast.html#rule_engine.ast.Statement" title="rule_engine.ast.Statement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Statement</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The parsed AST statement.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="ast.html#rule_engine.ast.Statement" title="rule_engine.ast.Statement"><code class="xref py py-class docutils literal notranslate"><span class="pre">Statement</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="rule_engine.parser.ParserBase.precedence">
-<code class="descname">precedence</code><em class="property"> = ()</em><a class="headerlink" href="#rule_engine.parser.ParserBase.precedence" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">precedence</code><em class="property"> = ()</em><a class="headerlink" href="#rule_engine.parser.ParserBase.precedence" title="Permalink to this definition">¶</a></dt>
 <dd><p>The precedence for operators.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="rule_engine.parser.ParserBase.reserved_words">
-<code class="descname">reserved_words</code><em class="property"> = {}</em><a class="headerlink" href="#rule_engine.parser.ParserBase.reserved_words" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reserved_words</code><em class="property"> = {}</em><a class="headerlink" href="#rule_engine.parser.ParserBase.reserved_words" title="Permalink to this definition">¶</a></dt>
 <dd><p>A mapping of literal words which are reserved to their corresponding grammar
 names.</p>
 </dd></dl>
@@ -266,8 +263,10 @@ names.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="../change_log.html" class="btn btn-neutral float-right" title="Change Log" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="errors.html" class="btn btn-neutral" title="errors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="errors.html" class="btn btn-neutral float-left" title="errors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -276,7 +275,7 @@ names.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre
+        &copy; Copyright 2019, Spencer McIntyre
 
     </p>
   </div>
@@ -293,25 +292,16 @@ names.</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

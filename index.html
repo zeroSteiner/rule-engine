@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Rule Engine Documentation &mdash; Rule Engine 1.1.0 documentation</title>
+  <title>Rule Engine Documentation &mdash; Rule Engine 2.0.0 documentation</title>
   
 
   
@@ -17,33 +17,36 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Syntax" href="syntax.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+    <link rel="next" title="Rule Syntax" href="syntax.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -57,7 +60,7 @@
             
             
               <div class="version">
-                1.1.0
+                2.0.0
               </div>
             
           
@@ -83,8 +86,11 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builtins.html">Builtin Symbols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
 </ul>
 
             
@@ -201,15 +207,26 @@ when an invalid symbol is specified in a rule.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="syntax.html#grammar">Grammar</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="rule_engine/ast.html"><code class="docutils literal notranslate"><span class="pre">ast</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="rule_engine/engine.html"><code class="docutils literal notranslate"><span class="pre">engine</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="rule_engine/errors.html"><code class="docutils literal notranslate"><span class="pre">errors</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="rule_engine/parser.html"><code class="docutils literal notranslate"><span class="pre">parser</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="builtins.html">Builtin Symbols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="attributes.html#builtin-attributes">Builtin Attributes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rule_engine/ast.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rule_engine/engine.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">engine</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rule_engine/errors.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">errors</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rule_engine/parser.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="change_log.html#version-2-0-0">Version 2.0.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change_log.html#version-1-1-0">Version 1.1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="change_log.html#version-1-0-0">Version 1.0.0</a></li>
 </ul>
 </li>
 </ul>
@@ -219,9 +236,9 @@ when an invalid symbol is specified in a rule.</p>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
 </div>
 
@@ -233,7 +250,7 @@ when an invalid symbol is specified in a rule.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="syntax.html" class="btn btn-neutral float-right" title="Syntax" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="syntax.html" class="btn btn-neutral float-right" title="Rule Syntax" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
@@ -243,7 +260,7 @@ when an invalid symbol is specified in a rule.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre
+        &copy; Copyright 2019, Spencer McIntyre
 
     </p>
   </div>
@@ -260,25 +277,16 @@ when an invalid symbol is specified in a rule.</p>
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

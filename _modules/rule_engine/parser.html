@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.parser &mdash; Rule Engine 1.1.0 documentation</title>
+  <title>rule_engine.parser &mdash; Rule Engine 2.0.0 documentation</title>
   
 
   
@@ -17,32 +17,35 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -56,7 +59,7 @@
             
             
               <div class="version">
-                1.1.0
+                2.0.0
               </div>
             
           
@@ -82,8 +85,11 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../builtins.html">Builtin Symbols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../change_log.html">Change Log</a></li>
 </ul>
 
             
@@ -180,6 +186,7 @@
 <span class="c1">#</span>
 
 <span class="kn">import</span> <span class="nn">ast</span> <span class="k">as</span> <span class="nn">ast_</span>
+<span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">ast</span>
@@ -258,7 +265,10 @@
 		<span class="s1">&#39;&gt;&#39;</span><span class="p">:</span>   <span class="s1">&#39;GT&#39;</span><span class="p">,</span>    <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;&lt;&#39;</span><span class="p">:</span>   <span class="s1">&#39;LT&#39;</span><span class="p">,</span>    <span class="s1">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span>
 		<span class="c1"># logical operators</span>
-		<span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="s1">&#39;AND&#39;</span><span class="p">,</span>   <span class="s1">&#39;or&#39;</span><span class="p">:</span> <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="s1">&#39;AND&#39;</span><span class="p">,</span>   <span class="s1">&#39;or&#39;</span><span class="p">:</span> <span class="s1">&#39;OR&#39;</span><span class="p">,</span>     <span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span>
+		<span class="c1"># other operators</span>
+		<span class="s1">&#39;.&#39;</span><span class="p">:</span>   <span class="s1">&#39;ATTR&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;in&#39;</span><span class="p">:</span>  <span class="s1">&#39;IN&#39;</span><span class="p">,</span>
 	<span class="p">}</span>
 	<span class="n">reserved_words</span> <span class="o">=</span> <span class="p">{</span>
 		<span class="c1"># booleans</span>
@@ -271,12 +281,14 @@
 		<span class="s1">&#39;null&#39;</span><span class="p">:</span> <span class="s1">&#39;NULL&#39;</span><span class="p">,</span>
 		<span class="c1"># operators</span>
 		<span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="s1">&#39;AND&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;in&#39;</span><span class="p">:</span> <span class="s1">&#39;IN&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;or&#39;</span><span class="p">:</span> <span class="s1">&#39;OR&#39;</span><span class="p">,</span>
 		<span class="s1">&#39;not&#39;</span><span class="p">:</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span>
 	<span class="p">}</span>
 	<span class="n">tokens</span> <span class="o">=</span> <span class="p">(</span>
 		<span class="s1">&#39;DATETIME&#39;</span><span class="p">,</span> <span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span> <span class="s1">&#39;STRING&#39;</span><span class="p">,</span> <span class="s1">&#39;SYMBOL&#39;</span><span class="p">,</span>
-		<span class="s1">&#39;LPAREN&#39;</span><span class="p">,</span> <span class="s1">&#39;RPAREN&#39;</span><span class="p">,</span> <span class="s1">&#39;QMARK&#39;</span><span class="p">,</span> <span class="s1">&#39;COLON&#39;</span>
+		<span class="s1">&#39;LPAREN&#39;</span><span class="p">,</span> <span class="s1">&#39;RPAREN&#39;</span><span class="p">,</span> <span class="s1">&#39;QMARK&#39;</span><span class="p">,</span> <span class="s1">&#39;COLON&#39;</span><span class="p">,</span> <span class="s1">&#39;COMMA&#39;</span><span class="p">,</span>
+		<span class="s1">&#39;LBRACKET&#39;</span><span class="p">,</span> <span class="s1">&#39;RBRACKET&#39;</span>
 	<span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">reserved_words</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">op_names</span><span class="o">.</span><span class="n">values</span><span class="p">())))</span>
 
 	<span class="n">t_ignore</span> <span class="o">=</span> <span class="s1">&#39; </span><span class="se">\t</span><span class="s1">&#39;</span>
@@ -293,7 +305,11 @@
 	<span class="n">t_ADD</span>              <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\+&#39;</span>
 	<span class="n">t_SUB</span>              <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\-&#39;</span>
 	<span class="n">t_MOD</span>              <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\%&#39;</span>
+	<span class="n">t_COMMA</span>            <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\,&#39;</span>
+	<span class="n">t_LBRACKET</span>         <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\[&#39;</span>
+	<span class="n">t_RBRACKET</span>         <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\]&#39;</span>
 	<span class="n">t_FLOAT</span>            <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?&#39;</span>
+	<span class="n">t_ATTR</span>             <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;(?&lt;=\S)\.(?=\S)&#39;</span>
 
 	<span class="c1"># tokens are listed from lowest to highest precedence, ones that appear</span>
 	<span class="c1"># later are effectively evaluated first</span>
@@ -306,12 +322,13 @@
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWXOR&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWAND&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>    <span class="s1">&#39;QMARK&#39;</span><span class="p">,</span> <span class="s1">&#39;COLON&#39;</span><span class="p">),</span>
-		<span class="p">(</span><span class="s1">&#39;nonassoc&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ&#39;</span><span class="p">,</span> <span class="s1">&#39;NE&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_FZM&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_FZS&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_FZM&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_FZS&#39;</span><span class="p">,</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span> <span class="s1">&#39;GT&#39;</span><span class="p">,</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">),</span>  <span class="c1"># Nonassociative operators</span>
+		<span class="p">(</span><span class="s1">&#39;nonassoc&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ&#39;</span><span class="p">,</span> <span class="s1">&#39;NE&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_FZM&#39;</span><span class="p">,</span> <span class="s1">&#39;EQ_FZS&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_FZM&#39;</span><span class="p">,</span> <span class="s1">&#39;NE_FZS&#39;</span><span class="p">,</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span> <span class="s1">&#39;GT&#39;</span><span class="p">,</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span> <span class="s1">&#39;LT&#39;</span><span class="p">,</span> <span class="s1">&#39;IN&#39;</span><span class="p">),</span>  <span class="c1"># Nonassociative operators</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;ADD&#39;</span><span class="p">,</span> <span class="s1">&#39;SUB&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;BWLSH&#39;</span><span class="p">,</span> <span class="s1">&#39;BWRSH&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;MUL&#39;</span><span class="p">,</span> <span class="s1">&#39;TDIV&#39;</span><span class="p">,</span> <span class="s1">&#39;FDIV&#39;</span><span class="p">,</span> <span class="s1">&#39;MOD&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;POW&#39;</span><span class="p">),</span>
 		<span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>    <span class="s1">&#39;UMINUS&#39;</span><span class="p">),</span>
+		<span class="p">(</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>     <span class="s1">&#39;ATTR&#39;</span><span class="p">),</span>
 	<span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">t_POW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
@@ -360,7 +377,7 @@
 		<span class="k">return</span> <span class="n">t</span>
 
 	<span class="k">def</span> <span class="nf">t_SYMBOL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-		<span class="sa">r</span><span class="s1">&#39;\$?[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]*)*&#39;</span>
+		<span class="sa">r</span><span class="s1">&#39;\$?[a-zA-Z_][a-zA-Z0-9_]*&#39;</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved_words</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;SYMBOL&#39;</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">t</span>
 
@@ -378,6 +395,20 @@
 	<span class="k">def</span> <span class="nf">p_statement_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;statement : expression&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Statement</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		objectattr : object ATTR SYMBOL</span>
+<span class="sd">		           | objectattr ATTR SYMBOL</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">GetAttributeExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : object</span>
+<span class="sd">		           | objectattr</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_ternary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -411,6 +442,19 @@
 		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BitwiseExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		expression : expression IN     expression</span>
+<span class="sd">				   | expression NOT IN expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+			<span class="n">member</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ContainsExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">member</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">member</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ContainsExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">member</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -453,7 +497,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">LogicExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="s1">&#39;expression : LPAREN expression RPAREN&#39;</span>
+		<span class="s1">&#39;object : LPAREN expression RPAREN&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_negate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -461,7 +505,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="s1">&#39;expression : SYMBOL&#39;</span>
+		<span class="s1">&#39;object : SYMBOL&#39;</span>
 		<span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 		<span class="n">scope</span> <span class="o">=</span> <span class="kc">None</span>
 		<span class="k">if</span> <span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;$&#39;</span><span class="p">:</span>
@@ -483,7 +527,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="s1">&#39;expression : DATETIME&#39;</span>
+		<span class="s1">&#39;object : DATETIME&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">DatetimeExpression</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -499,12 +543,36 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">FloatExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_null</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;expression : NULL&quot;&quot;&quot;</span>
+		<span class="s1">&#39;expression : NULL&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">NullExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="s1">&#39;expression : STRING&#39;</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">StringExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div>
+		<span class="s1">&#39;object : STRING&#39;</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">StringExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		object : LBRACKET RBRACKET</span>
+<span class="sd">			   | LBRACKET members RBRACKET</span>
+<span class="sd">			   | LBRACKET members COMMA RBRACKET</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArrayExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">())</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArrayExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_array_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		members : expression</span>
+<span class="sd">				| members COMMA expression</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+			<span class="n">deque</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
+			<span class="n">deque</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">deque</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+			<span class="n">deque</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span></div>
 </pre></div>
 
            </div>
@@ -517,7 +585,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre
+        &copy; Copyright 2019, Spencer McIntyre
 
     </p>
   </div>
@@ -534,25 +602,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

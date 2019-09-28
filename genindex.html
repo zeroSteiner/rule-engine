@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Rule Engine 1.1.0 documentation</title>
+  <title>Index &mdash; Rule Engine 2.0.0 documentation</title>
   
 
   
@@ -18,32 +18,35 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -57,7 +60,7 @@
             
             
               <div class="version">
-                1.1.0
+                2.0.0
               </div>
             
           
@@ -83,8 +86,11 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="syntax.html">Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builtins.html">Builtin Symbols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
 </ul>
 
             
@@ -158,10 +164,12 @@
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -173,9 +181,13 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rule_engine/engine.html#rule_engine.engine.Context.__init__">__init__() (Context method)</a>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.__init__">__init__() (AttributeResolutionError method)</a>
 
       <ul>
+        <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins.__init__">(Builtins method)</a>
+</li>
+        <li><a href="rule_engine/engine.html#rule_engine.engine.Context.__init__">(Context method)</a>
+</li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError.__init__">(DatetimeSyntaxError method)</a>
 </li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.EngineError.__init__">(EngineError method)</a>
@@ -207,9 +219,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ArithmeticComparisonExpression">ArithmeticComparisonExpression (class in rule_engine.ast)</a>
 </li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.ArithmeticExpression">ArithmeticExpression (class in rule_engine.ast)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rule_engine/ast.html#rule_engine.ast.ArithmeticExpression">ArithmeticExpression (class in rule_engine.ast)</a>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY">ARRAY (DataType attribute)</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.attribute_name">attribute_name (AttributeResolutionError attribute)</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError">AttributeResolutionError</a>
 </li>
   </ul></td>
 </tr></table>
@@ -219,11 +237,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.BitwiseExpression">BitwiseExpression (class in rule_engine.ast)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.BOOLEAN">BOOLEAN (DataType attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.BooleanExpression">BooleanExpression (class in rule_engine.ast)</a>
+</li>
+      <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins">Builtins (class in rule_engine.engine)</a>
+</li>
+      <li><a href="rule_engine/engine.html#rule_engine.engine.Context.builtins">builtins (Context attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -231,11 +253,15 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.coerce_value">coerce_value() (in module rule_engine.ast)</a>
+</li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ComparisonExpression">ComparisonExpression (class in rule_engine.ast)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types">compatible_types (LeftOperatorRightExpressionBase attribute)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.ContainsExpression">ContainsExpression (class in rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context">Context (class in rule_engine.engine)</a>
 </li>
@@ -289,13 +315,25 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.FloatExpression">FloatExpression (class in rule_engine.ast)</a>
 </li>
+      <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins.from_defaults">from_defaults() (Builtins class method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_type">from_type() (rule_engine.ast.DataType class method)</a>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_name">from_name() (DataType class method)</a>
 </li>
-      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_value">from_value() (rule_engine.ast.DataType class method)</a>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_type">from_type() (DataType class method)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.from_value">from_value() (DataType class method)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.FuzzyComparisonExpression">FuzzyComparisonExpression (class in rule_engine.ast)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.GetAttributeExpression">GetAttributeExpression (class in rule_engine.ast)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -313,7 +351,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.is_type">is_type (SymbolTypeError attribute)</a>
 </li>
-      <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.is_valid">is_valid() (rule_engine.engine.Rule class method)</a>
+      <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.is_valid">is_valid() (Rule class method)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.is_value">is_value (SymbolTypeError attribute)</a>
 </li>
@@ -358,6 +396,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.object">object (AttributeResolutionError attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -389,7 +435,11 @@
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.resolve">resolve() (Context method)</a>
 </li>
+      <li><a href="rule_engine/engine.html#rule_engine.engine.Context.resolve_attribute">resolve_attribute (Context attribute)</a>
+</li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.resolve_attribute">resolve_attribute() (in module rule_engine.engine)</a>
+</li>
+      <li><a href="rule_engine/engine.html#rule_engine.engine.Context.resolve_attribute_type">resolve_attribute_type() (Context class method)</a>
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.resolve_item">resolve_item() (in module rule_engine.engine)</a>
 </li>
@@ -406,11 +456,15 @@
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.ComparisonExpression.result_type">(ComparisonExpression attribute)</a>
 </li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.ContainsExpression.result_type">(ContainsExpression attribute)</a>
+</li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase.result_type">(ExpressionBase attribute)</a>, <a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase.result_type">[1]</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.FloatExpression.result_type">(FloatExpression attribute)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.FuzzyComparisonExpression.result_type">(FuzzyComparisonExpression attribute)</a>
+</li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.GetAttributeExpression.result_type">(GetAttributeExpression attribute)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.LogicExpression.result_type">(LogicExpression attribute)</a>
 </li>
@@ -479,13 +533,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.TernaryExpression">TernaryExpression (class in rule_engine.ast)</a>
 </li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.thing">thing (AttributeResolutionError attribute)</a>
+
+      <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError.thing">(SymbolResolutionError attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/engine.html#rule_engine.engine.to_default_resolver">to_default_resolver() (in module rule_engine.engine)</a>
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz">to_graphviz() (Rule method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rule_engine/engine.html#rule_engine.engine.to_recursive_resolver">to_recursive_resolver() (in module rule_engine.engine)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.RuleSyntaxError.token">token (RuleSyntaxError attribute)</a>
 </li>
@@ -502,7 +560,11 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED">UNDEFINED (DataType attribute)</a>
+
+      <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.UNDEFINED">(in module rule_engine.errors)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -530,7 +592,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre
+        &copy; Copyright 2019, Spencer McIntyre
 
     </p>
   </div>
@@ -547,25 +609,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

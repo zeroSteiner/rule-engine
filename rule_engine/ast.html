@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ast &mdash; Rule Engine 1.1.0 documentation</title>
+  <title>ast &mdash; Rule Engine 2.0.0 documentation</title>
   
 
   
@@ -17,34 +17,37 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="engine" href="engine.html" />
     <link rel="prev" title="rule_engine" href="index.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -58,7 +61,7 @@
             
             
               <div class="version">
-                1.1.0
+                2.0.0
               </div>
             
           
@@ -84,9 +87,11 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../syntax.html">Syntax</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ast</span></code></a><ul>
+<li class="toctree-l1"><a class="reference internal" href="../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../builtins.html">Builtin Symbols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#classes">Classes</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#base-classes">Base Classes</a></li>
@@ -97,11 +102,12 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="engine.html"><code class="docutils literal notranslate"><span class="pre">engine</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="docutils literal notranslate"><span class="pre">errors</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="parser.html"><code class="docutils literal notranslate"><span class="pre">parser</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="engine.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">engine</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">errors</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="parser.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../change_log.html">Change Log</a></li>
 </ul>
 
             
@@ -147,9 +153,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a> &raquo;</li>
+          <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a> &raquo;</li>
         
-      <li><code class="docutils literal notranslate"><span class="pre">ast</span></code></li>
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -169,70 +175,87 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-rule_engine.ast">
-<span id="ast"></span><h1><a class="reference external" href="https://docs.python.org/3.6/library/ast.html#module-ast" title="(in Python v3.6)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a><a class="headerlink" href="#module-rule_engine.ast" title="Permalink to this headline">¶</a></h1>
+<span id="ast"></span><h1><a class="reference external" href="https://docs.python.org/3.7/library/ast.html#module-ast" title="(in Python v3.7)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a><a class="headerlink" href="#module-rule_engine.ast" title="Permalink to this headline">¶</a></h1>
 <p>This module contains the nodes which comprise the abstract syntax tree generated
 from parsed grammar text.</p>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="rule_engine.ast.coerce_value">
+<code class="sig-name descname">coerce_value</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#coerce_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.coerce_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a native Python <em>value</em> and convert it to a value of a data type which
+is can be represented by a Rule Engine <a class="reference internal" href="#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>. This function
+is useful for converting native Python values at the engine boundaries such
+as when resolving a symbol from an object external to the engine.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.0.0.</span></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – The value to convert.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The converted value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="rule_engine.ast.is_natural_number">
-<code class="descname">is_natural_number</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_natural_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_natural_number" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_natural_number</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_natural_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_natural_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a natural number (i.e. a whole, non-negative
 number). This can, for example, be used to check if a floating point number
 such as <code class="docutils literal notranslate"><span class="pre">3.0</span></code> can safely be converted to an integer without loss of
 information.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> – The value to check. This value is a native Python type.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Whether or not the value is a natural number.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – The value to check. This value is a native Python type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether or not the value is a natural number.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="rule_engine.ast.is_numeric">
-<code class="descname">is_numeric</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_numeric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_numeric" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_numeric</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_numeric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_numeric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a numeric value (i.e. capable of being represented
 as a floating point value without loss of information).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> – The value to check. This value is a native Python type.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Whether or not the value is numeric.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – The value to check. This value is a native Python type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether or not the value is numeric.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="rule_engine.ast.is_real_number">
-<code class="descname">is_real_number</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_real_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_real_number" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">is_real_number</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_real_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_real_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a real number (i.e. capable of being represented as
 a floating point value without loss of information as well as being finite).
 Despite being able to be represented as a float, <code class="docutils literal notranslate"><span class="pre">NaN</span></code> is not considered a
 real number for the purposes of this function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> – The value to check. This value is a native Python type.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Whether or not the value is a natural number.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – The value to check. This value is a native Python type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether or not the value is a natural number.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -240,77 +263,95 @@ real number for the purposes of this function.</p>
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="rule_engine.ast.DataType">
-<em class="property">class </em><code class="descname">DataType</code><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<em class="property">class </em><code class="sig-name descname">DataType</code><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/enum.html#enum.Enum" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>A collection of constants representing the different supported data types.</p>
 <dl class="attribute">
+<dt id="rule_engine.ast.DataType.ARRAY">
+<code class="sig-name descname">ARRAY</code><a class="headerlink" href="#rule_engine.ast.DataType.ARRAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="rule_engine.ast.DataType.BOOLEAN">
-<code class="descname">BOOLEAN</code><a class="headerlink" href="#rule_engine.ast.DataType.BOOLEAN" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">BOOLEAN</code><a class="headerlink" href="#rule_engine.ast.DataType.BOOLEAN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="rule_engine.ast.DataType.DATETIME">
-<code class="descname">DATETIME</code><a class="headerlink" href="#rule_engine.ast.DataType.DATETIME" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">DATETIME</code><a class="headerlink" href="#rule_engine.ast.DataType.DATETIME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="rule_engine.ast.DataType.FLOAT">
-<code class="descname">FLOAT</code><a class="headerlink" href="#rule_engine.ast.DataType.FLOAT" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">FLOAT</code><a class="headerlink" href="#rule_engine.ast.DataType.FLOAT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="rule_engine.ast.DataType.NULL">
-<code class="descname">NULL</code><a class="headerlink" href="#rule_engine.ast.DataType.NULL" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">NULL</code><a class="headerlink" href="#rule_engine.ast.DataType.NULL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="rule_engine.ast.DataType.STRING">
-<code class="descname">STRING</code><a class="headerlink" href="#rule_engine.ast.DataType.STRING" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">STRING</code><a class="headerlink" href="#rule_engine.ast.DataType.STRING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="classmethod">
-<dt id="rule_engine.ast.DataType.from_type">
-<em class="property">classmethod </em><code class="descname">from_type</code><span class="sig-paren">(</span><em>python_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.from_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.from_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the supported data type constant for the specified Python type. If
-the type can not be mapped to a supported data type, then a
-<a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised. This function will not
-return <a class="reference internal" href="#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>python_type</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#type" title="(in Python v3.6)"><em>type</em></a>) – The native Python type to retrieve the
-corresponding type constant for.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">One of the constants.</td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="rule_engine.ast.DataType.from_name">
+<em class="property">classmethod </em><code class="sig-name descname">from_name</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.from_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.from_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the data type from its name.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.0.0.</span></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the data type to retrieve.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>One of the constants.</p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="classmethod">
+<dl class="method">
+<dt id="rule_engine.ast.DataType.from_type">
+<em class="property">classmethod </em><code class="sig-name descname">from_type</code><span class="sig-paren">(</span><em class="sig-param">python_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.from_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.from_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the supported data type constant for the specified Python type. If
+the type can not be mapped to a supported data type, then a
+<a class="reference external" href="https://docs.python.org/3.7/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised. This function will not
+return <a class="reference internal" href="#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>python_type</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a>) – The native Python type to retrieve the
+corresponding type constant for.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>One of the constants.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="rule_engine.ast.DataType.from_value">
-<em class="property">classmethod </em><code class="descname">from_value</code><span class="sig-paren">(</span><em>python_value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.from_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.from_value" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_value</code><span class="sig-paren">(</span><em class="sig-param">python_value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.from_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.from_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the supported data type constant for the specified Python value. If
 the value can not be mapped to a supported data type, then a
-<a class="reference external" href="https://docs.python.org/3.6/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> exception will be raised. This function will not
+<a class="reference external" href="https://docs.python.org/3.7/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> exception will be raised. This function will not
 return <a class="reference internal" href="#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>python_value</strong> – The native Python value to retrieve the
-corresponding data type constant for.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">One of the constants.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>python_value</strong> – The native Python value to retrieve the
+corresponding data type constant for.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>One of the constants.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="rule_engine.ast.DataType.UNDEFINED">
-<code class="descname">UNDEFINED</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.ast.DataType.UNDEFINED" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">UNDEFINED</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.ast.DataType.UNDEFINED" title="Permalink to this definition">¶</a></dt>
 <dd><p>Undefined values. This constant can be used to indicate that a particular
 symbol is valid, but it’s data type is currently unknown.</p>
 </dd></dl>
@@ -319,7 +360,7 @@ symbol is valid, but it’s data type is currently unknown.</p>
 
 <dl class="class">
 <dt id="rule_engine.ast.Statement">
-<em class="property">class </em><code class="descname">Statement</code><span class="sig-paren">(</span><em>context</em>, <em>expression</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Statement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.Statement" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Statement</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">expression</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Statement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.Statement" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ASTNodeBase</span></code></p>
 <p>A class representing the top level statement of the grammar text.</p>
 </dd></dl>
@@ -328,51 +369,47 @@ symbol is valid, but it’s data type is currently unknown.</p>
 <h3>Base Classes<a class="headerlink" href="#base-classes" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="rule_engine.ast.ExpressionBase">
-<em class="property">class </em><code class="descname">ExpressionBase</code><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ExpressionBase</code><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ASTNodeBase</span></code></p>
 <dl class="attribute">
 <dt id="rule_engine.ast.ExpressionBase.result_type">
-<code class="descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.ExpressionBase.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.ExpressionBase.result_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="rule_engine.ast.ExpressionBase.evaluate">
-<code class="descname">evaluate</code><span class="sig-paren">(</span><em>thing</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase.evaluate" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">evaluate</code><span class="sig-paren">(</span><em class="sig-param">thing</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase.evaluate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate this AST node and all applicable children nodes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>thing</strong> – The object to use for symbol resolution.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The result of the evaluation as a native Python type.</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>thing</strong> – The object to use for symbol resolution.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The result of the evaluation as a native Python type.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="rule_engine.ast.ExpressionBase.reduce">
-<code class="descname">reduce</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase.reduce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase.reduce" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reduce</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase.reduce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase.reduce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reduce this expression into a smaller subset of nodes. If the expression
 can not be reduced, then return an instance of itself, otherwise return
 a reduced <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a> to replace it.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Either a reduced version of this node or itself.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Either a reduced version of this node or itself.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt>
-<code class="descname">result_type</code><em class="property"> = None</em></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = None</em></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -380,13 +417,13 @@ a reduced <a class="reference internal" href="#rule_engine.ast.ExpressionBase" t
 
 <dl class="class">
 <dt id="rule_engine.ast.LeftOperatorRightExpressionBase">
-<em class="property">class </em><code class="descname">LeftOperatorRightExpressionBase</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">LeftOperatorRightExpressionBase</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">type_</em>, <em class="sig-param">left</em>, <em class="sig-param">right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A base class for representing complex expressions composed of a left side
 and a right side, separated by an operator.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types">
-<code class="descname">compatible_types</code><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">compatible_types</code><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>A tuple containing the compatible data types that the left and right
 expressions must return. This can for example be used to indicate that
 arithmetic operations are compatible with <a class="reference internal" href="#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a> but
@@ -395,47 +432,39 @@ not <a class="reference internal" href="#rule_engine.ast.DataType.STRING" title=
 
 <dl class="method">
 <dt id="rule_engine.ast.LeftOperatorRightExpressionBase.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</li>
-<li><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The grammar type of operator at the center of the
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">type_</em>, <em class="sig-param">left</em>, <em class="sig-param">right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</p></li>
+<li><p><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The grammar type of operator at the center of the
 expression. Subclasses must define operator methods to handle
-evaluation based on this value.</li>
-<li><strong>left</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the left of the operator.</li>
-<li><strong>right</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the right of the operator.</li>
+evaluation based on this value.</p></li>
+<li><p><strong>left</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the left of the operator.</p></li>
+<li><p><strong>right</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the right of the operator.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.LiteralExpressionBase">
-<em class="property">class </em><code class="descname">LiteralExpressionBase</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">LiteralExpressionBase</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A base class for representing literal values from the grammar text.</p>
 <dl class="method">
 <dt id="rule_engine.ast.LiteralExpressionBase.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</li>
-<li><strong>value</strong> – The native Python value.</li>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</p></li>
+<li><p><strong>value</strong> – The native Python value.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -445,78 +474,78 @@ evaluation based on this value.</li>
 <h3>Left-Operator-Right Expressions<a class="headerlink" href="#left-operator-right-expressions" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="rule_engine.ast.ArithmeticExpression">
-<em class="property">class </em><code class="descname">ArithmeticExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ArithmeticExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">type_</em>, <em class="sig-param">left</em>, <em class="sig-param">right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing arithmetic expressions from the grammar text such
 as addition and subtraction.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.ArithmeticExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = FLOAT</em><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = FLOAT</em><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.ArithmeticComparisonExpression">
-<em class="property">class </em><code class="descname">ArithmeticComparisonExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ArithmeticComparisonExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">type_</em>, <em class="sig-param">left</em>, <em class="sig-param">right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ComparisonExpression" title="rule_engine.ast.ComparisonExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ComparisonExpression</span></code></a></p>
 <p>A class for representing arithmetic comparison expressions from the grammar
 text such as less-than-or-equal-to and greater-than.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.ArithmeticComparisonExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.BitwiseExpression">
-<em class="property">class </em><code class="descname">BitwiseExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BitwiseExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.BitwiseExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">BitwiseExpression</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BitwiseExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.BitwiseExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing bitwise arithmetic expressions from the grammar
 text such as XOR and shifting operations.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.BitwiseExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = FLOAT</em><a class="headerlink" href="#rule_engine.ast.BitwiseExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = FLOAT</em><a class="headerlink" href="#rule_engine.ast.BitwiseExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.ComparisonExpression">
-<em class="property">class </em><code class="descname">ComparisonExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ComparisonExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">type_</em>, <em class="sig-param">left</em>, <em class="sig-param">right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ComparisonExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing comparison expressions from the grammar text such
 as equality checks.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.ComparisonExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.ComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.ComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.LogicExpression">
-<em class="property">class </em><code class="descname">LogicExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LogicExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LogicExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">LogicExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">type_</em>, <em class="sig-param">left</em>, <em class="sig-param">right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LogicExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.LogicExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing logical expressions from the grammar text such as
 as “and” and “or”.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.LogicExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.LogicExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.LogicExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.FuzzyComparisonExpression">
-<em class="property">class </em><code class="descname">FuzzyComparisonExpression</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FuzzyComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">FuzzyComparisonExpression</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FuzzyComparisonExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ComparisonExpression" title="rule_engine.ast.ComparisonExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ComparisonExpression</span></code></a></p>
 <p>A class for representing regular expression comparison expressions from the
 grammar text such as search and does not match.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.FuzzyComparisonExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -526,49 +555,49 @@ grammar text such as search and does not match.</p>
 <h3>Literal Expressions<a class="headerlink" href="#literal-expressions" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="rule_engine.ast.BooleanExpression">
-<em class="property">class </em><code class="descname">BooleanExpression</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BooleanExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.BooleanExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">BooleanExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BooleanExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.BooleanExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal boolean expressions representing True or False.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.BooleanExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.BooleanExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.BooleanExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.FloatExpression">
-<em class="property">class </em><code class="descname">FloatExpression</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FloatExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.FloatExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">FloatExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FloatExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.FloatExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal float expressions representing numerical values.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.FloatExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = FLOAT</em><a class="headerlink" href="#rule_engine.ast.FloatExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = FLOAT</em><a class="headerlink" href="#rule_engine.ast.FloatExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.NullExpression">
-<em class="property">class </em><code class="descname">NullExpression</code><span class="sig-paren">(</span><em>context</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#NullExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.NullExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">NullExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#NullExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.NullExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal null expressions representing null values. This expression type
 always evaluates to false.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.NullExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = NULL</em><a class="headerlink" href="#rule_engine.ast.NullExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = NULL</em><a class="headerlink" href="#rule_engine.ast.NullExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.StringExpression">
-<em class="property">class </em><code class="descname">StringExpression</code><span class="sig-paren">(</span><em>context</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#StringExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.StringExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">StringExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#StringExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.StringExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal string expressions representing an array of characters.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.StringExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = STRING</em><a class="headerlink" href="#rule_engine.ast.StringExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = STRING</em><a class="headerlink" href="#rule_engine.ast.StringExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -577,14 +606,39 @@ always evaluates to false.</p>
 <div class="section" id="miscellaneous-expressions">
 <h3>Miscellaneous Expressions<a class="headerlink" href="#miscellaneous-expressions" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
+<dt id="rule_engine.ast.ContainsExpression">
+<em class="property">class </em><code class="sig-name descname">ContainsExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">member</em>, <em class="sig-param">container</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ContainsExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ContainsExpression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
+<p>An expression used to test whether an item exists within a container.</p>
+<dl class="attribute">
+<dt id="rule_engine.ast.ContainsExpression.result_type">
+<code class="sig-name descname">result_type</code><em class="property"> = BOOLEAN</em><a class="headerlink" href="#rule_engine.ast.ContainsExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="rule_engine.ast.GetAttributeExpression">
+<em class="property">class </em><code class="sig-name descname">GetAttributeExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">object_</em>, <em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#GetAttributeExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.GetAttributeExpression" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
+<p>A class representing an expression in which <em>name</em> is retrieved as an
+attribute of <em>object</em>.</p>
+<dl class="attribute">
+<dt id="rule_engine.ast.GetAttributeExpression.result_type">
+<code class="sig-name descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.GetAttributeExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="rule_engine.ast.SymbolExpression">
-<em class="property">class </em><code class="descname">SymbolExpression</code><span class="sig-paren">(</span><em>context</em>, <em>name</em>, <em>scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#SymbolExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.SymbolExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">SymbolExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">name</em>, <em class="sig-param">scope=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#SymbolExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.SymbolExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class representing a symbol name to be resolved at evaluation time with
 the help of a <a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.SymbolExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.SymbolExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.SymbolExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>A collection of constants representing the different supported data types.</p>
 </dd></dl>
 
@@ -592,25 +646,25 @@ the help of a <a class="reference internal" href="engine.html#rule_engine.engine
 
 <dl class="class">
 <dt id="rule_engine.ast.TernaryExpression">
-<em class="property">class </em><code class="descname">TernaryExpression</code><span class="sig-paren">(</span><em>context</em>, <em>condition</em>, <em>case_true</em>, <em>case_false</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#TernaryExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.TernaryExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">TernaryExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">condition</em>, <em class="sig-param">case_true</em>, <em class="sig-param">case_false</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#TernaryExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.TernaryExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class for representing ternary expressions from the grammar text. These
 involve evaluating <code class="xref py py-attr docutils literal notranslate"><span class="pre">condition</span></code> before evaluating either
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">case_true</span></code> or <code class="xref py py-attr docutils literal notranslate"><span class="pre">case_false</span></code> based on the results.</p>
 <dl class="attribute">
 <dt id="rule_engine.ast.TernaryExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.TernaryExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.TernaryExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="rule_engine.ast.UnaryExpression">
-<em class="property">class </em><code class="descname">UnaryExpression</code><span class="sig-paren">(</span><em>context</em>, <em>type_</em>, <em>right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#UnaryExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.UnaryExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">UnaryExpression</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">type_</em>, <em class="sig-param">right</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#UnaryExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.UnaryExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <dl class="attribute">
 <dt id="rule_engine.ast.UnaryExpression.result_type">
-<code class="descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.UnaryExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">result_type</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.ast.UnaryExpression.result_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -630,7 +684,7 @@ involve evaluating <code class="xref py py-attr docutils literal notranslate"><s
         <a href="engine.html" class="btn btn-neutral float-right" title="engine" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="rule_engine" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="rule_engine" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -639,7 +693,7 @@ involve evaluating <code class="xref py py-attr docutils literal notranslate"><s
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018, Spencer McIntyre
+        &copy; Copyright 2019, Spencer McIntyre
 
     </p>
   </div>
@@ -656,25 +710,16 @@ involve evaluating <code class="xref py py-attr docutils literal notranslate"><s
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

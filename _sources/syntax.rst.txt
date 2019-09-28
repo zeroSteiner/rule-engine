@@ -1,14 +1,17 @@
 .. py:currentmodule:: rule_engine.ast
 
-Syntax
-======
+Rule Syntax
+===========
 The syntax for creating rules is based off of logical expressions evaluating to
 either True (matching) or False (non-matching). Rules support a small set of
 data types which can be defined as constants or resolved using the Python object
 on which the rule is being applied.
 
 +-------------------------------+-------------------------------+
-| Rule Engine Type              | Compatible Python Types       |
+| Rule Engine Data Type         | Compatible Python Types       |
++-------------------------------+-------------------------------+
+| :py:attr:`~DataType.ARRAY`    | :py:class:`list`,             |
+|                               | :py:class:`tuple`             |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.BOOLEAN`  | :py:class:`bool`              |
 +-------------------------------+-------------------------------+
@@ -119,6 +122,7 @@ to use for either the match or search operation.
 
 Reserved Keywords
 ^^^^^^^^^^^^^^^^^
+The following keywords are reserved and can not be used as the names of symbols.
 
 +-----------+----------------------------------------------+
 | Keyword   | Description                                  |
@@ -145,5 +149,49 @@ Reserved Keywords
 +-----------+----------------------------------------------+
 | ``or``    | Logical "or" operator                        |
 +-----------+----------------------------------------------+
+| **Membership Operators**                                 |
++-----------+----------------------------------------------+
+| ``in``    | Checks member is in the container            |
++-----------+----------------------------------------------+
+
+Literal Values
+^^^^^^^^^^^^^^
+STRING and DATETIME literal values are specified in a very similar manner by
+defining the value as a string of characters enclosed in either single or double
+quotes. The difference comes in an optional leading character before the opening
+quote. Either no leading character or a single ``s`` will specify a standard
+STRING value, while a single ``d`` will specify a DATETIME value.
+
+DATETIME literals must be specified in ISO-8601 format. The underlying parsing
+logic is provided by :py:meth:`dateutil.parser.isoparse`. DATETIME values with
+no time specified (e.g. ``d"2019-09-23"``) will evaluate to a DATETIME of the
+specified day at exactly midnight.
+
+Example rules showing equivalent literal expressions:
+
+* ``"foobar" == s"foobar"``
+* ``d"2019-09-23" == d"2019-09-23 00:00:00"``
+
+FLOAT literals may be expressed in either binary, octal, decimal, or hexadecimal
+formats. The binary, octal and hexadecimal formats use the ``0b``, ``0o``, and
+``0x`` prefixes respectively. Values in the decimal format require no prefix and
+is the default base in which values are represented. Only base-10, decimal
+values may include a decimal place component.
+
+Example rules showing equivalent literal expressions:
+
+* ``0b10 == 2``
+* ``0o10 == 8``
+* ``10.0 == 10``
+* ``0x10 == 16``
+
+FLOAT literals may also be expressed in scientific notation using the letter
+``e``.
+
+Example rules show equivalent literal expressions:
+
+* ``1E0 == 1``
+* ``1e0 == 1``
+* ``1.0e0 == 1``
 
 .. _Order of operations: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages

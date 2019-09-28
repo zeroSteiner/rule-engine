@@ -98,7 +98,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="builtins.html">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
 </ul>
 
@@ -170,35 +170,35 @@
 either True (matching) or False (non-matching). Rules support a small set of
 data types which can be defined as constants or resolved using the Python object
 on which the rule is being applied.</p>
-<table class="docutils align-default">
+<table border="1" class="docutils">
 <colgroup>
-<col style="width: 50%" />
-<col style="width: 50%" />
+<col width="50%" />
+<col width="50%" />
 </colgroup>
-<tbody>
-<tr class="row-odd"><td><p>Rule Engine Data Type</p></td>
-<td><p>Compatible Python Types</p></td>
+<tbody valign="top">
+<tr class="row-odd"><td>Rule Engine Data Type</td>
+<td>Compatible Python Types</td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>,
-<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p></td>
+<tr class="row-even"><td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a></td>
+<td><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>,
+<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.BOOLEAN" title="rule_engine.ast.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p></td>
+<tr class="row-odd"><td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.BOOLEAN" title="rule_engine.ast.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></td>
+<td><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.date" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></a>,
-<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a></p></td>
+<tr class="row-even"><td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></td>
+<td><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.date" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></a>,
+<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>,
-<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></p></td>
+<tr class="row-odd"><td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
+<td><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>,
+<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a></p></td>
-<td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p></td>
+<tr class="row-even"><td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a></td>
+<td><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<tr class="row-odd"><td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></td>
+<td><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -211,136 +211,136 @@ arithmetic for numerical data and regular expressions for strings. Operations
 are type aware and will raise an exception when an incompatible type is used.</p>
 <div class="section" id="supported-operations">
 <h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this headline">¶</a></h3>
-<table class="docutils align-default">
+<table border="1" class="docutils">
 <colgroup>
-<col style="width: 15%" />
-<col style="width: 41%" />
-<col style="width: 44%" />
+<col width="15%" />
+<col width="41%" />
+<col width="44%" />
 </colgroup>
-<tbody>
-<tr class="row-odd"><td><p>Operation</p></td>
-<td><p>Description</p></td>
-<td><p>Compatible Data Types</p></td>
+<tbody valign="top">
+<tr class="row-odd"><td>Operation</td>
+<td>Description</td>
+<td>Compatible Data Types</td>
 </tr>
-<tr class="row-even"><td colspan="3"><p><strong>Arithmetic Operators</strong></p></td>
+<tr class="row-even"><td colspan="3"><strong>Arithmetic Operators</strong></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">+</span></code></p></td>
-<td><p>Addition</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">+</span></code></td>
+<td>Addition</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-</span></code></p></td>
-<td><p>Subtraction</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">-</span></code></td>
+<td>Subtraction</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">*</span></code></p></td>
-<td><p>Multiplication</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">*</span></code></td>
+<td>Multiplication</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">**</span></code></p></td>
-<td><p>Exponent</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">**</span></code></td>
+<td>Exponent</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">/</span></code></p></td>
-<td><p>True division</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">/</span></code></td>
+<td>True division</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">//</span></code></p></td>
-<td><p>Floor division</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">//</span></code></td>
+<td>Floor division</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">%</span></code></p></td>
-<td><p>Modulo</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">%</span></code></td>
+<td>Modulo</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td colspan="3"><p><strong>Bitwise-Arithmetic Operators</strong></p></td>
+<tr class="row-even"><td colspan="3"><strong>Bitwise-Arithmetic Operators</strong></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&amp;</span></code></p></td>
-<td><p>Bitwise-and <sup>1</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&amp;</span></code></td>
+<td>Bitwise-and <sup>1</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">|</span></code></p></td>
-<td><p>Bitwise-or <sup>1</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">|</span></code></td>
+<td>Bitwise-or <sup>1</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">^</span></code></p></td>
-<td><p>Bitwise-xor <sup>1</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">^</span></code></td>
+<td>Bitwise-xor <sup>1</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code></p></td>
-<td><p>Bitwise right shift <sup>1</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code></td>
+<td>Bitwise right shift <sup>1</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code></p></td>
-<td><p>Bitwise left shift <sup>1</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code></td>
+<td>Bitwise left shift <sup>1</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td colspan="3"><p><strong>Comparison Operators</strong></p></td>
+<tr class="row-even"><td colspan="3"><strong>Comparison Operators</strong></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">==</span></code></p></td>
-<td><p>Equal to</p></td>
-<td><p><em>ANY</em></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">==</span></code></td>
+<td>Equal to</td>
+<td><em>ANY</em></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">!=</span></code></p></td>
-<td><p>Not equal to</p></td>
-<td><p><em>ANY</em></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">!=</span></code></td>
+<td>Not equal to</td>
+<td><em>ANY</em></td>
 </tr>
-<tr class="row-odd"><td colspan="3"><p><strong>Arithmetic-Comparison Operators</strong></p></td>
+<tr class="row-odd"><td colspan="3"><strong>Arithmetic-Comparison Operators</strong></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;</span></code></p></td>
-<td><p>Greater than</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&gt;</span></code></td>
+<td>Greater than</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;=</span></code></p></td>
-<td><p>Greater than or equal to</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&gt;=</span></code></td>
+<td>Greater than or equal to</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;</span></code></p></td>
-<td><p>Less than</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">&lt;</span></code></td>
+<td>Less than</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&lt;=</span></code></p></td>
-<td><p>Less than or equal to</p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">&lt;=</span></code></td>
+<td>Less than or equal to</td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
 </tr>
-<tr class="row-even"><td colspan="3"><p><strong>Fuzzy-Comparison Operators</strong></p></td>
+<tr class="row-even"><td colspan="3"><strong>Fuzzy-Comparison Operators</strong></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">=~</span></code></p></td>
-<td><p>Regex match <sup>2</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">=~</span></code></td>
+<td>Regex match <sup>2</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">=~~</span></code></p></td>
-<td><p>Regex search <sup>2</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">=~~</span></code></td>
+<td>Regex search <sup>2</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">!~</span></code></p></td>
-<td><p>Regex match fails <sup>2</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">!~</span></code></td>
+<td>Regex match fails <sup>2</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">!~~</span></code></p></td>
-<td><p>Regex search fails <sup>2</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">!~~</span></code></td>
+<td>Regex search fails <sup>2</sup></td>
+<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></td>
 </tr>
-<tr class="row-odd"><td colspan="3"><p><strong>Logical Operators</strong></p></td>
+<tr class="row-odd"><td colspan="3"><strong>Logical Operators</strong></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">and</span></code></p></td>
-<td><p>Logical and</p></td>
-<td><p><em>ANY</em></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">and</span></code></td>
+<td>Logical and</td>
+<td><em>ANY</em></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">not</span></code></p></td>
-<td><p>Logical not</p></td>
-<td><p><em>ANY</em></p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">not</span></code></td>
+<td>Logical not</td>
+<td><em>ANY</em></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">or</span></code></p></td>
-<td><p>Logical or</p></td>
-<td><p><em>ANY</em></p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">or</span></code></td>
+<td>Logical or</td>
+<td><em>ANY</em></td>
 </tr>
 </tbody>
 </table>
@@ -354,49 +354,49 @@ to use for either the match or search operation.</p>
 <div class="section" id="reserved-keywords">
 <h3>Reserved Keywords<a class="headerlink" href="#reserved-keywords" title="Permalink to this headline">¶</a></h3>
 <p>The following keywords are reserved and can not be used as the names of symbols.</p>
-<table class="docutils align-default">
+<table border="1" class="docutils">
 <colgroup>
-<col style="width: 19%" />
-<col style="width: 81%" />
+<col width="19%" />
+<col width="81%" />
 </colgroup>
-<tbody>
-<tr class="row-odd"><td><p>Keyword</p></td>
-<td><p>Description</p></td>
+<tbody valign="top">
+<tr class="row-odd"><td>Keyword</td>
+<td>Description</td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">null</span></code></p></td>
-<td><p>The <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.NullExpression" title="rule_engine.ast.NullExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">NullExpression</span></code></a> literal value</p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">null</span></code></td>
+<td>The <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.NullExpression" title="rule_engine.ast.NullExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">NullExpression</span></code></a> literal value</td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p><strong>Booleans</strong> (<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.BooleanExpression" title="rule_engine.ast.BooleanExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanExpression</span></code></a> Literals)</p></td>
+<tr class="row-odd"><td colspan="2"><strong>Booleans</strong> (<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.BooleanExpression" title="rule_engine.ast.BooleanExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanExpression</span></code></a> Literals)</td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
-<td><p>The “True” boolean value</p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">true</span></code></td>
+<td>The “True” boolean value</td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
-<td><p>The “False” boolean value</p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">false</span></code></td>
+<td>The “False” boolean value</td>
 </tr>
-<tr class="row-even"><td colspan="2"><p><strong>Floats</strong> (<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.FloatExpression" title="rule_engine.ast.FloatExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">FloatExpression</span></code></a> Literals)</p></td>
+<tr class="row-even"><td colspan="2"><strong>Floats</strong> (<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.FloatExpression" title="rule_engine.ast.FloatExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">FloatExpression</span></code></a> Literals)</td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">inf</span></code></p></td>
-<td><p>Floating point value for infinity</p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">inf</span></code></td>
+<td>Floating point value for infinity</td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nan</span></code></p></td>
-<td><p>Floating point value for not-a-number</p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">nan</span></code></td>
+<td>Floating point value for not-a-number</td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p><strong>Logical Operators</strong></p></td>
+<tr class="row-odd"><td colspan="2"><strong>Logical Operators</strong></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">and</span></code></p></td>
-<td><p>Logical “and” operator</p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">and</span></code></td>
+<td>Logical “and” operator</td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">not</span></code></p></td>
-<td><p>Logical “not” operator</p></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">not</span></code></td>
+<td>Logical “not” operator</td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">or</span></code></p></td>
-<td><p>Logical “or” operator</p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">or</span></code></td>
+<td>Logical “or” operator</td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p><strong>Membership Operators</strong></p></td>
+<tr class="row-odd"><td colspan="2"><strong>Membership Operators</strong></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">in</span></code></p></td>
-<td><p>Checks member is in the container</p></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">in</span></code></td>
+<td>Checks member is in the container</td>
 </tr>
 </tbody>
 </table>
@@ -414,8 +414,8 @@ no time specified (e.g. <code class="docutils literal notranslate"><span class="
 specified day at exactly midnight.</p>
 <p>Example rules showing equivalent literal expressions:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;foobar&quot;</span> <span class="pre">==</span> <span class="pre">s&quot;foobar&quot;</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">d&quot;2019-09-23&quot;</span> <span class="pre">==</span> <span class="pre">d&quot;2019-09-23</span> <span class="pre">00:00:00&quot;</span></code></p></li>
+<li><code class="docutils literal notranslate"><span class="pre">&quot;foobar&quot;</span> <span class="pre">==</span> <span class="pre">s&quot;foobar&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">d&quot;2019-09-23&quot;</span> <span class="pre">==</span> <span class="pre">d&quot;2019-09-23</span> <span class="pre">00:00:00&quot;</span></code></li>
 </ul>
 <p>FLOAT literals may be expressed in either binary, octal, decimal, or hexadecimal
 formats. The binary, octal and hexadecimal formats use the <code class="docutils literal notranslate"><span class="pre">0b</span></code>, <code class="docutils literal notranslate"><span class="pre">0o</span></code>, and
@@ -424,18 +424,18 @@ is the default base in which values are represented. Only base-10, decimal
 values may include a decimal place component.</p>
 <p>Example rules showing equivalent literal expressions:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">0b10</span> <span class="pre">==</span> <span class="pre">2</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">0o10</span> <span class="pre">==</span> <span class="pre">8</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">10.0</span> <span class="pre">==</span> <span class="pre">10</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">0x10</span> <span class="pre">==</span> <span class="pre">16</span></code></p></li>
+<li><code class="docutils literal notranslate"><span class="pre">0b10</span> <span class="pre">==</span> <span class="pre">2</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">0o10</span> <span class="pre">==</span> <span class="pre">8</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">10.0</span> <span class="pre">==</span> <span class="pre">10</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">0x10</span> <span class="pre">==</span> <span class="pre">16</span></code></li>
 </ul>
 <p>FLOAT literals may also be expressed in scientific notation using the letter
 <code class="docutils literal notranslate"><span class="pre">e</span></code>.</p>
 <p>Example rules show equivalent literal expressions:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">1E0</span> <span class="pre">==</span> <span class="pre">1</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">1e0</span> <span class="pre">==</span> <span class="pre">1</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">1.0e0</span> <span class="pre">==</span> <span class="pre">1</span></code></p></li>
+<li><code class="docutils literal notranslate"><span class="pre">1E0</span> <span class="pre">==</span> <span class="pre">1</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">1e0</span> <span class="pre">==</span> <span class="pre">1</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">1.0e0</span> <span class="pre">==</span> <span class="pre">1</span></code></li>
 </ul>
 </div>
 </div>

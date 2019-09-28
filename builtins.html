@@ -90,7 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
 </ul>
 
@@ -163,40 +163,40 @@
 through the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix. The default values can be overridden by defining a
 custom subclass of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> and setting the
 <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.builtins" title="rule_engine.engine.Context.builtins"><code class="xref py py-attr docutils literal notranslate"><span class="pre">builtins</span></code></a>.</p>
-<table border="1" class="docutils">
+<table class="docutils align-default">
 <colgroup>
-<col width="8%" />
-<col width="40%" />
-<col width="52%" />
+<col style="width: 8%" />
+<col style="width: 40%" />
+<col style="width: 52%" />
 </colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td>Name</td>
-<td>Data Type</td>
-<td>Value Description</td>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Data Type</p></td>
+<td><p>Value Description</p></td>
 </tr>
-<tr class="row-even"><td colspan="3"><strong>Math related</strong></td>
+<tr class="row-even"><td colspan="3"><p><strong>Math related</strong></p></td>
 </tr>
-<tr class="row-odd"><td>e</td>
-<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
-<td>The mathematical constant <em>e</em> (2.71828…).</td>
+<tr class="row-odd"><td><p>e</p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<td><p>The mathematical constant <em>e</em> (2.71828…).</p></td>
 </tr>
-<tr class="row-even"><td>pi</td>
-<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></td>
-<td>The mathematical constant <em>pi</em> (3.14159…).</td>
+<tr class="row-even"><td><p>pi</p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<td><p>The mathematical constant <em>pi</em> (3.14159…).</p></td>
 </tr>
-<tr class="row-odd"><td colspan="3"><strong>Timestamp related</strong></td>
+<tr class="row-odd"><td colspan="3"><p><strong>Timestamp related</strong></p></td>
 </tr>
-<tr class="row-even"><td>now</td>
-<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></td>
-<td>The current timestamp (including time)
+<tr class="row-even"><td><p>now</p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
+<td><p>The current timestamp (including time)
 using the default timezone from
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timestamp</span></code></td>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timestamp</span></code></p></td>
 </tr>
-<tr class="row-odd"><td>today</td>
-<td><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></td>
-<td>The current timestamp, (excluding time)
+<tr class="row-odd"><td><p>today</p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
+<td><p>The current timestamp, (excluding time)
 using the default timezone from
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timestamp</span></code></td>
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timestamp</span></code></p></td>
 </tr>
 </tbody>
 </table>

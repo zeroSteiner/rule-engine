@@ -88,7 +88,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Rule Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../builtins.html">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../attributes.html">Data Attributes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../change_log.html">Change Log</a></li>
 </ul>
 
@@ -468,7 +468,9 @@
 				<span class="k">break</span>
 		<span class="k">else</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EngineError</span><span class="p">(</span><span class="s2">&quot;can not create literal expression from python value: </span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-		<span class="k">return</span> <span class="n">subclass</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">datatype</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">is_compound</span><span class="p">:</span>
+			<span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">subclass</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
@@ -508,7 +510,6 @@
 <span class="sd">	expression type always evaluates to true.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
-
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
 		<span class="k">try</span><span class="p">:</span>

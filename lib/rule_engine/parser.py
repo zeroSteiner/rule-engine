@@ -342,7 +342,7 @@ class Parser(ParserBase):
 		p[0] = ast.LogicExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_group(self, p):
-		'expression : LPAREN expression RPAREN'
+		'object : LPAREN expression RPAREN'
 		p[0] = p[2]
 
 	def p_expression_negate(self, p):

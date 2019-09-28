@@ -11,6 +11,17 @@ install:
   - pipenv install --dev
   - python setup.py install
 
-script:
-  - python -m unittest -v tests
-  - sphinx-build -b html -a -E -v docs/source docs/html
+jobs:
+  include:
+    - script: python -m unittest -v tests
+    - stage: Documentation
+      python: "3.7"
+      script:
+        - sphinx-build -b html -a -E -v docs/source docs/html
+        - echo "Deploying to GitHub pages..."
+      deploy:
+        local_dir: docs/html
+        provider: pages
+        skip_cleanup: true
+        keep_history: true
+        github_token: $GITHUB_TOKEN

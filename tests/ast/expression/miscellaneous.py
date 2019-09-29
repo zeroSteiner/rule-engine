@@ -42,11 +42,17 @@ import rule_engine.errors as errors
 
 import dateutil.tz
 
-__all__ = ('ContainsExpressionTests', 'SymbolExpressionTests', 'TernaryExpressionTests', 'UnaryExpressionTests')
+__all__ = (
+	'ContainsExpressionTests',
+	'SymbolExpressionTests',
+	'SymbolExpressionConversionTests',
+	'TernaryExpressionTests',
+	'UnaryExpressionTests'
+)
 
 class ContainsExpressionTests(unittest.TestCase):
 	def test_ast_expression_contains(self):
-		container = ast.LiteralExpressionBase.from_value(context, tuple(range(3)))
+		container = ast.LiteralExpressionBase.from_value(context, range(3))
 
 		member = ast.FloatExpression(context, 1.0)
 		contains = ast.ContainsExpression(context, member, container)
@@ -116,20 +122,6 @@ class SymbolExpressionTests(unittest.TestCase):
 		self.assertEqual(symbol.name, self.sym_name)
 		self.assertEqual(symbol.evaluate({self.sym_name: self.sym_value}), self.sym_value)
 
-	def test_ast_expression_symbol_type_date_conversion(self):
-		symbol = ast.SymbolExpression(context, self.sym_name)
-		self.assertEqual(symbol.name, self.sym_name)
-		result = symbol.evaluate({self.sym_name: datetime.date(2016, 10, 15)})
-		self.assertIsInstance(result, datetime.datetime)
-		self.assertEqual(result, datetime.datetime(2016, 10, 15, tzinfo=dateutil.tz.tzlocal()))
-
-	def test_ast_expression_symbol_type_int_conversion(self):
-		symbol = ast.SymbolExpression(context, self.sym_name)
-		self.assertEqual(symbol.name, self.sym_name)
-		result = symbol.evaluate({self.sym_name: 1})
-		self.assertIsInstance(result, float)
-		self.assertEqual(result, 1.0)
-
 	def test_ast_expression_symbol_type_errors(self):
 		context = engine.Context(type_resolver=self._type_resolver)
 		symbol = ast.SymbolExpression(context, self.sym_name)
@@ -138,6 +130,27 @@ class SymbolExpressionTests(unittest.TestCase):
 		with self.assertRaises(errors.SymbolTypeError):
 			self.assertEqual(symbol.evaluate({self.sym_name: not self.sym_value}), self.sym_value)
 		self.assertIsNone(symbol.evaluate({self.sym_name: None}))
+
+class SymbolExpressionConversionTests(unittest.TestCase):
+	def setUp(self):
+		self.sym_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+		self.symbol = ast.SymbolExpression(context, self.sym_name)
+		self.assertEqual(self.symbol.name, self.sym_name)
+
+	def test_ast_expression_symbol_type_converts_date(self):
+		result = self.symbol.evaluate({self.sym_name: datetime.date(2016, 10, 15)})
+		self.assertIsInstance(result, datetime.datetime)
+		self.assertEqual(result, datetime.datetime(2016, 10, 15, tzinfo=dateutil.tz.tzlocal()))
+
+	def test_ast_expression_symbol_type_converts_int(self):
+		result = self.symbol.evaluate({self.sym_name: 1})
+		self.assertIsInstance(result, float)
+		self.assertEqual(result, 1.0)
+
+	def test_ast_expression_symbol_type_converts_range(self):
+		result = self.symbol.evaluate({self.sym_name: range(3)})
+		self.assertIsInstance(result, tuple)
+		self.assertEqual(result, (0, 1, 2))
 
 class TernaryExpressionTests(unittest.TestCase):
 	left_value = ast.StringExpression(context, 'left')

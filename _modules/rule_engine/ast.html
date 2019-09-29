@@ -198,7 +198,7 @@
 
 <span class="n">NoneType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="coerce_value"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.coerce_value">[docs]</a><span class="k">def</span> <span class="nf">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="coerce_value"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.coerce_value">[docs]</a><span class="k">def</span> <span class="nf">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Take a native Python *value* and convert it to a value of a data type which</span>
 <span class="sd">	is can be represented by a Rule Engine :py:class:`~.DataType`. This function</span>
@@ -208,7 +208,8 @@
 <span class="sd">	.. versionadded:: 2.0.0</span>
 
 <span class="sd">	:param value: The value to convert.</span>
-<span class="sd">	:return: The converted value</span>
+<span class="sd">	:param bool verify_type: Whether or not to verify the converted value&#39;s type.</span>
+<span class="sd">	:return: The converted value.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="c1"># ARRAY</span>
 	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">range</span><span class="p">)):</span>
@@ -219,7 +220,8 @@
 	<span class="c1"># FLOAT</span>
 	<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
 		<span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-	<span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># use this to raise a TypeError, if the type is incompatible</span>
+	<span class="k">if</span> <span class="n">verify_type</span><span class="p">:</span>
+		<span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># use this to raise a TypeError, if the type is incompatible</span>
 	<span class="k">return</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="is_natural_number"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_natural_number">[docs]</a><span class="k">def</span> <span class="nf">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -768,15 +770,15 @@
 		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 			<span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
-		<span class="k">elif</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
+		<span class="k">elif</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">member</span> <span class="o">=</span> <span class="n">member</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
 
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
-		<span class="n">member_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">member</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-		<span class="n">container_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+		<span class="n">member_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">member</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="n">container_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
 		<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">container_value</span><span class="p">)</span> <span class="ow">is</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 			<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">member_value</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
@@ -825,6 +827,8 @@
 			<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">resolved_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 		<span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">:</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">resolved_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">value</span> <span class="o">=</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">value</span>
 
 	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

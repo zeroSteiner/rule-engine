@@ -5,17 +5,23 @@ This document contains notes on the major changes for each version of the Rule
 Engine. In comparison to the git log, this list is curated by the development
 team for note worthy changes.
 
+Version 2.x.x
+-------------
+
 Version 2.0.0
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 *In Progress*
 
+* Removed the :py:func:`~rule_engine.engine.to_recursive_resolver` function
 * Added proper support for attributes
 * Added a change log
-* Removed the :py:func:`~rule_engine.engine.to_recursive_resolver` function
-* Added automatic unit testing using Travis-CI
 * Added additional information to the Graphviz output
 * Added the new :py:class:`~rule_engine.ast.DataType.ARRAY` data type
+* Started using Travis-CI
+
+    * Added automatic unit testing using Travis-CI
+    * Added automatic deployment of documentation using Travis-CI
 
 Version 1.x.x
 -------------

@@ -182,7 +182,7 @@ from parsed grammar text.</p>
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="rule_engine.ast.coerce_value">
-<code class="sig-name descname">coerce_value</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#coerce_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.coerce_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">coerce_value</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">verify_type=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#coerce_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.coerce_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a native Python <em>value</em> and convert it to a value of a data type which
 is can be represented by a Rule Engine <a class="reference internal" href="#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>. This function
 is useful for converting native Python values at the engine boundaries such
@@ -192,10 +192,13 @@ as when resolving a symbol from an object external to the engine.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>value</strong> – The value to convert.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>value</strong> – The value to convert.</p></li>
+<li><p><strong>verify_type</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to verify the converted value’s type.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The converted value</p>
+<dd class="field-even"><p>The converted value.</p>
 </dd>
 </dl>
 </dd></dl>

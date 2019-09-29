@@ -55,11 +55,13 @@ def coerce_value(value):
 	:param value: The value to convert.
 	:return: The converted value
 	"""
-	# convert the value from one of the supported types if necessary
-	if isinstance(value, list):
+	# ARRAY
+	if isinstance(value, (list, range)):
 		value = tuple(value)
+	# DATETIME
 	elif isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
 		value = datetime.datetime(value.year, value.month, value.day)
+	# FLOAT
 	elif isinstance(value, int) and not isinstance(value, bool):
 		value = float(value)
 	DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
@@ -202,7 +204,7 @@ class DataType(enum.Enum):
 		"""
 		if not isinstance(python_type, type):
 			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
-		if python_type is list or python_type is tuple:
+		if python_type is list or python_type is range or python_type is tuple:
 			return cls.ARRAY
 		elif python_type is bool:
 			return cls.BOOLEAN
@@ -228,7 +230,7 @@ class DataType(enum.Enum):
 			corresponding data type constant for.
 		:return: One of the constants.
 		"""
-		if isinstance(python_value, (list, tuple)):
+		if isinstance(python_value, (list, range, tuple)):
 			return cls.ARRAY
 		elif isinstance(python_value, bool):
 			return cls.BOOLEAN

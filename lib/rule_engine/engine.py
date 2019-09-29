@@ -155,7 +155,12 @@ class _AttributeResolver(object):
 			return function
 
 	def __call__(self, thing, object_, name):
-		resolver = self._get_resolver(ast.DataType.from_value(object_), name, thing=thing)
+		try:
+			object_type = ast.DataType.from_value(object_)
+		except TypeError:
+			# if the object can't be mapped to a supported type, raise a resolution error
+			raise errors.AttributeResolutionError(name, object_, thing=thing) from None
+		resolver = self._get_resolver(object_type, name, thing=thing)
 		value = resolver.function(self, object_)
 		value = ast.coerce_value(value)
 		if resolver.result_type is ast.DataType.UNDEFINED:

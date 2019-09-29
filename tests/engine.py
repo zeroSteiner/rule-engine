@@ -173,6 +173,17 @@ class EngineRuleTests(unittest.TestCase):
 		rule = engine.Rule('a.b.c')
 		self.assertTrue(rule.evaluate({'a': {'b': {'c': True}}}))
 
+		value = rule.evaluate({'a': {'b': {'c': 1}}})
+		self.assertIsInstance(value, float)
+		self.assertEqual(value, 1.0)
+
+		value = rule.evaluate({'a': {'b': {'c': {'d': None}}}})
+		self.assertIsInstance(value, dict)
+		self.assertIn('d', value)
+
+		with self.assertRaises(errors.AttributeResolutionError):
+			rule.evaluate({'a': {}})
+
 	def test_engine_rule_debug_parser(self):
 		with open(os.devnull, 'w') as file_h:
 			original_stderr = sys.stderr

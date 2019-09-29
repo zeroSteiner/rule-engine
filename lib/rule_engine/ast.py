@@ -43,7 +43,7 @@ import dateutil.parser
 
 NoneType = type(None)
 
-def coerce_value(value):
+def coerce_value(value, verify_type=True):
 	"""
 	Take a native Python *value* and convert it to a value of a data type which
 	is can be represented by a Rule Engine :py:class:`~.DataType`. This function
@@ -53,7 +53,8 @@ def coerce_value(value):
 	.. versionadded:: 2.0.0
 
 	:param value: The value to convert.
-	:return: The converted value
+	:param bool verify_type: Whether or not to verify the converted value's type.
+	:return: The converted value.
 	"""
 	# ARRAY
 	if isinstance(value, (list, range)):
@@ -64,7 +65,8 @@ def coerce_value(value):
 	# FLOAT
 	elif isinstance(value, int) and not isinstance(value, bool):
 		value = float(value)
-	DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
+	if verify_type:
+		DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
 	return value
 
 def is_natural_number(value):
@@ -613,15 +615,15 @@ class ContainsExpression(ExpressionBase):
 		if container.result_type is DataType.STRING:
 			if member.result_type is not DataType.UNDEFINED and member.result_type is not DataType.STRING:
 				raise errors.EvaluationError('data type mismatch')
-		elif container.result_type.value.is_scalar:
+		elif container.result_type is not DataType.UNDEFINED and container.result_type.value.is_scalar:
 			raise errors.EvaluationError('data type mismatch')
 		self.context = context
 		self.member = member
 		self.container = container
 
 	def evaluate(self, thing):
-		member_value = self.member.evaluate(None)
-		container_value = self.container.evaluate(None)
+		member_value = self.member.evaluate(thing)
+		container_value = self.container.evaluate(thing)
 		if DataType.from_value(container_value) is DataType.STRING:
 			if DataType.from_value(member_value) is not DataType.STRING:
 				raise errors.EvaluationError('data type mismatch')
@@ -670,6 +672,8 @@ class GetAttributeExpression(ExpressionBase):
 			value = self.context.resolve(resolved_obj, self.name)
 		except errors.SymbolResolutionError:
 			value = self.context.resolve_attribute(thing, resolved_obj, self.name)
+		else:
+			value = coerce_value(value, verify_type=False)
 		return value
 
 	def reduce(self):

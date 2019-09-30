@@ -54,11 +54,9 @@ example rules:
     "product == 'OpenSSH' and port != 22"
 """
 
-_custom_resolve_item = rule_engine.engine.to_recursive_resolver(rule_engine.engine.resolve_item)
-
 @rule_engine.engine.to_default_resolver
 def custom_resolve_item(thing, name):
-	value = _custom_resolve_item(thing, name)
+	value = rule_engine.engine.resolve_item(thing, name)
 	if isinstance(value, (dict, list)):
 		value = len(value) > 0
 	return value

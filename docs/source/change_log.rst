@@ -13,7 +13,6 @@ Version 2.0.0
 
 *In Progress*
 
-* Removed the :py:func:`~rule_engine.engine.to_recursive_resolver` function
 * Added proper support for attributes
 * Added a change log
 * Added additional information to the Graphviz output
@@ -22,6 +21,12 @@ Version 2.0.0
 
     * Added automatic unit testing using Travis-CI
     * Added automatic deployment of documentation using Travis-CI
+
+* Removed the resolver conversion functions
+
+    * Removed ``to_recursive_resolver`` in favor of attributes
+    * Removed ``to_default_resolver`` in favor of the *default_value* kwarg to
+      :py:meth:`~rule_engine.engine.Context.__init__`
 
 Version 1.x.x
 -------------

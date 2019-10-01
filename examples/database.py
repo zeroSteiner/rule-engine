@@ -39,23 +39,10 @@ import rule_engine
 def isiterable(thing):
 	return isinstance(thing, collections.abc.Iterable)
 
-_recursive_resolve_item = rule_engine.engine.to_recursive_resolver(
-	rule_engine.engine.resolve_item
-)
-
-@rule_engine.engine.to_default_resolver
-def custom_resolve_item(thing, name):
-	value = _recursive_resolve_item(thing, name)
-	if isinstance(value, (dict, list)):
-		value = len(value) > 0
-	return value
-
-_resolve_name = rule_engine.engine.to_default_resolver(_recursive_resolve_item)
-
 class Database(object):
 	def __init__(self, data):
 		self.data = data
-		self._rule_context = rule_engine.Context(resolver=custom_resolve_item)
+		self._rule_context = rule_engine.Context(default_value=None)
 
 	@classmethod
 	def from_csv(cls, file_path, headers=None, skip_first=False):
@@ -76,7 +63,7 @@ class Database(object):
 	def select(self, *names, from_=None, where='true', limit=None):
 		data = self.data
 		if from_ is not None:
-			data = _recursive_resolve_item(data, from_)
+			data = rule_engine.Rule(from_, context=self._rule_context).evaluate(data)
 			if isinstance(data, collections.abc.Mapping):
 				data = data.values()
 		if not isiterable(data):
@@ -86,5 +73,5 @@ class Database(object):
 		for match in rule.filter(data):
 			if count == limit:
 				break
-			yield tuple(_resolve_name(match, name) for name in names)
+			yield tuple(rule_engine.Rule(name, context=self._rule_context).evaluate(match) for name in names)
 			count += 1

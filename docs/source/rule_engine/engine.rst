@@ -13,8 +13,6 @@ Functions
 
 .. autofunction:: resolve_item
 
-.. autofunction:: to_default_resolver
-
 .. autofunction:: type_resolver_from_dict
 
 Classes

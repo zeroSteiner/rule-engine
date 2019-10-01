@@ -87,35 +87,6 @@ def resolve_item(thing, name):
 		raise errors.SymbolResolutionError(name, thing=thing)
 	return thing[name]
 
-def to_default_resolver(resolver, default_value=None):
-	"""
-	Convert the specified *resolver* function (such as
-	:py:func:`~.resolve_attribute` or :py:func:`~.resolve_item`) into one which
-	returns the specified *default_value* when the symbol fails to resolve.
-	Converted resolver functions will not raise
-	:py:exc:`~errors.SymbolResolutionError`, instead they will return the
-	default value.
-
-	.. versionadded:: 1.1.0
-
-	:param resolver: The resolver function to convert.
-	:type resolver: function
-	:param default_value: The Python value to use as the default for symbols
-		which can not be resolved.
-	:return: A new resolver function.
-	:rtype: function
-	"""
-	# use DataType.from_value to raise a TypeError if value is not of a
-	# compatible data type
-	ast.DataType.from_value(default_value)
-	@functools.wraps(resolver)
-	def default_resolver(thing, name):
-		try:
-			return resolver(thing, name)
-		except errors.SymbolResolutionError:
-			return default_value
-	return default_resolver
-
 def _type_resolver(type_map, name):
 	if name not in type_map:
 		raise errors.SymbolResolutionError(name)
@@ -303,7 +274,7 @@ class Context(object):
 	change the behavior of certain aspects of the rule such as how symbols are
 	resolved and what regex flags should be used.
 	"""
-	def __init__(self, regex_flags=0, resolver=None, type_resolver=None, default_timezone='local'):
+	def __init__(self, regex_flags=0, resolver=None, type_resolver=None, default_timezone='local', default_value=errors.UNDEFINED):
 		"""
 		:param int regex_flags: The flags to provide to functions in the
 			:py:mod:`re` module.
@@ -318,6 +289,11 @@ class Context(object):
 			string. If *default_timzezone* is a string it must be one of the
 			specially supported (case-insensitive) values of "local" or "utc".
 		:type default_timezone: str, :py:class:`~datetime.tzinfo`
+		:param default_value: The default value to return when resolving either
+			a missing symbol or attribute.
+
+		.. versionchanged: v2.0.0
+			Added the *default_value* parameter.
 		"""
 		self.regex_flags = regex_flags
 		"""
@@ -342,6 +318,7 @@ class Context(object):
 		elif not isinstance(default_timezone, datetime.tzinfo):
 			raise TypeError('invalid default_timezone type')
 		self.default_timezone = default_timezone
+		self.default_value = default_value
 		self.builtins = Builtins.from_defaults(timezone=default_timezone)
 		"""An instance of :py:class:`Builtins` to provided a default set of builtin symbol values."""
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
@@ -354,23 +331,42 @@ class Context(object):
 		*scope* is defined, this function handles the resolution itself, however
 		when the *scope* is ``None`` the resolver specified in
 		:py:meth:`~.Context.__init__` is used which defaults to
-		:py:func:`resolve_item`. This function must return a compatible value
-		for the specified symbol name.
+		:py:func:`resolve_item`.
 
 		:param thing: The object from which the *name* item will be accessed.
 		:param str name: The symbol name that is being resolved.
-		:return: The value for the corresponding attribute *name*.
+		:return: The value for the corresponding symbol *name*.
 		"""
 		if scope == 'built-in':
 			thing = self.builtins
 		if isinstance(thing, Builtins):
 			return resolve_item(thing, name)
 		if scope is None:
-			return self.__resolver(thing, name)
-		raise errors.SymbolResolutionError(name, symbol_scope=scope)
+			try:
+				return self.__resolver(thing, name)
+			except errors.SymbolResolutionError:
+				if self.default_value is not errors.UNDEFINED:
+					return self.default_value
+		raise errors.SymbolResolutionError(name, symbol_scope=scope, thing=thing)
 
-	resolve_attribute = _AttributeResolver()
-	resolve_attribute_type = resolve_attribute.resolve_type
+	__resolve_attribute = _AttributeResolver()
+	def resolve_attribute(self, thing, object_, name):
+		"""
+		The method to use for resolving attributes from values. This function
+		must return a compatible value for the specified attribute name.
+
+		:param thing: The object from which the *object_* was retrieved.
+		:param object_: The object from which the *name* attribute will be accessed.
+		:param str name: The attribute name that is being resolved.
+		:return: The value for the corresponding attribute *name*.
+		"""
+		try:
+			return self.__resolve_attribute(thing, object_, name)
+		except errors.AttributeResolutionError:
+			if self.default_value is not errors.UNDEFINED:
+				return self.default_value
+		raise errors.AttributeResolutionError(name, object_, thing=thing)
+	resolve_attribute_type = __resolve_attribute.resolve_type
 
 	def resolve_type(self, name):
 		"""

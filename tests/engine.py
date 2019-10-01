@@ -74,9 +74,10 @@ class EngineTests(unittest.TestCase):
 
 	def test_engine_resolve_attribute_with_defaults(self):
 		thing = collections.namedtuple('Person', ('name',))(name='alice')
-		resolver = engine.to_default_resolver(engine.resolve_attribute)
-		self.assertEqual(resolver(thing, 'name'), thing.name)
-		self.assertIsNone(resolver(thing, 'email'))
+		context = engine.Context(resolver=engine.resolve_attribute, default_value=None)
+		self.assertEqual(engine.Rule('name', context=context).evaluate(thing), thing.name)
+		self.assertIsNone(engine.Rule('address', context=context).evaluate(thing))
+		self.assertIsNone(engine.Rule('address.city', context=context).evaluate(thing))
 
 	def test_engine_resolve_item(self):
 		thing = {'name': 'Alice'}
@@ -86,9 +87,10 @@ class EngineTests(unittest.TestCase):
 
 	def test_engine_resolve_item_with_defaults(self):
 		thing = {'name': 'Alice'}
-		resolver = engine.to_default_resolver(engine.resolve_item)
-		self.assertEqual(resolver(thing, 'name'), thing['name'])
-		self.assertIsNone(resolver(thing, 'email'))
+		context = engine.Context(resolver=engine.resolve_item, default_value=None)
+		self.assertEqual(engine.Rule('name', context=context).evaluate(thing), thing['name'])
+		self.assertIsNone(engine.Rule('address', context=context).evaluate(thing))
+		self.assertIsNone(engine.Rule('address.city', context=context).evaluate(thing))
 
 	def test_engine_type_resolver_from_dict(self):
 		type_resolver = engine.type_resolver_from_dict({

@@ -206,13 +206,13 @@ class DataType(enum.Enum):
 		"""
 		if not isinstance(python_type, type):
 			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
-		if python_type is list or python_type is range or python_type is tuple:
+		if python_type in (dict, list, range, tuple):
 			return cls.ARRAY
 		elif python_type is bool:
 			return cls.BOOLEAN
 		elif python_type is datetime.date or python_type is datetime.datetime:
 			return cls.DATETIME
-		elif python_type is float or python_type is int:
+		elif python_type in (float, int):
 			return cls.FLOAT
 		elif python_type is NoneType:
 			return cls.NULL
@@ -232,7 +232,7 @@ class DataType(enum.Enum):
 			corresponding data type constant for.
 		:return: One of the constants.
 		"""
-		if isinstance(python_value, (list, range, tuple)):
+		if isinstance(python_value, (dict, list, range, tuple)):
 			return cls.ARRAY
 		elif isinstance(python_value, bool):
 			return cls.BOOLEAN
@@ -713,17 +713,17 @@ class SymbolExpression(ExpressionBase):
 
 	def evaluate(self, thing):
 		value = self.context.resolve(thing, self.name, scope=self.scope)
-		value = coerce_value(value)
+		value = coerce_value(value, verify_type=False)
 		if isinstance(value, datetime.datetime) and value.tzinfo is None:
 			value = value.replace(tzinfo=self.context.default_timezone)
-
-		# use DataType.from_value to raise a TypeError if value is not of a
-		# compatible data type
-		value_type = DataType.from_value(value)
 
 		# if the expected result type is undefined, return the value
 		if self.result_type is DataType.UNDEFINED:
 			return value
+
+		# use DataType.from_value to raise a TypeError if value is not of a
+		# compatible data type
+		value_type = DataType.from_value(value)
 
 		# if the type is the expected result type, return the value
 		if value_type is self.result_type:

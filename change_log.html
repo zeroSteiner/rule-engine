@@ -177,7 +177,6 @@ team for note worthy changes.</p>
 <h3>Version 2.0.0<a class="headerlink" href="#version-2-0-0" title="Permalink to this headline">¶</a></h3>
 <p><em>In Progress</em></p>
 <ul>
-<li><p>Removed the <code class="xref py py-func docutils literal notranslate"><span class="pre">to_recursive_resolver()</span></code> function</p></li>
 <li><p>Added proper support for attributes</p></li>
 <li><p>Added a change log</p></li>
 <li><p>Added additional information to the Graphviz output</p></li>
@@ -187,6 +186,15 @@ team for note worthy changes.</p>
 <div><ul class="simple">
 <li><p>Added automatic unit testing using Travis-CI</p></li>
 <li><p>Added automatic deployment of documentation using Travis-CI</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Removed the resolver conversion functions</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">to_recursive_resolver</span></code> in favor of attributes</p></li>
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">to_default_resolver</span></code> in favor of the <em>default_value</em> kwarg to
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></p></li>
 </ul>
 </div></blockquote>
 </li>

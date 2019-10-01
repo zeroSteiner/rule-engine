@@ -221,35 +221,6 @@ values in <em>thing</em> must be of a compatible data type.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="rule_engine.engine.to_default_resolver">
-<code class="sig-name descname">to_default_resolver</code><span class="sig-paren">(</span><em class="sig-param">resolver</em>, <em class="sig-param">default_value=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#to_default_resolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.to_default_resolver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert the specified <em>resolver</em> function (such as
-<a class="reference internal" href="#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_attribute()</span></code></a> or <a class="reference internal" href="#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_item()</span></code></a>) into one which
-returns the specified <em>default_value</em> when the symbol fails to resolve.
-Converted resolver functions will not raise
-<code class="xref py py-exc docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code>, instead they will return the
-default value.</p>
-<div class="versionadded">
-<p><span class="versionmodified added">New in version 1.1.0.</span></p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>resolver</strong> (<em>function</em>) – The resolver function to convert.</p></li>
-<li><p><strong>default_value</strong> – The Python value to use as the default for symbols
-which can not be resolved.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A new resolver function.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>function</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
 <dt id="rule_engine.engine.type_resolver_from_dict">
 <code class="sig-name descname">type_resolver_from_dict</code><span class="sig-paren">(</span><em class="sig-param">dictionary</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#type_resolver_from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.type_resolver_from_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a function suitable for use as the <em>type_resolver</em> for a
@@ -311,14 +282,14 @@ be passed a single argument, which is the instance of
 
 <dl class="class">
 <dt id="rule_engine.engine.Context">
-<em class="property">class </em><code class="sig-name descname">Context</code><span class="sig-paren">(</span><em class="sig-param">regex_flags=0</em>, <em class="sig-param">resolver=None</em>, <em class="sig-param">type_resolver=None</em>, <em class="sig-param">default_timezone='local'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Context</code><span class="sig-paren">(</span><em class="sig-param">regex_flags=0</em>, <em class="sig-param">resolver=None</em>, <em class="sig-param">type_resolver=None</em>, <em class="sig-param">default_timezone='local'</em>, <em class="sig-param">default_value=UNDEFINED</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An object defining the context for a rule’s evaluation. This can be used to
 change the behavior of certain aspects of the rule such as how symbols are
 resolved and what regex flags should be used.</p>
 <dl class="method">
 <dt id="rule_engine.engine.Context.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">regex_flags=0</em>, <em class="sig-param">resolver=None</em>, <em class="sig-param">type_resolver=None</em>, <em class="sig-param">default_timezone='local'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">regex_flags=0</em>, <em class="sig-param">resolver=None</em>, <em class="sig-param">type_resolver=None</em>, <em class="sig-param">default_timezone='local'</em>, <em class="sig-param">default_value=UNDEFINED</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -334,6 +305,8 @@ specified. This is necessary for comparison operations. The value
 should either be a <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.tzinfo" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> instance, or a
 string. If <em>default_timzezone</em> is a string it must be one of the
 specially supported (case-insensitive) values of “local” or “utc”.</p></li>
+<li><p><strong>default_value</strong> – The default value to return when resolving either
+a missing symbol or attribute.</p></li>
 </ul>
 </dd>
 </dl>
@@ -360,8 +333,7 @@ must return a compatible value for the specified symbol name. When a
 <em>scope</em> is defined, this function handles the resolution itself, however
 when the <em>scope</em> is <code class="docutils literal notranslate"><span class="pre">None</span></code> the resolver specified in
 <a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a> is used which defaults to
-<a class="reference internal" href="#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_item()</span></code></a>. This function must return a compatible value
-for the specified symbol name.</p>
+<a class="reference internal" href="#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_item()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -370,15 +342,29 @@ for the specified symbol name.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The value for the corresponding attribute <em>name</em>.</p>
+<dd class="field-even"><p>The value for the corresponding symbol <em>name</em>.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="method">
 <dt id="rule_engine.engine.Context.resolve_attribute">
-<code class="sig-name descname">resolve_attribute</code><em class="property"> = &lt;rule_engine.engine._AttributeResolver object&gt;</em><a class="headerlink" href="#rule_engine.engine.Context.resolve_attribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="sig-name descname">resolve_attribute</code><span class="sig-paren">(</span><em class="sig-param">thing</em>, <em class="sig-param">object_</em>, <em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.resolve_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.Context.resolve_attribute" title="Permalink to this definition">¶</a></dt>
+<dd><p>The method to use for resolving attributes from values. This function
+must return a compatible value for the specified attribute name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thing</strong> – The object from which the <em>object_</em> was retrieved.</p></li>
+<li><p><strong>object</strong> – The object from which the <em>name</em> attribute will be accessed.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The attribute name that is being resolved.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The value for the corresponding attribute <em>name</em>.</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="rule_engine.engine.Context.resolve_attribute_type">

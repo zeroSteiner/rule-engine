@@ -668,13 +668,16 @@ class GetAttributeExpression(ExpressionBase):
 			resolved_obj = self.context.resolve(thing, self.object.name, scope=self.object.scope)
 		else:
 			resolved_obj = self.object.evaluate(thing)
+
 		try:
 			value = self.context.resolve(resolved_obj, self.name)
 		except errors.SymbolResolutionError:
-			value = self.context.resolve_attribute(thing, resolved_obj, self.name)
+			pass
 		else:
-			value = coerce_value(value, verify_type=False)
-		return value
+			return coerce_value(value, verify_type=False)
+
+		value = self.context.resolve_attribute(thing, resolved_obj, self.name)
+		return coerce_value(value, verify_type=False)
 
 	def reduce(self):
 		if not _is_reduced(self.object):

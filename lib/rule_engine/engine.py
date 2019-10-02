@@ -144,10 +144,10 @@ class _AttributeResolver(object):
 	def _get_resolver(self, object_type, name, thing=errors.UNDEFINED):
 		attribute_resolvers = self.attribute.type_map.get(object_type)
 		if attribute_resolvers is None:
-			raise errors.AttributeResolutionError(name, object_type, thing)
+			raise errors.AttributeResolutionError(name, object_type, thing=thing)
 		resolver = attribute_resolvers.get(name)
 		if resolver is None:
-			raise errors.AttributeResolutionError(name, object_type, thing)
+			raise errors.AttributeResolutionError(name, object_type, thing=thing)
 		return resolver
 
 	def resolve_type(self, object_type, name):
@@ -347,6 +347,7 @@ class Context(object):
 			except errors.SymbolResolutionError:
 				if self.default_value is not errors.UNDEFINED:
 					return self.default_value
+				raise
 		raise errors.SymbolResolutionError(name, symbol_scope=scope, thing=thing)
 
 	__resolve_attribute = _AttributeResolver()
@@ -365,7 +366,7 @@ class Context(object):
 		except errors.AttributeResolutionError:
 			if self.default_value is not errors.UNDEFINED:
 				return self.default_value
-		raise errors.AttributeResolutionError(name, object_, thing=thing)
+			raise
 	resolve_attribute_type = __resolve_attribute.resolve_type
 
 	def resolve_type(self, name):

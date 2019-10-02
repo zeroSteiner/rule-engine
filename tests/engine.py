@@ -76,6 +76,7 @@ class EngineTests(unittest.TestCase):
 		thing = collections.namedtuple('Person', ('name',))(name='alice')
 		context = engine.Context(resolver=engine.resolve_attribute, default_value=None)
 		self.assertEqual(engine.Rule('name', context=context).evaluate(thing), thing.name)
+		self.assertIsNone(engine.Rule('name.first', context=context).evaluate(thing))
 		self.assertIsNone(engine.Rule('address', context=context).evaluate(thing))
 		self.assertIsNone(engine.Rule('address.city', context=context).evaluate(thing))
 
@@ -89,6 +90,7 @@ class EngineTests(unittest.TestCase):
 		thing = {'name': 'Alice'}
 		context = engine.Context(resolver=engine.resolve_item, default_value=None)
 		self.assertEqual(engine.Rule('name', context=context).evaluate(thing), thing['name'])
+		self.assertIsNone(engine.Rule('name.first', context=context).evaluate(thing))
 		self.assertIsNone(engine.Rule('address', context=context).evaluate(thing))
 		self.assertIsNone(engine.Rule('address.city', context=context).evaluate(thing))
 

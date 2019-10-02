@@ -39,6 +39,8 @@ from .engine import type_resolver_from_dict
 from .engine import Context
 from .engine import Rule
 
+from .errors import AttributeResolutionError
 from .errors import EngineError
+from .errors import EvaluationError
 from .errors import RuleSyntaxError
 from .errors import SymbolResolutionError

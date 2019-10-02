@@ -823,13 +823,16 @@
 			<span class="n">resolved_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">resolved_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+
 		<span class="k">try</span><span class="p">:</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">resolved_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 		<span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">:</span>
-			<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">resolved_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+			<span class="k">pass</span>
 		<span class="k">else</span><span class="p">:</span>
-			<span class="n">value</span> <span class="o">=</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-		<span class="k">return</span> <span class="n">value</span>
+			<span class="k">return</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+		<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">resolved_obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="p">):</span>

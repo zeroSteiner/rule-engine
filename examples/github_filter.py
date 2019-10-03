@@ -42,6 +42,15 @@ except ImportError:
 	print('this script requires PyGithub', file=sys.stderr)
 	sys.exit(os.EX_UNAVAILABLE)
 
+DESCRIPTION = 'Apply a rule to filter pull requests or issues from GitHub.'
+EPILOG = """\
+example rules:
+  * Show all merged pull requests by user zeroSteiner
+    "user.login == 'zeroSteiner' and merged"
+  * Show open issues assigned to user zeroSteiner
+    "state != 'open' and assignee and assignee.login == 'zeroSteiner'"
+"""
+
 get_path = functools.partial(os.path.join, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(get_path('lib'))
 
@@ -59,13 +68,18 @@ def _get_github(arguments):
 	return gh
 
 def main():
-	parser = argparse.ArgumentParser(description='github_filter', conflict_handler='resolve')
+	parser = argparse.ArgumentParser(
+		conflict_handler='resolve',
+		description=DESCRIPTION,
+		formatter_class=argparse.RawDescriptionHelpFormatter
+	)
 	auth_type_parser_group = parser.add_mutually_exclusive_group()
 	auth_type_parser_group.add_argument('--auth-token', dest='auth_token', help='authenticate to github with a token')
 	auth_type_parser_group.add_argument('--auth-user', dest='auth_user', help='authenticate to github with credentials')
 	parser.add_argument('repo_slug', help='the repository to filter')
 	parser.add_argument('type', choices=('issues', 'pulls'), help='thing to filter')
 	parser.add_argument('rule', help='the rule to apply')
+	parser.epilog = EPILOG
 	arguments = parser.parse_args()
 
 	# need to define a custom context to use a custom resolver function

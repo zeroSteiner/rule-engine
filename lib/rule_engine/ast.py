@@ -852,7 +852,7 @@ class UnaryExpression(ExpressionBase):
 			return BooleanExpression(self.context, self.evaluate(None))
 		elif type_ == 'uminus':
 			if not isinstance(self.right, (FloatExpression,)):
-				raise errors.EvaluationError('data type mismatch')
+				raise errors.EvaluationError('data type mismatch (not a float expression)')
 			return FloatExpression(self.context, self.evaluate(None))
 
 	def to_graphviz(self, digraph, *args, **kwargs):

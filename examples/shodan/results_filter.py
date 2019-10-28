@@ -54,13 +54,6 @@ example rules:
     "product == 'OpenSSH' and port != 22"
 """
 
-@rule_engine.engine.to_default_resolver
-def custom_resolve_item(thing, name):
-	value = rule_engine.engine.resolve_item(thing, name)
-	if isinstance(value, (dict, list)):
-		value = len(value) > 0
-	return value
-
 def result_to_url(result):
 	protocol = result['transport']
 	if 'http' in result:
@@ -85,7 +78,7 @@ def main():
 	if arguments.regex_case_sensitive:
 		re_flags &= re.IGNORECASE
 
-	context = rule_engine.Context(regex_flags=re_flags, resolver=custom_resolve_item)
+	context = rule_engine.Context(default_value=None, regex_flags=re_flags)
 	try:
 		rule = rule_engine.Rule(arguments.rule, context=context)
 	except rule_engine.RuleSyntaxError as error:

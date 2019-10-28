@@ -27,3 +27,9 @@ rules:
       metasploit-modules:
         - auxiliary/admin/http/allegro_rompager_auth_bypass
         - auxiliary/scanner/http/allegro_rompager_misfortune_cookie
+
+  - description: SSLv3 is enabled
+    rule: ssl.versions and 'SSLv3' in ssl.versions
+
+  - description: TLSv1 is enabled
+    rule: ssl.versions and 'TLSv1' in ssl.versions

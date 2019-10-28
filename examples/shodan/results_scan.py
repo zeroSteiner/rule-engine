@@ -79,7 +79,7 @@ def main():
 	arguments = parser.parse_args()
 
 	re_flags = re.IGNORECASE | re.MULTILINE
-	context = rule_engine.Context(regex_flags=re_flags, resolver=results_filter.custom_resolve_item)
+	context = rule_engine.Context(default_value=None, regex_flags=re_flags)
 
 	file_object = arguments.json_file
 	if arguments.gzip:

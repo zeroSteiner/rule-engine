@@ -33,3 +33,6 @@ rules:
 
   - description: TLSv1 is enabled
     rule: ssl.versions and 'TLSv1' in ssl.versions
+
+  - description: TLSv1.1 is enabled
+    rule: ssl.versions and 'TLSv1.1' in ssl.versions

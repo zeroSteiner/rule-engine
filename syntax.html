@@ -409,7 +409,7 @@ quotes. The difference comes in an optional leading character before the opening
 quote. Either no leading character or a single <code class="docutils literal notranslate"><span class="pre">s</span></code> will specify a standard
 STRING value, while a single <code class="docutils literal notranslate"><span class="pre">d</span></code> will specify a DATETIME value.</p>
 <p>DATETIME literals must be specified in ISO-8601 format. The underlying parsing
-logic is provided by <a class="reference external" href="https://dateutil.readthedocs.io/en/stable/parser.html#dateutil.parser.isoparse" title="(in dateutil v2.8.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dateutil.parser.isoparse()</span></code></a>. DATETIME values with
+logic is provided by <a class="reference external" href="https://dateutil.readthedocs.io/en/stable/parser.html#dateutil.parser.isoparse" title="(in dateutil v2.8.1)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dateutil.parser.isoparse()</span></code></a>. DATETIME values with
 no time specified (e.g. <code class="docutils literal notranslate"><span class="pre">d&quot;2019-09-23&quot;</span></code>) will evaluate to a DATETIME of the
 specified day at exactly midnight.</p>
 <p>Example rules showing equivalent literal expressions:</p>

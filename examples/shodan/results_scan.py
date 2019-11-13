@@ -35,7 +35,6 @@ import functools
 import gzip
 import json
 import os
-import pprint
 import re
 import sys
 

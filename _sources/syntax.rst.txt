@@ -154,6 +154,8 @@ The following keywords are reserved and can not be used as the names of symbols.
 | ``in``    | Checks member is in the container            |
 +-----------+----------------------------------------------+
 
+.. _literal-values:
+
 Literal Values
 ^^^^^^^^^^^^^^
 STRING and DATETIME literal values are specified in a very similar manner by

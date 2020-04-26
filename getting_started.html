@@ -88,7 +88,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#attribute-backed-objects">Attribute-Backed Objects</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#rule-inspection">Rule Inspection</a></li>
 </ul>
 </li>
@@ -251,7 +254,8 @@ attribute names are also valid symbol names, i.e. they start with a letter
 and contain note whitespace or punctuation. Just like in Python, Rule
 Engine symbols must follow these rules. For example, <code class="docutils literal notranslate"><span class="pre">released</span></code> is a
 valid symbol while <code class="docutils literal notranslate"><span class="pre">Released</span> <span class="pre">Date</span></code> is not (because of the space).</p></li>
-<li><p>An example rule for the comic book collection might look like:</p>
+<li><p>An simple rule for the comic book collection which matches the
+<code class="docutils literal notranslate"><span class="pre">publisher</span></code> symbol to the string <cite>“DC”`</cite> might look like:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
   <span class="c1"># match books published by DC</span>
@@ -259,6 +263,21 @@ valid symbol while <code class="docutils literal notranslate"><span class="pre">
 <span class="p">)</span>
 </pre></div>
 </div>
+</div></blockquote>
+</li>
+<li><p>Rules can contain more complex expressions such as datetime literals and
+conditionals.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
+  <span class="c1"># match DC books released in May 2020</span>
+  <span class="s1">&#39;released &gt;= d&quot;2020-05-01&quot; and released &lt; d&quot;2020-06-01&quot; and publisher == &quot;DC&quot;&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Notice that the datetime expression is a string, prefixed with <code class="docutils literal notranslate"><span class="pre">d</span></code> in
+<code class="docutils literal notranslate"><span class="pre">YYYY-MM-DD</span> <span class="pre">HH:mm:SS</span></code> format. If the time portion is ommitted, it will
+be normalized to <code class="docutils literal notranslate"><span class="pre">00:00:00</span></code> (midnight, zero minutes, zero seconds). See
+the <a class="reference internal" href="syntax.html#literal-values"><span class="std std-ref">Literal Values</span></a> section for more information.</p>
 </div></blockquote>
 </li>
 </ul>
@@ -286,6 +305,61 @@ methods might look like:</p>
 </ul>
 </li>
 </ol>
+<div class="section" id="attribute-backed-objects">
+<h3>Attribute-Backed Objects<a class="headerlink" href="#attribute-backed-objects" title="Permalink to this headline">¶</a></h3>
+<p>In the previous example, the target objects were Python dictionaries. The keys
+in the dictionary were used as symbols and while this is the default behavior it
+can be modified to use object attributes instead. This would necessary if the
+target objects had variable attributes (like a Python class object) instead of
+variable items (like a Python dictionary object).</p>
+<blockquote>
+<div><ul>
+<li><p>An example comic book collection using an object-based attribute-backed
+data structure might look like:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Comic</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">publisher</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">released</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span> <span class="o">=</span> <span class="n">publisher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">issue</span> <span class="o">=</span> <span class="n">issue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">released</span> <span class="o">=</span> <span class="n">released</span>
+
+<span class="n">comics</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="n">Comic</span><span class="p">(</span><span class="s1">&#39;Batman&#39;</span><span class="p">,</span>         <span class="s1">&#39;DC&#39;</span><span class="p">,</span>     <span class="mi">89</span><span class="p">,</span>  <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">28</span><span class="p">)),</span>
+  <span class="n">Comic</span><span class="p">(</span><span class="s1">&#39;Flash&#39;</span><span class="p">,</span>          <span class="s1">&#39;DC&#39;</span><span class="p">,</span>     <span class="mi">753</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">28</span><span class="p">)),</span>
+  <span class="n">Comic</span><span class="p">(</span><span class="s1">&#39;Captain Marvel&#39;</span><span class="p">,</span> <span class="s1">&#39;Marvel&#39;</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span>  <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<p>To resolve symbols from attributes, a custom <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object
+needs to be defined. This object is used for configuration of Rule behavior, one
+setting of which is the resolver to use. The resolver defines how a rule looks
+up symbols to their values for comparison given a target object. The following
+resolver functions are included in Rule Engine:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_attribute()</span></code></a> – Resolve symbols by looking them up as
+attributes on an object.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_item()</span></code></a> – <strong>Default</strong> Resolve symbols by looking them
+up as keys on a dictionary (or dictionary-like) object.</p></li>
+</ul>
+<p>To change the resolver, create a <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object, and specify
+the <em>resolver</em> function as a keyword argument.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the custom context to set the resolver</span>
+<span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">resolve_attribute</span><span class="p">)</span>
+<span class="c1"># then define a rule using the custom context</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;publisher == &quot;DC&quot;&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once the rule has been defined with the custom context, it can be used in the
+same way as a rule with a default context. The context object can be shared with
+other rule objects that are to be applied on the same objects. The context
+object should not be shared with rule object that are applied to other objects
+which do not have the same attributes (like artists).</p>
+</div>
 </div>
 <div class="section" id="rule-inspection">
 <h2>Rule Inspection<a class="headerlink" href="#rule-inspection" title="Permalink to this headline">¶</a></h2>

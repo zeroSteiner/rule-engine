@@ -87,6 +87,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../syntax.html">Rule Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../builtins.html">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../attributes.html">Data Attributes</a></li>
@@ -173,7 +174,7 @@
 <p>This module contains the exceptions raised by the package.</p>
 <div class="section" id="data">
 <h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">¶</a></h2>
-<dl class="data">
+<dl class="py data">
 <dt id="rule_engine.errors.UNDEFINED">
 <code class="sig-name descname">UNDEFINED</code><em class="property"> = UNDEFINED</em><a class="headerlink" href="#rule_engine.errors.UNDEFINED" title="Permalink to this definition">¶</a></dt>
 <dd><p>A sentinel value to specify that something is undefined. When evaluated, the
@@ -186,15 +187,15 @@ value is falsy.</p>
 </div>
 <div class="section" id="exceptions">
 <h2>Exceptions<a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.AttributeResolutionError">
-<em class="property">exception </em><code class="sig-name descname">AttributeResolutionError</code><span class="sig-paren">(</span><em class="sig-param">attribute_name</em>, <em class="sig-param">object_</em>, <em class="sig-param">thing=UNDEFINED</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#AttributeResolutionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.AttributeResolutionError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">AttributeResolutionError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attribute_name</span></em>, <em class="sig-param"><span class="n">object_</span></em>, <em class="sig-param"><span class="n">thing</span><span class="o">=</span><span class="default_value">UNDEFINED</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#AttributeResolutionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.AttributeResolutionError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.errors.EvaluationError</span></code></a></p>
 <p>An error raised with an attribute can not be resolved to a value.</p>
 <p>..versionadded:: 2.0.0</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.errors.AttributeResolutionError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">attribute_name</em>, <em class="sig-param">object_</em>, <em class="sig-param">thing=UNDEFINED</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#AttributeResolutionError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.AttributeResolutionError.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">attribute_name</span></em>, <em class="sig-param"><span class="n">object_</span></em>, <em class="sig-param"><span class="n">thing</span><span class="o">=</span><span class="default_value">UNDEFINED</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#AttributeResolutionError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.AttributeResolutionError.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -206,19 +207,19 @@ value is falsy.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.AttributeResolutionError.attribute_name">
 <code class="sig-name descname">attribute_name</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.AttributeResolutionError.attribute_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the symbol that can not be resolved.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.AttributeResolutionError.object">
 <code class="sig-name descname">object</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.AttributeResolutionError.object" title="Permalink to this definition">¶</a></dt>
 <dd><p>The value that <em>attribute_name</em> was used as an attribute for.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.AttributeResolutionError.thing">
 <code class="sig-name descname">thing</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.AttributeResolutionError.thing" title="Permalink to this definition">¶</a></dt>
 <dd><p>The root-object that was used to resolve <em>object</em>.</p>
@@ -226,15 +227,15 @@ value is falsy.</p>
 
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.DatetimeSyntaxError">
-<em class="property">exception </em><code class="sig-name descname">DatetimeSyntaxError</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#DatetimeSyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.DatetimeSyntaxError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">DatetimeSyntaxError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#DatetimeSyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.DatetimeSyntaxError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.errors.SyntaxError" title="rule_engine.errors.SyntaxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.errors.SyntaxError</span></code></a></p>
 <p>An error raised for issues regarding the use of improperly formatted
 datetime expressions.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.errors.DatetimeSyntaxError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#DatetimeSyntaxError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.DatetimeSyntaxError.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#DatetimeSyntaxError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.DatetimeSyntaxError.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -245,7 +246,7 @@ datetime expressions.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.DatetimeSyntaxError.value">
 <code class="sig-name descname">value</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.DatetimeSyntaxError.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>The datetime value which contains the syntax error which caused this
@@ -254,15 +255,15 @@ exception to be raised.</p>
 
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.EngineError">
-<em class="property">exception </em><code class="sig-name descname">EngineError</code><span class="sig-paren">(</span><em class="sig-param">message=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#EngineError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.EngineError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">EngineError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#EngineError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.EngineError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>The base exception class from which other exceptions within this package
 inherit.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.errors.EngineError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">message=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#EngineError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.EngineError.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#EngineError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.EngineError.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>message</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A text description of what error occurred.</p>
@@ -270,7 +271,7 @@ inherit.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.EngineError.message">
 <code class="sig-name descname">message</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.EngineError.message" title="Permalink to this definition">¶</a></dt>
 <dd><p>A text description of what error occurred.</p>
@@ -278,24 +279,24 @@ inherit.</p>
 
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.EvaluationError">
-<em class="property">exception </em><code class="sig-name descname">EvaluationError</code><span class="sig-paren">(</span><em class="sig-param">message=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#EvaluationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.EvaluationError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">EvaluationError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#EvaluationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.EvaluationError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.errors.EngineError" title="rule_engine.errors.EngineError"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.errors.EngineError</span></code></a></p>
 <p>An error raised for issues which occur while the rule is being evaluated.
 This can occur at parse time while AST nodes are being evaluated during
 the reduction phase.</p>
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.RegexSyntaxError">
-<em class="property">exception </em><code class="sig-name descname">RegexSyntaxError</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">error</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#RegexSyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.RegexSyntaxError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">RegexSyntaxError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">error</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#RegexSyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.RegexSyntaxError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.errors.SyntaxError" title="rule_engine.errors.SyntaxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.errors.SyntaxError</span></code></a></p>
 <p>An error raised for issues regarding the use of improper regular expression
 syntax.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.errors.RegexSyntaxError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">error</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#RegexSyntaxError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.RegexSyntaxError.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">error</span></em>, <em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#RegexSyntaxError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.RegexSyntaxError.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -307,13 +308,13 @@ syntax.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.RegexSyntaxError.error">
 <code class="sig-name descname">error</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.RegexSyntaxError.error" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <a class="reference external" href="https://docs.python.org/3.7/library/re.html#re.error" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">re.error</span></code></a> exception from which this error was triggered.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.RegexSyntaxError.value">
 <code class="sig-name descname">value</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.RegexSyntaxError.value" title="Permalink to this definition">¶</a></dt>
 <dd><p>The regular expression value which contains the syntax error which
@@ -322,15 +323,15 @@ caused this exception to be raised.</p>
 
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.RuleSyntaxError">
-<em class="property">exception </em><code class="sig-name descname">RuleSyntaxError</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">token=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#RuleSyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.RuleSyntaxError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">RuleSyntaxError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">token</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#RuleSyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.RuleSyntaxError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.errors.SyntaxError" title="rule_engine.errors.SyntaxError"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.errors.SyntaxError</span></code></a></p>
 <p>An error raised for issues identified in while parsing the grammar of the
 rule text.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.errors.RuleSyntaxError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">token=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#RuleSyntaxError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.RuleSyntaxError.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em>, <em class="sig-param"><span class="n">token</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#RuleSyntaxError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.RuleSyntaxError.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -341,7 +342,7 @@ rule text.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.RuleSyntaxError.token">
 <code class="sig-name descname">token</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.RuleSyntaxError.token" title="Permalink to this definition">¶</a></dt>
 <dd><p>The PLY token (if available) which is related to the syntax error.</p>
@@ -349,14 +350,14 @@ rule text.</p>
 
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.SymbolResolutionError">
-<em class="property">exception </em><code class="sig-name descname">SymbolResolutionError</code><span class="sig-paren">(</span><em class="sig-param">symbol_name</em>, <em class="sig-param">symbol_scope=None</em>, <em class="sig-param">thing=UNDEFINED</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SymbolResolutionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SymbolResolutionError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">SymbolResolutionError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol_name</span></em>, <em class="sig-param"><span class="n">symbol_scope</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thing</span><span class="o">=</span><span class="default_value">UNDEFINED</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SymbolResolutionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SymbolResolutionError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.errors.EvaluationError</span></code></a></p>
 <p>An error raised when a symbol name is not able to be resolved to a value.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.errors.SymbolResolutionError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">symbol_name</em>, <em class="sig-param">symbol_scope=None</em>, <em class="sig-param">thing=UNDEFINED</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SymbolResolutionError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SymbolResolutionError.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol_name</span></em>, <em class="sig-param"><span class="n">symbol_scope</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">thing</span><span class="o">=</span><span class="default_value">UNDEFINED</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SymbolResolutionError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SymbolResolutionError.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -371,19 +372,19 @@ rule text.</p>
 </div>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.SymbolResolutionError.symbol_name">
 <code class="sig-name descname">symbol_name</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.SymbolResolutionError.symbol_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the symbol that can not be resolved.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.SymbolResolutionError.symbol_scope">
 <code class="sig-name descname">symbol_scope</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.SymbolResolutionError.symbol_scope" title="Permalink to this definition">¶</a></dt>
 <dd><p>The scope of where the symbol should be valid for resolution.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.SymbolResolutionError.thing">
 <code class="sig-name descname">thing</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.SymbolResolutionError.thing" title="Permalink to this definition">¶</a></dt>
 <dd><p>The root-object that was used to resolve the symbol.</p>
@@ -391,15 +392,15 @@ rule text.</p>
 
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.SymbolTypeError">
-<em class="property">exception </em><code class="sig-name descname">SymbolTypeError</code><span class="sig-paren">(</span><em class="sig-param">symbol_name</em>, <em class="sig-param">is_value</em>, <em class="sig-param">is_type</em>, <em class="sig-param">expected_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SymbolTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SymbolTypeError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">SymbolTypeError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol_name</span></em>, <em class="sig-param"><span class="n">is_value</span></em>, <em class="sig-param"><span class="n">is_type</span></em>, <em class="sig-param"><span class="n">expected_type</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SymbolTypeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SymbolTypeError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.errors.EvaluationError</span></code></a></p>
 <p>An error raised when a symbol with type information is resolved to a Python
 value that is not of that type.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.errors.SymbolTypeError.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">symbol_name</em>, <em class="sig-param">is_value</em>, <em class="sig-param">is_type</em>, <em class="sig-param">expected_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SymbolTypeError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SymbolTypeError.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">symbol_name</span></em>, <em class="sig-param"><span class="n">is_value</span></em>, <em class="sig-param"><span class="n">is_type</span></em>, <em class="sig-param"><span class="n">expected_type</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SymbolTypeError.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SymbolTypeError.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -412,25 +413,25 @@ value that is not of that type.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.SymbolTypeError.expected_type">
 <code class="sig-name descname">expected_type</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.SymbolTypeError.expected_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <a class="reference internal" href="ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule-engine</span> <span class="pre">type</span></code></a> that was expected for this symbol.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.SymbolTypeError.is_type">
 <code class="sig-name descname">is_type</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.SymbolTypeError.is_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <a class="reference internal" href="ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule-engine</span> <span class="pre">type</span></code></a> of the incompatible symbol.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.SymbolTypeError.is_value">
 <code class="sig-name descname">is_value</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.SymbolTypeError.is_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>The native Python value of the incompatible symbol.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.errors.SymbolTypeError.symbol_name">
 <code class="sig-name descname">symbol_name</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.errors.SymbolTypeError.symbol_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the symbol that is of an incompatible type.</p>
@@ -438,9 +439,9 @@ value that is not of that type.</p>
 
 </dd></dl>
 
-<dl class="exception">
+<dl class="py exception">
 <dt id="rule_engine.errors.SyntaxError">
-<em class="property">exception </em><code class="sig-name descname">SyntaxError</code><span class="sig-paren">(</span><em class="sig-param">message=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SyntaxError" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><code class="sig-name descname">SyntaxError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/errors.html#SyntaxError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.errors.SyntaxError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.errors.EngineError" title="rule_engine.errors.EngineError"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.errors.EngineError</span></code></a></p>
 <p>A base error for syntax related issues.</p>
 </dd></dl>

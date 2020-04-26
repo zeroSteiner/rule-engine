@@ -59,6 +59,7 @@ See the `examples`_ folder for more.
    :maxdepth: 2
    :caption: Contents:
 
+   getting_started.rst
    syntax.rst
    builtins.rst
    attributes.rst

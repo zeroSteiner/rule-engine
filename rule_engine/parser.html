@@ -87,6 +87,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../syntax.html">Rule Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../builtins.html">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../attributes.html">Data Attributes</a></li>
@@ -174,9 +175,9 @@ grammar and converting it to an abstract syntax tree that can later be
 evaluated.</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
+<dl class="py class">
 <dt id="rule_engine.parser.Parser">
-<em class="property">class </em><code class="sig-name descname">Parser</code><span class="sig-paren">(</span><em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#Parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.Parser" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">Parser</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#Parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.Parser" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.parser.ParserBase" title="rule_engine.parser.ParserBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.parser.ParserBase</span></code></a></p>
 <p>The parser class for the rule grammar. This class contains many ply specific
 members to define the various components of the grammar allowing it to be
@@ -186,9 +187,9 @@ more efficient, nodes within the AST that are able to be reduced are while
 the parsing is taking place. This reduction phase involves evaluation,
 causing <a class="reference internal" href="errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> exceptions to be
 raised during parsing.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.parser.Parser.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.parser.Parser.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.parser.Parser.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to enable debugging features when
@@ -199,15 +200,15 @@ using the ply API.</p>
 
 </dd></dl>
 
-<dl class="class">
+<dl class="py class">
 <dt id="rule_engine.parser.ParserBase">
-<em class="property">class </em><code class="sig-name descname">ParserBase</code><span class="sig-paren">(</span><em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ParserBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A base class for parser objects to inherit from. This does not provide any
 grammar related definitions.</p>
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.parser.ParserBase.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to enable debugging features when
@@ -216,9 +217,9 @@ using the ply API.</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
+<dl class="py method">
 <dt id="rule_engine.parser.ParserBase.parse">
-<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param">text</em>, <em class="sig-param">context</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.parse" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">parse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">text</span></em>, <em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse the specified text in an abstract syntax tree of nodes that can
 later be evaluated.</p>
 <dl class="field-list simple">
@@ -237,13 +238,13 @@ later be evaluated.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.parser.ParserBase.precedence">
 <code class="sig-name descname">precedence</code><em class="property"> = ()</em><a class="headerlink" href="#rule_engine.parser.ParserBase.precedence" title="Permalink to this definition">¶</a></dt>
 <dd><p>The precedence for operators.</p>
 </dd></dl>
 
-<dl class="attribute">
+<dl class="py attribute">
 <dt id="rule_engine.parser.ParserBase.reserved_words">
 <code class="sig-name descname">reserved_words</code><em class="property"> = {}</em><a class="headerlink" href="#rule_engine.parser.ParserBase.reserved_words" title="Permalink to this definition">¶</a></dt>
 <dd><p>A mapping of literal words which are reserved to their corresponding grammar

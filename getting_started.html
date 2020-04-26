@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started &mdash; Rule Engine 2.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Rule Syntax" href="syntax.html" />
+    <link rel="prev" title="Rule Engine Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Rule Engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rule-inspection">Rule Inspection</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builtins.html">Builtin Symbols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rule Engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Getting Started</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>The Rule Engine is meant to allow developers to filter arbitrary Python objects
+with a “rule” specified either by them or by an end user. The “rules” that the
+Rule Engine uses are Python string expressions in a custom language. The syntax
+that Rule Engine uses is similar to Python by borrows some features from Ruby.
+The rules are a custom language and no Python <code class="docutils literal notranslate"><span class="pre">exec</span></code> or <code class="docutils literal notranslate"><span class="pre">eval</span></code> operations
+are used, allowing developers to safely and security evaluate rules provided by
+potentially untrusted sources.</p>
+<div class="section" id="basic-usage">
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p>The developer needs to identify data that they would like to be filtered.
+This would be some kind of object with a set of variable attributes. The
+rest of the usage example will assume that these objects are comic books.</p>
+<ul>
+<li><p>Comic books have various attributes that could be useful for filtering
+including:</p>
+<blockquote>
+<div><table class="docutils align-default">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 33%" />
+<col style="width: 51%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Attribute</p></td>
+<td><p>Python Type</p></td>
+<td><p>Rule Engine Type</p></td>
+</tr>
+<tr class="row-even"><td><p>title</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>publisher</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p>issue</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>released</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">datetime.date</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</li>
+<li><p>An example comic book collection might look like:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">comics</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Batman&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="s1">&#39;DC&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;issue&#39;</span><span class="p">:</span> <span class="mi">89</span><span class="p">,</span>
+    <span class="s1">&#39;released&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">28</span><span class="p">)</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Flash&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="s1">&#39;DC&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;issue&#39;</span><span class="p">:</span> <span class="mi">753</span><span class="p">,</span>
+    <span class="s1">&#39;released&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Captain Marvel&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="s1">&#39;Marvel&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;issue&#39;</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span>
+    <span class="s1">&#39;released&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p>Now the developer needs to create a rule object to match the target objects.
+The attributes of the objects will automatically become valid symbols for the
+rule expression. Creating a rule object is done by initializing an instance
+of the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> class which requires one argument, and that
+is the string expression (in Rule Engine syntax) of the rule.</p>
+<ul>
+<li><p>In the case of the comic book collection, these symbols would be:
+<code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">publisher</span></code>, <code class="docutils literal notranslate"><span class="pre">issue</span></code>, and <code class="docutils literal notranslate"><span class="pre">released</span></code>. Notice that these
+attribute names are also valid symbol names, i.e. they start with a letter
+and contain note whitespace or punctuation. Just like in Python, Rule
+Engine symbols must follow these rules. For example, <code class="docutils literal notranslate"><span class="pre">released</span></code> is a
+valid symbol while <code class="docutils literal notranslate"><span class="pre">Released</span> <span class="pre">Date</span></code> is not (because of the space).</p></li>
+<li><p>An example rule for the comic book collection might look like:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
+  <span class="c1"># match books published by DC</span>
+  <span class="s1">&#39;publisher == &quot;DC&quot;&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</li>
+<li><p>Once the rule object has been defined, it can be applied to target object(s).
+Two primary methods are available for applying the rule to the target objects.
+Those methods are:</p>
+<ul>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.matches" title="rule_engine.engine.Rule.matches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">matches()</span></code></a> – This method will determine whether the
+rule matches a single target object, returning <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.filter" title="rule_engine.engine.Rule.filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">filter()</span></code></a> – This method will filter an iterable of
+target objects, yielding ones for which the rule matches.</p></li>
+<li><p>Applying the rule to the comic book collection using each of the two
+methods might look like:</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># check if the first object matches</span>
+<span class="n">rule</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">comics</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># =&gt; True</span>
+
+<span class="c1"># filter the iterable &quot;comics&quot; and return matching objects</span>
+<span class="n">rule</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">comics</span><span class="p">)</span> <span class="c1"># =&gt; &lt;generator object Rule.filter at 0x7f2bdafbe650&gt;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</li>
+</ol>
+</div>
+<div class="section" id="rule-inspection">
+<h2>Rule Inspection<a class="headerlink" href="#rule-inspection" title="Permalink to this headline">¶</a></h2>
+<p>There are a few techniques that can be used to inspect a rule object.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.is_valid" title="rule_engine.engine.Rule.is_valid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_valid()</span></code></a> – This class method can be used to determine
+if a rule expression is valid. It will return <code class="docutils literal notranslate"><span class="pre">False</span></code> if for example there
+are any syntax errors.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.symbols" title="rule_engine.engine.Context.symbols"><code class="xref py py-attr docutils literal notranslate"><span class="pre">symbols</span></code></a> – Rule objects have a
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">context</span></code> attribute, which contains the <code class="docutils literal notranslate"><span class="pre">symbols</span></code>
+attribute. This contains the symbol names which were identified within the
+rule expression.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz" title="rule_engine.engine.Rule.to_graphviz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_graphviz()</span></code></a> – This method will create a Graphviz
+directed-graph of the Rule Engine Abstract Syntax Tree (AST) created by the
+rule expression. This can be helpful when debugging complex rules. This
+requires the Python <code class="docutils literal notranslate"><span class="pre">graphviz</span></code> package to be available.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="syntax.html" class="btn btn-neutral float-right" title="Rule Syntax" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Rule Engine Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Spencer McIntyre
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -11,7 +11,7 @@ Example
 
 The following example demonstrates the basic usage of defining a rule object and
 applying it to two dictionaries, showing that one matches while the other does
-not.
+not. See `Getting Started`_ for more information.
 
 .. code-block:: python
 
@@ -30,3 +30,5 @@ not.
 Credits
 -------
 * Spencer McIntyre - zeroSteiner (`@zeroSteiner <https://twitter.com/zeroSteiner>`_)
+
+.. _Getting Started: https://zerosteiner.github.io/rule-engine/getting_started.html

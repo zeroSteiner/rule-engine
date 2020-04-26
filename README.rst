@@ -9,6 +9,10 @@ Documentation is available at https://zeroSteiner.github.io/rule-engine/.
 Example
 -------
 
+The following example demonstrates the basic usage of defining a rule object and
+applying it to two dictionaries, showing that one matches while the other does
+not.
+
 .. code-block:: python
 
    import rule_engine

@@ -90,9 +90,30 @@ Basic Usage
          )
 
       Notice that the datetime expression is a string, prefixed with ``d`` in
-      ``YYYY-MM-DD HH:mm:SS`` format. If the time portion is ommitted, it will
+      ``YYYY-MM-DD HH:mm:SS`` format. If the time portion is omitted, it will
       be normalized to ``00:00:00`` (midnight, zero minutes, zero seconds). See
       the :ref:`Literal Values<literal-values>` section for more information.
+
+   * Certain datatypes also have `attributes<builtin-attributes` that can be
+      accessed with the dot (``.``) operator.
+
+      .. code-block:: python
+
+         rule = rule_engine.Rule(
+           # normalize potential variations in the publisher case such as 'Dc'
+           'publisher.as_upper == "DC"'
+         )
+
+   * Rules can also match strings using regular expressions. When using this
+     type of comparison, the string on the right hand side of the operator is
+     the regular expression, while the left is the string to compare it with.
+
+      .. code-block:: python
+
+         rule = rule_engine.Rule(
+           # match books with a title starting with 'Captain '
+           'title =~ "Captain\s\S+"'
+         )
 
 #. Once the rule object has been defined, it can be applied to target object(s).
    Two primary methods are available for applying the rule to the target objects.

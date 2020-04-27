@@ -6,6 +6,14 @@ whether or not they match.
 
 Documentation is available at https://zeroSteiner.github.io/rule-engine/.
 
+Rule Engine expressions are written in their own language, defined as strings
+in Python. Some features of this language includes:
+
+- Optional type hinting
+- Matching strings with regular expressions
+- Datetime datatypes
+- Data attributes
+
 Example
 -------
 

@@ -4,16 +4,15 @@ This project provides a library for creating general purpose "Rule" objects from
 a logical expression which can then be applied to arbitrary objects to evaluate
 whether or not they match.
 
-The source code is available on the `GitHub homepage`_.
+Documentation is available at https://zeroSteiner.github.io/rule-engine/.
 
-Symbol Resolution
------------------
+Rule Engine expressions are written in their own language, defined as strings
+in Python. Some features of this language includes:
 
-Symbols / variables in rules can be resolved from objects using an arbitrary
-function. Two are builtin, one for resolving symbols
-:py:func:`as keys<rule_engine.engine.resolve_item>` on objects (such as
-dictionaries) and one for resolving symbols
-:py:func:`as attributes<rule_engine.engine.resolve_attribute>` on objects.
+- Optional type hinting
+- Matching strings with regular expressions
+- Datetime datatypes
+- Data attributes
 
 Type Hinting
 ------------

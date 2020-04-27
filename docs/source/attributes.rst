@@ -8,6 +8,8 @@ used when the **thing** which the rule is evaluating has members with their own
 submembers. If the resolver function fails, the attribute will be checked to
 determine if it is a builtin attribute.
 
+.. _builtin-attributes:
+
 Builtin Attributes
 ------------------
 The following attributes are builtin to the default :py:class:`~.Context`

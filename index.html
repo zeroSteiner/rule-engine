@@ -161,34 +161,15 @@
 <p>This project provides a library for creating general purpose “Rule” objects from
 a logical expression which can then be applied to arbitrary objects to evaluate
 whether or not they match.</p>
-<p>The source code is available on the <a class="reference external" href="https://github.com/zeroSteiner/rule-engine">GitHub homepage</a>.</p>
-<div class="section" id="symbol-resolution">
-<h2>Symbol Resolution<a class="headerlink" href="#symbol-resolution" title="Permalink to this headline">¶</a></h2>
-<p>Symbols / variables in rules can be resolved from objects using an arbitrary
-function. Two are builtin, one for resolving symbols
-<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">keys</span></code></a> on objects (such as
-dictionaries) and one for resolving symbols
-<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">attributes</span></code></a> on objects.</p>
-</div>
-<div class="section" id="type-hinting">
-<h2>Type Hinting<a class="headerlink" href="#type-hinting" title="Permalink to this headline">¶</a></h2>
-<p>Symbol type information can be provided to the
-<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> through a
-<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance and will be used for
-compatibility testing. With type information, the engine will raise an
-<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> when an incompatible operation
-is detected such as a regex match (<code class="docutils literal notranslate"><span class="pre">=~</span></code>) using an integer on either side. This
-makes it possible to detect errors in a rule’s syntax prior to it being applied
-to an object. When symbol type information is specified, the value resolved from
-a symbol and object must either match the specified type or be
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code> otherwise a
-<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError" title="rule_engine.errors.SymbolTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolTypeError</span></code></a> will be raised when the symbol
-is resolved.</p>
-<p>Alternatively, a function can be specified that simply returns
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> for valid symbols. In both cases,
-the engine will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a>
-when an invalid symbol is specified in a rule.</p>
-</div>
+<p>Documentation is available at <a class="reference external" href="https://zeroSteiner.github.io/rule-engine/">https://zeroSteiner.github.io/rule-engine/</a>.</p>
+<p>Rule Engine expressions are written in their own language, defined as strings
+in Python. Some features of this language includes:</p>
+<ul class="simple">
+<li><p>Optional type hinting</p></li>
+<li><p>Matching strings with regular expressions</p></li>
+<li><p>Datetime datatypes</p></li>
+<li><p>Data attributes</p></li>
+</ul>
 <div class="section" id="usage-example">
 <h2>Usage Example<a class="headerlink" href="#usage-example" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rule_engine</span>
@@ -210,6 +191,7 @@ when an invalid symbol is specified in a rule.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#advanced-usage">Advanced Usage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#rule-inspection">Rule Inspection</a></li>
 </ul>
 </li>

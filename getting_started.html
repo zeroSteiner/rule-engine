@@ -92,6 +92,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#attribute-backed-objects">Attribute-Backed Objects</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-usage">Advanced Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#custom-resolvers">Custom Resolvers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-hinting">Type Hinting</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#rule-inspection">Rule Inspection</a></li>
 </ul>
 </li>
@@ -275,9 +280,32 @@ conditionals.</p>
 </pre></div>
 </div>
 <p>Notice that the datetime expression is a string, prefixed with <code class="docutils literal notranslate"><span class="pre">d</span></code> in
-<code class="docutils literal notranslate"><span class="pre">YYYY-MM-DD</span> <span class="pre">HH:mm:SS</span></code> format. If the time portion is ommitted, it will
+<code class="docutils literal notranslate"><span class="pre">YYYY-MM-DD</span> <span class="pre">HH:mm:SS</span></code> format. If the time portion is omitted, it will
 be normalized to <code class="docutils literal notranslate"><span class="pre">00:00:00</span></code> (midnight, zero minutes, zero seconds). See
 the <a class="reference internal" href="syntax.html#literal-values"><span class="std std-ref">Literal Values</span></a> section for more information.</p>
+</div></blockquote>
+</li>
+<li><dl>
+<dt>Certain datatypes also have <cite>attributes&lt;builtin-attributes</cite> that can be</dt><dd><p>accessed with the dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) operator.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
+  <span class="c1"># normalize potential variations in the publisher case such as &#39;Dc&#39;</span>
+  <span class="s1">&#39;publisher.as_upper == &quot;DC&quot;&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><p>Rules can also match strings using regular expressions. When using this
+type of comparison, the string on the right hand side of the operator is
+the regular expression, while the left is the string to compare it with.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
+  <span class="c1"># match books with a title starting with &#39;Captain &#39;</span>
+  <span class="s1">&#39;title =~ &quot;Captain\s\S+&quot;&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div></blockquote>
 </li>
 </ul>
@@ -359,6 +387,95 @@ same way as a rule with a default context. The context object can be shared with
 other rule objects that are to be applied on the same objects. The context
 object should not be shared with rule object that are applied to other objects
 which do not have the same attributes (like artists).</p>
+</div>
+</div>
+<div class="section" id="advanced-usage">
+<h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
+<p>The Rule Engine has a number of advanced features that contribute to its
+flexibility. In most use cases they are unnecessary.</p>
+<div class="section" id="custom-resolvers">
+<h3>Custom Resolvers<a class="headerlink" href="#custom-resolvers" title="Permalink to this headline">¶</a></h3>
+<p>Rule Engine includes resolvers for accessing attributes
+py:func:<cite>as keys&lt;engine.resolve_item&gt;</cite> on objects (such as dictionaries) and one
+for resolving symbols <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">attributes</span></code></a> on
+objects. If for some reason, neither of those are suitable for the target object
+then a custom one can be defined and used.</p>
+<p>The custom resolver should use the signature <code class="docutils literal notranslate"><span class="pre">resolver(thing,</span> <span class="pre">name)</span></code> where
+<em>thing</em> is the arbitrary object that the rule is being applied to and <em>name</em> is
+the symbol name as a Python string of the attribute that is to be accessed. If
+the resolver function fails for any reason, it should raise a
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a>, forwarding <em>thing</em> via keyword
+argument. This ensures consistency in how exceptions are raised and handled by
+the engine.</p>
+</div>
+<div class="section" id="type-hinting">
+<h3>Type Hinting<a class="headerlink" href="#type-hinting" title="Permalink to this headline">¶</a></h3>
+<p>Symbol type information can be provided to the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> through
+the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance and will be used for compatibility
+testing. With type information, the engine will raise an
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> when an incompatible operation is detected
+such as a regex match (<code class="docutils literal notranslate"><span class="pre">=~</span></code>) using an integer on either side. This makes it
+possible to detect errors in a rule’s syntax prior to it being applied to an
+object. When symbol type information is specified, the value resolved from a
+symbol and object must either match the specified type or be
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code>, otherwise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError" title="rule_engine.errors.SymbolTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolTypeError</span></code></a> will be
+raised when the symbol is resolved.</p>
+<p>To define type information, a <em>type_resolver</em> function must be passed to the
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> class. The type resolver function function is
+expected to take a single argument, and that is the name of the symbol (as a
+Python string) whose type needs to be resolved. The return type should be a
+member of the <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a> enumeration.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define a basic type resolver, that knows about the four attributes of a</span>
+<span class="c1"># comic book</span>
+<span class="k">def</span> <span class="nf">type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;publisher&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;issue&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;released&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
+    <span class="c1"># if the name is none of those, raise a SymbolResolutionError</span>
+    <span class="k">raise</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+<span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">=</span><span class="n">type_resolver</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be
+used to generate a <em>type_resolver</em> function from a dictionary mapping symbol
+names to their :py:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>~ast.DataType`s.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+    <span class="n">type_resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">type_resolver_from_dict</span><span class="p">({</span>
+        <span class="c1"># map symbol names to their data types</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span>     <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+        <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+        <span class="s1">&#39;issue&#39;</span><span class="p">:</span>     <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;released&#39;</span><span class="p">:</span>  <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
+    <span class="p">})</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> can be defined as the data type for a valid
+symbol without specifying explicit type information. In this case, the rule
+object will know that it is a valid symbol, but will not validate any operations
+that reference it.</p>
+<p>In all cases, when a <em>type_resolver</em> is defined, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a>
+object will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> if a symbol is
+referenced in the rule that is not known to the <em>type_resolver</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># this is valid: issue is defined as a valid symbol</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;issue == 1&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+<span class="c1"># =&gt; &lt;Rule text=&#39;issue == 1&#39; &gt;</span>
+
+<span class="c1"># this is invalid: author is not defined as a valid symbol</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;author == &quot;Stan Lee&quot;&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+<span class="c1"># =&gt; SymbolResolutionError: author</span>
+
+<span class="c1"># this is valid: no type information is defined (context is omitted)</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;author == &quot;Stan Lee&quot;&#39;</span><span class="p">)</span>
+<span class="c1"># =&gt; &lt;Rule text=&#39;author == &quot;Stan Lee&quot;&#39; &gt;</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="rule-inspection">

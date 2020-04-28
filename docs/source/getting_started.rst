@@ -188,6 +188,103 @@ other rule objects that are to be applied on the same objects. The context
 object should not be shared with rule object that are applied to other objects
 which do not have the same attributes (like artists).
 
+Advanced Usage
+--------------
+The Rule Engine has a number of advanced features that contribute to its
+flexibility. In most use cases they are unnecessary.
+
+Custom Resolvers
+^^^^^^^^^^^^^^^^
+Rule Engine includes resolvers for accessing attributes
+py:func:`as keys<engine.resolve_item>` on objects (such as dictionaries) and one
+for resolving symbols :py:func:`as attributes<engine.resolve_attribute>` on
+objects. If for some reason, neither of those are suitable for the target object
+then a custom one can be defined and used.
+
+The custom resolver should use the signature ``resolver(thing, name)`` where
+*thing* is the arbitrary object that the rule is being applied to and *name* is
+the symbol name as a Python string of the attribute that is to be accessed. If
+the resolver function fails for any reason, it should raise a
+:py:class:`~errors.SymbolResolutionError`, forwarding *thing* via keyword
+argument. This ensures consistency in how exceptions are raised and handled by
+the engine.
+
+Type Hinting
+^^^^^^^^^^^^
+Symbol type information can be provided to the :py:class:`~engine.Rule` through
+the :py:class:`~engine.Context` instance and will be used for compatibility
+testing. With type information, the engine will raise an
+:py:class:`~errors.EvaluationError` when an incompatible operation is detected
+such as a regex match (``=~``) using an integer on either side. This makes it
+possible to detect errors in a rule's syntax prior to it being applied to an
+object. When symbol type information is specified, the value resolved from a
+symbol and object must either match the specified type or be
+:py:attr:`~ast.NULL`, otherwise a :py:class:`~errors.SymbolTypeError` will be
+raised when the symbol is resolved.
+
+To define type information, a *type_resolver* function must be passed to the
+:py:class:`~engine.Context` class. The type resolver function function is
+expected to take a single argument, and that is the name of the symbol (as a
+Python string) whose type needs to be resolved. The return type should be a
+member of the :py:class:`~ast.DataType` enumeration.
+
+.. code-block:: python
+
+   # define a basic type resolver, that knows about the four attributes of a
+   # comic book
+   def type_resolver(name):
+       if name == 'title':
+           return rule_engine.DataType.STRING
+       elif name == 'publisher':
+           return rule_engine.DataType.STRING
+       elif name == 'issue':
+           return rule_engine.DataType.FLOAT
+       elif name == 'released':
+           return rule_engine.DataType.DATETIME
+       # if the name is none of those, raise a SymbolResolutionError
+       raise rule_engine.errors.SymbolResolutionError(name)
+
+   context = rule_engine.Context(type_resolver=type_resolver)
+
+For convenience, the :py:func:`~engine.type_resolver_from_dict` function can be
+used to generate a *type_resolver* function from a dictionary mapping symbol
+names to their :py:class:`~ast.DataType`s.
+
+.. code-block:: python
+
+   context = rule_engine.Context(
+       type_resolver=rule_engine.type_resolver_from_dict({
+           # map symbol names to their data types
+           'title':     rule_engine.DataType.STRING,
+           'publisher': rule_engine.DataType.STRING,
+           'issue':     rule_engine.DataType.FLOAT,
+           'released':  rule_engine.DataType.DATETIME
+       })
+   )
+
+:py:attr:`~ast.DataType.UNDEFINED` can be defined as the data type for a valid
+symbol without specifying explicit type information. In this case, the rule
+object will know that it is a valid symbol, but will not validate any operations
+that reference it.
+
+In all cases, when a *type_resolver* is defined, the :py:class:`~engine.Rule`
+object will raise a :py:class:`~errors.SymbolResolutionError` if a symbol is
+referenced in the rule that is not known to the *type_resolver*.
+
+.. code-block:: python
+
+   # this is valid: issue is defined as a valid symbol
+   rule = rule_engine.Rule('issue == 1', context=context)
+   # => <Rule text='issue == 1' >
+
+   # this is invalid: author is not defined as a valid symbol
+   rule = rule_engine.Rule('author == "Stan Lee"', context=context)
+   # => SymbolResolutionError: author
+
+   # this is valid: no type information is defined (context is omitted)
+   rule = rule_engine.Rule('author == "Stan Lee"')
+   # => <Rule text='author == "Stan Lee"' >
+
 Rule Inspection
 ---------------
 There are a few techniques that can be used to inspect a rule object.

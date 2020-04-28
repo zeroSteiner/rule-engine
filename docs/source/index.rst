@@ -14,27 +14,6 @@ in Python. Some features of this language includes:
 - Datetime datatypes
 - Data attributes
 
-Type Hinting
-------------
-
-Symbol type information can be provided to the
-:py:class:`~rule_engine.engine.Rule` through a
-:py:class:`~rule_engine.engine.Context` instance and will be used for
-compatibility testing. With type information, the engine will raise an
-:py:class:`~rule_engine.errors.EvaluationError` when an incompatible operation
-is detected such as a regex match (``=~``) using an integer on either side. This
-makes it possible to detect errors in a rule's syntax prior to it being applied
-to an object. When symbol type information is specified, the value resolved from
-a symbol and object must either match the specified type or be
-:py:attr:`~rule_engine.ast.NULL` otherwise a
-:py:class:`~rule_engine.errors.SymbolTypeError` will be raised when the symbol
-is resolved.
-
-Alternatively, a function can be specified that simply returns
-:py:attr:`~rule_engine.ast.DataType.UNDEFINED` for valid symbols. In both cases,
-the engine will raise a :py:class:`~rule_engine.errors.SymbolResolutionError`
-when an invalid symbol is specified in a rule.
-
 Usage Example
 -------------
 

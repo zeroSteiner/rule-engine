@@ -37,6 +37,8 @@ are type aware and will raise an exception when an incompatible type is used.
 
 Supported Operations
 ^^^^^^^^^^^^^^^^^^^^
+The following table outlines all operators that can be used in Rule Engine
+expressions.
 
 +-----------+------------------------------+--------------------------------+
 | Operation | Description                  | Compatible Data Types          |
@@ -195,5 +197,38 @@ Example rules show equivalent literal expressions:
 * ``1E0 == 1``
 * ``1e0 == 1``
 * ``1.0e0 == 1``
+
+.. py:currentmodule:: rule_engine
+
+.. _builtin-symbols:
+
+Builtin Symbols
+---------------
+The following symbols are provided by default using the
+:py:meth:`~engine.Builtins.from_defaults` method. These symbols can be accessed
+through the ``$`` prefix, e.g. ``$pi``. The default values can be overridden by
+defining a custom subclass of :py:class:`~engine.Context` and setting the
+:py:attr:`~engine.Context.builtins` attribute.
+
++-------+-----------------------------------+----------------------------------------------+
+| Name  | Data Type                         | Value Description                            |
++-------+-----------------------------------+----------------------------------------------+
+| **Math related**                                                                         |
++-------+-----------------------------------+----------------------------------------------+
+| e     | :py:attr:`~ast.DataType.FLOAT`    | The mathematical constant *e* (2.71828...).  |
++-------+-----------------------------------+----------------------------------------------+
+| pi    | :py:attr:`~ast.DataType.FLOAT`    | The mathematical constant *pi* (3.14159...). |
++-------+-----------------------------------+----------------------------------------------+
+| **Timestamp related**                                                                    |
++-------+-----------------------------------+----------------------------------------------+
+| now   | :py:attr:`~ast.DataType.DATETIME` | The current timestamp (including time)       |
+|       |                                   | using the default timezone from              |
+|       |                                   | :py:attr:`~engine.Context.default_timezone`  |
++-------+-----------------------------------+----------------------------------------------+
+| today | :py:attr:`~ast.DataType.DATETIME` | The current timestamp, (excluding time,      |
+|       |                                   | normalized to midnight / 00:00:00)           |
+|       |                                   | using the default timezone from              |
+|       |                                   | :py:attr:`~engine.Context.default_timezone`  |
++-------+-----------------------------------+----------------------------------------------+
 
 .. _Order of operations: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages

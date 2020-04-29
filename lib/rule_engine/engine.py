@@ -53,7 +53,7 @@ def resolve_attribute(thing, name):
 	"""
 	A replacement resolver function for looking up symbols as members of
 	*thing*. This is effectively the same as ``thing.name``. The *thing* object
-	can be a :py:class:`~collections.namedtuple`, a custom Python class or any
+	can be a :py:func:`~collections.namedtuple`, a custom Python class or any
 	other object. Each of the members of *thing* must be of a compatible data
 	type.
 
@@ -277,7 +277,8 @@ class Context(object):
 	def __init__(self, regex_flags=0, resolver=None, type_resolver=None, default_timezone='local', default_value=errors.UNDEFINED):
 		"""
 		:param int regex_flags: The flags to provide to functions in the
-			:py:mod:`re` module.
+			:py:mod:`re` module when calling either the :py:func:`~re.match` or
+			:py:func:`~re.search` functions for comparison expressions.
 		:param resolver: An optional callback function to use in place of
 			:py:meth:`.resolve`.
 		:param type_resolver: An optional callback function to use in place of
@@ -296,10 +297,7 @@ class Context(object):
 			Added the *default_value* parameter.
 		"""
 		self.regex_flags = regex_flags
-		"""
-		The flags to provide to the :py:func:`~re.match` and
-		:py:func:`~re.search` functions when matching or searching for patterns.
-		"""
+		"""The *regex_flags* parameter from :py:meth:`~__init__`"""
 		self.symbols = set()
 		"""
 		The symbols that are referred to by the rule. Some or all of these will
@@ -318,7 +316,9 @@ class Context(object):
 		elif not isinstance(default_timezone, datetime.tzinfo):
 			raise TypeError('invalid default_timezone type')
 		self.default_timezone = default_timezone
+		"""The *default_timezone* parameter from :py:meth:`~__init__`"""
 		self.default_value = default_value
+		"""The *default_value* parameter from :py:meth:`~__init__`"""
 		self.builtins = Builtins.from_defaults(timezone=default_timezone)
 		"""An instance of :py:class:`Builtins` to provided a default set of builtin symbol values."""
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)

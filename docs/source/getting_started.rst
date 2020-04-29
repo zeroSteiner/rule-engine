@@ -94,8 +94,8 @@ Basic Usage
       be normalized to ``00:00:00`` (midnight, zero minutes, zero seconds). See
       the :ref:`Literal Values<literal-values>` section for more information.
 
-   * Certain datatypes also have `attributes<builtin-attributes` that can be
-      accessed with the dot (``.``) operator.
+   * Certain datatypes also have :ref:`attributes<builtin-attributes>` that can
+     be accessed with the dot (``.``) operator.
 
       .. code-block:: python
 
@@ -193,6 +193,31 @@ Advanced Usage
 The Rule Engine has a number of advanced features that contribute to its
 flexibility. In most use cases they are unnecessary.
 
+Setting A Default Value
+^^^^^^^^^^^^^^^^^^^^^^^
+By default, :py:class:`engine.Rule` will raise a
+:py:class:`~errors.SymbolResolutionError` for invalid symbols. In some cases, it
+may be desirable to change the way in which the language behaves to instead
+treat unknown symbols with a default value (most often ``None`` /
+:py:attr:`ast.DataType.NULL` is used for this purpose, but value of a supported
+type can be used). To change this behavior, set the *default_value* parameter
+when initializing the :py:class:`~engine.Context` instance.
+
+.. code-block:: python
+
+   # this fails because title is not defined and there is no default_value
+   rule_engine.Rule('title').matches({})
+   # => SymbolResolutionError: title
+
+   context = rule_engine.Context(default_value=None)
+   # this evaluates successfully to False because title is null (from the default value)
+   rule_engine.Rule('title', context=context).matches({})
+   # => False
+
+   # this evaluates successfully to True because title is a non-empty string
+   rule_engine.Rule('title', context=context).matches({'title': 'Batman'})
+   # => True
+
 Custom Resolvers
 ^^^^^^^^^^^^^^^^
 Rule Engine includes resolvers for accessing attributes
@@ -248,7 +273,7 @@ member of the :py:class:`~ast.DataType` enumeration.
 
 For convenience, the :py:func:`~engine.type_resolver_from_dict` function can be
 used to generate a *type_resolver* function from a dictionary mapping symbol
-names to their :py:class:`~ast.DataType`s.
+names to their respective :py:class:`~ast.DataType`.
 
 .. code-block:: python
 
@@ -284,6 +309,32 @@ referenced in the rule that is not known to the *type_resolver*.
    # this is valid: no type information is defined (context is omitted)
    rule = rule_engine.Rule('author == "Stan Lee"')
    # => <Rule text='author == "Stan Lee"' >
+
+Changing Builtin Symbols
+^^^^^^^^^^^^^^^^^^^^^^^^
+To remove the default :ref:`builtins symbols<builtin-symbols>` that are
+provided, simply initialize a :py:class:`~Builtins` instance with a *values* of
+an empty dictionary. This will remove all builtin values, and the dictionary can
+optionally be populated with alternative values.
+
+To add additional values, use the :py:class:`~Builtins.from_defaults`
+constructor, with a *values* dictionary. In this case, *values* will optionally
+override any of the default settings, and keys which do not overlap will be
+added in addition to the default builtin symbols.
+
+.. code-block:: python
+
+   class CustomBuiltinsContext(rule_engine.Context):
+       def __init__(self, *args, **kwargs):
+           # call the parent class's __init__ method first to set the
+           # default_timezone attribute
+           super(CustomBuiltinsContext, self).__init__(*args, **kwargs)
+           self.builtins = rule_engine.engine.Builtins.from_defaults(
+               # expose the $version symbol
+               {'version': rule_engine.__version__},
+               # use the specified default timezone
+               timezone=self.default_timezone
+           )
 
 Rule Inspection
 ---------------

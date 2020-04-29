@@ -89,7 +89,6 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../syntax.html">Rule Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../builtins.html">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../attributes.html">Data Attributes</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ast.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a></li>
@@ -179,7 +178,7 @@
 <code class="sig-name descname">resolve_attribute</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">thing</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#resolve_attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.engine.resolve_attribute" title="Permalink to this definition">¶</a></dt>
 <dd><p>A replacement resolver function for looking up symbols as members of
 <em>thing</em>. This is effectively the same as <code class="docutils literal notranslate"><span class="pre">thing.name</span></code>. The <em>thing</em> object
-can be a <code class="xref py py-class docutils literal notranslate"><span class="pre">namedtuple</span></code>, a custom Python class or any
+can be a <a class="reference external" href="https://docs.python.org/3.7/library/collections.html#collections.namedtuple" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">namedtuple()</span></code></a>, a custom Python class or any
 other object. Each of the members of <em>thing</em> must be of a compatible data
 type.</p>
 <div class="admonition warning">
@@ -295,7 +294,8 @@ resolved and what regex flags should be used.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>regex_flags</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The flags to provide to functions in the
-<a class="reference external" href="https://docs.python.org/3.7/library/re.html#module-re" title="(in Python v3.7)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> module.</p></li>
+<a class="reference external" href="https://docs.python.org/3.7/library/re.html#module-re" title="(in Python v3.7)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> module when calling either the <a class="reference external" href="https://docs.python.org/3.7/library/re.html#re.match" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">match()</span></code></a> or
+<a class="reference external" href="https://docs.python.org/3.7/library/re.html#re.search" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a> functions for comparison expressions.</p></li>
 <li><p><strong>resolver</strong> – An optional callback function to use in place of
 <a class="reference internal" href="#rule_engine.engine.Context.resolve" title="rule_engine.engine.Context.resolve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resolve()</span></code></a>.</p></li>
 <li><p><strong>type_resolver</strong> – An optional callback function to use in place of
@@ -320,10 +320,21 @@ a missing symbol or attribute.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
+<dt id="rule_engine.engine.Context.default_timezone">
+<code class="sig-name descname">default_timezone</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.engine.Context.default_timezone" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <em>default_timezone</em> parameter from <a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="rule_engine.engine.Context.default_value">
+<code class="sig-name descname">default_value</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.engine.Context.default_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <em>default_value</em> parameter from <a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt id="rule_engine.engine.Context.regex_flags">
 <code class="sig-name descname">regex_flags</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.engine.Context.regex_flags" title="Permalink to this definition">¶</a></dt>
-<dd><p>The flags to provide to the <a class="reference external" href="https://docs.python.org/3.7/library/re.html#re.match" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">match()</span></code></a> and
-<a class="reference external" href="https://docs.python.org/3.7/library/re.html#re.search" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a> functions when matching or searching for patterns.</p>
+<dd><p>The <em>regex_flags</em> parameter from <a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">

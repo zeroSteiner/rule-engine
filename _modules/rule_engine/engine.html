@@ -87,7 +87,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Rule Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../builtins.html">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../attributes.html">Data Attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../change_log.html">Change Log</a></li>
@@ -209,7 +208,7 @@
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A replacement resolver function for looking up symbols as members of</span>
 <span class="sd">	*thing*. This is effectively the same as ``thing.name``. The *thing* object</span>
-<span class="sd">	can be a :py:class:`~collections.namedtuple`, a custom Python class or any</span>
+<span class="sd">	can be a :py:func:`~collections.namedtuple`, a custom Python class or any</span>
 <span class="sd">	other object. Each of the members of *thing* must be of a compatible data</span>
 <span class="sd">	type.</span>
 
@@ -433,7 +432,8 @@
 <div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_flags</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_timezone</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param int regex_flags: The flags to provide to functions in the</span>
-<span class="sd">			:py:mod:`re` module.</span>
+<span class="sd">			:py:mod:`re` module when calling either the :py:func:`~re.match` or</span>
+<span class="sd">			:py:func:`~re.search` functions for comparison expressions.</span>
 <span class="sd">		:param resolver: An optional callback function to use in place of</span>
 <span class="sd">			:py:meth:`.resolve`.</span>
 <span class="sd">		:param type_resolver: An optional callback function to use in place of</span>
@@ -452,10 +452,7 @@
 <span class="sd">			Added the *default_value* parameter.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">regex_flags</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		The flags to provide to the :py:func:`~re.match` and</span>
-<span class="sd">		:py:func:`~re.search` functions when matching or searching for patterns.</span>
-<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="sd">&quot;&quot;&quot;The *regex_flags* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		The symbols that are referred to by the rule. Some or all of these will</span>
@@ -474,7 +471,9 @@
 		<span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_timezone</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">):</span>
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;invalid default_timezone type&#39;</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span> <span class="o">=</span> <span class="n">default_timezone</span>
+		<span class="sd">&quot;&quot;&quot;The *default_timezone* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">default_value</span>
+		<span class="sd">&quot;&quot;&quot;The *default_value* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="n">default_timezone</span><span class="p">)</span>
 		<span class="sd">&quot;&quot;&quot;An instance of :py:class:`Builtins` to provided a default set of builtin symbol values.&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>

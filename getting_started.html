@@ -93,15 +93,16 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#advanced-usage">Advanced Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setting-a-default-value">Setting A Default Value</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#custom-resolvers">Custom Resolvers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#type-hinting">Type Hinting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changing-builtin-symbols">Changing Builtin Symbols</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#rule-inspection">Rule Inspection</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="builtins.html">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
@@ -285,16 +286,16 @@ be normalized to <code class="docutils literal notranslate"><span class="pre">00
 the <a class="reference internal" href="syntax.html#literal-values"><span class="std std-ref">Literal Values</span></a> section for more information.</p>
 </div></blockquote>
 </li>
-<li><dl>
-<dt>Certain datatypes also have <cite>attributes&lt;builtin-attributes</cite> that can be</dt><dd><p>accessed with the dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) operator.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
+<li><p>Certain datatypes also have <a class="reference internal" href="attributes.html#builtin-attributes"><span class="std std-ref">attributes</span></a> that can
+be accessed with the dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) operator.</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
   <span class="c1"># normalize potential variations in the publisher case such as &#39;Dc&#39;</span>
   <span class="s1">&#39;publisher.as_upper == &quot;DC&quot;&#39;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-</dd>
-</dl>
+</div></blockquote>
 </li>
 <li><p>Rules can also match strings using regular expressions. When using this
 type of comparison, the string on the right hand side of the operator is
@@ -393,6 +394,30 @@ which do not have the same attributes (like artists).</p>
 <h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
 <p>The Rule Engine has a number of advanced features that contribute to its
 flexibility. In most use cases they are unnecessary.</p>
+<div class="section" id="setting-a-default-value">
+<h3>Setting A Default Value<a class="headerlink" href="#setting-a-default-value" title="Permalink to this headline">¶</a></h3>
+<p>By default, <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">engine.Rule</span></code></a> will raise a
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> for invalid symbols. In some cases, it
+may be desirable to change the way in which the language behaves to instead
+treat unknown symbols with a default value (most often <code class="docutils literal notranslate"><span class="pre">None</span></code> /
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ast.DataType.NULL</span></code></a> is used for this purpose, but value of a supported
+type can be used). To change this behavior, set the <em>default_value</em> parameter
+when initializing the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># this fails because title is not defined and there is no default_value</span>
+<span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">matches</span><span class="p">({})</span>
+<span class="c1"># =&gt; SymbolResolutionError: title</span>
+
+<span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="c1"># this evaluates successfully to False because title is null (from the default value)</span>
+<span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span><span class="o">.</span><span class="n">matches</span><span class="p">({})</span>
+<span class="c1"># =&gt; False</span>
+
+<span class="c1"># this evaluates successfully to True because title is a non-empty string</span>
+<span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span><span class="o">.</span><span class="n">matches</span><span class="p">({</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Batman&#39;</span><span class="p">})</span>
+<span class="c1"># =&gt; True</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="custom-resolvers">
 <h3>Custom Resolvers<a class="headerlink" href="#custom-resolvers" title="Permalink to this headline">¶</a></h3>
 <p>Rule Engine includes resolvers for accessing attributes
@@ -444,7 +469,7 @@ member of the <a class="reference internal" href="rule_engine/ast.html#rule_engi
 </div>
 <p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be
 used to generate a <em>type_resolver</em> function from a dictionary mapping symbol
-names to their :py:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>~ast.DataType`s.</p>
+names to their respective <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
     <span class="n">type_resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">type_resolver_from_dict</span><span class="p">({</span>
         <span class="c1"># map symbol names to their data types</span>
@@ -474,6 +499,30 @@ referenced in the rule that is not known to the <em>type_resolver</em>.</p>
 <span class="c1"># this is valid: no type information is defined (context is omitted)</span>
 <span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;author == &quot;Stan Lee&quot;&#39;</span><span class="p">)</span>
 <span class="c1"># =&gt; &lt;Rule text=&#39;author == &quot;Stan Lee&quot;&#39; &gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="changing-builtin-symbols">
+<h3>Changing Builtin Symbols<a class="headerlink" href="#changing-builtin-symbols" title="Permalink to this headline">¶</a></h3>
+<p>To remove the default <a class="reference internal" href="syntax.html#builtin-symbols"><span class="std std-ref">builtins symbols</span></a> that are
+provided, simply initialize a <code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code> instance with a <em>values</em> of
+an empty dictionary. This will remove all builtin values, and the dictionary can
+optionally be populated with alternative values.</p>
+<p>To add additional values, use the <code class="xref py py-class docutils literal notranslate"><span class="pre">from_defaults</span></code>
+constructor, with a <em>values</em> dictionary. In this case, <em>values</em> will optionally
+override any of the default settings, and keys which do not overlap will be
+added in addition to the default builtin symbols.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CustomBuiltinsContext</span><span class="p">(</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># call the parent class&#39;s __init__ method first to set the</span>
+        <span class="c1"># default_timezone attribute</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CustomBuiltinsContext</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span>
+            <span class="c1"># expose the $version symbol</span>
+            <span class="p">{</span><span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">__version__</span><span class="p">},</span>
+            <span class="c1"># use the specified default timezone</span>
+            <span class="n">timezone</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span>
+        <span class="p">)</span>
 </pre></div>
 </div>
 </div>

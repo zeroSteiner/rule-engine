@@ -39,7 +39,6 @@ See the `examples`_ folder for more.
 
    getting_started.rst
    syntax.rst
-   builtins.rst
    attributes.rst
    rule_engine/index.rst
    change_log.rst

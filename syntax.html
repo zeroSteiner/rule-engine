@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Builtin Symbols" href="builtins.html" />
+    <link rel="next" title="Data Attributes" href="attributes.html" />
     <link rel="prev" title="Getting Started" href="getting_started.html" /> 
 </head>
 
@@ -95,9 +95,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#literal-values">Literal Values</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#builtin-symbols">Builtin Symbols</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="builtins.html">Builtin Symbols</a></li>
 <li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
@@ -212,6 +212,8 @@ arithmetic for numerical data and regular expressions for strings. Operations
 are type aware and will raise an exception when an incompatible type is used.</p>
 <div class="section" id="supported-operations">
 <h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this headline">¶</a></h3>
+<p>The following table outlines all operators that can be used in Rule Engine
+expressions.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 15%" />
@@ -440,6 +442,52 @@ values may include a decimal place component.</p>
 </ul>
 </div>
 </div>
+<div class="section" id="builtin-symbols">
+<span id="id2"></span><h2>Builtin Symbols<a class="headerlink" href="#builtin-symbols" title="Permalink to this headline">¶</a></h2>
+<p>The following symbols are provided by default using the
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Builtins.from_defaults" title="rule_engine.engine.Builtins.from_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_defaults()</span></code></a> method. These symbols can be accessed
+through the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix, e.g. <code class="docutils literal notranslate"><span class="pre">$pi</span></code>. The default values can be overridden by
+defining a custom subclass of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> and setting the
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.builtins" title="rule_engine.engine.Context.builtins"><code class="xref py py-attr docutils literal notranslate"><span class="pre">builtins</span></code></a> attribute.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 40%" />
+<col style="width: 52%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Name</p></td>
+<td><p>Data Type</p></td>
+<td><p>Value Description</p></td>
+</tr>
+<tr class="row-even"><td colspan="3"><p><strong>Math related</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p>e</p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<td><p>The mathematical constant <em>e</em> (2.71828…).</p></td>
+</tr>
+<tr class="row-even"><td><p>pi</p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<td><p>The mathematical constant <em>pi</em> (3.14159…).</p></td>
+</tr>
+<tr class="row-odd"><td colspan="3"><p><strong>Timestamp related</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>now</p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
+<td><p>The current timestamp (including time)
+using the default timezone from
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone" title="rule_engine.engine.Context.default_timezone"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timezone</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>today</p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
+<td><p>The current timestamp, (excluding time,
+normalized to midnight / 00:00:00)
+using the default timezone from
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone" title="rule_engine.engine.Context.default_timezone"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timezone</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
@@ -450,7 +498,7 @@ values may include a decimal place component.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="builtins.html" class="btn btn-neutral float-right" title="Builtin Symbols" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="attributes.html" class="btn btn-neutral float-right" title="Data Attributes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

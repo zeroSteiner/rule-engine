@@ -5,6 +5,7 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
+  - "3.8"
 
 install:
   - pip install pip==19.0.3 pipenv==2018.11.26
@@ -17,7 +18,7 @@ script:
 jobs:
   include:
     - stage: Documentation
-      python: "3.7"
+      python: "3.8"
       script:
         - sphinx-build -b html -a -E -v docs/source docs/html
         - echo "Deploying to GitHub pages..."

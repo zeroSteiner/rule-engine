@@ -70,7 +70,7 @@ Basic Usage
      valid symbol while ``Released Date`` is not (because of the space).
 
    * An simple rule for the comic book collection which matches the
-     ``publisher`` symbol to the string `"DC"`` might look like:
+     ``publisher`` symbol to the string ``"DC"`` might look like:
 
       .. code-block:: python
 

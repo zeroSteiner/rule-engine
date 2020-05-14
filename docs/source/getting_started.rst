@@ -221,8 +221,8 @@ when initializing the :py:class:`~engine.Context` instance.
 Custom Resolvers
 ^^^^^^^^^^^^^^^^
 Rule Engine includes resolvers for accessing attributes
-py:func:`as keys<engine.resolve_item>` on objects (such as dictionaries) and one
-for resolving symbols :py:func:`as attributes<engine.resolve_attribute>` on
+:py:func:`as keys<engine.resolve_item>` on objects (such as dictionaries) and
+one for resolving symbols :py:func:`as attributes<engine.resolve_attribute>` on
 objects. If for some reason, neither of those are suitable for the target object
 then a custom one can be defined and used.
 

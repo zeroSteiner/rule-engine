@@ -295,10 +295,10 @@ class Parser(ParserBase):
 		"""
 		if len(p) == 4:
 			member, _, container = p[1:4]
-			p[0] = ast.ContainsExpression(self.context, member, container).reduce()
+			p[0] = ast.ContainsExpression(self.context, container, member).reduce()
 		else:
 			member, _, _, container = p[1:5]
-			p[0] = ast.ContainsExpression(self.context, member, container).reduce()
+			p[0] = ast.ContainsExpression(self.context, container, member).reduce()
 			p[0] = ast.UnaryExpression(self.context, 'NOT', p[0]).reduce()
 
 	def p_expression_comparison(self, p):

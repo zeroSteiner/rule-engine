@@ -609,9 +609,9 @@ class ContainsExpression(ExpressionBase):
 	"""
 	An expression used to test whether an item exists within a container.
 	"""
-	__slots__ = ('member', 'container')
+	__slots__ = ('container', 'member')
 	result_type = DataType.BOOLEAN
-	def __init__(self, context, member, container):
+	def __init__(self, context, container, member):
 		if container.result_type is DataType.STRING:
 			if member.result_type is not DataType.UNDEFINED and member.result_type is not DataType.STRING:
 				raise errors.EvaluationError('data type mismatch')
@@ -620,6 +620,9 @@ class ContainsExpression(ExpressionBase):
 		self.context = context
 		self.member = member
 		self.container = container
+
+	def __repr__(self):
+		return "<{0} container={1!r} member={2!r} >".format(self.__class__.__name__, self.container, self.member)
 
 	def evaluate(self, thing):
 		member_value = self.member.evaluate(thing)

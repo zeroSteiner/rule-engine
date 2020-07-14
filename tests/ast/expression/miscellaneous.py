@@ -55,32 +55,32 @@ class ContainsExpressionTests(unittest.TestCase):
 		container = ast.LiteralExpressionBase.from_value(context, range(3))
 
 		member = ast.FloatExpression(context, 1.0)
-		contains = ast.ContainsExpression(context, member, container)
+		contains = ast.ContainsExpression(context, container, member)
 		self.assertTrue(contains.evaluate(None))
 		self.assertIsInstance(contains.reduce(), ast.BooleanExpression)
 
 		member = ast.FloatExpression(context, -1.0)
-		contains = ast.ContainsExpression(context, member, container)
+		contains = ast.ContainsExpression(context, container, member)
 		self.assertFalse(contains.evaluate(None))
 		self.assertIsInstance(contains.reduce(), ast.BooleanExpression)
 
 		container = ast.StringExpression(context, 'Rule Engine')
 
 		member = ast.StringExpression(context, ' ')
-		self.assertTrue(ast.ContainsExpression(context, member, container).evaluate(None))
+		self.assertTrue(ast.ContainsExpression(context, container, member).evaluate(None))
 
 		member = ast.StringExpression(context, 'x')
-		self.assertFalse(ast.ContainsExpression(context, member, container).evaluate(None))
+		self.assertFalse(ast.ContainsExpression(context, container, member).evaluate(None))
 
 	def test_ast_expression_contains_error(self):
 		container = ast.StringExpression(context, 'Rule Engine')
 		member = ast.FloatExpression(context, 1.0)
 		with self.assertRaises(errors.EvaluationError):
-			ast.ContainsExpression(context, member, container).evaluate(None)
+			ast.ContainsExpression(context, container, member).evaluate(None)
 
 		container = ast.FloatExpression(context, 1.0)
 		with self.assertRaises(errors.EvaluationError):
-			ast.ContainsExpression(context, member, container).evaluate(None)
+			ast.ContainsExpression(context, container, member).evaluate(None)
 
 class SymbolExpressionTests(unittest.TestCase):
 	def setUp(self):

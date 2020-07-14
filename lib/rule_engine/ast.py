@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import collections.abc
 import datetime
 import enum
 import functools
@@ -645,24 +646,24 @@ class ContainsExpression(ExpressionBase):
 		return "<{0} container={1!r} member={2!r} >".format(self.__class__.__name__, self.container, self.member)
 
 	def evaluate(self, thing):
-		member_value = self.member.evaluate(thing)
 		container_value = self.container.evaluate(thing)
+		member_value = self.member.evaluate(thing)
 		if DataType.from_value(container_value) is DataType.STRING:
 			if DataType.from_value(member_value) is not DataType.STRING:
 				raise errors.EvaluationError('data type mismatch')
 		return bool(member_value in container_value)
 
 	def reduce(self):
-		if _is_reduced(self.member) and _is_reduced(self.container):
+		if _is_reduced(self.container) and _is_reduced(self.member):
 			return BooleanExpression(self.context, self.evaluate(None))
 		return self
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		super(ContainsExpression, self).to_graphviz(digraph, *args, **kwargs)
-		self.member.to_graphviz(digraph, *args, **kwargs)
 		self.container.to_graphviz(digraph, *args, **kwargs)
-		digraph.edge(str(id(self)), str(id(self.member)), label='member')
+		self.member.to_graphviz(digraph, *args, **kwargs)
 		digraph.edge(str(id(self)), str(id(self.container)), label='container')
+		digraph.edge(str(id(self)), str(id(self.member)), label='member')
 
 class GetAttributeExpression(ExpressionBase):
 	"""
@@ -711,6 +712,51 @@ class GetAttributeExpression(ExpressionBase):
 		digraph.node(str(id(self)), "{}\nname={!r}".format(self.__class__.__name__, self.name))
 		self.object.to_graphviz(digraph, *args, **kwargs)
 		digraph.edge(str(id(self)), str(id(self.object)))
+
+class GetItemExpression(ExpressionBase):
+	"""
+	A class representing an expression in which an *item* is retrieved from a
+	container *object*.
+	"""
+	__slots__ = ('container', 'item')
+	def __init__(self, context, container, item):
+		"""
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
+		:param container: The container object from which to retrieve the item.
+		:param str item: The item to retrieve from the container.
+		"""
+		self.context = context
+		self.container = container
+		# todo: support type hinting and set the result type correctly
+		self.item = item
+
+	def __repr__(self):
+		return "<{0} container={1!r} item={2!r} >".format(self.__class__.__name__, self.container, self.item)
+
+	def evaluate(self, thing):
+		resolved_obj = self.container.evaluate(thing)
+		resolved_item = self.item.evaluate(thing)
+		if isinstance(resolved_obj, collections.abc.Sequence):
+			_assert_is_integer_number(resolved_item)
+			resolved_item = int(resolved_item)
+		try:
+			value = resolved_obj[resolved_item]
+		except (IndexError, KeyError):
+			raise errors.EvaluationError()
+		return coerce_value(value, verify_type=False)
+
+	def reduce(self):
+		if not _is_reduced(self.container) or not _is_reduced(self.item):
+			return self
+		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(GetItemExpression, self).to_graphviz(digraph, *args, **kwargs)
+		self.container.to_graphviz(digraph, *args, **kwargs)
+		self.item.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.container)), label='container')
+		digraph.edge(str(id(self)), str(id(self.item)), label='item')
 
 class SymbolExpression(ExpressionBase):
 	"""

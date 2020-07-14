@@ -406,6 +406,13 @@ class Parser(ParserBase):
 		else:
 			p[0] = ast.ArrayExpression(self.context, tuple(p[2])).reduce()
 
+	def p_expression_getitem(self, p):
+		"""
+		object : object LBRACKET expression RBRACKET
+		"""
+		container, _, item = p[1:4]
+		p[0] = ast.GetItemExpression(self.context, container, item).reduce()
+
 	def p_expression_array_members(self, p):
 		"""
 		members : expression

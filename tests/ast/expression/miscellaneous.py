@@ -44,6 +44,7 @@ import dateutil.tz
 
 __all__ = (
 	'ContainsExpressionTests',
+	'GetItemExpressionTests',
 	'SymbolExpressionTests',
 	'SymbolExpressionConversionTests',
 	'TernaryExpressionTests',
@@ -81,6 +82,36 @@ class ContainsExpressionTests(unittest.TestCase):
 		container = ast.FloatExpression(context, 1.0)
 		with self.assertRaises(errors.EvaluationError):
 			ast.ContainsExpression(context, container, member).evaluate(None)
+
+class GetItemExpressionTests(unittest.TestCase):
+	def test_ast_expression_getitem(self):
+		container = ast.LiteralExpressionBase.from_value(context, range(5))
+
+		item_1 = ast.FloatExpression(context, 1.0)
+		get_item = ast.GetItemExpression(context, container, item_1)
+		self.assertEqual(get_item.evaluate(None), 1)
+		self.assertIsInstance(get_item.reduce(), ast.FloatExpression)
+
+		item_n1 = ast.FloatExpression(context, -1.0)
+		get_item = ast.GetItemExpression(context, container, item_n1)
+		self.assertEqual(get_item.evaluate(None), 4)
+		self.assertIsInstance(get_item.reduce(), ast.FloatExpression)
+
+		container = ast.StringExpression(context, 'Rule Engine')
+
+		get_item = ast.GetItemExpression(context, container, item_1)
+		self.assertEqual(get_item.evaluate(None), 'u')
+		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
+
+		get_item = ast.GetItemExpression(context, container, item_n1)
+		self.assertEqual(get_item.evaluate(None), 'e')
+		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
+
+	def test_ast_expression_getitem_error(self):
+		container = ast.StringExpression(context, 'Rule Engine')
+		member = ast.FloatExpression(context, 100.0)
+		with self.assertRaises(errors.EvaluationError):
+			ast.GetItemExpression(context, container, member).evaluate(None)
 
 class SymbolExpressionTests(unittest.TestCase):
 	def setUp(self):

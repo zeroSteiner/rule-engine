@@ -227,6 +227,24 @@
 		<span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># use this to raise a TypeError, if the type is incompatible</span>
 	<span class="k">return</span> <span class="n">value</span></div>
 
+<div class="viewcode-block" id="is_integer_number"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_integer_number">[docs]</a><span class="k">def</span> <span class="nf">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Check whether *value* is an integer number (i.e. a whole, number). This can,</span>
+<span class="sd">	for example, be used to check if a floating point number such as ``3.0`` can</span>
+<span class="sd">	safely be converted to an integer without loss of information.</span>
+
+<span class="sd">	.. versionadded:: 2.1.0</span>
+
+<span class="sd">	:param value: The value to check. This value is a native Python type.</span>
+<span class="sd">	:return: Whether or not the value is an integer number.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="kc">True</span></div>
+
 <div class="viewcode-block" id="is_natural_number"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.is_natural_number">[docs]</a><span class="k">def</span> <span class="nf">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check whether *value* is a natural number (i.e. a whole, non-negative</span>
@@ -238,9 +256,7 @@
 <span class="sd">	:return: Whether or not the value is a natural number.</span>
 <span class="sd">	:rtype: bool</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-		<span class="k">return</span> <span class="kc">False</span>
-	<span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="kc">False</span>
 	<span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
 		<span class="k">return</span> <span class="kc">False</span>
@@ -277,6 +293,10 @@
 	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
 		<span class="k">return</span> <span class="kc">False</span>
 	<span class="k">return</span> <span class="kc">True</span></div>
+
+<span class="k">def</span> <span class="nf">_assert_is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not an integer number)&#39;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_assert_is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -767,9 +787,9 @@
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	An expression used to test whether an item exists within a container.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="s1">&#39;container&#39;</span><span class="p">)</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="s1">&#39;member&#39;</span><span class="p">)</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">member</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">member</span><span class="p">):</span>
 		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 			<span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
@@ -778,6 +798,9 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">member</span> <span class="o">=</span> <span class="n">member</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
+
+	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> container=</span><span class="si">{1!r}</span><span class="s2"> member=</span><span class="si">{2!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">member</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">member_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">member</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>

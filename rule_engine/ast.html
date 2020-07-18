@@ -207,6 +207,28 @@ as when resolving a symbol from an object external to the engine.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt id="rule_engine.ast.is_integer_number">
+<code class="sig-name descname">is_integer_number</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_integer_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_integer_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether <em>value</em> is an integer number (i.e. a whole, number). This can,
+for example, be used to check if a floating point number such as <code class="docutils literal notranslate"><span class="pre">3.0</span></code> can
+safely be converted to an integer without loss of information.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.1.0.</span></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – The value to check. This value is a native Python type.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether or not the value is an integer number.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt id="rule_engine.ast.is_natural_number">
 <code class="sig-name descname">is_natural_number</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#is_natural_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.is_natural_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a natural number (i.e. a whole, non-negative
@@ -666,7 +688,7 @@ always evaluates to false.</p>
 <h3>Miscellaneous Expressions<a class="headerlink" href="#miscellaneous-expressions" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
 <dt id="rule_engine.ast.ContainsExpression">
-<em class="property">class </em><code class="sig-name descname">ContainsExpression</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">member</span></em>, <em class="sig-param"><span class="n">container</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ContainsExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ContainsExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-name descname">ContainsExpression</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">context</span></em>, <em class="sig-param"><span class="n">container</span></em>, <em class="sig-param"><span class="n">member</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ContainsExpression"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.ContainsExpression" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>An expression used to test whether an item exists within a container.</p>
 <dl class="py attribute">

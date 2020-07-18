@@ -1,15 +1,19 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>engine &mdash; Rule Engine 2.0.0 documentation</title>
+  <title>engine &mdash; Rule Engine 2.1.0 documentation</title>
   
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
 
   
   
@@ -17,7 +21,9 @@
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -29,11 +35,6 @@
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="errors" href="errors.html" />
@@ -51,7 +52,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Rule Engine
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Rule Engine
           
 
           
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                2.0.0
+                2.1.0
               </div>
             
           
@@ -78,6 +79,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -107,6 +109,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -145,7 +148,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a> &raquo;</li>
         
@@ -315,25 +318,25 @@ a missing symbol or attribute.</p></li>
 
 <dl class="py attribute">
 <dt id="rule_engine.engine.Context.builtins">
-<code class="sig-name descname">builtins</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.engine.Context.builtins" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">builtins</code><a class="headerlink" href="#rule_engine.engine.Context.builtins" title="Permalink to this definition">¶</a></dt>
 <dd><p>An instance of <a class="reference internal" href="#rule_engine.engine.Builtins" title="rule_engine.engine.Builtins"><code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code></a> to provided a default set of builtin symbol values.</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="rule_engine.engine.Context.default_timezone">
-<code class="sig-name descname">default_timezone</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.engine.Context.default_timezone" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">default_timezone</code><a class="headerlink" href="#rule_engine.engine.Context.default_timezone" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <em>default_timezone</em> parameter from <a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="rule_engine.engine.Context.default_value">
-<code class="sig-name descname">default_value</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.engine.Context.default_value" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">default_value</code><a class="headerlink" href="#rule_engine.engine.Context.default_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <em>default_value</em> parameter from <a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="rule_engine.engine.Context.regex_flags">
-<code class="sig-name descname">regex_flags</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.engine.Context.regex_flags" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">regex_flags</code><a class="headerlink" href="#rule_engine.engine.Context.regex_flags" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <em>regex_flags</em> parameter from <a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></p>
 </dd></dl>
 
@@ -404,7 +407,7 @@ or raise an exception. The default behavior is to return
 
 <dl class="py attribute">
 <dt id="rule_engine.engine.Context.symbols">
-<code class="sig-name descname">symbols</code><em class="property"> = None</em><a class="headerlink" href="#rule_engine.engine.Context.symbols" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">symbols</code><a class="headerlink" href="#rule_engine.engine.Context.symbols" title="Permalink to this definition">¶</a></dt>
 <dd><p>The symbols that are referred to by the rule. Some or all of these will
 need to be resolved at evaluation time. This attribute can be used after
 a rule is generated to ensure that all symbols are valid before it is
@@ -555,11 +558,19 @@ evaluation.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2019, Spencer McIntyre
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -570,7 +581,6 @@ evaluation.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

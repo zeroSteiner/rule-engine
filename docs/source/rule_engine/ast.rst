@@ -12,6 +12,8 @@ Functions
 
 .. autofunction:: coerce_value
 
+.. autofunction:: is_integer_number
+
 .. autofunction:: is_natural_number
 
 .. autofunction:: is_numeric

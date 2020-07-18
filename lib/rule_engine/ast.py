@@ -69,6 +69,24 @@ def coerce_value(value, verify_type=True):
 		DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
 	return value
 
+def is_integer_number(value):
+	"""
+	Check whether *value* is an integer number (i.e. a whole, number). This can,
+	for example, be used to check if a floating point number such as ``3.0`` can
+	safely be converted to an integer without loss of information.
+
+	.. versionadded:: 2.1.0
+
+	:param value: The value to check. This value is a native Python type.
+	:return: Whether or not the value is an integer number.
+	:rtype: bool
+	"""
+	if not is_real_number(value):
+		return False
+	if math.floor(value) != value:
+		return False
+	return True
+
 def is_natural_number(value):
 	"""
 	Check whether *value* is a natural number (i.e. a whole, non-negative
@@ -80,9 +98,7 @@ def is_natural_number(value):
 	:return: Whether or not the value is a natural number.
 	:rtype: bool
 	"""
-	if not is_real_number(value):
-		return False
-	if math.floor(value) != value:
+	if not is_integer_number(value):
 		return False
 	if value < 0:
 		return False
@@ -119,6 +135,10 @@ def is_numeric(value):
 	if isinstance(value, bool):
 		return False
 	return True
+
+def _assert_is_integer_number(value):
+	if not is_integer_number(value):
+		raise errors.EvaluationError('data type mismatch (not an integer number)')
 
 def _assert_is_natural_number(value):
 	if not is_natural_number(value):

@@ -41,24 +41,28 @@ inf = float('inf')
 nan = float('nan')
 
 class ValueIsTests(unittest.TestCase):
-	_Case = collections.namedtuple('_Case', ('value', 'numeric', 'real', 'natural'))
+	_Case = collections.namedtuple('_Case', ('value', 'numeric', 'real', 'integer', 'natural'))
 	cases = (
-		#     value   numeric  real    natural
-		_Case(-inf,   True,    False,  False),
-		_Case(-1.5,   True,    True,   False),
-		_Case(-1.0,   True,    True,   False),
-		_Case(-1,     True,    True,   False),
-		_Case(0,      True,    True,   True ),
-		_Case(1,      True,    True,   True ),
-		_Case(1.0,    True,    True,   True ),
-		_Case(1.5,    True,    True,   False),
-		_Case(inf,    True,    False,  False),
-		_Case(nan,    True,    False,  False),
-		_Case(True,   False,   False,  False),
-		_Case(False,  False,   False,  False),
-		_Case('',     False,   False,  False),
-		_Case(None,   False,   False,  False),
+		#     value   numeric  real    integer natural
+		_Case(-inf,   True,    False,  False,  False),
+		_Case(-1.5,   True,    True,   False,  False),
+		_Case(-1.0,   True,    True,   True,   False),
+		_Case(-1,     True,    True,   True,   False),
+		_Case(0,      True,    True,   True,   True ),
+		_Case(1,      True,    True,   True,   True ),
+		_Case(1.0,    True,    True,   True,   True ),
+		_Case(1.5,    True,    True,   False,  False),
+		_Case(inf,    True,    False,  False,  False),
+		_Case(nan,    True,    False,  False,  False),
+		_Case(True,   False,   False,  False,  False),
+		_Case(False,  False,   False,  False,  False),
+		_Case('',     False,   False,  False,  False),
+		_Case(None,   False,   False,  False,  False),
 	)
+	def test_value_is_integer_number(self):
+		for case in self.cases:
+			self.assertEqual(ast.is_integer_number(case.value), case.integer)
+
 	def test_value_is_natural_number(self):
 		for case in self.cases:
 			self.assertEqual(ast.is_natural_number(case.value), case.natural)

@@ -33,9 +33,10 @@
 class _UNDEFINED(object):
 	def __bool__(self):
 		return False
+	__name__ = 'UNDEFINED'
 	__nonzero__ = __bool__
 	def __repr__(self):
-		return 'UNDEFINED'
+		return self.__name__
 UNDEFINED = _UNDEFINED()
 """
 A sentinel value to specify that something is undefined. When evaluated, the

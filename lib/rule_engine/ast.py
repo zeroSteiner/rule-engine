@@ -163,37 +163,54 @@ def _is_reduced(value):
 	return True
 
 class _DataTypeDef(object):
-	__slots__ = ('python_type', 'is_scalar')
-	def __init__(self, python_type, is_scalar=True):
+	__slots__ = ('name', 'python_type', 'is_scalar')
+	def __init__(self, name, python_type):
+		self.name = name
 		self.python_type = python_type
-		self.is_scalar = is_scalar
+		self.is_scalar = True
 
 	def __eq__(self, other):
-		return hash(other) == hash(self)
+		if not isinstance(other, self.__class__):
+			return False
+		return self.name == other.name
 
 	def __hash__(self):
 		return hash((self.python_type, self.is_scalar))
 
 	def __repr__(self):
-		return "<{} python_type={} >".format(self.__class__.__name__, self.python_type.__name__)
+		return "<{} name={} python_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__)
 
 	@property
 	def is_compound(self):
 		return not self.is_scalar
 
-_UndefinedDataTypeDef = None
+_DATA_TYPE_UNDEFINED = _DataTypeDef('UNDEFINED', errors.UNDEFINED)
+class _SequenceDataTypeDef(_DataTypeDef):
+	__slots__ = ('value_type',)
+	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED):
+		if not issubclass(python_type, collections.abc.Sequence):
+			raise TypeError('the specified python_type is not a Sequence')
+		super(_SequenceDataTypeDef, self).__init__(name, python_type)
+		self.is_scalar = False
+		self.value_type = value_type
 
-class DataType(enum.Enum):
+	def __call__(self, value_type):
+		return self.__class__(self.name, self.python_type, value_type=value_type)
+
+	def __repr__(self):
+		return "<{} name={} python_type={} value_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__, self.value_type.name)
+
+class DataType(object):
 	"""
 	A collection of constants representing the different supported data types.
 	"""
-	ARRAY = _DataTypeDef(tuple, is_scalar=False)
-	BOOLEAN = _DataTypeDef(bool)
-	DATETIME = _DataTypeDef(datetime.datetime)
-	FLOAT = _DataTypeDef(float)
-	NULL = _DataTypeDef(NoneType)
-	STRING = _DataTypeDef(str)
-	UNDEFINED = _UndefinedDataTypeDef
+	ARRAY = _SequenceDataTypeDef('ARRAY', tuple)
+	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
+	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
+	FLOAT = _DataTypeDef('FLOAT', float)
+	NULL = _DataTypeDef('NULL', NoneType)
+	STRING = _DataTypeDef('STRING', str)
+	UNDEFINED = _DATA_TYPE_UNDEFINED
 	"""
 	Undefined values. This constant can be used to indicate that a particular
 	symbol is valid, but it's data type is currently unknown.
@@ -210,7 +227,7 @@ class DataType(enum.Enum):
 		"""
 		if not isinstance(name, str):
 			raise TypeError('from_name argument 1 must be str, not ' + type(name).__name__)
-		dt = cls.__members__.get(name)
+		dt = getattr(cls, name, None)
 		if dt is None:
 			raise ValueError("can not map name {0!r} to a compatible data type".format(name))
 		return dt
@@ -269,6 +286,19 @@ class DataType(enum.Enum):
 			return cls.STRING
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
+	@classmethod
+	def is_definition(cls, value):
+		"""
+		Check if *value* is a data type definition.
+
+		.. versionadded: 2.1.0
+
+		:param value: The value to check.
+		:return: ``True`` if *value* is a data type definition.
+		:rtype: bool
+		"""
+		return isinstance(value, _DataTypeDef)
+
 class ASTNodeBase(object):
 	def to_graphviz(self, digraph):
 		digraph.node(str(id(self)), self.__class__.__name__)
@@ -314,8 +344,8 @@ class LiteralExpressionBase(ExpressionBase):
 		:param value: The native Python value.
 		"""
 		self.context = context
-		if not isinstance(value, self.result_type.value.python_type):
-			raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.value.python_type.__name__, type(value).__name__))
+		if not isinstance(value, self.result_type.python_type):
+			raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.python_type.__name__, type(value).__name__))
 		self.value = value
 
 	def __repr__(self):
@@ -340,7 +370,7 @@ class LiteralExpressionBase(ExpressionBase):
 				break
 		else:
 			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
-		if datatype.value.is_compound:
+		if datatype.is_compound:
 			value = tuple(cls.from_value(context, val) for val in value)
 		return subclass(context, coerce_value(value))
 
@@ -348,7 +378,7 @@ class LiteralExpressionBase(ExpressionBase):
 		return self.value
 
 	def to_graphviz(self, digraph, *args, **kwargs):
-		if self.result_type.value.is_compound:
+		if self.result_type.is_compound:
 			digraph.node(str(id(self)), self.__class__.__name__)
 		else:
 			digraph.node(str(id(self)), "{}\nvalue={!r}".format(self.__class__.__name__, self.value))
@@ -638,7 +668,7 @@ class ContainsExpression(ExpressionBase):
 		if container.result_type == DataType.STRING:
 			if member.result_type != DataType.UNDEFINED and member.result_type != DataType.STRING:
 				raise errors.EvaluationError('data type mismatch')
-		elif container.result_type != DataType.UNDEFINED and container.result_type.value.is_scalar:
+		elif container.result_type != DataType.UNDEFINED and container.result_type.is_scalar:
 			raise errors.EvaluationError('data type mismatch')
 		self.context = context
 		self.member = member
@@ -730,6 +760,12 @@ class GetItemExpression(ExpressionBase):
 		"""
 		self.context = context
 		self.container = container
+		if container.result_type == DataType.STRING:
+			self.result_type = DataType.STRING
+		elif container.result_type == DataType.ARRAY:
+			self.result_type = container.result_type.value_type
+		elif container.result_type != DataType.UNDEFINED:
+			raise errors.EvaluationError('data type mismatch')
 		# todo: support type hinting and set the result type correctly
 		self.item = item
 

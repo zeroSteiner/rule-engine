@@ -107,7 +107,7 @@ def type_resolver_from_dict(dictionary):
 	:return: The callback function.
 	:rtype: function
 	"""
-	type_map = {key: value if isinstance(value, ast.DataType) else ast.DataType.from_value(value) for key, value in dictionary.items()}
+	type_map = {key: value if ast.DataType.is_definition(value) else ast.DataType.from_value(value) for key, value in dictionary.items()}
 	return functools.partial(_type_resolver, type_map)
 
 _AttributeResolverFunction = collections.namedtuple('_AttributeResolverFunction', ('function', 'result_type'))

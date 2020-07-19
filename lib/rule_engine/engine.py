@@ -134,7 +134,7 @@ class _AttributeResolver(object):
 		resolver = self._get_resolver(object_type, name, thing=thing)
 		value = resolver.function(self, object_)
 		value = ast.coerce_value(value)
-		if resolver.result_type is ast.DataType.UNDEFINED:
+		if resolver.result_type == ast.DataType.UNDEFINED:
 			return value
 		value_type = ast.DataType.from_value(value)
 		if resolver.result_type is value_type:

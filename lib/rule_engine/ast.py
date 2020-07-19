@@ -181,6 +181,8 @@ class _DataTypeDef(object):
 	def is_compound(self):
 		return not self.is_scalar
 
+_UndefinedDataTypeDef = None
+
 class DataType(enum.Enum):
 	"""
 	A collection of constants representing the different supported data types.
@@ -191,7 +193,7 @@ class DataType(enum.Enum):
 	FLOAT = _DataTypeDef(float)
 	NULL = _DataTypeDef(NoneType)
 	STRING = _DataTypeDef(str)
-	UNDEFINED = None
+	UNDEFINED = _UndefinedDataTypeDef
 	"""
 	Undefined values. This constant can be used to indicate that a particular
 	symbol is valid, but it's data type is currently unknown.
@@ -443,11 +445,11 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		if self._evaluator is None:
 			raise errors.EngineError('unsupported operator: ' + type_)
 		self.left = left
-		if self.left.result_type is not DataType.UNDEFINED:
+		if self.left.result_type != DataType.UNDEFINED:
 			if self.left.result_type not in self.compatible_types:
 				raise errors.EvaluationError('data type mismatch')
 		self.right = right
-		if self.right.result_type is not DataType.UNDEFINED:
+		if self.right.result_type != DataType.UNDEFINED:
 			if self.right.result_type not in self.compatible_types:
 				raise errors.EvaluationError('data type mismatch')
 
@@ -542,7 +544,7 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	as equality checks.
 	"""
 	def _op_eq(self, thing):
-		if self.left.result_type is not DataType.UNDEFINED and self.right.result_type is not DataType.UNDEFINED:
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
 			if self.left.result_type is not self.right.result_type:
 				return False
 		left_value = self.left.evaluate(thing)
@@ -552,7 +554,7 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 		return operator.eq(left_value, right_value)
 
 	def _op_ne(self, thing):
-		if self.left.result_type is not DataType.UNDEFINED and self.right.result_type is not DataType.UNDEFINED:
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
 			if self.left.result_type is not self.right.result_type:
 				return True
 		left_value = self.left.evaluate(thing)
@@ -633,10 +635,10 @@ class ContainsExpression(ExpressionBase):
 	__slots__ = ('container', 'member')
 	result_type = DataType.BOOLEAN
 	def __init__(self, context, container, member):
-		if container.result_type is DataType.STRING:
-			if member.result_type is not DataType.UNDEFINED and member.result_type is not DataType.STRING:
+		if container.result_type == DataType.STRING:
+			if member.result_type != DataType.UNDEFINED and member.result_type != DataType.STRING:
 				raise errors.EvaluationError('data type mismatch')
-		elif container.result_type is not DataType.UNDEFINED and container.result_type.value.is_scalar:
+		elif container.result_type != DataType.UNDEFINED and container.result_type.value.is_scalar:
 			raise errors.EvaluationError('data type mismatch')
 		self.context = context
 		self.member = member
@@ -648,8 +650,8 @@ class ContainsExpression(ExpressionBase):
 	def evaluate(self, thing):
 		container_value = self.container.evaluate(thing)
 		member_value = self.member.evaluate(thing)
-		if DataType.from_value(container_value) is DataType.STRING:
-			if DataType.from_value(member_value) is not DataType.STRING:
+		if DataType.from_value(container_value) == DataType.STRING:
+			if DataType.from_value(member_value) != DataType.STRING:
 				raise errors.EvaluationError('data type mismatch')
 		return bool(member_value in container_value)
 
@@ -680,7 +682,7 @@ class GetAttributeExpression(ExpressionBase):
 		"""
 		self.context = context
 		self.object = object_
-		if self.object.result_type is not DataType.UNDEFINED:
+		if self.object.result_type != DataType.UNDEFINED:
 			self.result_type = context.resolve_attribute_type(self.object.result_type, name)
 		self.name = name
 
@@ -790,7 +792,7 @@ class SymbolExpression(ExpressionBase):
 			value = value.replace(tzinfo=self.context.default_timezone)
 
 		# if the expected result type is undefined, return the value
-		if self.result_type is DataType.UNDEFINED:
+		if self.result_type == DataType.UNDEFINED:
 			return value
 
 		# use DataType.from_value to raise a TypeError if value is not of a
@@ -802,7 +804,7 @@ class SymbolExpression(ExpressionBase):
 			return value
 
 		# if the type is null, return the value (treat null as a special case)
-		if value_type is DataType.NULL:
+		if value_type == DataType.NULL:
 			return value
 
 		raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)

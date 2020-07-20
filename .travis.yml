@@ -1,4 +1,6 @@
 language: python
+os: linux
+dist: xenial
 
 python:
   - "3.4"
@@ -20,6 +22,7 @@ script:
 jobs:
   include:
     - stage: Documentation
+      if: branch = master
       python: "3.8"
       script:
         - sphinx-build -b html -a -E -v docs/source docs/html
@@ -27,6 +30,6 @@ jobs:
       deploy:
         local_dir: docs/html
         provider: pages
-        skip_cleanup: true
+        cleanup: false
         keep_history: true
         github_token: $GITHUB_TOKEN

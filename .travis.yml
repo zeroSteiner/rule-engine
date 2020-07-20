@@ -30,6 +30,6 @@ jobs:
       deploy:
         local_dir: docs/html
         provider: pages
-        cleanup: false
+        skip_cleanup: true
         keep_history: true
         github_token: $GITHUB_TOKEN

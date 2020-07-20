@@ -1,6 +1,7 @@
 *.ipynb
 *.py[cod]
 
+.coverage
 .pylintrc
 .python-version
 Pipfile.lock

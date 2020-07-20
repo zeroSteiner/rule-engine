@@ -72,15 +72,15 @@ class DataTypeTests(unittest.TestCase):
 			ast.DataType.from_type(self._UnsupportedType)
 
 	def test_data_type_from_value(self):
-		self.assertIs(ast.DataType.from_value([]), ast.DataType.ARRAY)
-		self.assertIs(ast.DataType.from_value(()), ast.DataType.ARRAY)
-		self.assertIs(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
-		self.assertIs(ast.DataType.from_value(datetime.date.today()), ast.DataType.DATETIME)
-		self.assertIs(ast.DataType.from_value(datetime.datetime.now()), ast.DataType.DATETIME)
-		self.assertIs(ast.DataType.from_value(0), ast.DataType.FLOAT)
-		self.assertIs(ast.DataType.from_value(0.0), ast.DataType.FLOAT)
-		self.assertIs(ast.DataType.from_value(None), ast.DataType.NULL)
-		self.assertIs(ast.DataType.from_value(''), ast.DataType.STRING)
+		self.assertEqual(ast.DataType.from_value([]), ast.DataType.ARRAY)
+		self.assertEqual(ast.DataType.from_value(()), ast.DataType.ARRAY)
+		self.assertEqual(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
+		self.assertEqual(ast.DataType.from_value(datetime.date.today()), ast.DataType.DATETIME)
+		self.assertEqual(ast.DataType.from_value(datetime.datetime.now()), ast.DataType.DATETIME)
+		self.assertEqual(ast.DataType.from_value(0), ast.DataType.FLOAT)
+		self.assertEqual(ast.DataType.from_value(0.0), ast.DataType.FLOAT)
+		self.assertEqual(ast.DataType.from_value(None), ast.DataType.NULL)
+		self.assertEqual(ast.DataType.from_value(''), ast.DataType.STRING)
 
 	def test_data_type_from_value_exceptions(self):
 		with self.assertRaisesRegex(TypeError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):

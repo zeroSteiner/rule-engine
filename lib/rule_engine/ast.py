@@ -272,9 +272,7 @@ class DataType(object):
 			corresponding data type constant for.
 		:return: One of the constants.
 		"""
-		if isinstance(python_value, (dict, list, range, tuple)):
-			return cls.ARRAY
-		elif isinstance(python_value, bool):
+		if isinstance(python_value, bool):
 			return cls.BOOLEAN
 		elif isinstance(python_value, (datetime.date, datetime.datetime)):
 			return cls.DATETIME
@@ -284,6 +282,15 @@ class DataType(object):
 			return cls.NULL
 		elif isinstance(python_value, (str,)):
 			return cls.STRING
+		elif isinstance(python_value, collections.abc.Mapping):
+			return cls.ARRAY
+		elif isinstance(python_value, collections.abc.Sequence):
+			if len(python_value):
+				value = python_value[0]
+				if isinstance(value, str):
+					return cls.ARRAY(cls.STRING)
+				return cls.ARRAY(cls.from_value(python_value[0]))
+			return cls.ARRAY
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
 	@classmethod
@@ -372,7 +379,9 @@ class LiteralExpressionBase(ExpressionBase):
 			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
 		if datatype.is_compound:
 			value = tuple(cls.from_value(context, val) for val in value)
-		return subclass(context, coerce_value(value))
+		else:
+			value = coerce_value(value)
+		return subclass(context, value)
 
 	def evaluate(self, thing):
 		return self.value
@@ -835,8 +844,13 @@ class SymbolExpression(ExpressionBase):
 		value_type = DataType.from_value(value)
 
 		# if the type is the expected result type, return the value
-		if value_type is self.result_type:
-			return value
+		if value_type == self.result_type:
+			if self.result_type.is_scalar:
+				return value
+			if self.result_type.value_type == DataType.UNDEFINED:
+				return value
+			if self.result_type.value_type == value_type.value_type:
+				return value
 
 		# if the type is null, return the value (treat null as a special case)
 		if value_type == DataType.NULL:

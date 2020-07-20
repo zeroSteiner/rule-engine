@@ -283,6 +283,7 @@ class Context(object):
 			:py:meth:`.resolve`.
 		:param type_resolver: An optional callback function to use in place of
 			:py:meth:`.resolve_type`.
+		:type type_resolver: function, dict
 		:param default_timezone: The default timezone to apply to
 			:py:class:`~datetime.datetime` instances which do not have one
 			specified. This is necessary for comparison operations. The value
@@ -293,8 +294,13 @@ class Context(object):
 		:param default_value: The default value to return when resolving either
 			a missing symbol or attribute.
 
-		.. versionchanged: v2.0.0
+		.. versionchanged:: v2.0.0
 			Added the *default_value* parameter.
+
+		.. versionchanged:: v2.1.0
+			If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict`
+			will be called on it automatically and the result will be used as the
+			callback.
 		"""
 		self.regex_flags = regex_flags
 		"""The *regex_flags* parameter from :py:meth:`~__init__`"""
@@ -321,6 +327,8 @@ class Context(object):
 		"""The *default_value* parameter from :py:meth:`~__init__`"""
 		self.builtins = Builtins.from_defaults(timezone=default_timezone)
 		"""An instance of :py:class:`Builtins` to provided a default set of builtin symbol values."""
+		if isinstance(type_resolver, collections.abc.Mapping):
+			type_resolver = type_resolver_from_dict(type_resolver)
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
 

@@ -766,7 +766,6 @@ class GetItemExpression(ExpressionBase):
 			self.result_type = container.result_type.value_type
 		elif container.result_type != DataType.UNDEFINED:
 			raise errors.EvaluationError('data type mismatch')
-		# todo: support type hinting and set the result type correctly
 		self.item = item
 
 	def __repr__(self):

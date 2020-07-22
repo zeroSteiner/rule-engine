@@ -71,9 +71,16 @@ class DataTypeTests(unittest.TestCase):
 		with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
 			ast.DataType.from_type(self._UnsupportedType)
 
-	def test_data_type_from_value(self):
-		self.assertEqual(ast.DataType.from_value([]), ast.DataType.ARRAY)
-		self.assertEqual(ast.DataType.from_value(()), ast.DataType.ARRAY)
+	def test_data_type_from_value_compound(self):
+		for value in [list(), range(0), tuple()]:
+			value = ast.DataType.from_value(value)
+			self.assertEqual(value, ast.DataType.ARRAY)
+			self.assertIs(value.value_type, ast.DataType.UNDEFINED)
+		value = ast.DataType.from_value(['test'])
+		self.assertEqual(value, ast.DataType.ARRAY)
+		self.assertIs(value.value_type, ast.DataType.STRING)
+
+	def test_data_type_from_value_scalar(self):
 		self.assertEqual(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
 		self.assertEqual(ast.DataType.from_value(datetime.date.today()), ast.DataType.DATETIME)
 		self.assertEqual(ast.DataType.from_value(datetime.datetime.now()), ast.DataType.DATETIME)
@@ -85,6 +92,11 @@ class DataTypeTests(unittest.TestCase):
 	def test_data_type_from_value_exceptions(self):
 		with self.assertRaisesRegex(TypeError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
 			ast.DataType.from_value(self._UnsupportedType())
+
+	def test_data_type_definitions_describe_themselves(self):
+		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'FLOAT', 'NULL', 'STRING', 'UNDEFINED'):
+			data_type = getattr(ast.DataType, name)
+			self.assertRegex(repr(data_type), 'name=' + name)
 
 if __name__ == '__main__':
 	unittest.main()

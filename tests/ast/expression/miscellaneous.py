@@ -112,6 +112,9 @@ class GetItemExpressionTests(unittest.TestCase):
 		member = ast.FloatExpression(context, 100.0)
 		with self.assertRaises(errors.EvaluationError):
 			ast.GetItemExpression(context, container, member).evaluate(None)
+		member = ast.FloatExpression(context, 1.1)
+		with self.assertRaises(errors.EvaluationError):
+			ast.GetItemExpression(context, container, member).evaluate(None)
 
 class SymbolExpressionTests(unittest.TestCase):
 	def setUp(self):

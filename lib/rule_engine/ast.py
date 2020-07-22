@@ -32,7 +32,6 @@
 
 import collections.abc
 import datetime
-import enum
 import functools
 import math
 import operator

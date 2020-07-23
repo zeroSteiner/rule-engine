@@ -35,7 +35,7 @@ import unittest
 
 import rule_engine.ast as ast
 
-__all__ = ('DataTypeTests',)
+__all__ = ('DataTypeTests', 'MetaDataTypeTests')
 
 class DataTypeTests(unittest.TestCase):
 	class _UnsupportedType(object):
@@ -97,6 +97,20 @@ class DataTypeTests(unittest.TestCase):
 		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'FLOAT', 'NULL', 'STRING', 'UNDEFINED'):
 			data_type = getattr(ast.DataType, name)
 			self.assertRegex(repr(data_type), 'name=' + name)
+
+class MetaDataTypeTests(unittest.TestCase):
+	def test_data_type_is_iterable(self):
+		self.assertGreater(len(ast.DataType), 0)
+		for name in ast.DataType:
+			self.assertIsInstance(name, str)
+			self.assertRegex(name, r'^[A-Z]+$')
+
+	def test_data_type_supports_contains(self):
+		self.assertIn('STRING', ast.DataType)
+
+	def test_data_type_supports_getitem(self):
+		dt = ast.DataType['STRING']
+		self.assertEqual(dt, ast.DataType.STRING)
 
 if __name__ == '__main__':
 	unittest.main()

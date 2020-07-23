@@ -199,7 +199,29 @@ class _SequenceDataTypeDef(_DataTypeDef):
 	def __repr__(self):
 		return "<{} name={} python_type={} value_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__, self.value_type.name)
 
-class DataType(object):
+class DataTypeMeta(type):
+	def __new__(metacls, cls, bases, classdict):
+		data_type = super().__new__(metacls, cls, bases, classdict)
+		data_type._member_map_ = collections.OrderedDict()
+		for key, value in classdict.items():
+			if not isinstance(value, _DataTypeDef):
+				continue
+			data_type._member_map_[key] = value
+		return data_type
+
+	def __contains__(self, item):
+		return item in self._member_map_
+
+	def __getitem__(cls, item):
+		return cls._member_map_[item]
+
+	def __iter__(cls):
+		yield from cls._member_map_
+
+	def __len__(cls):
+		return len(cls._member_map_)
+
+class DataType(metaclass=DataTypeMeta):
 	"""
 	A collection of constants representing the different supported data types.
 	"""
@@ -227,7 +249,7 @@ class DataType(object):
 		if not isinstance(name, str):
 			raise TypeError('from_name argument 1 must be str, not ' + type(name).__name__)
 		dt = getattr(cls, name, None)
-		if dt is None:
+		if not isinstance(dt, _DataTypeDef):
 			raise ValueError("can not map name {0!r} to a compatible data type".format(name))
 		return dt
 

@@ -191,9 +191,10 @@
 <span class="k">class</span> <span class="nc">_UNDEFINED</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="kc">False</span>
+	<span class="vm">__name__</span> <span class="o">=</span> <span class="s1">&#39;UNDEFINED&#39;</span>
 	<span class="n">__nonzero__</span> <span class="o">=</span> <span class="fm">__bool__</span>
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="k">return</span> <span class="s1">&#39;UNDEFINED&#39;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span>
 <span class="n">UNDEFINED</span> <span class="o">=</span> <span class="n">_UNDEFINED</span><span class="p">()</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">A sentinel value to specify that something is undefined. When evaluated, the</span>

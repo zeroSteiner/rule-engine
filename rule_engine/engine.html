@@ -301,7 +301,7 @@ resolved and what regex flags should be used.</p>
 <a class="reference external" href="https://docs.python.org/3.7/library/re.html#re.search" title="(in Python v3.7)"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a> functions for comparison expressions.</p></li>
 <li><p><strong>resolver</strong> – An optional callback function to use in place of
 <a class="reference internal" href="#rule_engine.engine.Context.resolve" title="rule_engine.engine.Context.resolve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resolve()</span></code></a>.</p></li>
-<li><p><strong>type_resolver</strong> – An optional callback function to use in place of
+<li><p><strong>type_resolver</strong> (<em>function</em><em>, </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – An optional callback function to use in place of
 <a class="reference internal" href="#rule_engine.engine.Context.resolve_type" title="rule_engine.engine.Context.resolve_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resolve_type()</span></code></a>.</p></li>
 <li><p><strong>default_timezone</strong> (str, <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.tzinfo" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a>) – The default timezone to apply to
 <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> instances which do not have one
@@ -314,6 +314,14 @@ a missing symbol or attribute.</p></li>
 </ul>
 </dd>
 </dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version v2.0.0: </span>Added the <em>default_value</em> parameter.</p>
+</div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version v2.1.0: </span>If <em>type_resolver</em> is a dictionary, <a class="reference internal" href="#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a>
+will be called on it automatically and the result will be used as the
+callback.</p>
+</div>
 </dd></dl>
 
 <dl class="py attribute">

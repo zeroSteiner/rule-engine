@@ -564,6 +564,13 @@
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArrayExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
+	<span class="k">def</span> <span class="nf">p_expression_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		object : object LBRACKET expression RBRACKET</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">container</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">item</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">GetItemExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
 	<span class="k">def</span> <span class="nf">p_expression_array_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		members : expression</span>

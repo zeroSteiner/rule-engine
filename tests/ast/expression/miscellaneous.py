@@ -118,19 +118,27 @@ class GetItemExpressionTests(unittest.TestCase):
 
 class SymbolExpressionTests(unittest.TestCase):
 	def setUp(self):
-		self.sym_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-		self.sym_value = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+		self.sym_aryname = ''.join(random.choice(string.ascii_letters) for _ in range(12))
+		self.sym_aryvalue = [1.0, 2.0]
+		self.sym_aryname_nullable = ''.join(random.choice(string.ascii_letters) for _ in range(12))
+		self.sym_aryvalue_nullable = [1.0, 2.0, None]
+		self.sym_strname = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+		self.sym_strvalue = ''.join(random.choice(string.ascii_letters) for _ in range(10))
 
 	def _type_resolver(self, name):
-		if name == self.sym_name:
+		if name == self.sym_aryname:
+			return ast.DataType.ARRAY(ast.DataType.FLOAT, value_type_nullable=False)
+		elif name == self.sym_aryname_nullable:
+			return ast.DataType.ARRAY(ast.DataType.FLOAT, value_type_nullable=True)
+		elif name == self.sym_strname:
 			return ast.DataType.STRING
 		return ast.DataType.UNDEFINED
 
 	def test_ast_expression_symbol(self):
-		symbol = ast.SymbolExpression(engine.Context(), self.sym_name)
+		symbol = ast.SymbolExpression(engine.Context(), self.sym_strname)
 		self.assertIs(symbol.result_type, ast.DataType.UNDEFINED)
-		self.assertEqual(symbol.name, self.sym_name)
-		self.assertEqual(symbol.evaluate({self.sym_name: self.sym_value}), self.sym_value)
+		self.assertEqual(symbol.name, self.sym_strname)
+		self.assertEqual(symbol.evaluate({self.sym_strname: self.sym_strvalue}), self.sym_strvalue)
 
 	def test_ast_expression_symbol_scope(self):
 		symbol = ast.SymbolExpression(context, 'test', scope='built-in')
@@ -151,19 +159,34 @@ class SymbolExpressionTests(unittest.TestCase):
 
 	def test_ast_expression_symbol_type(self):
 		context = engine.Context(type_resolver=self._type_resolver)
-		symbol = ast.SymbolExpression(context, self.sym_name)
+		symbol = ast.SymbolExpression(context, self.sym_strname)
 		self.assertIs(symbol.result_type, ast.DataType.STRING)
-		self.assertEqual(symbol.name, self.sym_name)
-		self.assertEqual(symbol.evaluate({self.sym_name: self.sym_value}), self.sym_value)
+		self.assertEqual(symbol.name, self.sym_strname)
+		self.assertEqual(symbol.evaluate({self.sym_strname: self.sym_strvalue}), self.sym_strvalue)
 
 	def test_ast_expression_symbol_type_errors(self):
 		context = engine.Context(type_resolver=self._type_resolver)
-		symbol = ast.SymbolExpression(context, self.sym_name)
+		symbol = ast.SymbolExpression(context, self.sym_strname)
 		self.assertIs(symbol.result_type, ast.DataType.STRING)
-		self.assertEqual(symbol.name, self.sym_name)
+		self.assertEqual(symbol.name, self.sym_strname)
 		with self.assertRaises(errors.SymbolTypeError):
-			self.assertEqual(symbol.evaluate({self.sym_name: not self.sym_value}), self.sym_value)
-		self.assertIsNone(symbol.evaluate({self.sym_name: None}))
+			self.assertEqual(symbol.evaluate({self.sym_strname: not self.sym_strvalue}), self.sym_strvalue)
+		self.assertIsNone(symbol.evaluate({self.sym_strname: None}))
+
+		symbol = ast.SymbolExpression(context, self.sym_aryname)
+		with self.assertRaises(errors.SymbolTypeError):
+			symbol.evaluate({self.sym_aryname: self.sym_aryvalue_nullable})
+		try:
+			symbol.evaluate({self.sym_aryname: self.sym_aryvalue})
+		except errors.SymbolTypeError:
+			self.fail('raises SymbolTypeError when it should not')
+
+		symbol = ast.SymbolExpression(context, self.sym_aryname_nullable)
+		try:
+			symbol.evaluate({self.sym_aryname_nullable: self.sym_aryvalue})
+			symbol.evaluate({self.sym_aryname_nullable: self.sym_aryvalue_nullable})
+		except errors.SymbolTypeError:
+			self.fail('raises SymbolTypeError when it should not')
 
 class SymbolExpressionConversionTests(unittest.TestCase):
 	def setUp(self):

@@ -136,6 +136,32 @@ def is_numeric(value):
 		return False
 	return True
 
+def _sequence_member_value_type(python_value):
+	"""
+	Take a native *python_value* and ensure that the types of each of it's
+	members are either the same or NULL.
+
+	:return: The data type of the sequence members. This will never be NULL,
+		because that is considered a special case. It will either be
+		UNSPECIFIED or one of the other types.
+	"""
+	subvalue_types = set()
+	for subvalue in python_value:
+		if isinstance(subvalue, ExpressionBase):
+			subvalue_type = subvalue.result_type
+		else:
+			subvalue_type = DataType.from_value(subvalue)
+		subvalue_types.add(subvalue_type)
+	if DataType.NULL in subvalue_types:
+		subvalue_types.remove(DataType.NULL)
+	if len(subvalue_types) > 1:
+		raise TypeError('can not map python sequence type with multiple member types')
+	if subvalue_types:
+		subvalue_type = subvalue_types.pop()
+	else:
+		subvalue_type = DataType.UNDEFINED
+	return subvalue_type
+
 def _assert_is_integer_number(value):
 	if not is_integer_number(value):
 		raise errors.EvaluationError('data type mismatch (not an integer number)')
@@ -185,16 +211,17 @@ class _DataTypeDef(object):
 
 _DATA_TYPE_UNDEFINED = _DataTypeDef('UNDEFINED', errors.UNDEFINED)
 class _SequenceDataTypeDef(_DataTypeDef):
-	__slots__ = ('value_type',)
-	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED):
+	__slots__ = ('value_type', 'value_type_nullable')
+	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
 		if not issubclass(python_type, collections.abc.Sequence):
 			raise TypeError('the specified python_type is not a Sequence')
 		super(_SequenceDataTypeDef, self).__init__(name, python_type)
 		self.is_scalar = False
 		self.value_type = value_type
+		self.value_type_nullable = value_type_nullable
 
-	def __call__(self, value_type):
-		return self.__class__(self.name, self.python_type, value_type=value_type)
+	def __call__(self, value_type, value_type_nullable=True):
+		return self.__class__(self.name, self.python_type, value_type=value_type, value_type_nullable=value_type_nullable)
 
 	def __repr__(self):
 		return "<{} name={} python_type={} value_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__, self.value_type.name)
@@ -306,14 +333,7 @@ class DataType(metaclass=DataTypeMeta):
 		elif isinstance(python_value, collections.abc.Mapping):
 			return cls.ARRAY
 		elif isinstance(python_value, collections.abc.Sequence):
-			if len(python_value):
-				subvalue = python_value[0]
-				subvalue_type = cls.from_value(subvalue)
-				if len(python_value) > 1:
-					if any(cls.from_value(sv) != subvalue_type for sv in python_value[1:]):
-						raise TypeError('can not map python sequence type with multiple member types')
-				return cls.ARRAY(subvalue_type)
-			return cls.ARRAY
+			return cls.ARRAY(_sequence_member_value_type(python_value))
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
 	@classmethod
@@ -423,12 +443,7 @@ class ArrayExpression(LiteralExpressionBase):
 	result_type = DataType.ARRAY
 	def __init__(self, *args, **kwargs):
 		super(ArrayExpression, self).__init__(*args, **kwargs)
-		# use DataType.from_value to get the value_type
-		if len(self.value):
-			value_type = self.value[0].result_type
-			if any(member.result_type != value_type for member in self.value[1:]):
-				raise errors.EvaluationError('all array member types are not the same')
-			self.result_type = DataType.ARRAY(value_type)
+		self.result_type = DataType.ARRAY(_sequence_member_value_type(self.value))
 
 	def evaluate(self, thing):
 		return tuple(member.evaluate(thing) for member in self.value)
@@ -881,6 +896,8 @@ class SymbolExpression(ExpressionBase):
 				return value
 			if self.result_type.value_type == DataType.UNDEFINED:
 				return value
+			if not self.result_type.value_type_nullable and any(v is None for v in value):
+				raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
 			if self.result_type.value_type == value_type.value_type:
 				return value
 

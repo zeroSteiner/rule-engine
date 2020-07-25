@@ -35,6 +35,7 @@ import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
+import rule_engine.errors as errors
 
 __all__ = ('LiteralExpressionTests',)
 
@@ -80,7 +81,14 @@ class LiteralExpressionTests(unittest.TestCase):
 			self.assertTrue(expression.evaluate(None))
 
 	def test_ast_expression_literal_array(self):
-		self.assertLiteralTests(ast.ArrayExpression, tuple(), tuple((ast.NullExpression(context),)))
+		self.assertLiteralTests(ast.ArrayExpression, tuple(), tuple((ast.NullExpression(self.context),)))
+
+	def test_ast_expression_literall_array_error(self):
+		with self.assertRaises(errors.EvaluationError):
+			ast.ArrayExpression(self.context, tuple((
+				ast.FloatExpression(self.context, 1.0),
+				ast.StringExpression(self.context, 'error')
+			)))
 
 	def test_ast_expression_literal_boolean(self):
 		self.assertLiteralTests(ast.BooleanExpression, False, True)

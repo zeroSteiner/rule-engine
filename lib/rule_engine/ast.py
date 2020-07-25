@@ -307,10 +307,12 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.ARRAY
 		elif isinstance(python_value, collections.abc.Sequence):
 			if len(python_value):
-				value = python_value[0]
-				if isinstance(value, str):
-					return cls.ARRAY(cls.STRING)
-				return cls.ARRAY(cls.from_value(python_value[0]))
+				subvalue = python_value[0]
+				subvalue_type = cls.from_value(subvalue)
+				if len(python_value) > 1:
+					if any(cls.from_value(sv) != subvalue_type for sv in python_value[1:]):
+						raise TypeError('can not map python sequence type with multiple member types')
+				return cls.ARRAY(subvalue_type)
 			return cls.ARRAY
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
@@ -419,6 +421,15 @@ class LiteralExpressionBase(ExpressionBase):
 class ArrayExpression(LiteralExpressionBase):
 	"""Literal array expressions containing 0 or more sub-expressions."""
 	result_type = DataType.ARRAY
+	def __init__(self, *args, **kwargs):
+		super(ArrayExpression, self).__init__(*args, **kwargs)
+		# use DataType.from_value to get the value_type
+		if len(self.value):
+			value_type = self.value[0].result_type
+			if any(member.result_type != value_type for member in self.value[1:]):
+				raise errors.EvaluationError('all array member types are not the same')
+			self.result_type = DataType.ARRAY(value_type)
+
 	def evaluate(self, thing):
 		return tuple(member.evaluate(thing) for member in self.value)
 

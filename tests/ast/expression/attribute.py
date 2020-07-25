@@ -49,7 +49,7 @@ class BadAttributeResolver(engine._AttributeResolver):
 		return None
 
 class GetAttributeExpressionTests(unittest.TestCase):
-	def test_ast_expression_attribute_exception(self):
+	def test_ast_expression_attribute_error(self):
 		symbol = ast.SymbolExpression(context, 'foo')
 		expression = ast.GetAttributeExpression(context, symbol, 'bar')
 		with self.assertRaises(errors.AttributeResolutionError):
@@ -57,7 +57,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		with self.assertRaises(errors.AttributeResolutionError):
 			expression.evaluate({'foo': 'baz'})
 
-	def test_ast_expression_atrribute_type_exception(self):
+	def test_ast_expression_atrribute_type_error(self):
 		symbol = ast.StringExpression(context, 'foo')
 
 		expression = ast.GetAttributeExpression(context, symbol, 'undefined')

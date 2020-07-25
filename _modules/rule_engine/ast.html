@@ -294,6 +294,32 @@
 		<span class="k">return</span> <span class="kc">False</span>
 	<span class="k">return</span> <span class="kc">True</span></div>
 
+<span class="k">def</span> <span class="nf">_sequence_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Take a native *python_value* and ensure that the types of each of it&#39;s</span>
+<span class="sd">	members are either the same or NULL.</span>
+
+<span class="sd">	:return: The data type of the sequence members. This will never be NULL,</span>
+<span class="sd">		because that is considered a special case. It will either be</span>
+<span class="sd">		UNSPECIFIED or one of the other types.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">subvalue_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">subvalue</span> <span class="ow">in</span> <span class="n">python_value</span><span class="p">:</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subvalue</span><span class="p">,</span> <span class="n">ExpressionBase</span><span class="p">):</span>
+			<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">subvalue</span><span class="o">.</span><span class="n">result_type</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">subvalue</span><span class="p">)</span>
+		<span class="n">subvalue_types</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">subvalue_type</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span> <span class="ow">in</span> <span class="n">subvalue_types</span><span class="p">:</span>
+		<span class="n">subvalue_types</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subvalue_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;can not map python sequence type with multiple member types&#39;</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">subvalue_types</span><span class="p">:</span>
+		<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">subvalue_types</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+	<span class="k">return</span> <span class="n">subvalue_type</span>
+
 <span class="k">def</span> <span class="nf">_assert_is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not an integer number)&#39;</span><span class="p">)</span>
@@ -343,16 +369,17 @@
 
 <span class="n">_DATA_TYPE_UNDEFINED</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;UNDEFINED&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">_SequenceDataTypeDef</span><span class="p">(</span><span class="n">_DataTypeDef</span><span class="p">):</span>
-	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;value_type&#39;</span><span class="p">,)</span>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">python_type</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">):</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;value_type&#39;</span><span class="p">,</span> <span class="s1">&#39;value_type_nullable&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">python_type</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">,</span> <span class="n">value_type_nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;the specified python_type is not a Sequence&#39;</span><span class="p">)</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">_SequenceDataTypeDef</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">python_type</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span> <span class="o">=</span> <span class="kc">False</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">=</span> <span class="n">value_type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value_type_nullable</span> <span class="o">=</span> <span class="n">value_type_nullable</span>
 
-	<span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_type</span><span class="p">):</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">)</span>
+	<span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_type</span><span class="p">,</span> <span class="n">value_type_nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">value_type_nullable</span><span class="o">=</span><span class="n">value_type_nullable</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> name=</span><span class="si">{}</span><span class="s2"> python_type=</span><span class="si">{}</span><span class="s2"> value_type=</span><span class="si">{}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -464,12 +491,7 @@
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ARRAY</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
-			<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">python_value</span><span class="p">):</span>
-				<span class="n">value</span> <span class="o">=</span> <span class="n">python_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-				<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-					<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
-				<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">python_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ARRAY</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">_sequence_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="p">))</span>
 		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">python_value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="DataType.is_definition"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DataType.is_definition">[docs]</a>	<span class="nd">@classmethod</span>
@@ -577,6 +599,10 @@
 <span class="k">class</span> <span class="nc">ArrayExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;Literal array expressions containing 0 or more sub-expressions.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">ArrayExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">_sequence_member_value_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
@@ -1028,6 +1054,8 @@
 				<span class="k">return</span> <span class="n">value</span>
 			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
 				<span class="k">return</span> <span class="n">value</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value_type_nullable</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">):</span>
+				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolTypeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span>
 			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value_type</span> <span class="o">==</span> <span class="n">value_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">:</span>
 				<span class="k">return</span> <span class="n">value</span>
 

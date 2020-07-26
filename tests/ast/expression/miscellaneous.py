@@ -120,6 +120,8 @@ class SymbolExpressionTests(unittest.TestCase):
 	def setUp(self):
 		self.sym_aryname = ''.join(random.choice(string.ascii_letters) for _ in range(12))
 		self.sym_aryvalue = [1.0, 2.0]
+		self.sym_aryname_nontyped = ''.join(random.choice(string.ascii_letters) for _ in range(12))
+		self.sym_aryvalue_nontyped = self.sym_aryvalue
 		self.sym_aryname_nullable = ''.join(random.choice(string.ascii_letters) for _ in range(12))
 		self.sym_aryvalue_nullable = [1.0, 2.0, None]
 		self.sym_strname = ''.join(random.choice(string.ascii_letters) for _ in range(10))
@@ -128,6 +130,8 @@ class SymbolExpressionTests(unittest.TestCase):
 	def _type_resolver(self, name):
 		if name == self.sym_aryname:
 			return ast.DataType.ARRAY(ast.DataType.FLOAT, value_type_nullable=False)
+		elif name == self.sym_aryname_nontyped:
+			return ast.DataType.ARRAY
 		elif name == self.sym_aryname_nullable:
 			return ast.DataType.ARRAY(ast.DataType.FLOAT, value_type_nullable=True)
 		elif name == self.sym_strname:
@@ -178,6 +182,14 @@ class SymbolExpressionTests(unittest.TestCase):
 			symbol.evaluate({self.sym_aryname: self.sym_aryvalue_nullable})
 		try:
 			symbol.evaluate({self.sym_aryname: self.sym_aryvalue})
+		except errors.SymbolTypeError:
+			self.fail('raises SymbolTypeError when it should not')
+
+		symbol = ast.SymbolExpression(context, self.sym_aryname_nontyped)
+		try:
+			symbol.evaluate({self.sym_aryname_nontyped: self.sym_aryvalue})
+			symbol.evaluate({self.sym_aryname_nontyped: self.sym_aryvalue_nontyped})
+			symbol.evaluate({self.sym_aryname_nontyped: self.sym_aryvalue_nullable})
 		except errors.SymbolTypeError:
 			self.fail('raises SymbolTypeError when it should not')
 

@@ -896,7 +896,7 @@ class SymbolExpression(ExpressionBase):
 				return value
 			if self.result_type.value_type == DataType.UNDEFINED:
 				return value
-			if not self.result_type.value_type_nullable and any(v is None for v in value):
+			if self.result_type.value_type != DataType.NULL and not self.result_type.value_type_nullable and any(v is None for v in value):
 				raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
 			if self.result_type.value_type == value_type.value_type:
 				return value

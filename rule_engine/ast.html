@@ -438,9 +438,39 @@ corresponding data type constant for.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="rule_engine.ast.DataType.is_compatible">
+<em class="property">classmethod </em><code class="sig-name descname">is_compatible</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt1</span></em>, <em class="sig-param"><span class="n">dt2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.is_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.is_compatible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if two data type definitions are compatible without any kind of
+conversion. This evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code> when one or both are
+<a class="reference internal" href="#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> or both types are the same. In the case of
+compound data types (such as <a class="reference internal" href="#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>) the member types are
+checked recursively in the same manner.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.1.0.</span></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt1</strong> – The first data type to compare.</p></li>
+<li><p><strong>dt2</strong> – The second data type to compare.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether or not the two types are compatible.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="rule_engine.ast.DataType.is_definition">
 <em class="property">classmethod </em><code class="sig-name descname">is_definition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DataType.is_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.ast.DataType.is_definition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if <em>value</em> is a data type definition.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">New in version 2.1.0.</span></p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>value</strong> – The value to check.</p>

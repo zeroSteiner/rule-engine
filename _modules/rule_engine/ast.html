@@ -384,6 +384,14 @@
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> name=</span><span class="si">{}</span><span class="s2"> python_type=</span><span class="si">{}</span><span class="s2"> value_type=</span><span class="si">{}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
+	<span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+			<span class="k">return</span> <span class="kc">False</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value_type</span>
+
+	<span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">,</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="p">)))</span>
+
 <span class="k">class</span> <span class="nc">DataTypeMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
 	<span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="n">metacls</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">classdict</span><span class="p">):</span>
 		<span class="n">data_type</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">metacls</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">classdict</span><span class="p">)</span>
@@ -494,12 +502,42 @@
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">_sequence_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="p">))</span>
 		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">python_value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
 
+<div class="viewcode-block" id="DataType.is_compatible"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DataType.is_compatible">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">is_compatible</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dt1</span><span class="p">,</span> <span class="n">dt2</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Check if two data type definitions are compatible without any kind of</span>
+<span class="sd">		conversion. This evaluates to ``True`` when one or both are</span>
+<span class="sd">		:py:attr:`.UNDEFINED` or both types are the same. In the case of</span>
+<span class="sd">		compound data types (such as :py:attr:`.ARRAY`) the member types are</span>
+<span class="sd">		checked recursively in the same manner.</span>
+
+<span class="sd">		.. versionadded:: 2.1.0</span>
+
+<span class="sd">		:param dt1: The first data type to compare.</span>
+<span class="sd">		:param dt2: The second data type to compare.</span>
+<span class="sd">		:return: Whether or not the two types are compatible.</span>
+<span class="sd">		:rtype: bool</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">is_definition</span><span class="p">(</span><span class="n">dt1</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_definition</span><span class="p">(</span><span class="n">dt2</span><span class="p">)):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;argument is not a data type definition&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">dt1</span> <span class="ow">is</span> <span class="n">_DATA_TYPE_UNDEFINED</span> <span class="ow">or</span> <span class="n">dt2</span> <span class="ow">is</span> <span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">:</span>
+			<span class="k">return</span> <span class="kc">True</span>
+		<span class="k">if</span> <span class="n">dt1</span><span class="o">.</span><span class="n">is_scalar</span> <span class="ow">and</span> <span class="n">dt2</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">dt1</span> <span class="o">==</span> <span class="n">dt2</span>
+		<span class="k">elif</span> <span class="n">dt1</span><span class="o">.</span><span class="n">is_compound</span> <span class="ow">and</span> <span class="n">dt2</span><span class="o">.</span><span class="n">is_compound</span><span class="p">:</span>
+			<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt1</span><span class="p">,</span> <span class="n">_SequenceDataTypeDef</span><span class="p">):</span>
+				<span class="k">if</span> <span class="n">dt1</span><span class="o">.</span><span class="n">value_type</span> <span class="ow">is</span> <span class="n">_DATA_TYPE_UNDEFINED</span> <span class="ow">or</span> <span class="n">dt2</span><span class="o">.</span><span class="n">value_type</span> <span class="ow">is</span> <span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">:</span>
+					<span class="k">return</span> <span class="kc">True</span>
+				<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">dt1</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">dt2</span><span class="o">.</span><span class="n">value_type</span><span class="p">)</span>
+			<span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+		<span class="k">return</span> <span class="kc">False</span></div>
+
 <div class="viewcode-block" id="DataType.is_definition"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DataType.is_definition">[docs]</a>	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">is_definition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Check if *value* is a data type definition.</span>
 
-<span class="sd">		.. versionadded: 2.1.0</span>
+<span class="sd">		.. versionadded:: 2.1.0</span>
 
 <span class="sd">		:param value: The value to check.</span>
 <span class="sd">		:return: ``True`` if *value* is a data type definition.</span>
@@ -574,7 +612,7 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">datatype</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 		<span class="k">for</span> <span class="n">subclass</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
-			<span class="k">if</span> <span class="n">subclass</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">datatype</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">subclass</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
 				<span class="k">break</span>
 		<span class="k">else</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EngineError</span><span class="p">(</span><span class="s2">&quot;can not create literal expression from python value: </span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
@@ -976,7 +1014,9 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
 		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span>
-		<span class="k">elif</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">:</span>
+		<span class="c1"># check against __class__ so the parent class is dynamic in case it changes in the future, what we&#39;re doing here</span>
+		<span class="c1"># is explicitly checking if result_type is an array with out checking the value_type</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value_type</span>
 		<span class="k">elif</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
@@ -1049,7 +1089,7 @@
 		<span class="n">value_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 		<span class="c1"># if the type is the expected result type, return the value</span>
-		<span class="k">if</span> <span class="n">value_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">value_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">):</span>
 			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
 				<span class="k">return</span> <span class="n">value</span>
 			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">value_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>

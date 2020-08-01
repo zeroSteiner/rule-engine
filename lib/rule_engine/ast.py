@@ -992,6 +992,10 @@ class TernaryExpression(ExpressionBase):
 		self.condition = condition
 		self.case_true = case_true
 		self.case_false = case_false
+		if self.case_true.result_type == self.case_false.result_type:
+			self.result_type = self.case_true.result_type
+		elif isinstance(self.case_true.result_type, DataType.ARRAY.__class__) and isinstance(self.case_false.result_type, DataType.ARRAY.__class__):
+			self.result_type = DataType.ARRAY
 
 	def evaluate(self, thing):
 		case = (self.case_true if self.condition.evaluate(thing) else self.case_false)

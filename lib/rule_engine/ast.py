@@ -226,6 +226,14 @@ class _SequenceDataTypeDef(_DataTypeDef):
 	def __repr__(self):
 		return "<{} name={} python_type={} value_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__, self.value_type.name)
 
+	def __eq__(self, other):
+		if not super().__eq__(other):
+			return False
+		return self.value_type == other.value_type
+
+	def __hash__(self):
+		return hash((self.python_type, self.is_scalar, hash(self.value_type)))
+
 class DataTypeMeta(type):
 	def __new__(metacls, cls, bases, classdict):
 		data_type = super().__new__(metacls, cls, bases, classdict)
@@ -337,11 +345,41 @@ class DataType(metaclass=DataTypeMeta):
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
 	@classmethod
+	def is_compatible(cls, dt1, dt2):
+		"""
+		Check if two data type definitions are compatible without any kind of
+		conversion. This evaluates to ``True`` when one or both are
+		:py:attr:`.UNDEFINED` or both types are the same. In the case of
+		compound data types (such as :py:attr:`.ARRAY`) the member types are
+		checked recursively in the same manner.
+
+		.. versionadded:: 2.1.0
+
+		:param dt1: The first data type to compare.
+		:param dt2: The second data type to compare.
+		:return: Whether or not the two types are compatible.
+		:rtype: bool
+		"""
+		if not (cls.is_definition(dt1) and cls.is_definition(dt2)):
+			raise TypeError('argument is not a data type definition')
+		if dt1 is _DATA_TYPE_UNDEFINED or dt2 is _DATA_TYPE_UNDEFINED:
+			return True
+		if dt1.is_scalar and dt2.is_scalar:
+			return dt1 == dt2
+		elif dt1.is_compound and dt2.is_compound:
+			if isinstance(dt1, _SequenceDataTypeDef):
+				if dt1.value_type is _DATA_TYPE_UNDEFINED or dt2.value_type is _DATA_TYPE_UNDEFINED:
+					return True
+				return cls.is_compatible(dt1.value_type, dt2.value_type)
+			raise NotImplementedError()
+		return False
+
+	@classmethod
 	def is_definition(cls, value):
 		"""
 		Check if *value* is a data type definition.
 
-		.. versionadded: 2.1.0
+		.. versionadded:: 2.1.0
 
 		:param value: The value to check.
 		:return: ``True`` if *value* is a data type definition.
@@ -416,7 +454,7 @@ class LiteralExpressionBase(ExpressionBase):
 		"""
 		datatype = DataType.from_value(value)
 		for subclass in cls.__subclasses__():
-			if subclass.result_type == datatype:
+			if DataType.is_compatible(subclass.result_type, datatype):
 				break
 		else:
 			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
@@ -818,7 +856,9 @@ class GetItemExpression(ExpressionBase):
 		self.container = container
 		if container.result_type == DataType.STRING:
 			self.result_type = DataType.STRING
-		elif container.result_type == DataType.ARRAY:
+		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
+		# is explicitly checking if result_type is an array with out checking the value_type
+		elif isinstance(container.result_type, DataType.ARRAY.__class__):
 			self.result_type = container.result_type.value_type
 		elif container.result_type != DataType.UNDEFINED:
 			raise errors.EvaluationError('data type mismatch')
@@ -891,7 +931,7 @@ class SymbolExpression(ExpressionBase):
 		value_type = DataType.from_value(value)
 
 		# if the type is the expected result type, return the value
-		if value_type == self.result_type:
+		if DataType.is_compatible(value_type, self.result_type):
 			if self.result_type.is_scalar:
 				return value
 			if self.result_type.value_type == DataType.UNDEFINED:

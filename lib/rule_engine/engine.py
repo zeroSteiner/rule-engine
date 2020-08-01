@@ -294,10 +294,10 @@ class Context(object):
 		:param default_value: The default value to return when resolving either
 			a missing symbol or attribute.
 
-		.. versionchanged:: v2.0.0
+		.. versionchanged:: 2.0.0
 			Added the *default_value* parameter.
 
-		.. versionchanged:: v2.1.0
+		.. versionchanged:: 2.1.0
 			If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict`
 			will be called on it automatically and the result will be used as the
 			callback.

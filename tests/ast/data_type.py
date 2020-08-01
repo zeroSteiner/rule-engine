@@ -77,7 +77,7 @@ class DataTypeTests(unittest.TestCase):
 			self.assertEqual(value, ast.DataType.ARRAY)
 			self.assertIs(value.value_type, ast.DataType.UNDEFINED)
 		value = ast.DataType.from_value(['test'])
-		self.assertEqual(value, ast.DataType.ARRAY)
+		self.assertEqual(value, ast.DataType.ARRAY(ast.DataType.STRING))
 		self.assertIs(value.value_type, ast.DataType.STRING)
 
 	def test_data_type_from_value_compound_error(self):
@@ -108,6 +108,30 @@ class MetaDataTypeTests(unittest.TestCase):
 		for name in ast.DataType:
 			self.assertIsInstance(name, str)
 			self.assertRegex(name, r'^[A-Z]+$')
+
+	def test_data_type_is_compatible(self):
+		def _is_compat(*args):
+			return self.assertTrue(ast.DataType.is_compatible(*args))
+		def _is_not_compat(*args):
+			return self.assertFalse(ast.DataType.is_compatible(*args))
+		_is_compat(ast.DataType.STRING, ast.DataType.STRING)
+		_is_compat(ast.DataType.STRING, ast.DataType.UNDEFINED)
+		_is_compat(ast.DataType.UNDEFINED, ast.DataType.STRING)
+
+		_is_compat(ast.DataType.UNDEFINED, ast.DataType.ARRAY)
+		_is_compat(ast.DataType.ARRAY, ast.DataType.ARRAY(ast.DataType.STRING))
+
+		_is_not_compat(ast.DataType.STRING, ast.DataType.ARRAY)
+		_is_not_compat(ast.DataType.STRING, ast.DataType.NULL)
+		_is_not_compat(ast.DataType.ARRAY(ast.DataType.STRING), ast.DataType.ARRAY(ast.DataType.FLOAT))
+
+		with self.assertRaises(TypeError):
+			ast.DataType.is_compatible(ast.DataType.STRING, None)
+
+	def test_data_type_is_definition(self):
+		self.assertTrue(ast.DataType.is_definition(ast.DataType.ARRAY))
+		self.assertFalse(ast.DataType.is_definition(1))
+		self.assertFalse(ast.DataType.is_definition(None))
 
 	def test_data_type_supports_contains(self):
 		self.assertIn('STRING', ast.DataType)

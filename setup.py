@@ -57,7 +57,7 @@ whether or not they match.\
 
 setup(
 	name='rule-engine',
-	version='2.1.0',
+	version='2.1.1',
 	author='Spencer McIntyre',
 	author_email='zeroSteiner@gmail.com',
 	maintainer='Spencer McIntyre',

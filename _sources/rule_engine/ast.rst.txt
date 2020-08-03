@@ -25,6 +25,7 @@ Classes
 
 .. autoclass:: DataType
    :members:
+   :exclude-members: ARRAY
    :show-inheritance:
 
    .. autoattribute:: ARRAY
@@ -45,12 +46,6 @@ Classes
    .. autoattribute:: STRING
       :annotation:
 
-   .. automethod:: from_name
-
-   .. automethod:: from_type
-
-   .. automethod:: from_value
-
 .. autoclass:: Statement
    :show-inheritance:
 
@@ -59,6 +54,7 @@ Base Classes
 
 .. autoclass:: ExpressionBase
    :members:
+   :exclude-members: result_type
    :show-inheritance:
    :special-members: __init__
 

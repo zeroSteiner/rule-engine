@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; Rule Engine 2.1.0 documentation</title>
+  <title>Getting Started &mdash; Rule Engine 2.1.1 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.1.1
               </div>
             
           
@@ -470,6 +470,9 @@ member of the <a class="reference internal" href="rule_engine/ast.html#rule_engi
 <span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">=</span><span class="n">type_resolver</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Compound data types such as <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code></a> can optionally
+specify member type information by calling their respective type. For example,
+an array of strings would be define as <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code>.</p>
 <p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be
 used to generate a <em>type_resolver</em> function from a dictionary mapping symbol
 names to their respective <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>.</p>

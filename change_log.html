@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Change Log &mdash; Rule Engine 2.1.0 documentation</title>
+  <title>Change Log &mdash; Rule Engine 2.1.1 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.1.1
               </div>
             
           
@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#version-2-x-x">Version 2.x.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#version-2-1-0">Version 2.1.0</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version-2-0-0">Version 2.0.0</a></li>
 </ul>
 </li>
@@ -176,9 +177,25 @@ Engine. In comparison to the git log, this list is curated by the development
 team for note worthy changes.</p>
 <div class="section" id="version-2-x-x">
 <h2>Version 2.x.x<a class="headerlink" href="#version-2-x-x" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="version-2-1-0">
+<h3>Version 2.1.0<a class="headerlink" href="#version-2-1-0" title="Permalink to this headline">¶</a></h3>
+<p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.1.0">v2.1.0</a> on August 3rd, 2020</p>
+<ul>
+<li><p>Added coverage reporting to Travis-CI</p></li>
+<li><p>Changed <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a> from an enum to a custom class</p></li>
+<li><p>Improvements for the <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code></a> data type</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Added <cite>get[item]</cite> support for arrays, allowing items to be retrieved by index</p></li>
+<li><p>Added ability for specifying the member type and optionally null</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
 <div class="section" id="version-2-0-0">
 <h3>Version 2.0.0<a class="headerlink" href="#version-2-0-0" title="Permalink to this headline">¶</a></h3>
-<p><em>In Progress</em></p>
+<p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.0.0">v2.0.0</a> on October 2nd, 2019</p>
 <ul>
 <li><p>Added proper support for attributes</p></li>
 <li><p>Added a change log</p></li>

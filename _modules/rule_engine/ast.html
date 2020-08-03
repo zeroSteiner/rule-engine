@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.ast &mdash; Rule Engine 2.1.0 documentation</title>
+  <title>rule_engine.ast &mdash; Rule Engine 2.1.1 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                2.1.0
+                2.1.1
               </div>
             
           
@@ -419,6 +419,12 @@
 <span class="sd">	A collection of constants representing the different supported data types.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">ARRAY</span> <span class="o">=</span> <span class="n">_SequenceDataTypeDef</span><span class="p">(</span><span class="s1">&#39;ARRAY&#39;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	.. py:function:: __call__(value_type, value_type_nullable=True)</span>
+<span class="sd">	</span>
+<span class="sd">	:param value_type: The type of the array members.</span>
+<span class="sd">	:param bool value_type_nullable: Whether or not array members are allowed to be :py:attr:`.NULL`.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">BOOLEAN</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;BOOLEAN&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
 	<span class="n">DATETIME</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;DATETIME&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
 	<span class="n">FLOAT</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>

@@ -261,6 +261,12 @@ class DataType(metaclass=DataTypeMeta):
 	A collection of constants representing the different supported data types.
 	"""
 	ARRAY = _SequenceDataTypeDef('ARRAY', tuple)
+	"""
+	.. py:function:: __call__(value_type, value_type_nullable=True)
+	
+	:param value_type: The type of the array members.
+	:param bool value_type_nullable: Whether or not array members are allowed to be :py:attr:`.NULL`.
+	"""
 	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
 	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
 	FLOAT = _DataTypeDef('FLOAT', float)

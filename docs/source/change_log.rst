@@ -8,10 +8,22 @@ team for note worthy changes.
 Version 2.x.x
 -------------
 
+Version 2.1.0
+^^^^^^^^^^^^^
+
+Released :release:`2.1.0` on August 3rd, 2020
+
+* Added coverage reporting to Travis-CI
+* Changed :py:class:`~rule_engine.ast.DataType` from an enum to a custom class
+* Improvements for the :py:class:`~rule_engine.ast.DataType.ARRAY` data type
+
+    * Added `get[item]` support for arrays, allowing items to be retrieved by index
+    * Added ability for specifying the member type and optionally null
+
 Version 2.0.0
 ^^^^^^^^^^^^^
 
-*In Progress*
+Released :release:`2.0.0` on October 2nd, 2019
 
 * Added proper support for attributes
 * Added a change log

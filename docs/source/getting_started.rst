@@ -271,6 +271,10 @@ member of the :py:class:`~ast.DataType` enumeration.
 
    context = rule_engine.Context(type_resolver=type_resolver)
 
+Compound data types such as :py:class:`~ast.DataType.ARRAY` can optionally
+specify member type information by calling their respective type. For example,
+an array of strings would be define as ``DataType.ARRAY(DataType.STRING)``.
+
 For convenience, the :py:func:`~engine.type_resolver_from_dict` function can be
 used to generate a *type_resolver* function from a dictionary mapping symbol
 names to their respective :py:class:`~ast.DataType`.

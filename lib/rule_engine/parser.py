@@ -406,13 +406,6 @@ class Parser(ParserBase):
 		else:
 			p[0] = ast.ArrayExpression(self.context, tuple(p[2])).reduce()
 
-	def p_expression_getitem(self, p):
-		"""
-		object : object LBRACKET expression RBRACKET
-		"""
-		container, _, item = p[1:4]
-		p[0] = ast.GetItemExpression(self.context, container, item).reduce()
-
 	def p_expression_array_members(self, p):
 		"""
 		members : expression
@@ -425,3 +418,31 @@ class Parser(ParserBase):
 			deque = p[1]
 			deque.append(p[3])
 		p[0] = deque
+
+	def p_expression_getitem(self, p):
+		"""
+		object : object LBRACKET expression RBRACKET
+		"""
+		container, _, item = p[1:4]
+		p[0] = ast.GetItemExpression(self.context, container, item).reduce()
+
+	def p_expression_getslice(self, p):
+		"""
+		object : object LBRACKET COLON RBRACKET
+		       | object LBRACKET COLON expression RBRACKET
+		       | object LBRACKET expression COLON RBRACKET
+		       | object LBRACKET expression COLON expression RBRACKET
+		"""
+		container = p[1]
+		colon_index = p[1:].index(':')
+		if colon_index == 2 and len(p) == 5:
+			start, end = None, None
+		elif colon_index == 2 and len(p) == 6:
+			start, end = None, p[4]
+		elif colon_index == 3 and len(p) == 6:
+			start, end = p[3], None
+		elif colon_index == 3 and len(p) == 7:
+			start, _, end = p[3:6]
+		else:
+			raise errors.RuleSyntaxError('invalid slice expression')
+		p[0] = ast.GetSliceExpression(self.context, container, start, end)  # todo: implement .reduce()

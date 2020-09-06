@@ -162,16 +162,16 @@ def _sequence_member_value_type(python_value):
 		subvalue_type = DataType.UNDEFINED
 	return subvalue_type
 
-def _assert_is_integer_number(value):
-	if not is_integer_number(value):
+def _assert_is_integer_number(*values):
+	if not all(map(is_integer_number, values)):
 		raise errors.EvaluationError('data type mismatch (not an integer number)')
 
-def _assert_is_natural_number(value):
-	if not is_natural_number(value):
+def _assert_is_natural_number(*values):
+	if not all(map(is_natural_number, values)):
 		raise errors.EvaluationError('data type mismatch (not a natural number)')
 
-def _assert_is_numeric(value):
-	if not is_numeric(value):
+def _assert_is_numeric(*values):
+	if not all(map(is_numeric, values)):
 		raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
 def _is_reduced(value):
@@ -895,6 +895,49 @@ class GetItemExpression(ExpressionBase):
 		self.item.to_graphviz(digraph, *args, **kwargs)
 		digraph.edge(str(id(self)), str(id(self.container)), label='container')
 		digraph.edge(str(id(self)), str(id(self.item)), label='item')
+
+class GetSliceExpression(ExpressionBase):
+	"""
+	A class representing an expression in which a range of items is retrieved
+	from a container *object*.
+	"""
+	__slots__ = ('container', 'start', 'end')
+	def __init__(self, context, container, start=None, end=None):
+		self.context = context
+		self.container = container
+		if container.result_type == DataType.STRING:
+			self.result_type = DataType.STRING
+		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
+		# is explicitly checking if result_type is an array with out checking the value_type
+		elif isinstance(container.result_type, DataType.ARRAY.__class__):
+			self.result_type = container.result_type.value_type
+		elif container.result_type != DataType.UNDEFINED:
+			raise errors.EvaluationError('data type mismatch')
+		self.start = start or LiteralExpressionBase.from_value(context, 0)
+		self.end = end or LiteralExpressionBase.from_value(context, -1)
+
+	def __repr__(self):
+		return "<{0} container={1!r} start={2!r} end={3!r} >".format(self.__class__.__name__, self.container, self.start, self.end)
+
+	def evaluate(self, thing):
+		resolved_obj = self.container.evaluate(thing)
+		resolved_start = self.start.evaluate(thing)
+		resolved_end = self.end.evaluate(thing)
+		if isinstance(resolved_obj, collections.abc.Sequence):
+			_assert_is_integer_number(resolved_start, resolved_end)
+			resolved_start = int(resolved_start)
+			resolved_end = int(resolved_end)
+		try:
+			value = resolved_obj[resolved_start:resolved_end]
+		except (IndexError, KeyError):
+			raise errors.EvaluationError()
+		return coerce_value(value, verify_type=False)
+
+	def reduce(self):
+		raise NotImplementedError()
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		raise NotImplementedError()
 
 class SymbolExpression(ExpressionBase):
 	"""

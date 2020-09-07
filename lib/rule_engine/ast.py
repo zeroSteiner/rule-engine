@@ -174,18 +174,14 @@ def _assert_is_numeric(*values):
 	if not all(map(is_numeric, values)):
 		raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
-def _is_reduced(value):
+def _is_reduced(*values):
 	"""
 	Check if the ast expression *value* is a literal expression and if it is a
 	compound datatype, that all of it's members are reduced literals. A value
 	that causes this to evaluate to True for is able to be evaluated without a
 	*thing*.
 	"""
-	if not isinstance(value, LiteralExpressionBase):
-		return False
-	if not value.is_reduced:
-		return False
-	return True
+	return all((isinstance(value, LiteralExpressionBase) and value.is_reduced) for value in values)
 
 class _DataTypeDef(object):
 	__slots__ = ('name', 'python_type', 'is_scalar')
@@ -494,7 +490,7 @@ class ArrayExpression(LiteralExpressionBase):
 
 	@property
 	def is_reduced(self):
-		return all(_is_reduced(member) for member in self.value)
+		return _is_reduced(*self.value)
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		super(ArrayExpression, self).to_graphviz(digraph, *args, **kwargs)
@@ -590,9 +586,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		return self._evaluator(thing)
 
 	def reduce(self):
-		if not _is_reduced(self.left):
-			return self
-		if not _is_reduced(self.right):
+		if not _is_reduced(self.left, self.right):
 			return self
 		return self.result_expression(self.context, self.evaluate(None))
 
@@ -786,9 +780,10 @@ class ContainsExpression(ExpressionBase):
 		return bool(member_value in container_value)
 
 	def reduce(self):
-		if _is_reduced(self.container) and _is_reduced(self.member):
-			return BooleanExpression(self.context, self.evaluate(None))
-		return self
+		if not _is_reduced(self.container, self.member):
+			return self
+		return BooleanExpression(self.context, self.evaluate(None))
+
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		super(ContainsExpression, self).to_graphviz(digraph, *args, **kwargs)
@@ -885,7 +880,7 @@ class GetItemExpression(ExpressionBase):
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):
-		if not _is_reduced(self.container) or not _is_reduced(self.item):
+		if not _is_reduced(self.container, self.item):
 			return self
 		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 

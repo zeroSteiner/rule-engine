@@ -445,4 +445,4 @@ class Parser(ParserBase):
 			start, _, end = p[3:6]
 		else:
 			raise errors.RuleSyntaxError('invalid slice expression')
-		p[0] = ast.GetSliceExpression(self.context, container, start, end)  # todo: implement .reduce()
+		p[0] = ast.GetSliceExpression(self.context, container, start, end).reduce()

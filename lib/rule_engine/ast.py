@@ -905,7 +905,7 @@ class GetSliceExpression(ExpressionBase):
 		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
 		# is explicitly checking if result_type is an array with out checking the value_type
 		elif isinstance(container.result_type, DataType.ARRAY.__class__):
-			self.result_type = container.result_type.value_type
+			self.result_type = container.result_type
 		elif container.result_type != DataType.UNDEFINED:
 			raise errors.EvaluationError('data type mismatch')
 		self.start = start or LiteralExpressionBase.from_value(context, 0)
@@ -918,10 +918,9 @@ class GetSliceExpression(ExpressionBase):
 		resolved_obj = self.container.evaluate(thing)
 		resolved_start = self.start.evaluate(thing)
 		resolved_end = self.end.evaluate(thing)
-		if isinstance(resolved_obj, collections.abc.Sequence):
-			_assert_is_integer_number(resolved_start, resolved_end)
-			resolved_start = int(resolved_start)
-			resolved_end = int(resolved_end)
+		_assert_is_integer_number(resolved_start, resolved_end)
+		resolved_start = int(resolved_start)
+		resolved_end = int(resolved_end)
 		try:
 			value = resolved_obj[resolved_start:resolved_end]
 		except (IndexError, KeyError):
@@ -929,10 +928,18 @@ class GetSliceExpression(ExpressionBase):
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):
-		raise NotImplementedError()
+		if not _is_reduced(self.container, self.start, self.end):
+			return self
+		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 
 	def to_graphviz(self, digraph, *args, **kwargs):
-		raise NotImplementedError()
+		super(GetSliceExpression, self).to_graphviz(digraph, *args, **kwargs)
+		self.container.to_graphviz(digraph, *args, **kwargs)
+		self.start.to_graphviz(digraph, *args, **kwargs)
+		self.end.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.container)), label='container')
+		digraph.edge(str(id(self)), str(id(self.start)), label='start')
+		digraph.edge(str(id(self)), str(id(self.end)), label='end')
 
 class SymbolExpression(ExpressionBase):
 	"""

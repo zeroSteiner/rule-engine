@@ -876,9 +876,8 @@ class GetItemExpression(ExpressionBase):
 	def evaluate(self, thing):
 		resolved_obj = self.container.evaluate(thing)
 		resolved_item = self.item.evaluate(thing)
-		if isinstance(resolved_obj, collections.abc.Sequence):
-			_assert_is_integer_number(resolved_item)
-			resolved_item = int(resolved_item)
+		_assert_is_integer_number(resolved_item)
+		resolved_item = int(resolved_item)
 		try:
 			value = resolved_obj[resolved_item]
 		except (IndexError, KeyError):

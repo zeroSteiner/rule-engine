@@ -1034,9 +1034,8 @@
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">resolved_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
 		<span class="n">resolved_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolved_obj</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
-			<span class="n">_assert_is_integer_number</span><span class="p">(</span><span class="n">resolved_item</span><span class="p">)</span>
-			<span class="n">resolved_item</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resolved_item</span><span class="p">)</span>
+		<span class="n">_assert_is_integer_number</span><span class="p">(</span><span class="n">resolved_item</span><span class="p">)</span>
+		<span class="n">resolved_item</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resolved_item</span><span class="p">)</span>
 		<span class="k">try</span><span class="p">:</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="n">resolved_obj</span><span class="p">[</span><span class="n">resolved_item</span><span class="p">]</span>
 		<span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>

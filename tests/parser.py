@@ -31,6 +31,7 @@
 #
 
 import datetime
+import itertools
 import math
 import unittest
 
@@ -180,6 +181,22 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralAttributeStatementEqual('[ ]', tuple())
 		self.assertLiteralAttributeStatementEqual('[1, 2]', tuple((1.0, 2.0)))
 		self.assertLiteralAttributeStatementEqual('[1, 2,]', tuple((1.0, 2.0)))
+
+	def test_parse_array_getitem(self):
+		cases = (
+			('["t", "e", "s", "t", "i", "n", "g"]', '"testing"'),
+			(('[0]', 't'), ('[1]', 'e'), ('[-1]', 'g'))
+		)
+		for (container, (getitem, answer)) in itertools.product(*cases):
+			self.assertLiteralAttributeStatementEqual(container + getitem, answer)
+
+	def test_parse_array_getslice(self):
+		self.assertLiteralAttributeStatementEqual('"testing"[:]', 'testing')
+		self.assertLiteralAttributeStatementEqual('"testing"[1:-1]', 'estin')
+		self.assertLiteralAttributeStatementEqual('"testing"[1:6]', 'estin')
+		self.assertLiteralAttributeStatementEqual('["t", "e", "s", "t", "i", "n", "g"][:]', tuple('testing'))
+		self.assertLiteralAttributeStatementEqual('["t", "e", "s", "t", "i", "n", "g"][1:-1]', tuple('estin'))
+		self.assertLiteralAttributeStatementEqual('["t", "e", "s", "t", "i", "n", "g"][1:6]', tuple('estin'))
 
 	def test_parse_boolean(self):
 		self.assertLiteralStatementEqual('true', ast.BooleanExpression, True)

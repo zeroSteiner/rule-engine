@@ -31,6 +31,7 @@
 #
 
 import datetime
+import itertools
 import random
 import string
 import unittest
@@ -45,6 +46,7 @@ import dateutil.tz
 __all__ = (
 	'ContainsExpressionTests',
 	'GetItemExpressionTests',
+	'GetSliceExpressionTests',
 	'SymbolExpressionTests',
 	'SymbolExpressionConversionTests',
 	'TernaryExpressionTests',
@@ -115,6 +117,32 @@ class GetItemExpressionTests(unittest.TestCase):
 		member = ast.FloatExpression(context, 1.1)
 		with self.assertRaises(errors.EvaluationError):
 			ast.GetItemExpression(context, container, member).evaluate(None)
+
+class GetSliceExpressionTests(unittest.TestCase):
+	def test_ast_expression_getslice(self):
+		ary_value = tuple(random.choice(string.ascii_letters) for _ in range(12))
+		str_value = ''.join(ary_value)
+		cases = (
+			(ary_value, str_value),
+			(None,  0,  2),
+			(None, -1, -3),
+		)
+		for container, start, end in itertools.product(*cases):
+			get_slice = ast.GetSliceExpression(
+				context,
+				ast.LiteralExpressionBase.from_value(context, container),
+				start=(None if start is None else ast.LiteralExpressionBase.from_value(context, start)),
+				end=(None if end is None else ast.LiteralExpressionBase.from_value(context, end))
+			)
+			self.assertEqual(get_slice.evaluate({}), container[start:end])
+
+	def test_ast_expression_getslice_error(self):
+		with self.assertRaises(errors.EvaluationError):
+			ast.GetSliceExpression(context, ast.LiteralExpressionBase.from_value(context, 1.0))
+		with self.assertRaises(errors.EvaluationError):
+			ast.GetSliceExpression(context, ast.LiteralExpressionBase.from_value(context, None))
+		with self.assertRaises(errors.EvaluationError):
+			ast.GetSliceExpression(context, ast.LiteralExpressionBase.from_value(context, True))
 
 class SymbolExpressionTests(unittest.TestCase):
 	def setUp(self):

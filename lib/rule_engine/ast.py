@@ -528,7 +528,10 @@ class NullExpression(LiteralExpressionBase):
 	always evaluates to false.
 	"""
 	result_type = DataType.NULL
-	def __init__(self, context):
+	def __init__(self, context, value=None):
+		# all of the literal expressions take a value
+		if value is not None:
+			raise TypeError('value must be None')
 		super(NullExpression, self).__init__(context, value=None)
 
 class StringExpression(LiteralExpressionBase):
@@ -909,7 +912,7 @@ class GetSliceExpression(ExpressionBase):
 		elif container.result_type != DataType.UNDEFINED:
 			raise errors.EvaluationError('data type mismatch')
 		self.start = start or LiteralExpressionBase.from_value(context, 0)
-		self.end = end or LiteralExpressionBase.from_value(context, -1)
+		self.end = end or LiteralExpressionBase.from_value(context, None)
 
 	def __repr__(self):
 		return "<{0} container={1!r} start={2!r} end={3!r} >".format(self.__class__.__name__, self.container, self.start, self.end)
@@ -917,10 +920,13 @@ class GetSliceExpression(ExpressionBase):
 	def evaluate(self, thing):
 		resolved_obj = self.container.evaluate(thing)
 		resolved_start = self.start.evaluate(thing)
+		if resolved_start is not None:
+			_assert_is_integer_number(resolved_start)
+			resolved_start = int(resolved_start)
 		resolved_end = self.end.evaluate(thing)
-		_assert_is_integer_number(resolved_start, resolved_end)
-		resolved_start = int(resolved_start)
-		resolved_end = int(resolved_end)
+		if resolved_end is not None:
+			_assert_is_integer_number(resolved_end)
+			resolved_end = int(resolved_end)
 		try:
 			value = resolved_obj[resolved_start:resolved_end]
 		except (IndexError, KeyError):

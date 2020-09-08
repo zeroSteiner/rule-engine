@@ -877,7 +877,7 @@ class GetItemExpression(ExpressionBase):
 		_assert_is_integer_number(resolved_item)
 		resolved_item = int(resolved_item)
 		try:
-			value = resolved_obj[resolved_item]
+			value = operator.getitem(resolved_obj, resolved_item)
 		except (IndexError, KeyError):
 			raise errors.EvaluationError()
 		return coerce_value(value, verify_type=False)
@@ -927,10 +927,7 @@ class GetSliceExpression(ExpressionBase):
 		if resolved_end is not None:
 			_assert_is_integer_number(resolved_end)
 			resolved_end = int(resolved_end)
-		try:
-			value = resolved_obj[resolved_start:resolved_end]
-		except (IndexError, KeyError):
-			raise errors.EvaluationError()
+		value = operator.getitem(resolved_obj, slice(resolved_start, resolved_end))
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):

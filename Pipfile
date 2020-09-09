@@ -12,3 +12,10 @@ sphinx = "*"
 sphinx-rtd-theme = "*"
 graphviz = "*"
 coverage = "*"
+
+[scripts]
+build-docs = "sphinx-build -b html -a -E -v docs/source docs/html"
+release = 'sh -c "python setup.py build sdist && twine upload --verbose dist/*"'
+tests = 'sh -c "PYTHONPATH=$(pwd)/lib python -m unittest -v tests"'
+tests-coverage = 'sh -c "PYTHONPATH=$(pwd)/lib coverage run -m unittest -v tests && coverage report --include=\"*/rule_engine/*\""'
+

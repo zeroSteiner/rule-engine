@@ -8,6 +8,14 @@ team for note worthy changes.
 Version 2.x.x
 -------------
 
+Version 2.2.0
+^^^^^^^^^^^^^
+
+Released :release:`2.1.0` on September 9th, 2020
+
+* Added script entries to the Pipfile for development
+* Added support for slices on sequence data types
+
 Version 2.1.0
 ^^^^^^^^^^^^^
 

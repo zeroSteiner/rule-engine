@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.ast &mdash; Rule Engine 2.1.1 documentation</title>
+  <title>rule_engine.ast &mdash; Rule Engine 2.2.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                2.1.1
+                2.2.0
               </div>
             
           
@@ -320,30 +320,26 @@
 		<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
 	<span class="k">return</span> <span class="n">subvalue_type</span>
 
-<span class="k">def</span> <span class="nf">_assert_is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_assert_is_integer_number</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_integer_number</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not an integer number)&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_assert_is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_assert_is_natural_number</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_natural_number</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a natural number)&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_assert_is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_assert_is_numeric</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_numeric</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a numeric value)&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_is_reduced</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_is_reduced</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check if the ast expression *value* is a literal expression and if it is a</span>
 <span class="sd">	compound datatype, that all of it&#39;s members are reduced literals. A value</span>
 <span class="sd">	that causes this to evaluate to True for is able to be evaluated without a</span>
 <span class="sd">	*thing*.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
-		<span class="k">return</span> <span class="kc">False</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">is_reduced</span><span class="p">:</span>
-		<span class="k">return</span> <span class="kc">False</span>
-	<span class="k">return</span> <span class="kc">True</span>
+	<span class="k">return</span> <span class="nb">all</span><span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">is_reduced</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">_DataTypeDef</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;python_type&#39;</span><span class="p">,</span> <span class="s1">&#39;is_scalar&#39;</span><span class="p">)</span>
@@ -652,7 +648,7 @@
 
 	<span class="nd">@property</span>
 	<span class="k">def</span> <span class="nf">is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">_is_reduced</span><span class="p">(</span><span class="n">member</span><span class="p">)</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">ArrayExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -690,7 +686,10 @@
 <span class="sd">	always evaluates to false.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="c1"># all of the literal expressions take a value</span>
+		<span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;value must be None&#39;</span><span class="p">)</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">NullExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="StringExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.StringExpression">[docs]</a><span class="k">class</span> <span class="nc">StringExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
@@ -748,9 +747,7 @@
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluator</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">):</span>
-			<span class="k">return</span> <span class="bp">self</span>
-		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">self</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_expression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
 
@@ -944,9 +941,10 @@
 		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">member_value</span> <span class="ow">in</span> <span class="n">container_value</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="k">if</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">member</span><span class="p">):</span>
-			<span class="k">return</span> <span class="n">BooleanExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
-		<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">member</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">return</span> <span class="n">BooleanExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+
 
 	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">ContainsExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1037,13 +1035,13 @@
 		<span class="n">_assert_is_integer_number</span><span class="p">(</span><span class="n">resolved_item</span><span class="p">)</span>
 		<span class="n">resolved_item</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resolved_item</span><span class="p">)</span>
 		<span class="k">try</span><span class="p">:</span>
-			<span class="n">value</span> <span class="o">=</span> <span class="n">resolved_obj</span><span class="p">[</span><span class="n">resolved_item</span><span class="p">]</span>
+			<span class="n">value</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">getitem</span><span class="p">(</span><span class="n">resolved_obj</span><span class="p">,</span> <span class="n">resolved_item</span><span class="p">)</span>
 		<span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">()</span>
 		<span class="k">return</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">self</span>
 		<span class="k">return</span> <span class="n">LiteralExpressionBase</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
 
@@ -1053,6 +1051,56 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;container&#39;</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;item&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">GetSliceExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A class representing an expression in which a range of items is retrieved</span>
+<span class="sd">	from a container *object*.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
+		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span>
+		<span class="c1"># check against __class__ so the parent class is dynamic in case it changes in the future, what we&#39;re doing here</span>
+		<span class="c1"># is explicitly checking if result_type is an array with out checking the value_type</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span>
+		<span class="k">elif</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span> <span class="ow">or</span> <span class="n">LiteralExpressionBase</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span> <span class="ow">or</span> <span class="n">LiteralExpressionBase</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> container=</span><span class="si">{1!r}</span><span class="s2"> start=</span><span class="si">{2!r}</span><span class="s2"> end=</span><span class="si">{3!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">resolved_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="n">resolved_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">resolved_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">_assert_is_integer_number</span><span class="p">(</span><span class="n">resolved_start</span><span class="p">)</span>
+			<span class="n">resolved_start</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resolved_start</span><span class="p">)</span>
+		<span class="n">resolved_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">resolved_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="n">_assert_is_integer_number</span><span class="p">(</span><span class="n">resolved_end</span><span class="p">)</span>
+			<span class="n">resolved_end</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resolved_end</span><span class="p">)</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">getitem</span><span class="p">(</span><span class="n">resolved_obj</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="n">resolved_start</span><span class="p">,</span> <span class="n">resolved_end</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">return</span> <span class="n">LiteralExpressionBase</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+
+	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">GetSliceExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;container&#39;</span><span class="p">)</span>
+		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">)</span>
+		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;end&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SymbolExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.SymbolExpression">[docs]</a><span class="k">class</span> <span class="nc">SymbolExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.parser &mdash; Rule Engine 2.1.1 documentation</title>
+  <title>rule_engine.parser &mdash; Rule Engine 2.2.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                2.1.1
+                2.2.0
               </div>
             
           
@@ -564,13 +564,6 @@
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">ArrayExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		object : object LBRACKET expression RBRACKET</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">container</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">item</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">GetItemExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
-
 	<span class="k">def</span> <span class="nf">p_expression_array_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		members : expression</span>
@@ -582,7 +575,35 @@
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">deque</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 			<span class="n">deque</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span></div>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		object : object LBRACKET expression RBRACKET</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">container</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">item</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">GetItemExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">p_expression_getslice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		object : object LBRACKET COLON RBRACKET</span>
+<span class="sd">		       | object LBRACKET COLON expression RBRACKET</span>
+<span class="sd">		       | object LBRACKET expression COLON RBRACKET</span>
+<span class="sd">		       | object LBRACKET expression COLON expression RBRACKET</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">container</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="n">colon_index</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">colon_index</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+			<span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+		<span class="k">elif</span> <span class="n">colon_index</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+			<span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+		<span class="k">elif</span> <span class="n">colon_index</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+			<span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="kc">None</span>
+		<span class="k">elif</span> <span class="n">colon_index</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+			<span class="n">start</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid slice expression&#39;</span><span class="p">)</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">GetSliceExpression</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span></div>
 </pre></div>
 
            </div>

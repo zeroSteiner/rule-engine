@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; Rule Engine 2.2.0 documentation</title>
+  <title>Getting Started &mdash; Rule Engine 2.2.1 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.2.0
+                2.2.1
               </div>
             
           
@@ -449,10 +449,10 @@ symbol and object must either match the specified type or be
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code>, otherwise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError" title="rule_engine.errors.SymbolTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolTypeError</span></code></a> will be
 raised when the symbol is resolved.</p>
 <p>To define type information, a <em>type_resolver</em> function must be passed to the
-<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> class. The type resolver function function is
-expected to take a single argument, and that is the name of the symbol (as a
-Python string) whose type needs to be resolved. The return type should be a
-member of the <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a> enumeration.</p>
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> class. The type resolver function is expected to
+take a single argument, and that is the name of the symbol (as a Python string)
+whose type needs to be resolved. The return type should be a member of the
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a> enumeration.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define a basic type resolver, that knows about the four attributes of a</span>
 <span class="c1"># comic book</span>
 <span class="k">def</span> <span class="nf">type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>

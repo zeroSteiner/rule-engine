@@ -248,10 +248,10 @@ symbol and object must either match the specified type or be
 raised when the symbol is resolved.
 
 To define type information, a *type_resolver* function must be passed to the
-:py:class:`~engine.Context` class. The type resolver function function is
-expected to take a single argument, and that is the name of the symbol (as a
-Python string) whose type needs to be resolved. The return type should be a
-member of the :py:class:`~ast.DataType` enumeration.
+:py:class:`~engine.Context` class. The type resolver function is expected to
+take a single argument, and that is the name of the symbol (as a Python string)
+whose type needs to be resolved. The return type should be a member of the
+:py:class:`~ast.DataType` enumeration.
 
 .. code-block:: python
 

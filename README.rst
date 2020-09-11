@@ -1,8 +1,7 @@
 Rule Engine
 ===========
-This project provides a library for creating general purpose "Rule" objects from
-a logical expression which can then be applied to arbitrary objects to evaluate
-whether or not they match.
+A lightweight, optionally typed expression language with a custom grammar for
+matching arbitrary Python objects.
 
 Documentation is available at https://zeroSteiner.github.io/rule-engine/.
 

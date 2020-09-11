@@ -31,6 +31,7 @@
 #
 
 import os
+import re
 import sys
 
 base_directory = os.path.dirname(__file__)
@@ -46,18 +47,22 @@ try:
 	with open(os.path.join(base_directory, 'README.rst')) as file_h:
 		long_description = file_h.read()
 except OSError:
-	print('README.rst is unavailable, can not generate the long description', file=sys.stderr)
+	sys.stderr.write('README.rst is unavailable, can not generate the long description\n')
 	long_description = None
 
+with open(os.path.join(base_directory, 'lib', 'rule_engine', '__init__.py')) as file_h:
+	match = re.search(r'^__version__\s*=\s*([\'"])(?P<version>\d+(\.\d)*)\1$', file_h.read(), flags=re.MULTILINE)
+if match is None:
+	raise RuntimeError('Unable to find the version information')
+version = match.group('version')
+
 DESCRIPTION = """\
-This project provides a library for creating general purpose "Rule" objects from \
-a logical expression which can then be applied to arbitrary objects to evaluate \
-whether or not they match.\
+A lightweight, optionally typed expression language with a custom grammar for matching arbitrary Python objects.\
 """
 
 setup(
 	name='rule-engine',
-	version='2.2.1',
+	version=version,
 	author='Spencer McIntyre',
 	author_email='zeroSteiner@gmail.com',
 	maintainer='Spencer McIntyre',

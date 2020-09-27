@@ -54,6 +54,7 @@ falseish = (
 # literal expressions which should evaluate to true
 trueish = (
 	ast.ArrayExpression(context, tuple((ast.NullExpression(context),))),
+	ast.ArrayExpression(context, tuple((ast.FloatExpression(context, 1.0),))),
 	ast.BooleanExpression(context, True),
 	ast.DatetimeExpression(context, datetime.datetime.now()),
 	ast.FloatExpression(context, float('-inf')),

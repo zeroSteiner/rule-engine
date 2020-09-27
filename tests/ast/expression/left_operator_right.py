@@ -153,6 +153,14 @@ class ComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		for left, right in itertools.product(chain, chain):
 			self.assertExpressionTests('ne', left, right, left is not right)
 
+	def test_ast_expression_left_operator_right_comparison_compound(self):
+		names1 = ast.LiteralExpressionBase.from_value(context, ('Alice', 'Bob'))
+		names2 = ast.LiteralExpressionBase.from_value(context, ('Alice', 'Bob', 'Charlie'))
+		self.assertExpressionTests('eq', names1, names1, True)
+		self.assertExpressionTests('eq', names1, names2, False)
+		self.assertExpressionTests('ne', names1, names1, False)
+		self.assertExpressionTests('ne', names1, names2, True)
+
 class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.ArithmeticComparisonExpression
 	def test_ast_expression_left_operator_right_arithmeticcomparison_datetime(self):

@@ -573,14 +573,17 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		self._evaluator = getattr(self, '_op_' + type_, None)
 		if self._evaluator is None:
 			raise errors.EngineError('unsupported operator: ' + type_)
+		self._assert_type_is_compatible(left)
 		self.left = left
-		if self.left.result_type != DataType.UNDEFINED:
-			if self.left.result_type not in self.compatible_types:
-				raise errors.EvaluationError('data type mismatch')
+		self._assert_type_is_compatible(right)
 		self.right = right
-		if self.right.result_type != DataType.UNDEFINED:
-			if self.right.result_type not in self.compatible_types:
-				raise errors.EvaluationError('data type mismatch')
+
+	def _assert_type_is_compatible(self, value):
+		if value.result_type == DataType.UNDEFINED:
+			return
+		if any(DataType.is_compatible(dt, value.result_type) for dt in self.compatible_types):
+			return
+		raise errors.EvaluationError('data type mismatch')
 
 	def __repr__(self):
 		return "<{} type={!r} >".format(self.__class__.__name__, self.type)

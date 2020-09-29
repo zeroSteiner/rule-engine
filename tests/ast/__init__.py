@@ -192,7 +192,8 @@ class AstTests(unittest.TestCase):
 			# type,             type_is,             type_is_not
 			('symbol << 1',     ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol + 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
-			('symbol > 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
+			('symbol[1]',       ast.DataType.STRING, ast.DataType.FLOAT),
+			('symbol[1]',       ast.DataType.ARRAY,  ast.DataType.FLOAT),
 			('symbol =~ "foo"', ast.DataType.STRING, ast.DataType.FLOAT),
 		)
 		for case, type_is, type_is_not in cases:
@@ -200,7 +201,7 @@ class AstTests(unittest.TestCase):
 			context = engine.Context(type_resolver=engine.type_resolver_from_dict({'symbol': type_is}))
 			parser_.parse(case, context)
 			context = engine.Context(type_resolver=engine.type_resolver_from_dict({'symbol': type_is_not}))
-			with self.assertRaises(errors.EvaluationError):
+			with self.assertRaises(errors.EvaluationError, msg='case: ' + case):
 				parser_.parse(case, context)
 
 if __name__ == '__main__':

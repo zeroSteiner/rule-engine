@@ -163,6 +163,15 @@ class ComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 
 class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.ArithmeticComparisonExpression
+	def test_ast_expression_left_operator_right_arithmeticcomparison_boolean(self):
+		for left, right in itertools.product([True, False], repeat=2):
+			left_expr = ast.BooleanExpression(context, left)
+			right_expr = ast.BooleanExpression(context, right)
+			self.assertExpressionTests('ge', left_expr, right_expr, left >= right)
+			self.assertExpressionTests('gt', left_expr, right_expr, left > right)
+			self.assertExpressionTests('le', left_expr, right_expr, left <= right)
+			self.assertExpressionTests('lt', left_expr, right_expr, left < right)
+
 	def test_ast_expression_left_operator_right_arithmeticcomparison_datetime(self):
 		past_date = ast.DatetimeExpression(context, datetime.datetime(2016, 10, 15))
 		now = ast.DatetimeExpression(context, datetime.datetime.now())
@@ -182,9 +191,17 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			self.assertExpressionTests('le', number, zero, number is zero or number is neg_one)
 			self.assertExpressionTests('lt', number, zero, number is neg_one)
 
+	def test_ast_expression_left_operator_right_arithmeticcomparison_string(self):
+		string1 = ast.StringExpression(context, 'abcd')
+		string2 = ast.StringExpression(context, 'ABCD')
+		self.assertExpressionTests('ge', string1, string2, True)
+		self.assertExpressionTests('gt', string1, string2, True)
+		self.assertExpressionTests('le', string1, string2, False)
+		self.assertExpressionTests('lt', string1, string2, False)
+
 	def test_ast_expression_left_operator_right_arithmeticcomparison_type_errors(self):
 		for operation, left, right in itertools.product(('ge', 'gt', 'le', 'lt'), trueish, falseish):
-			if isinstance(left, ast.FloatExpression) and isinstance(right, ast.FloatExpression):
+			if type(left) is type(right):
 				continue
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, left, right)

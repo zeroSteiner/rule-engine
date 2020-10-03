@@ -163,6 +163,19 @@ class ComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 
 class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.ArithmeticComparisonExpression
+	def test_ast_expression_left_operator_right_arithmeticcomparison_array(self):
+		left_expr = ast.LiteralExpressionBase.from_value(context, ((1, 2, 3),))
+		right_expr = ast.LiteralExpressionBase.from_value(context, ((1, 2, 3),))
+		self.assertExpressionTests('ge', left_expr, right_expr, True)
+		self.assertExpressionTests('gt', left_expr, right_expr, False)
+		self.assertExpressionTests('le', left_expr, right_expr, True)
+		self.assertExpressionTests('lt', left_expr, right_expr, False)
+		right_expr = ast.LiteralExpressionBase.from_value(context, ((1, 2, 3, 4),))
+		self.assertExpressionTests('ge', left_expr, right_expr, False)
+		self.assertExpressionTests('gt', left_expr, right_expr, False)
+		self.assertExpressionTests('le', left_expr, right_expr, True)
+		self.assertExpressionTests('lt', left_expr, right_expr, True)
+
 	def test_ast_expression_left_operator_right_arithmeticcomparison_boolean(self):
 		for left, right in itertools.product([True, False], repeat=2):
 			left_expr = ast.BooleanExpression(context, left)
@@ -191,7 +204,7 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			self.assertExpressionTests('le', number, zero, number is zero or number is neg_one)
 			self.assertExpressionTests('lt', number, zero, number is neg_one)
 
-	def test_ast_expression_left_operator_right_arithmeticcomparison_boolean(self):
+	def test_ast_expression_left_operator_right_arithmeticcomparison_null(self):
 		left_expr = ast.NullExpression(context)
 		right_expr = ast.NullExpression(context)
 		self.assertExpressionTests('ge', left_expr, right_expr, True)

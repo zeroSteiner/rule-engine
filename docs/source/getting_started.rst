@@ -7,7 +7,7 @@ with a "rule" specified either by them or by an end user. The "rules" that the
 Rule Engine uses are Python string expressions in a custom language. The syntax
 that Rule Engine uses is similar to Python by borrows some features from Ruby.
 The rules are a custom language and no Python ``exec`` or ``eval`` operations
-are used, allowing developers to safely and security evaluate rules provided by
+are used, allowing developers to safely and securely evaluate rules provided by
 potentially untrusted sources.
 
 Basic Usage

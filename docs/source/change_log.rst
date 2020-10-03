@@ -1,12 +1,18 @@
 Change Log
 ==========
 
-This document contains notes on the major changes for each version of the Rule
-Engine. In comparison to the git log, this list is curated by the development
-team for note worthy changes.
+This document contains notes on the major changes for each version of the Rule Engine. In comparison to the git log,
+this list is curated by the development team for note worthy changes.
 
 Version 2.x.x
 -------------
+
+Version 2.3.0
+^^^^^^^^^^^^^
+
+*In progress*
+
+* Added support for arithmetic comparisons for all currently supported data types
 
 Version 2.2.0
 ^^^^^^^^^^^^^

@@ -180,7 +180,7 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('le', past_date, now, True)
 		self.assertExpressionTests('lt', past_date, now, True)
 
-	def test_ast_expression_left_operator_right_arithmeticcomparison_numeric(self):
+	def test_ast_expression_left_operator_right_arithmeticcomparison_float(self):
 		neg_one = ast.FloatExpression(context, -1.0)
 		zero = ast.FloatExpression(context, 0.0)
 		one = ast.FloatExpression(context, 1.0)
@@ -190,6 +190,14 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			self.assertExpressionTests('gt', number, zero, number is one)
 			self.assertExpressionTests('le', number, zero, number is zero or number is neg_one)
 			self.assertExpressionTests('lt', number, zero, number is neg_one)
+
+	def test_ast_expression_left_operator_right_arithmeticcomparison_boolean(self):
+		left_expr = ast.NullExpression(context)
+		right_expr = ast.NullExpression(context)
+		self.assertExpressionTests('ge', left_expr, right_expr, True)
+		self.assertExpressionTests('gt', left_expr, right_expr, False)
+		self.assertExpressionTests('le', left_expr, right_expr, True)
+		self.assertExpressionTests('lt', left_expr, right_expr, False)
 
 	def test_ast_expression_left_operator_right_arithmeticcomparison_string(self):
 		string1 = ast.StringExpression(context, 'abcd')

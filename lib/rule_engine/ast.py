@@ -57,7 +57,7 @@ def coerce_value(value, verify_type=True):
 	:return: The converted value.
 	"""
 	# ARRAY
-	if isinstance(value, (list, range)):
+	if isinstance(value, (list, range, tuple)):
 		value = tuple(coerce_value(v, verify_type=verify_type) for v in value)
 	# DATETIME
 	elif isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):

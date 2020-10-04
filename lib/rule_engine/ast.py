@@ -759,6 +759,8 @@ class FuzzyComparisonExpression(ComparisonExpression):
 		if left is None or regex is None:
 			return not modifier(left, regex)
 		match = getattr(regex, regex_function)(left)
+		if match is not None:
+			self.context._tls['regex.groups'] = coerce_value(match.groups())
 		return modifier(match, None)
 
 	_op_eq_fzm = functools.partialmethod(__op_regex, 'match', operator.is_not)

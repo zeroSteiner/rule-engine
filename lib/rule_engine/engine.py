@@ -34,8 +34,8 @@ import collections
 import collections.abc
 import datetime
 import functools
-import inspect
 import math
+import threading
 
 from . import ast
 from . import errors
@@ -48,6 +48,9 @@ def _now(builtins):
 
 def _today(builtins):
 	return _now(builtins).replace(hour=0, minute=0, second=0, microsecond=0)
+
+def _tls_getter(thread_local, key, _builtins):
+	return thread_local.storage.get(key)
 
 def resolve_attribute(thing, name):
 	"""
@@ -245,7 +248,7 @@ class Builtins(collections.abc.Mapping):
 			else:
 				namespace = self.namespace + '.' + name
 			return self.__class__(value, namespace=namespace, timezone=self.timezone)
-		elif inspect.isfunction(value):
+		elif callable(value):
 			value = value(self)
 		return value
 
@@ -321,16 +324,26 @@ class Context(object):
 				raise ValueError('unsupported timezone: ' + default_timezone)
 		elif not isinstance(default_timezone, datetime.tzinfo):
 			raise TypeError('invalid default_timezone type')
+		self._thread_local = threading.local()
 		self.default_timezone = default_timezone
 		"""The *default_timezone* parameter from :py:meth:`~__init__`"""
 		self.default_value = default_value
 		"""The *default_value* parameter from :py:meth:`~__init__`"""
-		self.builtins = Builtins.from_defaults(timezone=default_timezone)
+		self.builtins = Builtins.from_defaults(
+			values={'re_groups': functools.partial(_tls_getter, self._thread_local, 'regex.groups')},
+			timezone=default_timezone
+		)
 		"""An instance of :py:class:`Builtins` to provided a default set of builtin symbol values."""
 		if isinstance(type_resolver, collections.abc.Mapping):
 			type_resolver = type_resolver_from_dict(type_resolver)
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
+
+	@property
+	def _tls(self):
+		if not hasattr(self._thread_local, 'storage'):
+			self._thread_local.storage = {}
+		return self._thread_local.storage
 
 	def resolve(self, thing, name, scope=None):
 		"""
@@ -463,6 +476,7 @@ class Rule(object):
 		:return: The value the rule evaluates to. Unlike the :py:meth:`.matches`
 			method, this is not necessarily a boolean.
 		"""
+		self.context._tls.clear()
 		return self.statement.evaluate(thing)
 
 	def matches(self, thing):
@@ -474,7 +488,7 @@ class Rule(object):
 		:return: Whether or not the rule matches.
 		:rtype: bool
 		"""
-		return bool(self.statement.evaluate(thing))
+		return bool(self.evaluate(thing))
 
 	def to_graphviz(self):
 		"""

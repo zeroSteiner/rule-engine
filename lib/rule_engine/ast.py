@@ -58,7 +58,7 @@ def coerce_value(value, verify_type=True):
 	"""
 	# ARRAY
 	if isinstance(value, (list, range)):
-		value = tuple(value)
+		value = tuple(coerce_value(v, verify_type=verify_type) for v in value)
 	# DATETIME
 	elif isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
 		value = datetime.datetime(value.year, value.month, value.day)

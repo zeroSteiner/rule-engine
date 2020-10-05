@@ -153,6 +153,8 @@ def _sequence_member_value_type(python_value):
 			subvalue_type = DataType.from_value(subvalue)
 		subvalue_types.add(subvalue_type)
 	if DataType.NULL in subvalue_types:
+		# treat NULL as a special case, allowing typed arrays to be a specified type *or* NULL
+		# this however makes it impossible to define an array with a type of NULL
 		subvalue_types.remove(DataType.NULL)
 	if len(subvalue_types) > 1:
 		raise TypeError('can not map python sequence type with multiple member types')

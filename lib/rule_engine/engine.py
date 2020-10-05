@@ -50,6 +50,7 @@ def _today(builtins):
 	return _now(builtins).replace(hour=0, minute=0, second=0, microsecond=0)
 
 def _tls_getter(thread_local, key, _builtins):
+	# a function stub to be used with functools.partial for retrieving thread-local values
 	return thread_local.storage.get(key)
 
 def resolve_attribute(thing, name):

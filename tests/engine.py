@@ -33,7 +33,9 @@
 import collections
 import datetime
 import os
+import random
 import re
+import string
 import sys
 import types
 import unittest
@@ -119,6 +121,22 @@ class EngineTests(unittest.TestCase):
 		self.assertIn('today', builtins)
 		today = builtins['today']
 		self.assertIsInstance(today, datetime.date)
+
+	def test_engine_builtins_re_groups(self):
+		context = engine.Context()
+		rule = engine.Rule('words =~ "(\\w+) (\\w+) (\\w+)" and $re_groups[0] == word0', context=context)
+		self.assertNotIn('regex.groups', context._tls)
+		words = (
+			''.join(random.choice(string.ascii_letters) for _ in range(random.randint(4, 12))),
+			''.join(random.choice(string.ascii_letters) for _ in range(random.randint(4, 12))),
+			''.join(random.choice(string.ascii_letters) for _ in range(random.randint(4, 12)))
+		)
+		self.assertTrue(rule.matches({'words': ' '.join(words), 'word0': words[0]}))
+		self.assertEqual(context._tls['regex.groups'], words)
+
+		self.assertFalse(rule.matches({'words': ''.join(words), 'word0': words[0]}))
+		self.assertNotIn('regex.groups', context._tls)
+
 
 class EngineRuleTests(unittest.TestCase):
 	rule_text = 'first_name == "Luke" and email =~ ".*@rebels.org$"'

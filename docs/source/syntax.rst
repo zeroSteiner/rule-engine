@@ -200,31 +200,30 @@ The following symbols are provided by default using the :py:meth:`~engine.Builti
 can be accessed through the ``$`` prefix, e.g. ``$pi``. The default values can be overridden by defining a custom
 subclass of :py:class:`~engine.Context` and setting the :py:attr:`~engine.Context.builtins` attribute.
 
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| Name      | Data Type                         | Value Description                                                    |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| **Math related**                                                                                                     |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| e         | :py:attr:`~ast.DataType.FLOAT`    | The mathematical constant *e* (2.71828...).                          |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| pi        | :py:attr:`~ast.DataType.FLOAT`    | The mathematical constant *pi* (3.14159...).                         |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| **Regular Expression related**                                                                                       |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| re_groups | :py:attr:`~ast.DataType.ARRAY`    | An array of strings from the last regular expression match as        |
-|           |                                   | defined by the regular expression itself. See documentation on       |
-|           |                                   | `grouping`_ for more information. If no match has taken place, this  |
-|           |                                   | value is :py:attr:`~ast.DataType.NULL`.                              |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| **Timestamp related**                                                                                                |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| now       | :py:attr:`~ast.DataType.DATETIME` | The current timestamp (including time) using the default timezone    |
-|           |                                   | from :py:attr:`~engine.Context.default_timezone`                     |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
-| today     | :py:attr:`~ast.DataType.DATETIME` | The current timestamp, (excluding time, normalized to midnight /     |
-|           |                                   | 00:00:00) using the default timezone from                            |
-|           |                                   | :py:attr:`~engine.Context.default_timezone`                          |
-+-----------+-----------------------------------+----------------------------------------------------------------------+
+Math Related
+^^^^^^^^^^^^
+
+* ``e`` (type: :py:attr:`~ast.DataType.FLOAT`) -- The mathematical constant *e* (2.71828...).
+* ``pi`` (type: :py:attr:`~ast.DataType.FLOAT`) -- The mathematical constant *pi* (3.14159...).
+
+Regular Expression Related
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ``re_groups`` (type: :py:attr:`~ast.DataType.ARRAY`) -- An array of strings from the last regular expression match as
+  defined by the regular expression itself. See documentation on `grouping`_ for more information. If no match has taken
+  place, this value is :py:attr:`~ast.DataType.NULL`.
+
+  .. note:: For technical reasons, this symbol is provided by the default :py:attr:`~engine.Context` and is not included
+    within the :py:meth:`~engine.Builtins.from_defaults`. This means that unlike the other symbols listed here, it will
+    be unavailable if the default builtins are replaced.
+
+Timestamp Related
+^^^^^^^^^^^^^^^^^
+
+* ``now`` (type: :py:attr:`~ast.DataType.DATETIME`) -- The current timestamp (including time) using the default timezone
+  from :py:attr:`~engine.Context.default_timezone`.
+* ``today`` (type: :py:attr:`~ast.DataType.DATETIME`) -- The current timestamp, (excluding time, normalized to midnight
+  00:00:00) using the default timezone from :py:attr:`~engine.Context.default_timezone`.
 
 .. _grouping: https://docs.python.org/3/howto/regex.html#grouping
 .. _Order of operations: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages

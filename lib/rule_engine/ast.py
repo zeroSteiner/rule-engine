@@ -701,6 +701,12 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 	text such as less-than-or-equal-to and greater-than.
 	"""
 	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
+	def __init__(self, *args, **kwargs):
+		super(ArithmeticComparisonExpression, self).__init__(*args, **kwargs)
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
+			if self.left.result_type != self.right.result_type:
+				raise errors.EvaluationError('data type mismatch')
+
 	def __op_arithmetic(self, op, thing):
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
@@ -979,7 +985,7 @@ class SymbolExpression(ExpressionBase):
 		context.symbols.add(name)
 		self.context = context
 		self.name = name
-		type_hint = context.resolve_type(name)
+		type_hint = context.resolve_type(name, scope=scope)
 		if type_hint is not None:
 			self.result_type = type_hint
 		self.scope = scope

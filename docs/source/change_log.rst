@@ -13,6 +13,7 @@ Version 2.3.0
 *In progress*
 
 * Added support for arithmetic comparisons for all currently supported data types
+* Added support for proper type hinting of builtin symbols
 * Added the ``$re_groups`` builtin symbol for extracting groups from a regular expression match
 
 Version 2.2.0

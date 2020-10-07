@@ -146,8 +146,10 @@ class _AttributeResolver(object):
 		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=resolver.result_type)
 
 	def _get_resolver(self, object_type, name, thing=errors.UNDEFINED):
-		attribute_resolvers = self.attribute.type_map.get(object_type)
-		if attribute_resolvers is None:
+		for data_type, attribute_resolvers in self.attribute.type_map.items():
+			if ast.DataType.is_compatible(data_type, object_type):
+				break
+		else:
 			raise errors.AttributeResolutionError(name, object_type, thing=thing)
 		resolver = attribute_resolvers.get(name)
 		if resolver is None:
@@ -223,7 +225,8 @@ class Builtins(collections.abc.Mapping):
 	A class to define and provide variables to within the builtin context of
 	rules. These can be accessed by specifying a symbol name with the ``$``
 	prefix."""
-	def __init__(self, values, namespace=None, timezone=None):
+	scope_name = 'built-in'
+	def __init__(self, values, namespace=None, timezone=None, value_types=None):
 		"""
 		:param dict values: A mapping of string keys to be used as symbol names
 			with values of either Python literals or a function which will be
@@ -233,10 +236,18 @@ class Builtins(collections.abc.Mapping):
 		:param str namespace: The namespace of the variables to resolve.
 		:param timezone: A timezone to use when resolving timestamps.
 		:type timezone: :py:class:`~datetime.tzinfo`
+		:param dict value_types: A mapping of the values to their datatypes.
+
+		.. versionchanged:: 2.3.0
+			Added the *value_types* parameter.
 		"""
 		self.__values = values
+		self.__value_types = value_types or {}
 		self.namespace = namespace
 		self.timezone = timezone or dateutil.tz.tzlocal()
+
+	def resolve_type(self, name):
+		return self.__value_types.get(name, ast.DataType.UNDEFINED)
 
 	def __repr__(self):
 		return "<{} namespace={!r} keys={!r} timezone={!r} >".format(self.__class__.__name__, self.namespace, tuple(self.keys()), self.timezone)
@@ -268,9 +279,15 @@ class Builtins(collections.abc.Mapping):
 			'now': _now,
 			'today': _today
 		}
-		if values is not None:
-			default_values.update(values)
-		return cls(default_values, **kwargs)
+		default_values.update(values or {})
+		default_value_types = {
+			'e': ast.DataType.FLOAT,
+			'pi': ast.DataType.FLOAT,
+			'now': ast.DataType.DATETIME,
+			'today': ast.DataType.DATETIME
+		}
+		default_value_types.update(kwargs.pop('value_types', {}))
+		return cls(default_values, value_types=default_value_types, **kwargs)
 
 class Context(object):
 	"""
@@ -332,6 +349,7 @@ class Context(object):
 		"""The *default_value* parameter from :py:meth:`~__init__`"""
 		self.builtins = Builtins.from_defaults(
 			values={'re_groups': functools.partial(_tls_getter, self._thread_local, 'regex.groups')},
+			value_types={'re_groups': ast.DataType.ARRAY(ast.DataType.STRING)},
 			timezone=default_timezone
 		)
 		"""An instance of :py:class:`Builtins` to provided a default set of builtin symbol values."""
@@ -359,7 +377,7 @@ class Context(object):
 		:param str name: The symbol name that is being resolved.
 		:return: The value for the corresponding symbol *name*.
 		"""
-		if scope == 'built-in':
+		if scope == Builtins.scope_name:
 			thing = self.builtins
 		if isinstance(thing, Builtins):
 			return resolve_item(thing, name)
@@ -391,7 +409,7 @@ class Context(object):
 			raise
 	resolve_attribute_type = __resolve_attribute.resolve_type
 
-	def resolve_type(self, name):
+	def resolve_type(self, name, scope=None):
 		"""
 		A method for providing type hints while the rule is being generated.
 		This can be used to ensure that all symbol names are valid and that the
@@ -403,6 +421,8 @@ class Context(object):
 		:param str name: The symbol name to provide a type hint for.
 		:return: The type of the specified symbol
 		"""
+		if scope == Builtins.scope_name:
+			return self.builtins.resolve_type(name)
 		return self.__type_resolver(name)
 
 class Rule(object):

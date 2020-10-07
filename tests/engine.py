@@ -122,6 +122,19 @@ class EngineTests(unittest.TestCase):
 		today = builtins['today']
 		self.assertIsInstance(today, datetime.date)
 
+		# test that builtins have correct type hints
+		builtins = engine.Builtins.from_defaults(
+			{'name': 'Alice'},
+			value_types={'name': ast.DataType.STRING}
+		)
+		self.assertEqual(builtins.resolve_type('name'), ast.DataType.STRING)
+		self.assertEqual(builtins.resolve_type('missing'), ast.DataType.UNDEFINED)
+		context = engine.Context()
+		context.builtins = builtins
+		engine.Rule('$name =~ ""')
+		with self.assertRaises(errors.EvaluationError):
+			engine.Rule('$name + 1', context=context)
+
 	def test_engine_builtins_re_groups(self):
 		context = engine.Context()
 		rule = engine.Rule('words =~ "(\\w+) (\\w+) (\\w+)" and $re_groups[0] == word0', context=context)

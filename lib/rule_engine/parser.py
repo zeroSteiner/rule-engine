@@ -41,6 +41,7 @@ import ply.lex as lex
 import ply.yacc as yacc
 
 literal_eval = ast_.literal_eval
+REGEX_FLOAT_10 = r'[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
 
 class ParserBase(object):
 	"""
@@ -153,7 +154,7 @@ class Parser(ParserBase):
 	t_COMMA            = r'\,'
 	t_LBRACKET         = r'\['
 	t_RBRACKET         = r'\]'
-	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
+	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|' + REGEX_FLOAT_10
 	t_ATTR             = r'(?<=\S)\.(?=\S)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear

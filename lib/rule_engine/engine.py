@@ -35,6 +35,7 @@ import collections.abc
 import datetime
 import functools
 import math
+import re
 import threading
 
 from . import ast
@@ -211,6 +212,17 @@ class _AttributeResolver(object):
 	@attribute('as_upper', ast.DataType.STRING, result_type=ast.DataType.STRING)
 	def string_as_upper(self, value):
 		return value.upper()
+
+	@attribute('to_float', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
+	def string_to_float(self, value):
+		value = value.strip()
+		if re.match(r'-?inf', value):
+			return float(value)
+		match = re.match(parser.REGEX_FLOAT_10, value)
+		if match is None:
+			return float('nan')
+		return parser.literal_eval(match.group(0))
+
 
 	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.STRING, result_type=ast.DataType.BOOLEAN)
 	def value_is_empty(self, value):

@@ -31,6 +31,7 @@
 #
 
 import datetime
+import math
 import unittest
 
 from .literal import context
@@ -69,7 +70,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 
 	def test_ast_expression_datetime_attributes(self):
 		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)
-		symbol = ast.DatetimeExpression(engine.Context(), timestamp)
+		symbol = ast.DatetimeExpression(context, timestamp)
 
 		attributes = {
 			'day': 11,
@@ -89,7 +90,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 
 	def test_ast_expression_string_attributes(self):
 		string = 'Rule Engine'
-		symbol = ast.StringExpression(engine.Context(), string)
+		symbol = ast.StringExpression(context, string)
 
 		attributes = {
 			'as_lower': string.lower(),
@@ -99,6 +100,26 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		for attribute_name, value in attributes.items():
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
+
+	def test_ast_expression_string_attributes_numeric(self):
+		symbol = ast.StringExpression(context, '123')
+		attributes = {
+			'to_int': 123.0,
+			'to_flt': 123.0,
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
+
+		expression = ast.GetAttributeExpression(context, ast.StringExpression(context, 'Foobar'), 'to_flt')
+		self.assertTrue(math.isnan(expression.evaluate(None)))
+		with self.assertRaises(errors.EvaluationError):
+			expression = ast.GetAttributeExpression(context, ast.StringExpression(context, 'Foobar'), 'to_int')
+			self.assertEqual(expression.evaluate(None), float('nan'))
+
+		expression = ast.GetAttributeExpression(context, ast.StringExpression(context, 'inf'), 'to_flt')
+		self.assertEqual(expression.evaluate(None), float('inf'))
+
 
 if __name__ == '__main__':
 	unittest.main()

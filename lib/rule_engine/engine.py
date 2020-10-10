@@ -213,16 +213,22 @@ class _AttributeResolver(object):
 	def string_as_upper(self, value):
 		return value.upper()
 
-	@attribute('to_float', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
-	def string_to_float(self, value):
+	@attribute('to_flt', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
+	def string_to_flt(self, value):
 		value = value.strip()
 		if re.match(r'-?inf', value):
 			return float(value)
-		match = re.match(parser.REGEX_FLOAT_10, value)
+		match = re.match(r'^(' + parser.Parser.t_FLOAT + ')$', value)
 		if match is None:
 			return float('nan')
 		return parser.literal_eval(match.group(0))
 
+	@attribute('to_int', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
+	def string_to_int(self, value):
+		value = self.string_to_flt(value)
+		if not ast.is_integer_number(value):
+			raise errors.EvaluationError('data type mismatch (not an integer number)')
+		return value
 
 	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.STRING, result_type=ast.DataType.BOOLEAN)
 	def value_is_empty(self, value):

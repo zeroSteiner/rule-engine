@@ -243,15 +243,13 @@ class Parser(ParserBase):
 
 	def p_expression_getattr(self, p):
 		"""
-		objectattr : object ATTR SYMBOL
-		           | objectattr ATTR SYMBOL
+		object : object ATTR SYMBOL
 		"""
 		p[0] = ast.GetAttributeExpression(self.context, p[1], p[3]).reduce()
 
 	def p_expression_object(self, p):
 		"""
 		expression : object
-		           | objectattr
 		"""
 		p[0] = p[1]
 

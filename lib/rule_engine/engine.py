@@ -142,7 +142,7 @@ class _AttributeResolver(object):
 		if resolver.result_type == ast.DataType.UNDEFINED:
 			return value
 		value_type = ast.DataType.from_value(value)
-		if resolver.result_type is value_type:
+		if ast.DataType.is_compatible(resolver.result_type, value_type):
 			return value
 		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=resolver.result_type)
 
@@ -212,6 +212,10 @@ class _AttributeResolver(object):
 	@attribute('as_upper', ast.DataType.STRING, result_type=ast.DataType.STRING)
 	def string_as_upper(self, value):
 		return value.upper()
+
+	@attribute('to_ary', ast.DataType.STRING, result_type=ast.DataType.ARRAY(ast.DataType.STRING))
+	def string_to_ary(self, value):
+		return value.split()
 
 	@attribute('to_flt', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
 	def string_to_flt(self, value):

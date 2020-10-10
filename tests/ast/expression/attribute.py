@@ -95,6 +95,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		attributes = {
 			'as_lower': string.lower(),
 			'as_upper': string.upper(),
+			'to_ary': tuple(string.split()),
 			'length': len(string),
 		}
 		for attribute_name, value in attributes.items():

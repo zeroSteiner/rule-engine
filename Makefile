@@ -1,4 +1,4 @@
-VERSION := $(shell awk '/__version__/ {print $3}' lib/rule_engine/__init__.py | tr -d \')
+VERSION := $(shell ./setup.py --version)
 
 .PHONY: build
 build:
@@ -16,7 +16,7 @@ docs:
 .PHONY: release
 release: build
 	$(eval RELEASE_TAG := v$(VERSION))
-	git tag -sm "Version: $(VERSION)" $(RELEASE_TAG)
+	git tag -sm "Version $(VERSION)" $(RELEASE_TAG)
 	git push --tags
 	twine upload --verbose dist/*
 

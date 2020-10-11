@@ -316,9 +316,9 @@ referenced in the rule that is not known to the *type_resolver*.
 
 Changing Builtin Symbols
 ^^^^^^^^^^^^^^^^^^^^^^^^
-To remove the default :ref:`builtins symbols<builtin-symbols>` that are
-provided, simply initialize a :py:class:`~Builtins` instance with a *values* of
-an empty dictionary. This will remove all builtin values, and the dictionary can
+To remove the default :ref:`builtin symbols<builtin-symbols>` that are provided,
+simply initialize a :py:class:`~Builtins` instance with a *values* of an empty
+dictionary. This will remove all builtin values, and the dictionary can
 optionally be populated with alternative values.
 
 To add additional values, use the :py:class:`~Builtins.from_defaults`

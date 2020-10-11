@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.engine &mdash; Rule Engine 2.2.2 documentation</title>
+  <title>rule_engine.engine &mdash; Rule Engine 2.3.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                2.2.2
+                2.3.0
               </div>
             
           
@@ -192,8 +192,9 @@
 <span class="kn">import</span> <span class="nn">collections.abc</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">threading</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ast</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
@@ -206,6 +207,10 @@
 
 <span class="k">def</span> <span class="nf">_today</span><span class="p">(</span><span class="n">builtins</span><span class="p">):</span>
 	<span class="k">return</span> <span class="n">_now</span><span class="p">(</span><span class="n">builtins</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">minute</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">second</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_tls_getter</span><span class="p">(</span><span class="n">thread_local</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">_builtins</span><span class="p">):</span>
+	<span class="c1"># a function stub to be used with functools.partial for retrieving thread-local values</span>
+	<span class="k">return</span> <span class="n">thread_local</span><span class="o">.</span><span class="n">storage</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
 <div class="viewcode-block" id="resolve_attribute"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_attribute">[docs]</a><span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -295,13 +300,15 @@
 		<span class="k">if</span> <span class="n">resolver</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
 			<span class="k">return</span> <span class="n">value</span>
 		<span class="n">value_type</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-		<span class="k">if</span> <span class="n">resolver</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">is</span> <span class="n">value_type</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">resolver</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">value_type</span><span class="p">):</span>
 			<span class="k">return</span> <span class="n">value</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">AttributeTypeError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="n">resolver</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">_get_resolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">):</span>
-		<span class="n">attribute_resolvers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span><span class="o">.</span><span class="n">type_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">object_type</span><span class="p">)</span>
-		<span class="k">if</span> <span class="n">attribute_resolvers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">attribute_resolvers</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span><span class="o">.</span><span class="n">type_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+			<span class="k">if</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+				<span class="k">break</span>
+		<span class="k">else</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">AttributeResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">)</span>
 		<span class="n">resolver</span> <span class="o">=</span> <span class="n">attribute_resolvers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 		<span class="k">if</span> <span class="n">resolver</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -364,6 +371,27 @@
 	<span class="k">def</span> <span class="nf">string_as_upper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_ary&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">))</span>
+	<span class="k">def</span> <span class="nf">string_to_ary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_flt&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">string_to_flt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;-?inf&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+			<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+		<span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(&#39;</span> <span class="o">+</span> <span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="o">.</span><span class="n">t_FLOAT</span> <span class="o">+</span> <span class="s1">&#39;)$&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_int&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">string_to_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_to_flt</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">ast</span><span class="o">.</span><span class="n">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not an integer number)&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">value</span>
+
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;is_empty&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">value_is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
@@ -377,7 +405,8 @@
 <span class="sd">	A class to define and provide variables to within the builtin context of</span>
 <span class="sd">	rules. These can be accessed by specifying a symbol name with the ``$``</span>
 <span class="sd">	prefix.&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Builtins.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Builtins.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+	<span class="n">scope_name</span> <span class="o">=</span> <span class="s1">&#39;built-in&#39;</span>
+<div class="viewcode-block" id="Builtins.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Builtins.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param dict values: A mapping of string keys to be used as symbol names</span>
 <span class="sd">			with values of either Python literals or a function which will be</span>
@@ -387,10 +416,18 @@
 <span class="sd">		:param str namespace: The namespace of the variables to resolve.</span>
 <span class="sd">		:param timezone: A timezone to use when resolving timestamps.</span>
 <span class="sd">		:type timezone: :py:class:`~datetime.tzinfo`</span>
+<span class="sd">		:param dict value_types: A mapping of the values to their datatypes.</span>
+
+<span class="sd">		.. versionchanged:: 2.3.0</span>
+<span class="sd">			Added the *value_types* parameter.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">__values</span> <span class="o">=</span> <span class="n">values</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">__value_types</span> <span class="o">=</span> <span class="n">value_types</span> <span class="ow">or</span> <span class="p">{}</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span> <span class="ow">or</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">tz</span><span class="o">.</span><span class="n">tzlocal</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Builtins.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Builtins.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span></div>
 
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> namespace=</span><span class="si">{!r}</span><span class="s2"> keys=</span><span class="si">{!r}</span><span class="s2"> timezone=</span><span class="si">{!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">)</span>
@@ -403,7 +440,7 @@
 			<span class="k">else</span><span class="p">:</span>
 				<span class="n">namespace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">name</span>
 			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="n">namespace</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">)</span>
-		<span class="k">elif</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">value</span>
 
@@ -422,9 +459,15 @@
 			<span class="s1">&#39;now&#39;</span><span class="p">:</span> <span class="n">_now</span><span class="p">,</span>
 			<span class="s1">&#39;today&#39;</span><span class="p">:</span> <span class="n">_today</span>
 		<span class="p">}</span>
-		<span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-			<span class="n">default_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
-		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">default_values</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+		<span class="n">default_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span> <span class="ow">or</span> <span class="p">{})</span>
+		<span class="n">default_value_types</span> <span class="o">=</span> <span class="p">{</span>
+			<span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
+			<span class="s1">&#39;pi&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
+			<span class="s1">&#39;now&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span>
+			<span class="s1">&#39;today&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
+		<span class="p">}</span>
+		<span class="n">default_value_types</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;value_types&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">default_values</span><span class="p">,</span> <span class="n">value_types</span><span class="o">=</span><span class="n">default_value_types</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -479,16 +522,27 @@
 				<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unsupported timezone: &#39;</span> <span class="o">+</span> <span class="n">default_timezone</span><span class="p">)</span>
 		<span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_timezone</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">):</span>
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;invalid default_timezone type&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span> <span class="o">=</span> <span class="n">default_timezone</span>
 		<span class="sd">&quot;&quot;&quot;The *default_timezone* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">default_value</span>
 		<span class="sd">&quot;&quot;&quot;The *default_value* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span><span class="n">timezone</span><span class="o">=</span><span class="n">default_timezone</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span>
+			<span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_tls_getter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="p">,</span> <span class="s1">&#39;regex.groups&#39;</span><span class="p">)},</span>
+			<span class="n">value_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)},</span>
+			<span class="n">timezone</span><span class="o">=</span><span class="n">default_timezone</span>
+		<span class="p">)</span>
 		<span class="sd">&quot;&quot;&quot;An instance of :py:class:`Builtins` to provided a default set of builtin symbol values.&quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">type_resolver</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
 			<span class="n">type_resolver</span> <span class="o">=</span> <span class="n">type_resolver_from_dict</span><span class="p">(</span><span class="n">type_resolver</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">resolver</span> <span class="ow">or</span> <span class="n">resolve_item</span></div>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">_tls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="p">,</span> <span class="s1">&#39;storage&#39;</span><span class="p">):</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="o">.</span><span class="n">storage</span>
 
 <div class="viewcode-block" id="Context.resolve"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve">[docs]</a>	<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
@@ -503,7 +557,7 @@
 <span class="sd">		:param str name: The symbol name that is being resolved.</span>
 <span class="sd">		:return: The value for the corresponding symbol *name*.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="s1">&#39;built-in&#39;</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="n">Builtins</span><span class="o">.</span><span class="n">scope_name</span><span class="p">:</span>
 			<span class="n">thing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">Builtins</span><span class="p">):</span>
 			<span class="k">return</span> <span class="n">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
@@ -535,7 +589,7 @@
 			<span class="k">raise</span></div>
 	<span class="n">resolve_attribute_type</span> <span class="o">=</span> <span class="n">__resolve_attribute</span><span class="o">.</span><span class="n">resolve_type</span>
 
-<div class="viewcode-block" id="Context.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="Context.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		A method for providing type hints while the rule is being generated.</span>
 <span class="sd">		This can be used to ensure that all symbol names are valid and that the</span>
@@ -547,6 +601,8 @@
 <span class="sd">		:param str name: The symbol name to provide a type hint for.</span>
 <span class="sd">		:return: The type of the specified symbol</span>
 <span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="n">Builtins</span><span class="o">.</span><span class="n">scope_name</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Rule"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule">[docs]</a><span class="k">class</span> <span class="nc">Rule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -621,6 +677,7 @@
 <span class="sd">		:return: The value the rule evaluates to. Unlike the :py:meth:`.matches`</span>
 <span class="sd">			method, this is not necessarily a boolean.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rule.matches"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.matches">[docs]</a>	<span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
@@ -632,7 +689,7 @@
 <span class="sd">		:return: Whether or not the rule matches.</span>
 <span class="sd">		:rtype: bool</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span></div>
+		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Rule.to_graphviz"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz">[docs]</a>	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>

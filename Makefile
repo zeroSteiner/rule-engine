@@ -2,7 +2,7 @@ VERSION := $(shell ./setup.py --version)
 
 .PHONY: build
 build:
-	python setup.py build bdist sdist
+	python setup.py build sdist
 
 .PHONY: clean
 clean:

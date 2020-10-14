@@ -10,16 +10,20 @@ Version 2.x.x
 Version 2.3.0
 ^^^^^^^^^^^^^
 
-*In progress*
+Released :release:`2.3.0` on October 11th, 2020
 
 * Added support for arithmetic comparisons for all currently supported data types
 * Added support for proper type hinting of builtin symbols
 * Added the ``$re_groups`` builtin symbol for extracting groups from a regular expression match
+* Added some new data attributes
+
+    * Added ``to_ary`` to :py:class:`~rule_engine.ast.DataType.STRING`
+    * Added ``to_int`` and ``to_flt`` to :py:class:`~rule_engine.ast.DataType.STRING`
 
 Version 2.2.0
 ^^^^^^^^^^^^^
 
-Released :release:`2.1.0` on September 9th, 2020
+Released :release:`2.2.0` on September 9th, 2020
 
 * Added script entries to the Pipfile for development
 * Added support for slices on sequence data types
@@ -33,7 +37,7 @@ Released :release:`2.1.0` on August 3rd, 2020
 * Changed :py:class:`~rule_engine.ast.DataType` from an enum to a custom class
 * Improvements for the :py:class:`~rule_engine.ast.DataType.ARRAY` data type
 
-    * Added `get[item]` support for arrays, allowing items to be retrieved by index
+    * Added ``get[item]`` support for arrays, allowing items to be retrieved by index
     * Added ability for specifying the member type and optionally null
 
 Version 2.0.0

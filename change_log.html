@@ -180,16 +180,24 @@ this list is curated by the development team for note worthy changes.</p>
 <h2>Version 2.x.x<a class="headerlink" href="#version-2-x-x" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="version-2-3-0">
 <h3>Version 2.3.0<a class="headerlink" href="#version-2-3-0" title="Permalink to this headline">¶</a></h3>
-<p><em>In progress</em></p>
-<ul class="simple">
+<p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.3.0">v2.3.0</a> on October 11th, 2020</p>
+<ul>
 <li><p>Added support for arithmetic comparisons for all currently supported data types</p></li>
 <li><p>Added support for proper type hinting of builtin symbols</p></li>
 <li><p>Added the <code class="docutils literal notranslate"><span class="pre">$re_groups</span></code> builtin symbol for extracting groups from a regular expression match</p></li>
+<li><p>Added some new data attributes</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">to_ary</span></code> to <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-class docutils literal notranslate"><span class="pre">STRING</span></code></a></p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">to_int</span></code> and <code class="docutils literal notranslate"><span class="pre">to_flt</span></code> to <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-class docutils literal notranslate"><span class="pre">STRING</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
 </ul>
 </div>
 <div class="section" id="version-2-2-0">
 <h3>Version 2.2.0<a class="headerlink" href="#version-2-2-0" title="Permalink to this headline">¶</a></h3>
-<p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.1.0">v2.1.0</a> on September 9th, 2020</p>
+<p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.2.0">v2.2.0</a> on September 9th, 2020</p>
 <ul class="simple">
 <li><p>Added script entries to the Pipfile for development</p></li>
 <li><p>Added support for slices on sequence data types</p></li>
@@ -204,7 +212,7 @@ this list is curated by the development team for note worthy changes.</p>
 <li><p>Improvements for the <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code></a> data type</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>Added <cite>get[item]</cite> support for arrays, allowing items to be retrieved by index</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">get[item]</span></code> support for arrays, allowing items to be retrieved by index</p></li>
 <li><p>Added ability for specifying the member type and optionally null</p></li>
 </ul>
 </div></blockquote>

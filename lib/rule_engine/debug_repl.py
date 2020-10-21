@@ -40,18 +40,39 @@ from . import engine
 
 def main():
 	parser = argparse.ArgumentParser(description='Rule Engine: Debug REPL', conflict_handler='resolve')
-	parser.add_argument('--edit', action='store_true', default=False, help='edit the environment')
+	parser.add_argument(
+		'--edit-console',
+		action='store_true',
+		default=False,
+		help='edit the environment (via an interactive console)'
+	)
+	parser.add_argument(
+		'--edit-file',
+		type=argparse.FileType('r'),
+		help='edit the environment (via a file)'
+	)
 	parser.add_argument('-v', '--version', action='version', version=parser.prog + ' Version: ' + __version__)
 	arguments = parser.parse_args()
 
 	context = engine.Context()
 	thing = None
-	if arguments.edit:
+	if arguments.edit_console or arguments.edit_file:
 		console = code.InteractiveConsole({
 			'context': context,
 			'thing': thing
 		})
-		console.interact()
+		if arguments.edit_file:
+			print('executing: ' + arguments.edit_file.name)
+			console.runcode(code.compile_command(
+				arguments.edit_file.read(),
+				filename=arguments.edit_file.name,
+				symbol='exec'
+			))
+		if arguments.edit_console:
+			console.interact(
+				banner='edit the \'context\' and \'thing\' objects as necessary',
+				exitmsg='exiting the edit console...'
+			)
 		context = console.locals['context']
 		thing = console.locals['thing']
 
@@ -63,10 +84,10 @@ def main():
 
 		try:
 			rule = engine.Rule(rule_text, context=context)
+			result = rule.evaluate(thing)
 		except Exception:
 			traceback.print_exc()
 		else:
-			result = rule.evaluate(thing)
 			print('result: ')
 			pprint.pprint(result, indent=4)
 

@@ -839,7 +839,8 @@ class GetAttributeExpression(ExpressionBase):
 		self.context = context
 		self.object = object_
 		if self.object.result_type != DataType.UNDEFINED:
-			self.result_type = context.resolve_attribute_type(self.object.result_type, name)
+			if not (self.object.result_type == DataType.NULL and safe):
+				self.result_type = context.resolve_attribute_type(self.object.result_type, name)
 		self.name = name
 		self.safe = safe
 

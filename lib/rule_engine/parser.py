@@ -113,6 +113,7 @@ class Parser(ParserBase):
 		'and': 'AND',   'or': 'OR',     'not': 'NOT',
 		# other operators
 		'.':   'ATTR',
+		'&.':  'ATTR_SAFE',
 		'in':  'IN',
 	}
 	reserved_words = {
@@ -154,7 +155,9 @@ class Parser(ParserBase):
 	t_LBRACKET         = r'\['
 	t_RBRACKET         = r'\]'
 	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
-	t_ATTR             = r'(?<=\S)\.(?=\S)'
+	# attributes must be valid symbol names so the right side is more specific
+	t_ATTR             = r'(?<=\S)\.(?=[a-zA-Z_][a-zA-Z0-9_]*)'
+	t_ATTR_SAFE        = r'(?<=\S)&\.(?=[a-zA-Z_][a-zA-Z0-9_]*)'
 
 	# tokens are listed from lowest to highest precedence, ones that appear
 	# later are effectively evaluated first
@@ -173,7 +176,7 @@ class Parser(ParserBase):
 		('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
 		('left',     'POW'),
 		('right',    'UMINUS'),
-		('left',     'ATTR'),
+		('left',     'ATTR', 'ATTR_SAFE'),
 	)
 
 	def t_POW(self, t):
@@ -244,8 +247,10 @@ class Parser(ParserBase):
 	def p_expression_getattr(self, p):
 		"""
 		object : object ATTR SYMBOL
+		       | object ATTR_SAFE SYMBOL
 		"""
-		p[0] = ast.GetAttributeExpression(self.context, p[1], p[3]).reduce()
+		op_name = self.op_names.get(p[2])
+		p[0] = ast.GetAttributeExpression(self.context, p[1], p[3], safe=op_name == 'ATTR_SAFE').reduce()
 
 	def p_expression_object(self, p):
 		"""
@@ -386,7 +391,8 @@ class Parser(ParserBase):
 		p[0] = ast.FloatExpression(self.context, float('inf'))
 
 	def p_expression_null(self, p):
-		'expression : NULL'
+		'object : NULL'
+		# null is an object because of the safe operator
 		p[0] = ast.NullExpression(self.context)
 
 	def p_expression_string(self, p):
@@ -442,5 +448,5 @@ class Parser(ParserBase):
 		elif colon_index == 3 and len(p) == 7:
 			start, _, end = p[3:6]
 		else:
-			raise errors.RuleSyntaxError('invalid slice expression')
+			raise errors.RuleSyntaxError('invalid get slice expression')
 		p[0] = ast.GetSliceExpression(self.context, container, start, end).reduce()

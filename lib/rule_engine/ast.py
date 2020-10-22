@@ -824,19 +824,24 @@ class GetAttributeExpression(ExpressionBase):
 	A class representing an expression in which *name* is retrieved as an
 	attribute of *object*.
 	"""
-	__slots__ = ('name', 'object')
-	def __init__(self, context, object_, name):
+	__slots__ = ('name', 'object', 'safe')
+	def __init__(self, context, object_, name, safe=False):
 		"""
 		:param context: The context to use for evaluating the expression.
 		:type context: :py:class:`~rule_engine.engine.Context`
 		:param object_: The parent object from which to retrieve the attribute.
 		:param str name: The name of the attribute to retrieve.
+		:param bool safe: Whether or not the safe version should be invoked.
+
+		.. versionchanged:: 2.4.0
+			Added the *safe* parameter.
 		"""
 		self.context = context
 		self.object = object_
 		if self.object.result_type != DataType.UNDEFINED:
 			self.result_type = context.resolve_attribute_type(self.object.result_type, name)
 		self.name = name
+		self.safe = safe
 
 	def __repr__(self):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
@@ -846,6 +851,9 @@ class GetAttributeExpression(ExpressionBase):
 			resolved_obj = self.context.resolve(thing, self.object.name, scope=self.object.scope)
 		else:
 			resolved_obj = self.object.evaluate(thing)
+
+		if resolved_obj is None and self.safe:
+			return resolved_obj
 
 		try:
 			value = self.context.resolve(resolved_obj, self.name)
@@ -872,13 +880,17 @@ class GetItemExpression(ExpressionBase):
 	A class representing an expression in which an *item* is retrieved from a
 	container *object*.
 	"""
-	__slots__ = ('container', 'item')
-	def __init__(self, context, container, item):
+	__slots__ = ('container', 'item', 'safe')
+	def __init__(self, context, container, item, safe=False):
 		"""
 		:param context: The context to use for evaluating the expression.
 		:type context: :py:class:`~rule_engine.engine.Context`
 		:param container: The container object from which to retrieve the item.
 		:param str item: The item to retrieve from the container.
+		:param bool safe: Whether or not the safe version should be invoked.
+
+		.. versionchanged:: 2.4.0
+			Added the *safe* parameter.
 		"""
 		self.context = context
 		self.container = container
@@ -891,12 +903,17 @@ class GetItemExpression(ExpressionBase):
 		elif container.result_type != DataType.UNDEFINED:
 			raise errors.EvaluationError('data type mismatch')
 		self.item = item
+		self.safe = safe
 
 	def __repr__(self):
 		return "<{0} container={1!r} item={2!r} >".format(self.__class__.__name__, self.container, self.item)
 
 	def evaluate(self, thing):
 		resolved_obj = self.container.evaluate(thing)
+
+		if resolved_obj is None and self.safe:
+			return resolved_obj
+
 		resolved_item = self.item.evaluate(thing)
 		_assert_is_integer_number(resolved_item)
 		resolved_item = int(resolved_item)

@@ -87,7 +87,6 @@ class ParserTests(ParserTestsBase):
 			self.assertEqual(expression.name, text)
 			self.assertEqual(expression.scope, 'built-in')
 
-
 	def test_parser_ternary_expressions(self):
 		statement = self.assertStatementType('condition ? case_true : case_false', ast.TernaryExpression)
 		self.assertIsInstance(statement.expression.condition, ast.SymbolExpression)
@@ -284,6 +283,18 @@ class ParserLiteralTests(ParserTestsBase):
 	def test_parse_string_escapes(self):
 		self.assertLiteralStatementEqual("'Alice\\\'s'", ast.StringExpression, 'Alice\'s')
 		self.assertLiteralStatementEqual('"Alice\'s"', ast.StringExpression, 'Alice\'s')
+
+	def test_parse_xxx_edge_cases(self):
+		# test the safe getattr parsing for weird edge cases
+		self.assertLiteralStatementEqual('null&.doesnotexist', ast.NullExpression, None)
+		self.assertLiteralStatementEqual('2&.0', ast.FloatExpression, 0)
+		self.assertLiteralStatementEqual('1 & .0', ast.FloatExpression, 0)
+		self.assertLiteralStatementEqual('"test"&.length', ast.FloatExpression, 4)
+		self.assertLiteralStatementEqual('("test").length', ast.FloatExpression, 4)
+		with self.assertRaises(errors.RuleSyntaxError):
+			self.assertLiteralStatementEqual('"test"(.length)', ast.FloatExpression, 4)
+		with self.assertRaises(errors.RuleSyntaxError):
+			self.assertLiteralStatementEqual('"test".(length)', ast.FloatExpression, 4)
 
 if __name__ == '__main__':
 	unittest.main()

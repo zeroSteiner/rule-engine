@@ -58,7 +58,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		with self.assertRaises(errors.AttributeResolutionError):
 			expression.evaluate({'foo': 'baz'})
 
-	def test_ast_expression_atrribute_type_error(self):
+	def test_ast_expression_attribute_type_error(self):
 		symbol = ast.StringExpression(context, 'foo')
 
 		expression = ast.GetAttributeExpression(context, symbol, 'undefined')
@@ -67,6 +67,15 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		expression = ast.GetAttributeExpression(context, symbol, 'unsupported')
 		with self.assertRaises(errors.AttributeTypeError):
 			expression.evaluate(None)
+
+	def test_ast_expression_attribute_safe(self):
+		symbol = ast.StringExpression(context, 'foo')
+
+		expression = ast.GetAttributeExpression(context, symbol, 'undefined', safe=True)
+		expression.evaluate(None)
+
+		expression = ast.GetAttributeExpression(context, ast.NullExpression(context), 'undefined', safe=True)
+		self.assertIsNone(expression.evaluate(None))
 
 	def test_ast_expression_datetime_attributes(self):
 		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data Attributes &mdash; Rule Engine 2.3.1 documentation</title>
+  <title>Data Attributes &mdash; Rule Engine 2.4.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.3.1
+                2.4.0
               </div>
             
           
@@ -164,15 +164,12 @@
             
   <div class="section" id="data-attributes">
 <h1>Data Attributes<a class="headerlink" href="#data-attributes" title="Permalink to this headline">¶</a></h1>
-<p>The attribute operator (<code class="docutils literal notranslate"><span class="pre">.</span></code>) can be used to recursively resolve values from a
-compound native Python data type such as an object or dictionary. This can be
-used when the <strong>thing</strong> which the rule is evaluating has members with their own
-submembers. If the resolver function fails, the attribute will be checked to
-determine if it is a builtin attribute.</p>
+<p>The attribute operator (<code class="docutils literal notranslate"><span class="pre">.</span></code>) can be used to recursively resolve values from a compound native Python data type such as
+an object or dictionary. This can be used when the <strong>thing</strong> which the rule is evaluating has members with their own
+submembers. If the resolver function fails, the attribute will be checked to determine if it is a builtin attribute.</p>
 <div class="section" id="builtin-attributes">
 <span id="id1"></span><h2>Builtin Attributes<a class="headerlink" href="#builtin-attributes" title="Permalink to this headline">¶</a></h2>
-<p>The following attributes are builtin to the default <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>
-object.</p>
+<p>The following attributes are builtin to the default <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 31%" />

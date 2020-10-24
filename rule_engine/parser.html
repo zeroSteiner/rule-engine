@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>parser &mdash; Rule Engine 2.3.1 documentation</title>
+  <title>parser &mdash; Rule Engine 2.4.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.3.1
+                2.4.0
               </div>
             
           
@@ -171,10 +171,9 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-rule_engine.parser">
-<span id="parser"></span><h1><a class="reference external" href="https://docs.python.org/3.7/library/parser.html#module-parser" title="(in Python v3.7)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a><a class="headerlink" href="#module-rule_engine.parser" title="Permalink to this headline">¶</a></h1>
-<p>This module contains the parsing logic for taking rule text in the specified
-grammar and converting it to an abstract syntax tree that can later be
-evaluated.</p>
+<span id="parser"></span><h1><a class="reference external" href="https://docs.python.org/3.8/library/parser.html#module-parser" title="(in Python v3.8)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a><a class="headerlink" href="#module-rule_engine.parser" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the parsing logic for taking rule text in the specified grammar and converting it to an abstract
+syntax tree that can later be evaluated.</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
@@ -194,7 +193,7 @@ raised during parsing.</p>
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.parser.Parser.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to enable debugging features when
+<dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether or not to enable debugging features when
 using the ply API.</p>
 </dd>
 </dl>
@@ -205,7 +204,7 @@ using the ply API.</p>
 <dl class="py class">
 <dt id="rule_engine.parser.ParserBase">
 <em class="property">class </em><code class="sig-name descname">ParserBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A base class for parser objects to inherit from. This does not provide any
 grammar related definitions.</p>
 <dl class="py method">
@@ -213,7 +212,7 @@ grammar related definitions.</p>
 <code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">debug</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#ParserBase.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#rule_engine.parser.ParserBase.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to enable debugging features when
+<dd class="field-odd"><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Whether or not to enable debugging features when
 using the ply API.</p>
 </dd>
 </dl>
@@ -227,7 +226,7 @@ later be evaluated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The grammar text to parse into an AST.</p></li>
+<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The grammar text to parse into an AST.</p></li>
 <li><p><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – A context for specifying parsing and evaluation options.</p></li>
 </ul>
 </dd>

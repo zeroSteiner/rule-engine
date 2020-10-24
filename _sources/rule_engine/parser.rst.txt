@@ -4,9 +4,8 @@
 .. module:: rule_engine.parser
    :synopsis:
 
-This module contains the parsing logic for taking rule text in the specified
-grammar and converting it to an abstract syntax tree that can later be
-evaluated.
+This module contains the parsing logic for taking rule text in the specified grammar and converting it to an abstract
+syntax tree that can later be evaluated.
 
 Classes
 -------

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; Rule Engine 2.3.1 documentation</title>
+  <title>Getting Started &mdash; Rule Engine 2.4.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.3.1
+                2.4.0
               </div>
             
           
@@ -175,22 +175,18 @@
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>The Rule Engine is meant to allow developers to filter arbitrary Python objects
-with a “rule” specified either by them or by an end user. The “rules” that the
-Rule Engine uses are Python string expressions in a custom language. The syntax
-that Rule Engine uses is similar to Python by borrows some features from Ruby.
-The rules are a custom language and no Python <code class="docutils literal notranslate"><span class="pre">exec</span></code> or <code class="docutils literal notranslate"><span class="pre">eval</span></code> operations
-are used, allowing developers to safely and securely evaluate rules provided by
+<p>The Rule Engine is meant to allow developers to filter arbitrary Python objects with a “rule” specified either by them
+or by an end user. The “rules” that the Rule Engine uses are Python string expressions in a custom language. The syntax
+that Rule Engine uses is similar to Python by borrows some features from Ruby. The rules are a custom language and no
+Python <code class="docutils literal notranslate"><span class="pre">exec</span></code> or <code class="docutils literal notranslate"><span class="pre">eval</span></code> operations are used, allowing developers to safely and securely evaluate rules provided by
 potentially untrusted sources.</p>
 <div class="section" id="basic-usage">
 <h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
-<li><p>The developer needs to identify data that they would like to be filtered.
-This would be some kind of object with a set of variable attributes. The
-rest of the usage example will assume that these objects are comic books.</p>
+<li><p>The developer needs to identify data that they would like to be filtered. This would be some kind of object with a
+set of variable attributes. The rest of the usage example will assume that these objects are comic books.</p>
 <ul>
-<li><p>Comic books have various attributes that could be useful for filtering
-including:</p>
+<li><p>Comic books have various attributes that could be useful for filtering including:</p>
 <blockquote>
 <div><table class="docutils align-default">
 <colgroup>
@@ -251,20 +247,17 @@ including:</p>
 </li>
 </ul>
 </li>
-<li><p>Now the developer needs to create a rule object to match the target objects.
-The attributes of the objects will automatically become valid symbols for the
-rule expression. Creating a rule object is done by initializing an instance
-of the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> class which requires one argument, and that
-is the string expression (in Rule Engine syntax) of the rule.</p>
+<li><p>Now the developer needs to create a rule object to match the target objects. The attributes of the objects will
+automatically become valid symbols for the rule expression. Creating a rule object is done by initializing an
+instance of the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> class which requires one argument, and that is the string expression (in
+Rule Engine syntax) of the rule.</p>
 <ul>
-<li><p>In the case of the comic book collection, these symbols would be:
-<code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">publisher</span></code>, <code class="docutils literal notranslate"><span class="pre">issue</span></code>, and <code class="docutils literal notranslate"><span class="pre">released</span></code>. Notice that these
-attribute names are also valid symbol names, i.e. they start with a letter
-and contain note whitespace or punctuation. Just like in Python, Rule
-Engine symbols must follow these rules. For example, <code class="docutils literal notranslate"><span class="pre">released</span></code> is a
-valid symbol while <code class="docutils literal notranslate"><span class="pre">Released</span> <span class="pre">Date</span></code> is not (because of the space).</p></li>
-<li><p>An simple rule for the comic book collection which matches the
-<code class="docutils literal notranslate"><span class="pre">publisher</span></code> symbol to the string <code class="docutils literal notranslate"><span class="pre">&quot;DC&quot;</span></code> might look like:</p>
+<li><p>In the case of the comic book collection, these symbols would be: <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">publisher</span></code>, <code class="docutils literal notranslate"><span class="pre">issue</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">released</span></code>. Notice that these attribute names are also valid symbol names, i.e. they start with a letter and
+contain note whitespace or punctuation. Just like in Python, Rule Engine symbols must follow these rules. For
+example, <code class="docutils literal notranslate"><span class="pre">released</span></code> is a valid symbol while <code class="docutils literal notranslate"><span class="pre">Released</span> <span class="pre">Date</span></code> is not (because of the space).</p></li>
+<li><p>An simple rule for the comic book collection which matches the <code class="docutils literal notranslate"><span class="pre">publisher</span></code> symbol to the string <code class="docutils literal notranslate"><span class="pre">&quot;DC&quot;</span></code> might
+look like:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
   <span class="c1"># match books published by DC</span>
@@ -274,8 +267,7 @@ valid symbol while <code class="docutils literal notranslate"><span class="pre">
 </div>
 </div></blockquote>
 </li>
-<li><p>Rules can contain more complex expressions such as datetime literals and
-conditionals.</p>
+<li><p>Rules can contain more complex expressions such as datetime literals and conditionals.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
   <span class="c1"># match DC books released in May 2020</span>
@@ -283,14 +275,13 @@ conditionals.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<p>Notice that the datetime expression is a string, prefixed with <code class="docutils literal notranslate"><span class="pre">d</span></code> in
-<code class="docutils literal notranslate"><span class="pre">YYYY-MM-DD</span> <span class="pre">HH:mm:SS</span></code> format. If the time portion is omitted, it will
-be normalized to <code class="docutils literal notranslate"><span class="pre">00:00:00</span></code> (midnight, zero minutes, zero seconds). See
-the <a class="reference internal" href="syntax.html#literal-values"><span class="std std-ref">Literal Values</span></a> section for more information.</p>
+<p>Notice that the datetime expression is a string, prefixed with <code class="docutils literal notranslate"><span class="pre">d</span></code> in <code class="docutils literal notranslate"><span class="pre">YYYY-MM-DD</span> <span class="pre">HH:mm:SS</span></code> format. If the
+time portion is omitted, it will be normalized to <code class="docutils literal notranslate"><span class="pre">00:00:00</span></code> (midnight, zero minutes, zero seconds). See the
+<a class="reference internal" href="syntax.html#literal-values"><span class="std std-ref">Literal Values</span></a> section for more information.</p>
 </div></blockquote>
 </li>
-<li><p>Certain datatypes also have <a class="reference internal" href="attributes.html#builtin-attributes"><span class="std std-ref">attributes</span></a> that can
-be accessed with the dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) operator.</p>
+<li><p>Certain datatypes also have <a class="reference internal" href="attributes.html#builtin-attributes"><span class="std std-ref">attributes</span></a> that can be accessed with the dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>)
+operator.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
   <span class="c1"># normalize potential variations in the publisher case such as &#39;Dc&#39;</span>
@@ -300,9 +291,8 @@ be accessed with the dot (<code class="docutils literal notranslate"><span class
 </div>
 </div></blockquote>
 </li>
-<li><p>Rules can also match strings using regular expressions. When using this
-type of comparison, the string on the right hand side of the operator is
-the regular expression, while the left is the string to compare it with.</p>
+<li><p>Rules can also match strings using regular expressions. When using this type of comparison, the string on the right
+hand side of the operator is the regular expression, while the left is the string to compare it with.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
   <span class="c1"># match books with a title starting with &#39;Captain &#39;</span>
@@ -314,16 +304,14 @@ the regular expression, while the left is the string to compare it with.</p>
 </li>
 </ul>
 </li>
-<li><p>Once the rule object has been defined, it can be applied to target object(s).
-Two primary methods are available for applying the rule to the target objects.
-Those methods are:</p>
+<li><p>Once the rule object has been defined, it can be applied to target object(s). Two primary methods are available for
+applying the rule to the target objects. Those methods are:</p>
 <ul>
-<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.matches" title="rule_engine.engine.Rule.matches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">matches()</span></code></a> – This method will determine whether the
-rule matches a single target object, returning <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
-<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.filter" title="rule_engine.engine.Rule.filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">filter()</span></code></a> – This method will filter an iterable of
-target objects, yielding ones for which the rule matches.</p></li>
-<li><p>Applying the rule to the comic book collection using each of the two
-methods might look like:</p>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.matches" title="rule_engine.engine.Rule.matches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">matches()</span></code></a> – This method will determine whether the rule matches a single target object,
+returning <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.filter" title="rule_engine.engine.Rule.filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">filter()</span></code></a> – This method will filter an iterable of target objects, yielding ones for which
+the rule matches.</p></li>
+<li><p>Applying the rule to the comic book collection using each of the two methods might look like:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># check if the first object matches</span>
 <span class="n">rule</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">comics</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="c1"># =&gt; True</span>
@@ -339,15 +327,13 @@ methods might look like:</p>
 </ol>
 <div class="section" id="attribute-backed-objects">
 <h3>Attribute-Backed Objects<a class="headerlink" href="#attribute-backed-objects" title="Permalink to this headline">¶</a></h3>
-<p>In the previous example, the target objects were Python dictionaries. The keys
-in the dictionary were used as symbols and while this is the default behavior it
-can be modified to use object attributes instead. This would necessary if the
-target objects had variable attributes (like a Python class object) instead of
-variable items (like a Python dictionary object).</p>
+<p>In the previous example, the target objects were Python dictionaries. The keys in the dictionary were used as symbols
+and while this is the default behavior it can be modified to use object attributes instead. This would necessary if the
+target objects had variable attributes (like a Python class object) instead of variable items (like a Python dictionary
+object).</p>
 <blockquote>
 <div><ul>
-<li><p>An example comic book collection using an object-based attribute-backed
-data structure might look like:</p>
+<li><p>An example comic book collection using an object-based attribute-backed data structure might look like:</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Comic</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">publisher</span><span class="p">,</span> <span class="n">issue</span><span class="p">,</span> <span class="n">released</span><span class="p">)</span>
@@ -367,45 +353,40 @@ data structure might look like:</p>
 </li>
 </ul>
 </div></blockquote>
-<p>To resolve symbols from attributes, a custom <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object
-needs to be defined. This object is used for configuration of Rule behavior, one
-setting of which is the resolver to use. The resolver defines how a rule looks
-up symbols to their values for comparison given a target object. The following
-resolver functions are included in Rule Engine:</p>
+<p>To resolve symbols from attributes, a custom <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object needs to be defined. This object is used
+for configuration of Rule behavior, one setting of which is the resolver to use. The resolver defines how a rule looks
+up symbols to their values for comparison given a target object. The following resolver functions are included in Rule
+Engine:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_attribute()</span></code></a> – Resolve symbols by looking them up as
-attributes on an object.</p></li>
-<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_item()</span></code></a> – <strong>Default</strong> Resolve symbols by looking them
-up as keys on a dictionary (or dictionary-like) object.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_attribute()</span></code></a> – Resolve symbols by looking them up as attributes on an object.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve_item()</span></code></a> – <strong>Default</strong> Resolve symbols by looking them up as keys on a dictionary (or
+dictionary-like) object.</p></li>
 </ul>
-<p>To change the resolver, create a <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object, and specify
-the <em>resolver</em> function as a keyword argument.</p>
+<p>To change the resolver, create a <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object, and specify the <em>resolver</em> function as a keyword
+argument.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the custom context to set the resolver</span>
 <span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">resolve_attribute</span><span class="p">)</span>
 <span class="c1"># then define a rule using the custom context</span>
 <span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;publisher == &quot;DC&quot;&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Once the rule has been defined with the custom context, it can be used in the
-same way as a rule with a default context. The context object can be shared with
-other rule objects that are to be applied on the same objects. The context
-object should not be shared with rule object that are applied to other objects
-which do not have the same attributes (like artists).</p>
+<p>Once the rule has been defined with the custom context, it can be used in the same way as a rule with a default context.
+The context object can be shared with other rule objects that are to be applied on the same objects. The context object
+should not be shared with rule object that are applied to other objects which do not have the same attributes (like
+artists).</p>
 </div>
 </div>
 <div class="section" id="advanced-usage">
 <h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h2>
-<p>The Rule Engine has a number of advanced features that contribute to its
-flexibility. In most use cases they are unnecessary.</p>
+<p>The Rule Engine has a number of advanced features that contribute to its flexibility. In most use cases they are
+unnecessary.</p>
 <div class="section" id="setting-a-default-value">
 <h3>Setting A Default Value<a class="headerlink" href="#setting-a-default-value" title="Permalink to this headline">¶</a></h3>
-<p>By default, <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">engine.Rule</span></code></a> will raise a
-<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> for invalid symbols. In some cases, it
-may be desirable to change the way in which the language behaves to instead
-treat unknown symbols with a default value (most often <code class="docutils literal notranslate"><span class="pre">None</span></code> /
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ast.DataType.NULL</span></code></a> is used for this purpose, but value of a supported
-type can be used). To change this behavior, set the <em>default_value</em> parameter
-when initializing the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance.</p>
+<p>By default, <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">engine.Rule</span></code></a> will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> for invalid symbols. In some
+cases, it may be desirable to change the way in which the language behaves to instead treat unknown symbols with a
+default value (most often <code class="docutils literal notranslate"><span class="pre">None</span></code> / <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ast.DataType.NULL</span></code></a> is used for this purpose, but value of a supported
+type can be used). To change this behavior, set the <em>default_value</em> parameter when initializing the
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># this fails because title is not defined and there is no default_value</span>
 <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">matches</span><span class="p">({})</span>
 <span class="c1"># =&gt; SymbolResolutionError: title</span>
@@ -423,36 +404,26 @@ when initializing the <a class="reference internal" href="rule_engine/engine.htm
 </div>
 <div class="section" id="custom-resolvers">
 <h3>Custom Resolvers<a class="headerlink" href="#custom-resolvers" title="Permalink to this headline">¶</a></h3>
-<p>Rule Engine includes resolvers for accessing attributes
-<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">keys</span></code></a> on objects (such as dictionaries) and
-one for resolving symbols <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">attributes</span></code></a> on
-objects. If for some reason, neither of those are suitable for the target object
-then a custom one can be defined and used.</p>
-<p>The custom resolver should use the signature <code class="docutils literal notranslate"><span class="pre">resolver(thing,</span> <span class="pre">name)</span></code> where
-<em>thing</em> is the arbitrary object that the rule is being applied to and <em>name</em> is
-the symbol name as a Python string of the attribute that is to be accessed. If
-the resolver function fails for any reason, it should raise a
-<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a>, forwarding <em>thing</em> via keyword
-argument. This ensures consistency in how exceptions are raised and handled by
-the engine.</p>
+<p>Rule Engine includes resolvers for accessing attributes <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">keys</span></code></a> on objects (such as
+dictionaries) and one for resolving symbols <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">attributes</span></code></a> on objects. If for some
+reason, neither of those are suitable for the target object then a custom one can be defined and used.</p>
+<p>The custom resolver should use the signature <code class="docutils literal notranslate"><span class="pre">resolver(thing,</span> <span class="pre">name)</span></code> where <em>thing</em> is the arbitrary object that the
+rule is being applied to and <em>name</em> is the symbol name as a Python string of the attribute that is to be accessed. If
+the resolver function fails for any reason, it should raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a>, forwarding
+<em>thing</em> via keyword argument. This ensures consistency in how exceptions are raised and handled by the engine.</p>
 </div>
 <div class="section" id="type-hinting">
 <h3>Type Hinting<a class="headerlink" href="#type-hinting" title="Permalink to this headline">¶</a></h3>
-<p>Symbol type information can be provided to the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> through
-the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance and will be used for compatibility
-testing. With type information, the engine will raise an
-<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> when an incompatible operation is detected
-such as a regex match (<code class="docutils literal notranslate"><span class="pre">=~</span></code>) using an integer on either side. This makes it
-possible to detect errors in a rule’s syntax prior to it being applied to an
-object. When symbol type information is specified, the value resolved from a
-symbol and object must either match the specified type or be
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code>, otherwise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError" title="rule_engine.errors.SymbolTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolTypeError</span></code></a> will be
-raised when the symbol is resolved.</p>
-<p>To define type information, a <em>type_resolver</em> function must be passed to the
-<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> class. The type resolver function is expected to
-take a single argument, and that is the name of the symbol (as a Python string)
-whose type needs to be resolved. The return type should be a member of the
-<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a> enumeration.</p>
+<p>Symbol type information can be provided to the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> through the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance
+and will be used for compatibility testing. With type information, the engine will raise an
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> when an incompatible operation is detected such as a regex match (<code class="docutils literal notranslate"><span class="pre">=~</span></code>) using an
+integer on either side. This makes it possible to detect errors in a rule’s syntax prior to it being applied to an
+object. When symbol type information is specified, the value resolved from a symbol and object must either match the
+specified type or be <code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code>, otherwise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError" title="rule_engine.errors.SymbolTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolTypeError</span></code></a> will be raised when the
+symbol is resolved.</p>
+<p>To define type information, a <em>type_resolver</em> function must be passed to the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> class. The type
+resolver function is expected to take a single argument, and that is the name of the symbol (as a Python string) whose
+type needs to be resolved. The return type should be a member of the <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a> enumeration.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define a basic type resolver, that knows about the four attributes of a</span>
 <span class="c1"># comic book</span>
 <span class="k">def</span> <span class="nf">type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
@@ -470,12 +441,10 @@ whose type needs to be resolved. The return type should be a member of the
 <span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">=</span><span class="n">type_resolver</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Compound data types such as <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code></a> can optionally
-specify member type information by calling their respective type. For example,
-an array of strings would be define as <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code>.</p>
-<p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be
-used to generate a <em>type_resolver</em> function from a dictionary mapping symbol
-names to their respective <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>.</p>
+<p>Compound data types such as <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code></a> can optionally specify member type information by calling
+their respective type. For example, an array of strings would be define as <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code>.</p>
+<p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be used to generate a <em>type_resolver</em>
+function from a dictionary mapping symbol names to their respective <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
     <span class="n">type_resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">type_resolver_from_dict</span><span class="p">({</span>
         <span class="c1"># map symbol names to their data types</span>
@@ -487,13 +456,12 @@ names to their respective <a class="reference internal" href="rule_engine/ast.ht
 <span class="p">)</span>
 </pre></div>
 </div>
-<p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> can be defined as the data type for a valid
-symbol without specifying explicit type information. In this case, the rule
-object will know that it is a valid symbol, but will not validate any operations
+<p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> can be defined as the data type for a valid symbol without specifying explicit type
+information. In this case, the rule object will know that it is a valid symbol, but will not validate any operations
 that reference it.</p>
-<p>In all cases, when a <em>type_resolver</em> is defined, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a>
-object will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> if a symbol is
-referenced in the rule that is not known to the <em>type_resolver</em>.</p>
+<p>In all cases, when a <em>type_resolver</em> is defined, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> object will raise a
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> if a symbol is referenced in the rule that is not known to the
+<em>type_resolver</em>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># this is valid: issue is defined as a valid symbol</span>
 <span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;issue == 1&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
 <span class="c1"># =&gt; &lt;Rule text=&#39;issue == 1&#39; &gt;</span>
@@ -510,14 +478,12 @@ referenced in the rule that is not known to the <em>type_resolver</em>.</p>
 </div>
 <div class="section" id="changing-builtin-symbols">
 <h3>Changing Builtin Symbols<a class="headerlink" href="#changing-builtin-symbols" title="Permalink to this headline">¶</a></h3>
-<p>To remove the default <a class="reference internal" href="syntax.html#builtin-symbols"><span class="std std-ref">builtin symbols</span></a> that are provided,
-simply initialize a <code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code> instance with a <em>values</em> of an empty
-dictionary. This will remove all builtin values, and the dictionary can
-optionally be populated with alternative values.</p>
-<p>To add additional values, use the <code class="xref py py-class docutils literal notranslate"><span class="pre">from_defaults</span></code>
-constructor, with a <em>values</em> dictionary. In this case, <em>values</em> will optionally
-override any of the default settings, and keys which do not overlap will be
-added in addition to the default builtin symbols.</p>
+<p>To remove the default <a class="reference internal" href="syntax.html#builtin-symbols"><span class="std std-ref">builtin symbols</span></a> that are provided, simply initialize a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code> instance with a <em>values</em> of an empty dictionary. This will remove all builtin values, and the
+dictionary can optionally be populated with alternative values.</p>
+<p>To add additional values, use the <code class="xref py py-class docutils literal notranslate"><span class="pre">from_defaults</span></code> constructor, with a <em>values</em> dictionary. In this
+case, <em>values</em> will optionally override any of the default settings, and keys which do not overlap will be added in
+addition to the default builtin symbols.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CustomBuiltinsContext</span><span class="p">(</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># call the parent class&#39;s __init__ method first to set the</span>
@@ -537,17 +503,13 @@ added in addition to the default builtin symbols.</p>
 <h2>Rule Inspection<a class="headerlink" href="#rule-inspection" title="Permalink to this headline">¶</a></h2>
 <p>There are a few techniques that can be used to inspect a rule object.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.is_valid" title="rule_engine.engine.Rule.is_valid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_valid()</span></code></a> – This class method can be used to determine
-if a rule expression is valid. It will return <code class="docutils literal notranslate"><span class="pre">False</span></code> if for example there
-are any syntax errors.</p></li>
-<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.symbols" title="rule_engine.engine.Context.symbols"><code class="xref py py-attr docutils literal notranslate"><span class="pre">symbols</span></code></a> – Rule objects have a
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">context</span></code> attribute, which contains the <code class="docutils literal notranslate"><span class="pre">symbols</span></code>
-attribute. This contains the symbol names which were identified within the
-rule expression.</p></li>
-<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz" title="rule_engine.engine.Rule.to_graphviz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_graphviz()</span></code></a> – This method will create a Graphviz
-directed-graph of the Rule Engine Abstract Syntax Tree (AST) created by the
-rule expression. This can be helpful when debugging complex rules. This
-requires the Python <code class="docutils literal notranslate"><span class="pre">graphviz</span></code> package to be available.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.is_valid" title="rule_engine.engine.Rule.is_valid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_valid()</span></code></a> – This class method can be used to determine if a rule expression is valid. It will
+return <code class="docutils literal notranslate"><span class="pre">False</span></code> if for example there are any syntax errors.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.symbols" title="rule_engine.engine.Context.symbols"><code class="xref py py-attr docutils literal notranslate"><span class="pre">symbols</span></code></a> – Rule objects have a <code class="xref py py-attr docutils literal notranslate"><span class="pre">context</span></code> attribute, which contains
+the <code class="docutils literal notranslate"><span class="pre">symbols</span></code> attribute. This contains the symbol names which were identified within the rule expression.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz" title="rule_engine.engine.Rule.to_graphviz"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_graphviz()</span></code></a> – This method will create a Graphviz directed-graph of the Rule Engine Abstract
+Syntax Tree (AST) created by the rule expression. This can be helpful when debugging complex rules. This requires the
+Python <code class="docutils literal notranslate"><span class="pre">graphviz</span></code> package to be available.</p></li>
 </ul>
 </div>
 </div>

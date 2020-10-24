@@ -7,6 +7,13 @@ this list is curated by the development team for note worthy changes.
 Version 2.x.x
 -------------
 
+Version 2.4.0
+^^^^^^^^^^^^^
+
+*In progress*
+
+* Added the Debug REPL utility
+
 Version 2.3.0
 ^^^^^^^^^^^^^
 

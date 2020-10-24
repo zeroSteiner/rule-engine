@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Rule Engine 2.3.1 documentation</title>
+  <title>Index &mdash; Rule Engine 2.4.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                2.3.1
+                2.4.0
               </div>
             
           
@@ -186,6 +186,8 @@
       <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.__init__">__init__() (AttributeResolutionError method)</a>
 
       <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeTypeError.__init__">(AttributeTypeError method)</a>
+</li>
         <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins.__init__">(Builtins method)</a>
 </li>
         <li><a href="rule_engine/engine.html#rule_engine.engine.Context.__init__">(Context method)</a>
@@ -197,6 +199,8 @@
         <li><a href="rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase.__init__">(LeftOperatorRightExpressionBase method)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase.__init__">(LiteralExpressionBase method)</a>
+</li>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.LookupError.__init__">(LookupError method)</a>
 </li>
         <li><a href="rule_engine/parser.html#rule_engine.parser.Parser.__init__">(Parser method)</a>
 </li>
@@ -223,13 +227,19 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ArithmeticExpression">ArithmeticExpression (class in rule_engine.ast)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY">ARRAY (DataType attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.attribute_name">attribute_name (AttributeResolutionError attribute)</a>
+
+      <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeTypeError.attribute_name">(AttributeTypeError attribute)</a>
 </li>
+      </ul></li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError">AttributeResolutionError</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeTypeError">AttributeTypeError</a>
 </li>
   </ul></td>
 </tr></table>
@@ -259,9 +269,11 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ComparisonExpression">ComparisonExpression (class in rule_engine.ast)</a>
 </li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types">compatible_types (LeftOperatorRightExpressionBase attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types">compatible_types (LeftOperatorRightExpressionBase attribute)</a>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.LookupError.container">container (LookupError attribute)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ContainsExpression">ContainsExpression (class in rule_engine.ast)</a>
 </li>
@@ -307,8 +319,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.EvaluationError">EvaluationError</a>
 </li>
-      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.expected_type">expected_type (SymbolTypeError attribute)</a>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeTypeError.expected_type">expected_type (AttributeTypeError attribute)</a>
+
+      <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.expected_type">(SymbolTypeError attribute)</a>
 </li>
+      </ul></li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase">ExpressionBase (class in rule_engine.ast)</a>
 </li>
   </ul></td>
@@ -357,17 +373,27 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.is_natural_number">is_natural_number() (in module rule_engine.ast)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.is_numeric">is_numeric() (in module rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.is_real_number">is_real_number() (in module rule_engine.ast)</a>
 </li>
-      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.is_type">is_type (SymbolTypeError attribute)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeTypeError.is_type">is_type (AttributeTypeError attribute)</a>
+
+      <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.is_type">(SymbolTypeError attribute)</a>
 </li>
+      </ul></li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.is_valid">is_valid() (Rule class method)</a>
 </li>
-      <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.is_value">is_value (SymbolTypeError attribute)</a>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeTypeError.is_value">is_value (AttributeTypeError attribute)</a>
+
+      <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.is_value">(SymbolTypeError attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.LookupError.item">item (LookupError attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -377,11 +403,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase">LeftOperatorRightExpressionBase (class in rule_engine.ast)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase">LiteralExpressionBase (class in rule_engine.ast)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.LogicExpression">LogicExpression (class in rule_engine.ast)</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.LookupError">LookupError</a>
 </li>
   </ul></td>
 </tr></table>
@@ -425,6 +453,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.object">object (AttributeResolutionError attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeTypeError.object_type">object_type (AttributeTypeError attribute)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rule_engine.engine &mdash; Rule Engine 2.3.1 documentation</title>
+  <title>rule_engine.engine &mdash; Rule Engine 2.4.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                2.3.1
+                2.4.0
               </div>
             
           
@@ -214,16 +214,13 @@
 
 <div class="viewcode-block" id="resolve_attribute"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_attribute">[docs]</a><span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	A replacement resolver function for looking up symbols as members of</span>
-<span class="sd">	*thing*. This is effectively the same as ``thing.name``. The *thing* object</span>
-<span class="sd">	can be a :py:func:`~collections.namedtuple`, a custom Python class or any</span>
-<span class="sd">	other object. Each of the members of *thing* must be of a compatible data</span>
-<span class="sd">	type.</span>
+<span class="sd">	A replacement resolver function for looking up symbols as members of *thing*. This is effectively the same as</span>
+<span class="sd">	``thing.name``. The *thing* object can be a :py:func:`~collections.namedtuple`, a custom Python class or any other</span>
+<span class="sd">	object. Each of the members of *thing* must be of a compatible data type.</span>
 
 <span class="sd">	.. warning::</span>
-<span class="sd">		This effectively exposes all members of *thing*. If any members are</span>
-<span class="sd">		sensitive, then a custom resolver should be used that checks *name*</span>
-<span class="sd">		against a whitelist of attributes that are allowed to be accessed.</span>
+<span class="sd">		This effectively exposes all members of *thing*. If any members are sensitive, then a custom resolver should be</span>
+<span class="sd">		used that checks *name* against a whitelist of attributes that are allowed to be accessed.</span>
 
 <span class="sd">	:param thing: The object on which the *name* attribute will be accessed.</span>
 <span class="sd">	:param str name: The symbol name that is being resolved.</span>
@@ -235,10 +232,9 @@
 
 <div class="viewcode-block" id="resolve_item"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_item">[docs]</a><span class="k">def</span> <span class="nf">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	A resolver function for looking up symbols as items from an object (*thing*)</span>
-<span class="sd">	which supports the :py:class:`~collections.abc.Mapping` interface, such as a</span>
-<span class="sd">	dictionary. This is effectively the same as ``thing[&#39;name&#39;]``. Each of the</span>
-<span class="sd">	values in *thing* must be of a compatible data type.</span>
+<span class="sd">	A resolver function for looking up symbols as items from an object (*thing*) which supports the</span>
+<span class="sd">	:py:class:`~collections.abc.Mapping` interface, such as a dictionary. This is effectively the same as</span>
+<span class="sd">	``thing[&#39;name&#39;]``. Each of the values in *thing* must be of a compatible data type.</span>
 
 <span class="sd">	:param thing: The object from which the *name* item will be accessed.</span>
 <span class="sd">	:param str name: The symbol name that is being resolved.</span>
@@ -257,16 +253,13 @@
 
 <div class="viewcode-block" id="type_resolver_from_dict"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict">[docs]</a><span class="k">def</span> <span class="nf">type_resolver_from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	Return a function suitable for use as the *type_resolver* for a</span>
-<span class="sd">	:py:class:`.Context` instance from a dictionary. If any of the values within</span>
-<span class="sd">	the dictionary are not of a compatible data type, a :py:exc:`TypeError` will</span>
-<span class="sd">	be raised. Additionally, the resulting function will raise a</span>
-<span class="sd">	:py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol name does</span>
-<span class="sd">	not exist within the dictionary.</span>
+<span class="sd">	Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a dictionary. If</span>
+<span class="sd">	any of the values within the dictionary are not of a compatible data type, a :py:exc:`TypeError` will be raised.</span>
+<span class="sd">	Additionally, the resulting function will raise a :py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol</span>
+<span class="sd">	name does not exist within the dictionary.</span>
 
-<span class="sd">	:param dict dictionary: A dictionary (or any other object which supports the</span>
-<span class="sd">		:py:class:`~collections.abc.Mapping` interface) from which to create the</span>
-<span class="sd">		callback function.</span>
+<span class="sd">	:param dict dictionary: A dictionary (or any other object which supports the :py:class:`~collections.abc.Mapping`</span>
+<span class="sd">		interface) from which to create the callback function.</span>
 <span class="sd">	:return: The callback function.</span>
 <span class="sd">	:rtype: function</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -402,17 +395,15 @@
 
 <div class="viewcode-block" id="Builtins"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Builtins">[docs]</a><span class="k">class</span> <span class="nc">Builtins</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	A class to define and provide variables to within the builtin context of</span>
-<span class="sd">	rules. These can be accessed by specifying a symbol name with the ``$``</span>
-<span class="sd">	prefix.&quot;&quot;&quot;</span>
+<span class="sd">	A class to define and provide variables to within the builtin context of rules. These can be accessed by specifying</span>
+<span class="sd">	a symbol name with the ``$`` prefix.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">scope_name</span> <span class="o">=</span> <span class="s1">&#39;built-in&#39;</span>
 <div class="viewcode-block" id="Builtins.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Builtins.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		:param dict values: A mapping of string keys to be used as symbol names</span>
-<span class="sd">			with values of either Python literals or a function which will be</span>
-<span class="sd">			called when the symbol is accessed. When using a function, it will</span>
-<span class="sd">			be passed a single argument, which is the instance of</span>
-<span class="sd">			:py:class:`Builtins`.</span>
+<span class="sd">		:param dict values: A mapping of string keys to be used as symbol names with values of either Python literals or</span>
+<span class="sd">			a function which will be called when the symbol is accessed. When using a function, it will be passed a</span>
+<span class="sd">			single argument, which is the instance of :py:class:`Builtins`.</span>
 <span class="sd">		:param str namespace: The namespace of the variables to resolve.</span>
 <span class="sd">		:param timezone: A timezone to use when resolving timestamps.</span>
 <span class="sd">		:type timezone: :py:class:`~datetime.tzinfo`</span>
@@ -471,45 +462,36 @@
 
 <div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	An object defining the context for a rule&#39;s evaluation. This can be used to</span>
-<span class="sd">	change the behavior of certain aspects of the rule such as how symbols are</span>
-<span class="sd">	resolved and what regex flags should be used.</span>
+<span class="sd">	An object defining the context for a rule&#39;s evaluation. This can be used to change the behavior of certain aspects</span>
+<span class="sd">	of the rule such as how symbols are resolved and what regex flags should be used.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_flags</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_timezone</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		:param int regex_flags: The flags to provide to functions in the</span>
-<span class="sd">			:py:mod:`re` module when calling either the :py:func:`~re.match` or</span>
-<span class="sd">			:py:func:`~re.search` functions for comparison expressions.</span>
-<span class="sd">		:param resolver: An optional callback function to use in place of</span>
-<span class="sd">			:py:meth:`.resolve`.</span>
-<span class="sd">		:param type_resolver: An optional callback function to use in place of</span>
-<span class="sd">			:py:meth:`.resolve_type`.</span>
+<span class="sd">		:param int regex_flags: The flags to provide to functions in the :py:mod:`re` module when calling either the</span>
+<span class="sd">			:py:func:`~re.match` or :py:func:`~re.search` functions for comparison expressions.</span>
+<span class="sd">		:param resolver: An optional callback function to use in place of :py:meth:`.resolve`.</span>
+<span class="sd">		:param type_resolver: An optional callback function to use in place of :py:meth:`.resolve_type`.</span>
 <span class="sd">		:type type_resolver: function, dict</span>
-<span class="sd">		:param default_timezone: The default timezone to apply to</span>
-<span class="sd">			:py:class:`~datetime.datetime` instances which do not have one</span>
-<span class="sd">			specified. This is necessary for comparison operations. The value</span>
-<span class="sd">			should either be a :py:class:`~datetime.tzinfo` instance, or a</span>
-<span class="sd">			string. If *default_timzezone* is a string it must be one of the</span>
+<span class="sd">		:param default_timezone: The default timezone to apply to :py:class:`~datetime.datetime` instances which do not</span>
+<span class="sd">			have one specified. This is necessary for comparison operations. The value should either be a</span>
+<span class="sd">			:py:class:`~datetime.tzinfo` instance, or a string. If *default_timzezone* is a string it must be one of the</span>
 <span class="sd">			specially supported (case-insensitive) values of &quot;local&quot; or &quot;utc&quot;.</span>
 <span class="sd">		:type default_timezone: str, :py:class:`~datetime.tzinfo`</span>
-<span class="sd">		:param default_value: The default value to return when resolving either</span>
-<span class="sd">			a missing symbol or attribute.</span>
+<span class="sd">		:param default_value: The default value to return when resolving either a missing symbol or attribute.</span>
 
 <span class="sd">		.. versionchanged:: 2.0.0</span>
 <span class="sd">			Added the *default_value* parameter.</span>
 
 <span class="sd">		.. versionchanged:: 2.1.0</span>
-<span class="sd">			If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict`</span>
-<span class="sd">			will be called on it automatically and the result will be used as the</span>
-<span class="sd">			callback.</span>
+<span class="sd">			If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict` will be called on it automatically</span>
+<span class="sd">			and the result will be used as the callback.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">regex_flags</span>
 		<span class="sd">&quot;&quot;&quot;The *regex_flags* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		The symbols that are referred to by the rule. Some or all of these will</span>
-<span class="sd">		need to be resolved at evaluation time. This attribute can be used after</span>
-<span class="sd">		a rule is generated to ensure that all symbols are valid before it is</span>
+<span class="sd">		The symbols that are referred to by the rule. Some or all of these will need to be resolved at evaluation time.</span>
+<span class="sd">		This attribute can be used after a rule is generated to ensure that all symbols are valid before it is</span>
 <span class="sd">		evaluated.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_timezone</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -546,11 +528,9 @@
 
 <div class="viewcode-block" id="Context.resolve"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve">[docs]</a>	<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		The method to use for resolving symbols names to values. This function</span>
-<span class="sd">		must return a compatible value for the specified symbol name. When a</span>
-<span class="sd">		*scope* is defined, this function handles the resolution itself, however</span>
-<span class="sd">		when the *scope* is ``None`` the resolver specified in</span>
-<span class="sd">		:py:meth:`~.Context.__init__` is used which defaults to</span>
+<span class="sd">		The method to use for resolving symbols names to values. This function must return a compatible value for the</span>
+<span class="sd">		specified symbol name. When a *scope* is defined, this function handles the resolution itself, however when the</span>
+<span class="sd">		*scope* is ``None`` the resolver specified in :py:meth:`~.Context.__init__` is used which defaults to</span>
 <span class="sd">		:py:func:`resolve_item`.</span>
 
 <span class="sd">		:param thing: The object from which the *name* item will be accessed.</span>
@@ -573,8 +553,8 @@
 	<span class="n">__resolve_attribute</span> <span class="o">=</span> <span class="n">_AttributeResolver</span><span class="p">()</span>
 <div class="viewcode-block" id="Context.resolve_attribute"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_attribute">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		The method to use for resolving attributes from values. This function</span>
-<span class="sd">		must return a compatible value for the specified attribute name.</span>
+<span class="sd">		The method to use for resolving attributes from values. This function must return a compatible value for the</span>
+<span class="sd">		specified attribute name.</span>
 
 <span class="sd">		:param thing: The object from which the *object_* was retrieved.</span>
 <span class="sd">		:param object_: The object from which the *name* attribute will be accessed.</span>
@@ -591,12 +571,10 @@
 
 <div class="viewcode-block" id="Context.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		A method for providing type hints while the rule is being generated.</span>
-<span class="sd">		This can be used to ensure that all symbol names are valid and that the</span>
-<span class="sd">		types are appropriate for the operations being performed. It must then</span>
-<span class="sd">		return one of the compatible data type constants if the symbol is valid</span>
-<span class="sd">		or raise an exception. The default behavior is to return</span>
-<span class="sd">		:py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.</span>
+<span class="sd">		A method for providing type hints while the rule is being generated. This can be used to ensure that all symbol</span>
+<span class="sd">		names are valid and that the types are appropriate for the operations being performed. It must then return one</span>
+<span class="sd">		of the compatible data type constants if the symbol is valid or raise an exception. The default behavior is to</span>
+<span class="sd">		return :py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.</span>
 
 <span class="sd">		:param str name: The symbol name to provide a type hint for.</span>
 <span class="sd">		:return: The type of the specified symbol</span>
@@ -607,23 +585,20 @@
 
 <div class="viewcode-block" id="Rule"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule">[docs]</a><span class="k">class</span> <span class="nc">Rule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	A rule which parses a string with a logical expression and can then evaluate</span>
-<span class="sd">	an arbitrary object for whether or not it matches based on the constraints</span>
-<span class="sd">	of the expression.</span>
+<span class="sd">	A rule which parses a string with a logical expression and can then evaluate an arbitrary object for whether or not</span>
+<span class="sd">	it matches based on the constraints of the expression.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="p">()</span>
 	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	The :py:class:`~rule_engine.parser.Parser` instance that will be used for</span>
-<span class="sd">	parsing the rule text into a compatible abstract syntax tree (AST) for</span>
-<span class="sd">	evaluation.</span>
+<span class="sd">	The :py:class:`~rule_engine.parser.Parser` instance that will be used for parsing the rule text into a compatible</span>
+<span class="sd">	abstract syntax tree (AST) for evaluation.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Rule.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param str text: The text of the logical expression.</span>
-<span class="sd">		:param context: The context to use for evaluating the expression on</span>
-<span class="sd">			arbitrary objects. This can be used to change the default behavior.</span>
-<span class="sd">			The default context is :py:class:`.Context` but any object providing</span>
-<span class="sd">			the same interface (such as a subclass) can be used.</span>
+<span class="sd">		:param context: The context to use for evaluating the expression on arbitrary objects. This can be used to</span>
+<span class="sd">			change the default behavior. The default context is :py:class:`.Context` but any object providing the same</span>
+<span class="sd">			interface (such as a subclass) can be used.</span>
 <span class="sd">		:type context: :py:class:`.Context`</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="n">Context</span><span class="p">()</span>
@@ -639,8 +614,8 @@
 
 <div class="viewcode-block" id="Rule.filter"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.filter">[docs]</a>	<span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">things</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		A convenience function for iterating over *things* and yielding each</span>
-<span class="sd">		member that :py:meth:`.matches` return True for.</span>
+<span class="sd">		A convenience function for iterating over *things* and yielding each member that :py:meth:`.matches` return True</span>
+<span class="sd">		for.</span>
 
 <span class="sd">		:param things: The collection of objects to iterate over.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -649,16 +624,13 @@
 <div class="viewcode-block" id="Rule.is_valid"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.is_valid">[docs]</a>	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Test whether or not the rule is syntactically correct. This verifies the</span>
-<span class="sd">		grammar is well structured and that there are no type compatibility</span>
-<span class="sd">		issues regarding literals or symbols with known types (see</span>
-<span class="sd">		:py:meth:`~.Context.resolve_type` for specifying symbol type</span>
-<span class="sd">		information).</span>
+<span class="sd">		Test whether or not the rule is syntactically correct. This verifies the grammar is well structured and that</span>
+<span class="sd">		there are no type compatibility issues regarding literals or symbols with known types (see</span>
+<span class="sd">		:py:meth:`~.Context.resolve_type` for specifying symbol type information).</span>
 
 <span class="sd">		:param str text: The text of the logical expression.</span>
-<span class="sd">		:param context: The context as would be passed to the</span>
-<span class="sd">			:py:meth:`.__init__` method. This can be used for specifying symbol</span>
-<span class="sd">			type information.</span>
+<span class="sd">		:param context: The context as would be passed to the :py:meth:`.__init__` method. This can be used for</span>
+<span class="sd">			specifying symbol type information.</span>
 <span class="sd">		:return: Whether or not the expression is well formed and appears valid.</span>
 <span class="sd">		:rtype: bool</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -670,20 +642,20 @@
 
 <div class="viewcode-block" id="Rule.evaluate"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.evaluate">[docs]</a>	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Evaluate the rule against the specified *thing* and return the value.</span>
-<span class="sd">		This can be used to, for example, apply the symbol resolver.</span>
+<span class="sd">		Evaluate the rule against the specified *thing* and return the value. This can be used to, for example, apply</span>
+<span class="sd">		the symbol resolver.</span>
 
 <span class="sd">		:param thing: The object on which to apply the rule.</span>
-<span class="sd">		:return: The value the rule evaluates to. Unlike the :py:meth:`.matches`</span>
-<span class="sd">			method, this is not necessarily a boolean.</span>
+<span class="sd">		:return: The value the rule evaluates to. Unlike the :py:meth:`.matches` method, this is not necessarily a</span>
+<span class="sd">			boolean.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rule.matches"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.matches">[docs]</a>	<span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Evaluate the rule against the specified *thing*. This will either return</span>
-<span class="sd">		whether *thing* matches, or an exception will be raised.</span>
+<span class="sd">		Evaluate the rule against the specified *thing*. This will either return whether *thing* matches, or an</span>
+<span class="sd">		exception will be raised.</span>
 
 <span class="sd">		:param thing: The object on which to apply the rule.</span>
 <span class="sd">		:return: Whether or not the rule matches.</span>

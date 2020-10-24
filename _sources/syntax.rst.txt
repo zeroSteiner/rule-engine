@@ -37,75 +37,84 @@ Supported Operations
 ^^^^^^^^^^^^^^^^^^^^
 The following table outlines all operators that can be used in Rule Engine expressions.
 
-+-----------+------------------------------+--------------------------------+
-| Operation | Description                  | Compatible Data Types          |
-+-----------+------------------------------+--------------------------------+
-| **Arithmetic Operators**                                                  |
-+-----------+------------------------------+--------------------------------+
-| ``+``     | Addition                     | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``-``     | Subtraction                  | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``*``     | Multiplication               | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``**``    | Exponent                     | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``/``     | True division                | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``//``    | Floor division               | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``%``     | Modulo                       | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| **Bitwise-Arithmetic Operators**                                          |
-+-----------+------------------------------+--------------------------------+
-| ``&``     | Bitwise-and :sup:`1`         | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``|``     | Bitwise-or :sup:`1`          | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``^``     | Bitwise-xor :sup:`1`         | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``>>``    | Bitwise right shift :sup:`1` | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| ``<<``    | Bitwise left shift :sup:`1`  | :py:attr:`~DataType.FLOAT`     |
-+-----------+------------------------------+--------------------------------+
-| **Comparison Operators**                                                  |
-+-----------+------------------------------+--------------------------------+
-| ``==``    | Equal to                     | *ANY*                          |
-+-----------+------------------------------+--------------------------------+
-| ``!=``    | Not equal to                 | *ANY*                          |
-+-----------+------------------------------+--------------------------------+
-| **Arithmetic-Comparison Operators**                                       |
-+-----------+------------------------------+--------------------------------+
-| ``>``     | Greater than                 | *ANY* :sup:`2`                 |
-+-----------+------------------------------+--------------------------------+
-| ``>=``    | Greater than or equal to     | *ANY* :sup:`2`                 |
-+-----------+------------------------------+--------------------------------+
-| ``<``     | Less than                    | *ANY* :sup:`2`                 |
-+-----------+------------------------------+--------------------------------+
-| ``<=``    | Less than or equal to        | *ANY* :sup:`2`                 |
-+-----------+------------------------------+--------------------------------+
-| **Fuzzy-Comparison Operators**                                            |
-+-----------+------------------------------+--------------------------------+
-| ``=~``    | Regex match :sup:`3`         | :py:attr:`~DataType.NULL`,     |
-|           |                              | :py:attr:`~DataType.STRING`    |
-+-----------+------------------------------+--------------------------------+
-| ``=~~``   | Regex search :sup:`3`        | :py:attr:`~DataType.NULL`,     |
-|           |                              | :py:attr:`~DataType.STRING`    |
-+-----------+------------------------------+--------------------------------+
-| ``!~``    | Regex match fails :sup:`3`   | :py:attr:`~DataType.NULL`,     |
-|           |                              | :py:attr:`~DataType.STRING`    |
-+-----------+------------------------------+--------------------------------+
-| ``!~~``   | Regex search fails :sup:`3`  | :py:attr:`~DataType.NULL`,     |
-|           |                              | :py:attr:`~DataType.STRING`    |
-+-----------+------------------------------+--------------------------------+
-| **Logical Operators**                                                     |
-+-----------+------------------------------+--------------------------------+
-| ``and``   | Logical and                  | *ANY*                          |
-+-----------+------------------------------+--------------------------------+
-| ``not``   | Logical not                  | *ANY*                          |
-+-----------+------------------------------+--------------------------------+
-| ``or``    | Logical or                   | *ANY*                          |
-+-----------+------------------------------+--------------------------------+
++-----------+------------------------------+---------------------------------------------------------------+
+| Operation | Description                  | Compatible Data Types                                         |
++-----------+------------------------------+---------------------------------------------------------------+
+| **Arithmetic Operators**                                                                                 |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``+``     | Addition                     | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``-``     | Subtraction                  | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``*``     | Multiplication               | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``**``    | Exponent                     | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``/``     | True division                | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``//``    | Floor division               | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``%``     | Modulo                       | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| **Bitwise-Arithmetic Operators**                                                                         |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``&``     | Bitwise-and :sup:`1`         | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``|``     | Bitwise-or :sup:`1`          | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``^``     | Bitwise-xor :sup:`1`         | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``>>``    | Bitwise right shift :sup:`1` | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``<<``    | Bitwise left shift :sup:`1`  | :py:attr:`~DataType.FLOAT`                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| **Comparison Operators**                                                                                 |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``==``    | Equal to                     | *ANY*                                                         |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``!=``    | Not equal to                 | *ANY*                                                         |
++-----------+------------------------------+---------------------------------------------------------------+
+| **Arithmetic-Comparison Operators**                                                                      |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``>``     | Greater than                 | *ANY* :sup:`2`                                                |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``>=``    | Greater than or equal to     | *ANY* :sup:`2`                                                |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``<``     | Less than                    | *ANY* :sup:`2`                                                |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``<=``    | Less than or equal to        | *ANY* :sup:`2`                                                |
++-----------+------------------------------+---------------------------------------------------------------+
+| **Fuzzy-Comparison Operators**                                                                           |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``=~``    | Regex match :sup:`3`         | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``=~~``   | Regex search :sup:`3`        | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``!~``    | Regex match fails :sup:`3`   | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``!~~``   | Regex search fails :sup:`3`  | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
++-----------+------------------------------+---------------------------------------------------------------+
+| **Logical Operators**                                                                                    |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``and``   | Logical and                  | *ANY*                                                         |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``not``   | Logical not                  | *ANY*                                                         |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``or``    | Logical or                   | *ANY*                                                         |
++-----------+------------------------------+---------------------------------------------------------------+
+| **Accessor Operators**                                                                                   |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``.``     | Attribute access             | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.DATETIME`,    |
+|           |                              | :py:attr:`~DataType.STRING`                                   |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``&.``    | Safe attribute access        | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.DATETIME`,    |
+|           |                              | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``[``     | Item lookup                  | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.STRING`       |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``&[``    | Safe item lookup             | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.NULL`,        |
+|           |                              | :py:attr:`~DataType.STRING`                                   |
++-----------+------------------------------+---------------------------------------------------------------+
 
 :sup:`1` Bitwise operations support floating point values, but if the value is not a natural number, an
 :py:class:`~rule_engine.errors.EvaluationError` will be raised.
@@ -117,6 +126,26 @@ based sequence comparison `technique used by Python`_.
 
 :sup:`3` When using regular expression operations, the expression on the left is the string to compare and the
 expression on the right is the regular expression to use for either the match or search operation.
+
+Accessor Operators
+""""""""""""""""""
+Some data types support accessor operators to obtain sub-values and attributes. One example is the
+:py:attr:`~DataType.STRING` which supports both attribute and item lookup operations. For example, "length" is a valid
+attribute and can be accessed by appending ``.length`` to either a string literal or symbol. Alternatively, a specific
+character in a string of characters can be accessed by index. For example, the first character in a string can be
+referenced by appending ``[0]`` to either the string literal or symbol. Attempts to lookup either an invalid attribute
+or item will raise a :py:class:`~rule_engine.errors.LookupError`.
+
+Both attribute and item lookups have "safe" variants which utilize the ``&`` operator prefix (not to be confused with
+the bit-wise and operator which leverages the same symbol). The safe operator version will evaluate to
+:py:attr:`~DataType.NULL` instead of raising an exception when the container value on which the operation is applied is
+:py:attr:`~DataType.NULL`. Additionally, the safe version of item lookup operations will evaluate to
+:py:attr:`~DataType.NULL` instead of raising a :py:class:`~rule_engine.errors.LookupError` exception when the item is
+not held within the container. This is analogous the Python's :py:meth:`dict.get` method.
+
+The item lookup operation can also evaluate to an array when a stop boundary is provided. For example to reference the
+first four elements of a string by appending ``[0:4]`` to the end of the value. Alternatively, only the ending index
+may be specified using ``[:4]``. Finally, just as in Python, negative values can be used to reference the last elements.
 
 Reserved Keywords
 ^^^^^^^^^^^^^^^^^

@@ -118,6 +118,16 @@ class GetItemExpressionTests(unittest.TestCase):
 		with self.assertRaises(errors.EvaluationError):
 			ast.GetItemExpression(context, container, member).evaluate(None)
 
+	def test_ast_expression_getitem_safe(self):
+		sym_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+		container = ast.SymbolExpression(context, sym_name)
+		member = ast.FloatExpression(context, 0)
+		get_item = ast.GetItemExpression(context, container, member)
+		with self.assertRaises(errors.EvaluationError):
+			get_item.evaluate({sym_name: None})
+		get_item = ast.GetItemExpression(context, container, member, safe=True)
+		self.assertIsNone(get_item.evaluate({sym_name: None}))
+
 class GetSliceExpressionTests(unittest.TestCase):
 	def test_ast_expression_getslice(self):
 		ary_value = tuple(random.choice(string.ascii_letters) for _ in range(12))
@@ -143,6 +153,17 @@ class GetSliceExpressionTests(unittest.TestCase):
 			ast.GetSliceExpression(context, ast.LiteralExpressionBase.from_value(context, None))
 		with self.assertRaises(errors.EvaluationError):
 			ast.GetSliceExpression(context, ast.LiteralExpressionBase.from_value(context, True))
+
+	def test_ast_expression_getslice_safe(self):
+		sym_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+		container = ast.SymbolExpression(context, sym_name)
+		start = ast.FloatExpression(context, 0)
+		stop = ast.FloatExpression(context, -1)
+		get_slice = ast.GetSliceExpression(context, container, start, stop)
+		with self.assertRaises(errors.EvaluationError):
+			get_slice.evaluate({sym_name: None})
+		get_slice = ast.GetSliceExpression(context, container, start, stop, safe=True)
+		self.assertIsNone(get_slice.evaluate({sym_name: None}))
 
 class SymbolExpressionTests(unittest.TestCase):
 	def setUp(self):

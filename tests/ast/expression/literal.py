@@ -97,6 +97,10 @@ class LiteralExpressionTests(unittest.TestCase):
 	def test_ast_expression_literal_float(self):
 		trueish_floats = (expression.value for expression in trueish if isinstance(expression, ast.FloatExpression))
 		self.assertLiteralTests(ast.FloatExpression, 0.0, float('nan'), *trueish_floats)
+		# converts ints to floats automatically
+		int_float = ast.FloatExpression(context, 1)
+		self.assertIsInstance(int_float.value, float)
+		self.assertEqual(int_float.value, 1.0)
 
 	def test_ast_expression_literal_null(self):
 		expression = ast.NullExpression(self.context)

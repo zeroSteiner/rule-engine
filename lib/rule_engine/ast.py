@@ -523,6 +523,10 @@ class DatetimeExpression(LiteralExpressionBase):
 class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
+	def __init__(self, context, value):
+		if isinstance(value, int):
+			value = float(value)
+		super(FloatExpression, self).__init__(context, value)
 
 class NullExpression(LiteralExpressionBase):
 	"""

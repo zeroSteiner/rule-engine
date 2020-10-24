@@ -19,6 +19,11 @@ Exceptions
    :show-inheritance:
    :special-members: __init__
 
+.. autoexception:: AttributeTypeError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: DatetimeSyntaxError
    :members:
    :show-inheritance:
@@ -58,3 +63,22 @@ Exceptions
    :members:
    :show-inheritance:
    :special-members: __init__
+
+Exception Hierarchy
+-------------------
+
+The class hierarchy for Rule Engine exceptions is:
+
+.. code-block:: text
+
+   EngineError
+    +-- EvaluationError
+         +-- AttributeResolutionError
+         +-- AttributeTypeError
+         +-- SymbolResolutionError
+         +-- SymbolTypeError
+    +-- SyntaxError
+         +-- DatetimeSyntaxError
+         +-- RegexSyntaxError
+         +-- RuleSyntaxError
+

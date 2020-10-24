@@ -85,25 +85,6 @@ class DatetimeSyntaxError(SyntaxError):
 		exception to be raised.
 		"""
 
-class RuleSyntaxError(SyntaxError):
-	"""
-	An error raised for issues identified in while parsing the grammar of the
-	rule text.
-	"""
-	def __init__(self, message, token=None):
-		"""
-		:param str message: A text description of what error occurred.
-		:param token: The PLY token (if available) which is related to the syntax error.
-		"""
-		if token is None:
-			position = 'EOF'
-		else:
-			position = "line {0}:{1}".format(token.lineno, token.lexpos)
-		message = message + ' at: ' + position
-		super(RuleSyntaxError, self).__init__(message)
-		self.token = token
-		"""The PLY token (if available) which is related to the syntax error."""
-
 class RegexSyntaxError(SyntaxError):
 	"""
 	An error raised for issues regarding the use of improper regular expression
@@ -124,6 +105,25 @@ class RegexSyntaxError(SyntaxError):
 		The regular expression value which contains the syntax error which
 		caused this exception to be raised.
 		"""
+
+class RuleSyntaxError(SyntaxError):
+	"""
+	An error raised for issues identified in while parsing the grammar of the
+	rule text.
+	"""
+	def __init__(self, message, token=None):
+		"""
+		:param str message: A text description of what error occurred.
+		:param token: The PLY token (if available) which is related to the syntax error.
+		"""
+		if token is None:
+			position = 'EOF'
+		else:
+			position = "line {0}:{1}".format(token.lineno, token.lexpos)
+		message = message + ' at: ' + position
+		super(RuleSyntaxError, self).__init__(message)
+		self.token = token
+		"""The PLY token (if available) which is related to the syntax error."""
 
 class AttributeResolutionError(EvaluationError):
 	"""

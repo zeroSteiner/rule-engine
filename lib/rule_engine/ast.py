@@ -915,8 +915,10 @@ class GetItemExpression(ExpressionBase):
 
 	def evaluate(self, thing):
 		resolved_obj = self.container.evaluate(thing)
-		if resolved_obj is None and self.safe:
-			return resolved_obj
+		if resolved_obj is None:
+			if self.safe:
+				return resolved_obj
+			raise errors.EvaluationError('data type mismatch')
 
 		resolved_item = self.item.evaluate(thing)
 		_assert_is_integer_number(resolved_item)
@@ -926,7 +928,7 @@ class GetItemExpression(ExpressionBase):
 		except (IndexError, KeyError):
 			if self.safe:
 				return None
-			raise errors.EvaluationError()
+			raise errors.EvaluationError() # todo: this should really be cleaned up
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):

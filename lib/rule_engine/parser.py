@@ -152,7 +152,7 @@ class Parser(ParserBase):
 	t_SUB              = r'\-'
 	t_MOD              = r'\%'
 	t_COMMA            = r'\,'
-	t_LBRACKET         = r'\['
+	t_LBRACKET         = r'((?<=\S)&)?\['
 	t_RBRACKET         = r'\]'
 	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
 	# attributes must be valid symbol names so the right side is more specific
@@ -427,8 +427,8 @@ class Parser(ParserBase):
 		"""
 		object : object LBRACKET expression RBRACKET
 		"""
-		container, _, item = p[1:4]
-		p[0] = ast.GetItemExpression(self.context, container, item).reduce()
+		container, lbracket, item = p[1:4]
+		p[0] = ast.GetItemExpression(self.context, container, item, safe=lbracket == '&[').reduce()
 
 	def p_expression_getslice(self, p):
 		"""
@@ -438,6 +438,7 @@ class Parser(ParserBase):
 		       | object LBRACKET expression COLON expression RBRACKET
 		"""
 		container = p[1]
+		safe = p[2] == '&['
 		colon_index = p[1:].index(':')
 		if colon_index == 2 and len(p) == 5:
 			start, stop = None, None
@@ -449,4 +450,4 @@ class Parser(ParserBase):
 			start, _, stop = p[3:6]
 		else:
 			raise errors.RuleSyntaxError('invalid get slice expression')
-		p[0] = ast.GetSliceExpression(self.context, container, start, stop).reduce()
+		p[0] = ast.GetSliceExpression(self.context, container, start, stop, safe=safe).reduce()

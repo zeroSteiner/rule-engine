@@ -112,7 +112,7 @@ class GetItemExpressionTests(unittest.TestCase):
 	def test_ast_expression_getitem_error(self):
 		container = ast.StringExpression(context, 'Rule Engine')
 		member = ast.FloatExpression(context, 100.0)
-		with self.assertRaises(errors.EvaluationError):
+		with self.assertRaises(errors.LookupError):
 			ast.GetItemExpression(context, container, member).evaluate(None)
 		member = ast.FloatExpression(context, 1.1)
 		with self.assertRaises(errors.EvaluationError):

@@ -165,7 +165,7 @@ extlinks = {
 
 intersphinx_mapping = {
     'dateutil': ('https://dateutil.readthedocs.io/en/stable/', None),
-    'python': ('https://docs.python.org/3.7', None)
+    'python': ("https://docs.python.org/{version.major}.{version.minor}".format(version=sys.version_info), None)
 }
 
 def setup(app):

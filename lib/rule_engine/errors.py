@@ -39,17 +39,13 @@ class _UNDEFINED(object):
 		return self.__name__
 UNDEFINED = _UNDEFINED()
 """
-A sentinel value to specify that something is undefined. When evaluated, the
-value is falsy.
+A sentinel value to specify that something is undefined. When evaluated, the value is falsy.
 
 .. versionadded:: 2.0.0
 """
 
 class EngineError(Exception):
-	"""
-	The base exception class from which other exceptions within this package
-	inherit.
-	"""
+	"""The base exception class from which other exceptions within this package inherit."""
 	def __init__(self, message=''):
 		"""
 		:param str message: A text description of what error occurred.
@@ -59,9 +55,8 @@ class EngineError(Exception):
 
 class EvaluationError(EngineError):
 	"""
-	An error raised for issues which occur while the rule is being evaluated.
-	This can occur at parse time while AST nodes are being evaluated during
-	the reduction phase.
+	An error raised for issues which occur while the rule is being evaluated. This can occur at parse time while AST
+	nodes are being evaluated during the reduction phase.
 	"""
 	pass
 
@@ -69,10 +64,7 @@ class SyntaxError(EngineError):
 	"""A base error for syntax related issues."""
 
 class DatetimeSyntaxError(SyntaxError):
-	"""
-	An error raised for issues regarding the use of improperly formatted
-	datetime expressions.
-	"""
+	"""An error raised for issues regarding the use of improperly formatted datetime expressions."""
 	def __init__(self, message, value):
 		"""
 		:param str message: A text description of what error occurred.
@@ -80,16 +72,10 @@ class DatetimeSyntaxError(SyntaxError):
 		"""
 		super(DatetimeSyntaxError, self).__init__(message)
 		self.value = value
-		"""
-		The datetime value which contains the syntax error which caused this
-		exception to be raised.
-		"""
+		"""The datetime value which contains the syntax error which caused this exception to be raised."""
 
 class RegexSyntaxError(SyntaxError):
-	"""
-	An error raised for issues regarding the use of improper regular expression
-	syntax.
-	"""
+	"""An error raised for issues regarding the use of improper regular expression syntax."""
 	def __init__(self, message, error, value):
 		"""
 		:param str message: A text description of what error occurred.
@@ -101,16 +87,10 @@ class RegexSyntaxError(SyntaxError):
 		self.error = error
 		"""The :py:exc:`re.error` exception from which this error was triggered."""
 		self.value = value
-		"""
-		The regular expression value which contains the syntax error which
-		caused this exception to be raised.
-		"""
+		"""The regular expression value which contains the syntax error which caused this exception to be raised."""
 
 class RuleSyntaxError(SyntaxError):
-	"""
-	An error raised for issues identified in while parsing the grammar of the
-	rule text.
-	"""
+	"""An error raised for issues identified in while parsing the grammar of the rule text."""
 	def __init__(self, message, token=None):
 		"""
 		:param str message: A text description of what error occurred.
@@ -147,8 +127,7 @@ class AttributeResolutionError(EvaluationError):
 
 class AttributeTypeError(EvaluationError):
 	"""
-	An error raised when an attribute with type information is resolved to a
-	Python value that is not of that type.
+	An error raised when an attribute with type information is resolved to a Python value that is not of that type.
 	"""
 	def __init__(self, attribute_name, object_type, is_value, is_type, expected_type):
 		"""
@@ -171,10 +150,26 @@ class AttributeTypeError(EvaluationError):
 		message = "attribute {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(attribute_name, is_type.name, expected_type.name)
 		super(AttributeTypeError, self).__init__(message)
 
+class LookupError(EvaluationError):
+	"""
+	An error raised when a lookup operation fails to obtain and *item* from a *container*. This is analogous to a
+	combination of Python's builtin :py:exc:`IndexError` and :py:exc:`KeyError` exceptions.
+
+	.. versionadded:: 2.4.0
+	"""
+	def __init__(self, container, item):
+		"""
+		:param container: The container object that the lookup was performed on.
+		:param item: The item that was used as either the key or index of *container* for the lookup.
+		"""
+		self.container = container
+		"""The container object that the lookup was performed on."""
+		self.item = item
+		"""The item that was used as either the key or index of *container* for the lookup."""
+		super(LookupError, self).__init__('lookup operation failed')
+
 class SymbolResolutionError(EvaluationError):
-	"""
-	An error raised when a symbol name is not able to be resolved to a value.
-	"""
+	"""An error raised when a symbol name is not able to be resolved to a value."""
 	def __init__(self, symbol_name, symbol_scope=None, thing=UNDEFINED):
 		"""
 		:param str symbol_name: The name of the symbol that can not be resolved.
@@ -193,10 +188,7 @@ class SymbolResolutionError(EvaluationError):
 		super(SymbolResolutionError, self).__init__("unknown symbol: {0!r}".format(symbol_name))
 
 class SymbolTypeError(EvaluationError):
-	"""
-	An error raised when a symbol with type information is resolved to a Python
-	value that is not of that type.
-	"""
+	"""An error raised when a symbol with type information is resolved to a Python value that is not of that type."""
 	def __init__(self, symbol_name, is_value, is_type, expected_type):
 		"""
 		:param str symbol_name: The name of the symbol that is of an incompatible type.

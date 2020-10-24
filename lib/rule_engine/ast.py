@@ -928,7 +928,7 @@ class GetItemExpression(ExpressionBase):
 		except (IndexError, KeyError):
 			if self.safe:
 				return None
-			raise errors.EvaluationError() # todo: this should really be cleaned up
+			raise errors.LookupError(resolved_obj, resolved_item)
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):

@@ -1,18 +1,17 @@
 Rule Engine Documentation
 =========================
-This project provides a library for creating general purpose "Rule" objects from
-a logical expression which can then be applied to arbitrary objects to evaluate
-whether or not they match.
+This project provides a library for creating general purpose "Rule" objects from a logical expression which can then be
+applied to arbitrary objects to evaluate whether or not they match.
 
 Documentation is available at https://zeroSteiner.github.io/rule-engine/.
 
-Rule Engine expressions are written in their own language, defined as strings
-in Python. Some features of this language includes:
+Rule Engine expressions are written in their own language, defined as strings in Python. Some features of this language
+includes:
 
-- Optional type hinting
-- Matching strings with regular expressions
-- Datetime datatypes
-- Data attributes
+* Optional type hinting
+* Matching strings with regular expressions
+* Datetime datatypes
+* Data attributes
 
 Usage Example
 -------------

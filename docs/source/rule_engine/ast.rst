@@ -4,8 +4,7 @@
 .. module:: rule_engine.ast
    :synopsis:
 
-This module contains the nodes which comprise the abstract syntax tree generated
-from parsed grammar text.
+This module contains the nodes which comprise the abstract syntax tree generated from parsed grammar text.
 
 Functions
 ---------

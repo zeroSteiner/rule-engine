@@ -87,4 +87,3 @@ The class hierarchy for Rule Engine exceptions is:
          +-- DatetimeSyntaxError
          +-- RegexSyntaxError
          +-- RuleSyntaxError
-

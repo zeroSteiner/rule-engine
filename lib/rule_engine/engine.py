@@ -56,16 +56,13 @@ def _tls_getter(thread_local, key, _builtins):
 
 def resolve_attribute(thing, name):
 	"""
-	A replacement resolver function for looking up symbols as members of
-	*thing*. This is effectively the same as ``thing.name``. The *thing* object
-	can be a :py:func:`~collections.namedtuple`, a custom Python class or any
-	other object. Each of the members of *thing* must be of a compatible data
-	type.
+	A replacement resolver function for looking up symbols as members of *thing*. This is effectively the same as
+	``thing.name``. The *thing* object can be a :py:func:`~collections.namedtuple`, a custom Python class or any other
+	object. Each of the members of *thing* must be of a compatible data type.
 
 	.. warning::
-		This effectively exposes all members of *thing*. If any members are
-		sensitive, then a custom resolver should be used that checks *name*
-		against a whitelist of attributes that are allowed to be accessed.
+		This effectively exposes all members of *thing*. If any members are sensitive, then a custom resolver should be
+		used that checks *name* against a whitelist of attributes that are allowed to be accessed.
 
 	:param thing: The object on which the *name* attribute will be accessed.
 	:param str name: The symbol name that is being resolved.
@@ -77,10 +74,9 @@ def resolve_attribute(thing, name):
 
 def resolve_item(thing, name):
 	"""
-	A resolver function for looking up symbols as items from an object (*thing*)
-	which supports the :py:class:`~collections.abc.Mapping` interface, such as a
-	dictionary. This is effectively the same as ``thing['name']``. Each of the
-	values in *thing* must be of a compatible data type.
+	A resolver function for looking up symbols as items from an object (*thing*) which supports the
+	:py:class:`~collections.abc.Mapping` interface, such as a dictionary. This is effectively the same as
+	``thing['name']``. Each of the values in *thing* must be of a compatible data type.
 
 	:param thing: The object from which the *name* item will be accessed.
 	:param str name: The symbol name that is being resolved.
@@ -99,16 +95,13 @@ def _type_resolver(type_map, name):
 
 def type_resolver_from_dict(dictionary):
 	"""
-	Return a function suitable for use as the *type_resolver* for a
-	:py:class:`.Context` instance from a dictionary. If any of the values within
-	the dictionary are not of a compatible data type, a :py:exc:`TypeError` will
-	be raised. Additionally, the resulting function will raise a
-	:py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol name does
-	not exist within the dictionary.
+	Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a dictionary. If
+	any of the values within the dictionary are not of a compatible data type, a :py:exc:`TypeError` will be raised.
+	Additionally, the resulting function will raise a :py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol
+	name does not exist within the dictionary.
 
-	:param dict dictionary: A dictionary (or any other object which supports the
-		:py:class:`~collections.abc.Mapping` interface) from which to create the
-		callback function.
+	:param dict dictionary: A dictionary (or any other object which supports the :py:class:`~collections.abc.Mapping`
+		interface) from which to create the callback function.
 	:return: The callback function.
 	:rtype: function
 	"""
@@ -244,17 +237,15 @@ class _AttributeResolver(object):
 
 class Builtins(collections.abc.Mapping):
 	"""
-	A class to define and provide variables to within the builtin context of
-	rules. These can be accessed by specifying a symbol name with the ``$``
-	prefix."""
+	A class to define and provide variables to within the builtin context of rules. These can be accessed by specifying
+	a symbol name with the ``$`` prefix.
+	"""
 	scope_name = 'built-in'
 	def __init__(self, values, namespace=None, timezone=None, value_types=None):
 		"""
-		:param dict values: A mapping of string keys to be used as symbol names
-			with values of either Python literals or a function which will be
-			called when the symbol is accessed. When using a function, it will
-			be passed a single argument, which is the instance of
-			:py:class:`Builtins`.
+		:param dict values: A mapping of string keys to be used as symbol names with values of either Python literals or
+			a function which will be called when the symbol is accessed. When using a function, it will be passed a
+			single argument, which is the instance of :py:class:`Builtins`.
 		:param str namespace: The namespace of the variables to resolve.
 		:param timezone: A timezone to use when resolving timestamps.
 		:type timezone: :py:class:`~datetime.tzinfo`
@@ -313,45 +304,36 @@ class Builtins(collections.abc.Mapping):
 
 class Context(object):
 	"""
-	An object defining the context for a rule's evaluation. This can be used to
-	change the behavior of certain aspects of the rule such as how symbols are
-	resolved and what regex flags should be used.
+	An object defining the context for a rule's evaluation. This can be used to change the behavior of certain aspects
+	of the rule such as how symbols are resolved and what regex flags should be used.
 	"""
 	def __init__(self, regex_flags=0, resolver=None, type_resolver=None, default_timezone='local', default_value=errors.UNDEFINED):
 		"""
-		:param int regex_flags: The flags to provide to functions in the
-			:py:mod:`re` module when calling either the :py:func:`~re.match` or
-			:py:func:`~re.search` functions for comparison expressions.
-		:param resolver: An optional callback function to use in place of
-			:py:meth:`.resolve`.
-		:param type_resolver: An optional callback function to use in place of
-			:py:meth:`.resolve_type`.
+		:param int regex_flags: The flags to provide to functions in the :py:mod:`re` module when calling either the
+			:py:func:`~re.match` or :py:func:`~re.search` functions for comparison expressions.
+		:param resolver: An optional callback function to use in place of :py:meth:`.resolve`.
+		:param type_resolver: An optional callback function to use in place of :py:meth:`.resolve_type`.
 		:type type_resolver: function, dict
-		:param default_timezone: The default timezone to apply to
-			:py:class:`~datetime.datetime` instances which do not have one
-			specified. This is necessary for comparison operations. The value
-			should either be a :py:class:`~datetime.tzinfo` instance, or a
-			string. If *default_timzezone* is a string it must be one of the
+		:param default_timezone: The default timezone to apply to :py:class:`~datetime.datetime` instances which do not
+			have one specified. This is necessary for comparison operations. The value should either be a
+			:py:class:`~datetime.tzinfo` instance, or a string. If *default_timzezone* is a string it must be one of the
 			specially supported (case-insensitive) values of "local" or "utc".
 		:type default_timezone: str, :py:class:`~datetime.tzinfo`
-		:param default_value: The default value to return when resolving either
-			a missing symbol or attribute.
+		:param default_value: The default value to return when resolving either a missing symbol or attribute.
 
 		.. versionchanged:: 2.0.0
 			Added the *default_value* parameter.
 
 		.. versionchanged:: 2.1.0
-			If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict`
-			will be called on it automatically and the result will be used as the
-			callback.
+			If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict` will be called on it automatically
+			and the result will be used as the callback.
 		"""
 		self.regex_flags = regex_flags
 		"""The *regex_flags* parameter from :py:meth:`~__init__`"""
 		self.symbols = set()
 		"""
-		The symbols that are referred to by the rule. Some or all of these will
-		need to be resolved at evaluation time. This attribute can be used after
-		a rule is generated to ensure that all symbols are valid before it is
+		The symbols that are referred to by the rule. Some or all of these will need to be resolved at evaluation time.
+		This attribute can be used after a rule is generated to ensure that all symbols are valid before it is
 		evaluated.
 		"""
 		if isinstance(default_timezone, str):
@@ -388,11 +370,9 @@ class Context(object):
 
 	def resolve(self, thing, name, scope=None):
 		"""
-		The method to use for resolving symbols names to values. This function
-		must return a compatible value for the specified symbol name. When a
-		*scope* is defined, this function handles the resolution itself, however
-		when the *scope* is ``None`` the resolver specified in
-		:py:meth:`~.Context.__init__` is used which defaults to
+		The method to use for resolving symbols names to values. This function must return a compatible value for the
+		specified symbol name. When a *scope* is defined, this function handles the resolution itself, however when the
+		*scope* is ``None`` the resolver specified in :py:meth:`~.Context.__init__` is used which defaults to
 		:py:func:`resolve_item`.
 
 		:param thing: The object from which the *name* item will be accessed.
@@ -415,8 +395,8 @@ class Context(object):
 	__resolve_attribute = _AttributeResolver()
 	def resolve_attribute(self, thing, object_, name):
 		"""
-		The method to use for resolving attributes from values. This function
-		must return a compatible value for the specified attribute name.
+		The method to use for resolving attributes from values. This function must return a compatible value for the
+		specified attribute name.
 
 		:param thing: The object from which the *object_* was retrieved.
 		:param object_: The object from which the *name* attribute will be accessed.
@@ -433,12 +413,10 @@ class Context(object):
 
 	def resolve_type(self, name, scope=None):
 		"""
-		A method for providing type hints while the rule is being generated.
-		This can be used to ensure that all symbol names are valid and that the
-		types are appropriate for the operations being performed. It must then
-		return one of the compatible data type constants if the symbol is valid
-		or raise an exception. The default behavior is to return
-		:py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.
+		A method for providing type hints while the rule is being generated. This can be used to ensure that all symbol
+		names are valid and that the types are appropriate for the operations being performed. It must then return one
+		of the compatible data type constants if the symbol is valid or raise an exception. The default behavior is to
+		return :py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.
 
 		:param str name: The symbol name to provide a type hint for.
 		:return: The type of the specified symbol
@@ -449,23 +427,20 @@ class Context(object):
 
 class Rule(object):
 	"""
-	A rule which parses a string with a logical expression and can then evaluate
-	an arbitrary object for whether or not it matches based on the constraints
-	of the expression.
+	A rule which parses a string with a logical expression and can then evaluate an arbitrary object for whether or not
+	it matches based on the constraints of the expression.
 	"""
 	parser = parser.Parser()
 	"""
-	The :py:class:`~rule_engine.parser.Parser` instance that will be used for
-	parsing the rule text into a compatible abstract syntax tree (AST) for
-	evaluation.
+	The :py:class:`~rule_engine.parser.Parser` instance that will be used for parsing the rule text into a compatible
+	abstract syntax tree (AST) for evaluation.
 	"""
 	def __init__(self, text, context=None):
 		"""
 		:param str text: The text of the logical expression.
-		:param context: The context to use for evaluating the expression on
-			arbitrary objects. This can be used to change the default behavior.
-			The default context is :py:class:`.Context` but any object providing
-			the same interface (such as a subclass) can be used.
+		:param context: The context to use for evaluating the expression on arbitrary objects. This can be used to
+			change the default behavior. The default context is :py:class:`.Context` but any object providing the same
+			interface (such as a subclass) can be used.
 		:type context: :py:class:`.Context`
 		"""
 		context = context or Context()
@@ -481,8 +456,8 @@ class Rule(object):
 
 	def filter(self, things):
 		"""
-		A convenience function for iterating over *things* and yielding each
-		member that :py:meth:`.matches` return True for.
+		A convenience function for iterating over *things* and yielding each member that :py:meth:`.matches` return True
+		for.
 
 		:param things: The collection of objects to iterate over.
 		"""
@@ -491,16 +466,13 @@ class Rule(object):
 	@classmethod
 	def is_valid(cls, text, context=None):
 		"""
-		Test whether or not the rule is syntactically correct. This verifies the
-		grammar is well structured and that there are no type compatibility
-		issues regarding literals or symbols with known types (see
-		:py:meth:`~.Context.resolve_type` for specifying symbol type
-		information).
+		Test whether or not the rule is syntactically correct. This verifies the grammar is well structured and that
+		there are no type compatibility issues regarding literals or symbols with known types (see
+		:py:meth:`~.Context.resolve_type` for specifying symbol type information).
 
 		:param str text: The text of the logical expression.
-		:param context: The context as would be passed to the
-			:py:meth:`.__init__` method. This can be used for specifying symbol
-			type information.
+		:param context: The context as would be passed to the :py:meth:`.__init__` method. This can be used for
+			specifying symbol type information.
 		:return: Whether or not the expression is well formed and appears valid.
 		:rtype: bool
 		"""
@@ -512,20 +484,20 @@ class Rule(object):
 
 	def evaluate(self, thing):
 		"""
-		Evaluate the rule against the specified *thing* and return the value.
-		This can be used to, for example, apply the symbol resolver.
+		Evaluate the rule against the specified *thing* and return the value. This can be used to, for example, apply
+		the symbol resolver.
 
 		:param thing: The object on which to apply the rule.
-		:return: The value the rule evaluates to. Unlike the :py:meth:`.matches`
-			method, this is not necessarily a boolean.
+		:return: The value the rule evaluates to. Unlike the :py:meth:`.matches` method, this is not necessarily a
+			boolean.
 		"""
 		self.context._tls.clear()
 		return self.statement.evaluate(thing)
 
 	def matches(self, thing):
 		"""
-		Evaluate the rule against the specified *thing*. This will either return
-		whether *thing* matches, or an exception will be raised.
+		Evaluate the rule against the specified *thing*. This will either return whether *thing* matches, or an
+		exception will be raised.
 
 		:param thing: The object on which to apply the rule.
 		:return: Whether or not the rule matches.

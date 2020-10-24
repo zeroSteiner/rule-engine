@@ -45,10 +45,9 @@ NoneType = type(None)
 
 def coerce_value(value, verify_type=True):
 	"""
-	Take a native Python *value* and convert it to a value of a data type which
-	is can be represented by a Rule Engine :py:class:`~.DataType`. This function
-	is useful for converting native Python values at the engine boundaries such
-	as when resolving a symbol from an object external to the engine.
+	Take a native Python *value* and convert it to a value of a data type which is can be represented by a Rule Engine
+	:py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as
+	when resolving a symbol from an object external to the engine.
 
 	.. versionadded:: 2.0.0
 
@@ -71,9 +70,8 @@ def coerce_value(value, verify_type=True):
 
 def is_integer_number(value):
 	"""
-	Check whether *value* is an integer number (i.e. a whole, number). This can,
-	for example, be used to check if a floating point number such as ``3.0`` can
-	safely be converted to an integer without loss of information.
+	Check whether *value* is an integer number (i.e. a whole, number). This can, for example, be used to check if a
+	floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
 
 	.. versionadded:: 2.1.0
 
@@ -89,10 +87,8 @@ def is_integer_number(value):
 
 def is_natural_number(value):
 	"""
-	Check whether *value* is a natural number (i.e. a whole, non-negative
-	number). This can, for example, be used to check if a floating point number
-	such as ``3.0`` can safely be converted to an integer without loss of
-	information.
+	Check whether *value* is a natural number (i.e. a whole, non-negative number). This can, for example, be used to
+	check if a floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
 
 	:param value: The value to check. This value is a native Python type.
 	:return: Whether or not the value is a natural number.
@@ -106,9 +102,8 @@ def is_natural_number(value):
 
 def is_real_number(value):
 	"""
-	Check whether *value* is a real number (i.e. capable of being represented as
-	a floating point value without loss of information as well as being finite).
-	Despite being able to be represented as a float, ``NaN`` is not considered a
+	Check whether *value* is a real number (i.e. capable of being represented as a floating point value without loss of
+	information as well as being finite). Despite being able to be represented as a float, ``NaN`` is not considered a
 	real number for the purposes of this function.
 
 	:param value: The value to check. This value is a native Python type.
@@ -123,8 +118,8 @@ def is_real_number(value):
 
 def is_numeric(value):
 	"""
-	Check whether *value* is a numeric value (i.e. capable of being represented
-	as a floating point value without loss of information).
+	Check whether *value* is a numeric value (i.e. capable of being represented as a floating point value without loss
+	of information).
 
 	:param value: The value to check. This value is a native Python type.
 	:return: Whether or not the value is numeric.
@@ -138,12 +133,10 @@ def is_numeric(value):
 
 def _sequence_member_value_type(python_value):
 	"""
-	Take a native *python_value* and ensure that the types of each of it's
-	members are either the same or NULL.
+	Take a native *python_value* and ensure that the types of each of it's members are either the same or NULL.
 
-	:return: The data type of the sequence members. This will never be NULL,
-		because that is considered a special case. It will either be
-		UNSPECIFIED or one of the other types.
+	:return: The data type of the sequence members. This will never be NULL, because that is considered a special case.
+		It will either be UNSPECIFIED or one of the other types.
 	"""
 	subvalue_types = set()
 	for subvalue in python_value:
@@ -178,9 +171,8 @@ def _assert_is_numeric(*values):
 
 def _is_reduced(*values):
 	"""
-	Check if the ast expression *value* is a literal expression and if it is a
-	compound datatype, that all of it's members are reduced literals. A value
-	that causes this to evaluate to True for is able to be evaluated without a
+	Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of it's
+	members are reduced literals. A value that causes this to evaluate to True for is able to be evaluated without a
 	*thing*.
 	"""
 	return all((isinstance(value, LiteralExpressionBase) and value.is_reduced) for value in values)
@@ -272,8 +264,8 @@ class DataType(metaclass=DataTypeMeta):
 	STRING = _DataTypeDef('STRING', str)
 	UNDEFINED = _DATA_TYPE_UNDEFINED
 	"""
-	Undefined values. This constant can be used to indicate that a particular
-	symbol is valid, but it's data type is currently unknown.
+	Undefined values. This constant can be used to indicate that a particular symbol is valid, but it's data type is
+	currently unknown.
 	"""
 	@classmethod
 	def from_name(cls, name):
@@ -295,13 +287,11 @@ class DataType(metaclass=DataTypeMeta):
 	@classmethod
 	def from_type(cls, python_type):
 		"""
-		Get the supported data type constant for the specified Python type. If
-		the type can not be mapped to a supported data type, then a
-		:py:exc:`ValueError` exception will be raised. This function will not
-		return :py:attr:`.UNDEFINED`.
+		Get the supported data type constant for the specified Python type. If the type can not be mapped to a supported
+		data type, then a :py:exc:`ValueError` exception will be raised. This function will not return
+		:py:attr:`.UNDEFINED`.
 
-		:param type python_type: The native Python type to retrieve the
-			corresponding type constant for.
+		:param type python_type: The native Python type to retrieve the corresponding type constant for.
 		:return: One of the constants.
 		"""
 		if not isinstance(python_type, type):
@@ -323,13 +313,11 @@ class DataType(metaclass=DataTypeMeta):
 	@classmethod
 	def from_value(cls, python_value):
 		"""
-		Get the supported data type constant for the specified Python value. If
-		the value can not be mapped to a supported data type, then a
-		:py:exc:`TypeError` exception will be raised. This function will not
-		return :py:attr:`.UNDEFINED`.
+		Get the supported data type constant for the specified Python value. If the value can not be mapped to a
+		supported data type, then a :py:exc:`TypeError` exception will be raised. This function will not return
+		:py:attr:`.UNDEFINED`.
 
-		:param python_value: The native Python value to retrieve the
-			corresponding data type constant for.
+		:param python_value: The native Python value to retrieve the corresponding data type constant for.
 		:return: One of the constants.
 		"""
 		if isinstance(python_value, bool):
@@ -351,11 +339,9 @@ class DataType(metaclass=DataTypeMeta):
 	@classmethod
 	def is_compatible(cls, dt1, dt2):
 		"""
-		Check if two data type definitions are compatible without any kind of
-		conversion. This evaluates to ``True`` when one or both are
-		:py:attr:`.UNDEFINED` or both types are the same. In the case of
-		compound data types (such as :py:attr:`.ARRAY`) the member types are
-		checked recursively in the same manner.
+		Check if two data type definitions are compatible without any kind of conversion. This evaluates to ``True``
+		when one or both are :py:attr:`.UNDEFINED` or both types are the same. In the case of compound data types (such
+		as :py:attr:`.ARRAY`) the member types are checked recursively in the same manner.
 
 		.. versionadded:: 2.1.0
 
@@ -416,9 +402,8 @@ class ExpressionBase(ASTNodeBase):
 
 	def reduce(self):
 		"""
-		Reduce this expression into a smaller subset of nodes. If the expression
-		can not be reduced, then return an instance of itself, otherwise return
-		a reduced :py:class:`.ExpressionBase` to replace it.
+		Reduce this expression into a smaller subset of nodes. If the expression can not be reduced, then return an
+		instance of itself, otherwise return a reduced :py:class:`.ExpressionBase` to replace it.
 
 		:return: Either a reduced version of this node or itself.
 		:rtype: :py:class:`.ExpressionBase`
@@ -453,8 +438,7 @@ class LiteralExpressionBase(ExpressionBase):
 		:param context: The context to use for evaluating the expression.
 		:type context: :py:class:`~rule_engine.engine.Context`
 		:param value: The value to represent as a Literal Expression.
-		:return: A subclass of :py:class:`~.LiteralExpressionBase`
-			specific to the type of *value*.
+		:return: A subclass of :py:class:`~.LiteralExpressionBase` specific to the type of *value*.
 		"""
 		datatype = DataType.from_value(value)
 		for subclass in cls.__subclasses__():
@@ -506,8 +490,7 @@ class BooleanExpression(LiteralExpressionBase):
 
 class DatetimeExpression(LiteralExpressionBase):
 	"""
-	Literal datetime expressions representing a specific point in time. This
-	expression type always evaluates to true.
+	Literal datetime expressions representing a specific point in time. This expression type always evaluates to true.
 	"""
 	result_type = DataType.DATETIME
 	@classmethod
@@ -529,10 +512,7 @@ class FloatExpression(LiteralExpressionBase):
 		super(FloatExpression, self).__init__(context, value)
 
 class NullExpression(LiteralExpressionBase):
-	"""
-	Literal null expressions representing null values. This expression type
-	always evaluates to false.
-	"""
+	"""Literal null expressions representing null values. This expression type always evaluates to false."""
 	result_type = DataType.NULL
 	def __init__(self, context, value=None):
 		# all of the literal expressions take a value
@@ -549,15 +529,14 @@ class StringExpression(LiteralExpressionBase):
 ################################################################################
 class LeftOperatorRightExpressionBase(ExpressionBase):
 	"""
-	A base class for representing complex expressions composed of a left side
-	and a right side, separated by an operator.
+	A base class for representing complex expressions composed of a left side and a right side, separated by an
+	operator.
 	"""
 	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
 	"""
-	A tuple containing the compatible data types that the left and right
-	expressions must return. This can for example be used to indicate that
-	arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but
-	not :py:attr:`~.DataType.STRING` values.
+	A tuple containing the compatible data types that the left and right expressions must return. This can for example
+	be used to indicate that arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but not
+	:py:attr:`~.DataType.STRING` values.
 	"""
 	result_expression = BooleanExpression
 	result_type = DataType.BOOLEAN
@@ -565,9 +544,8 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		"""
 		:param context: The context to use for evaluating the expression.
 		:type context: :py:class:`~rule_engine.engine.Context`
-		:param str type_: The grammar type of operator at the center of the
-			expression. Subclasses must define operator methods to handle
-			evaluation based on this value.
+		:param str type_: The grammar type of operator at the center of the expression. Subclasses must define operator
+			methods to handle evaluation based on this value.
 		:param left: The expression to the left of the operator.
 		:type left: :py:class:`.ExpressionBase`
 		:param right: The expression to the right of the operator.
@@ -610,10 +588,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		digraph.edge(str(id(self)), str(id(self.right)), label='right')
 
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
-	"""
-	A class for representing arithmetic expressions from the grammar text such
-	as addition and subtraction.
-	"""
+	"""A class for representing arithmetic expressions from the grammar text such as addition and subtraction."""
 	compatible_types = (DataType.FLOAT,)
 	result_expression = FloatExpression
 	result_type = DataType.FLOAT
@@ -634,8 +609,7 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 
 class BitwiseExpression(LeftOperatorRightExpressionBase):
 	"""
-	A class for representing bitwise arithmetic expressions from the grammar
-	text such as XOR and shifting operations.
+	A class for representing bitwise arithmetic expressions from the grammar text such as XOR and shifting operations.
 	"""
 	compatible_types = (DataType.FLOAT,)
 	result_expression = FloatExpression
@@ -661,10 +635,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	_op_bwrsh = functools.partialmethod(__op_bitwise, operator.rshift)
 
 class LogicExpression(LeftOperatorRightExpressionBase):
-	"""
-	A class for representing logical expressions from the grammar text such as
-	as "and" and "or".
-	"""
+	"""A class for representing logical expressions from the grammar text such as "and" and "or"."""
 	def _op_and(self, thing):
 		return bool(self.left.evaluate(thing) and self.right.evaluate(thing))
 
@@ -675,10 +646,7 @@ class LogicExpression(LeftOperatorRightExpressionBase):
 # Left-Operator-Right Comparison Expressions
 ################################################################################
 class ComparisonExpression(LeftOperatorRightExpressionBase):
-	"""
-	A class for representing comparison expressions from the grammar text such
-	as equality checks.
-	"""
+	"""A class for representing comparison expressions from the grammar text such as equality checks."""
 	def _op_eq(self, thing):
 		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
 			if self.left.result_type is not self.right.result_type:
@@ -701,8 +669,8 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 
 class ArithmeticComparisonExpression(ComparisonExpression):
 	"""
-	A class for representing arithmetic comparison expressions from the grammar
-	text such as less-than-or-equal-to and greater-than.
+	A class for representing arithmetic comparison expressions from the grammar text such as less-than-or-equal-to and
+	greater-than.
 	"""
 	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
 	def __init__(self, *args, **kwargs):
@@ -740,8 +708,8 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 
 class FuzzyComparisonExpression(ComparisonExpression):
 	"""
-	A class for representing regular expression comparison expressions from the
-	grammar text such as search and does not match.
+	A class for representing regular expression comparison expressions from the grammar text such as search and does not
+	match.
 	"""
 	compatible_types = (DataType.NULL, DataType.STRING)
 	def __init__(self, *args, **kwargs):
@@ -784,9 +752,7 @@ class FuzzyComparisonExpression(ComparisonExpression):
 # Miscellaneous Expressions
 ################################################################################
 class ContainsExpression(ExpressionBase):
-	"""
-	An expression used to test whether an item exists within a container.
-	"""
+	"""An expression used to test whether an item exists within a container."""
 	__slots__ = ('container', 'member')
 	result_type = DataType.BOOLEAN
 	def __init__(self, context, container, member):
@@ -824,10 +790,7 @@ class ContainsExpression(ExpressionBase):
 		digraph.edge(str(id(self)), str(id(self.member)), label='member')
 
 class GetAttributeExpression(ExpressionBase):
-	"""
-	A class representing an expression in which *name* is retrieved as an
-	attribute of *object*.
-	"""
+	"""A class representing an expression in which *name* is retrieved as an attribute of *object*."""
 	__slots__ = ('name', 'object', 'safe')
 	def __init__(self, context, object_, name, safe=False):
 		"""
@@ -880,10 +843,7 @@ class GetAttributeExpression(ExpressionBase):
 		digraph.edge(str(id(self)), str(id(self.object)))
 
 class GetItemExpression(ExpressionBase):
-	"""
-	A class representing an expression in which an *item* is retrieved from a
-	container *object*.
-	"""
+	"""A class representing an expression in which an *item* is retrieved from a container *object*."""
 	__slots__ = ('container', 'item', 'safe')
 	def __init__(self, context, container, item, safe=False):
 		"""
@@ -944,10 +904,7 @@ class GetItemExpression(ExpressionBase):
 		digraph.edge(str(id(self)), str(id(self.item)), label='item')
 
 class GetSliceExpression(ExpressionBase):
-	"""
-	A class representing an expression in which a range of items is retrieved
-	from a container *object*.
-	"""
+	"""A class representing an expression in which a range of items is retrieved from a container *object*."""
 	__slots__ = ('container', 'start', 'stop', 'safe')
 	def __init__(self, context, container, start=None, stop=None, safe=False):
 		"""
@@ -1013,16 +970,16 @@ class GetSliceExpression(ExpressionBase):
 
 class SymbolExpression(ExpressionBase):
 	"""
-	A class representing a symbol name to be resolved at evaluation time with
-	the help of a :py:class:`~rule_engine.engine.Context` object.
+	A class representing a symbol name to be resolved at evaluation time with the help of a
+	:py:class:`~rule_engine.engine.Context` object.
 	"""
 	__slots__ = ('name', 'result_type', 'scope')
 	def __init__(self, context, name, scope=None):
 		"""
 		:param context: The context to use for evaluating the expression.
 		:type context: :py:class:`~rule_engine.engine.Context`
-		:param str name: The name of the symbol. This will be resolved with a
-			given context object on the specified *thing*.
+		:param str name: The name of the symbol. This will be resolved with a given context object on the specified
+			*thing*.
 		:param str scope: The optional scope to use while resolving the symbol.
 		"""
 		context.symbols.add(name)
@@ -1093,20 +1050,17 @@ class Statement(ASTNodeBase):
 
 class TernaryExpression(ExpressionBase):
 	"""
-	A class for representing ternary expressions from the grammar text. These
-	involve evaluating :py:attr:`.condition` before evaluating either
-	:py:attr:`.case_true` or :py:attr:`.case_false` based on the results.
+	A class for representing ternary expressions from the grammar text. These involve evaluating :py:attr:`.condition`
+	before evaluating either :py:attr:`.case_true` or :py:attr:`.case_false` based on the results.
 	"""
 	def __init__(self, context, condition, case_true, case_false):
 		"""
 		:param context: The context to use for evaluating the expression.
 		:type context: :py:class:`~rule_engine.engine.Context`
-		:param condition: The condition expression whose evaluation determines
-			whether the *case_true* or *case_false* expression is evaluated.
-		:param case_true: The expression that's evaluated when *condition* is
-			True.
-		:param case_false:The expression that's evaluated when *condition* is
-			False.
+		:param condition: The condition expression whose evaluation determines whether the *case_true* or *case_false*
+			expression is evaluated.
+		:param case_true: The expression that's evaluated when *condition* is True.
+		:param case_false:The expression that's evaluated when *condition* is False.
 		"""
 		self.context = context
 		self.condition = condition
@@ -1140,12 +1094,14 @@ class TernaryExpression(ExpressionBase):
 		digraph.edge(str(id(self)), str(id(self.case_false)), label='false case')
 
 class UnaryExpression(ExpressionBase):
+	"""
+	A class for representing unary expressions from the grammar text. These involve a single operator on the left side.
+	"""
 	def __init__(self, context, type_, right):
 		"""
 		:param context: The context to use for evaluating the expression.
 		:type context: :py:class:`~rule_engine.engine.Context`
-		:param str type_: The grammar type of operator to the left of the
-			expression.
+		:param str type_: The grammar type of operator to the left of the expression.
 		:param right: The expression to the right of the operator.
 		:type right: :py:class:`~.ExpressionBase`
 		"""

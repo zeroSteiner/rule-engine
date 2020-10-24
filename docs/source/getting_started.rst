@@ -310,10 +310,10 @@ Rule Inspection
 ---------------
 There are a few techniques that can be used to inspect a rule object.
 
-*:py:meth:`~engine.Rule.is_valid` -- This class method can be used to determine if a rule expression is valid. It will
+* :py:meth:`~engine.Rule.is_valid` -- This class method can be used to determine if a rule expression is valid. It will
   return ``False`` if for example there are any syntax errors.
-*:py:attr:`~engine.Context.symbols` -- Rule objects have a :py:attr:`~engine.Rule.context` attribute, which contains
+* :py:attr:`~engine.Context.symbols` -- Rule objects have a :py:attr:`~engine.Rule.context` attribute, which contains
   the ``symbols`` attribute. This contains the symbol names which were identified within the rule expression.
-*:py:meth:`~engine.Rule.to_graphviz` -- This method will create a Graphviz directed-graph of the Rule Engine Abstract
+* :py:meth:`~engine.Rule.to_graphviz` -- This method will create a Graphviz directed-graph of the Rule Engine Abstract
   Syntax Tree (AST) created by the rule expression. This can be helpful when debugging complex rules. This requires the
   Python ``graphviz`` package to be available.

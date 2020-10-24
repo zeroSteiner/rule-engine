@@ -132,7 +132,7 @@ class GetSliceExpressionTests(unittest.TestCase):
 				context,
 				ast.LiteralExpressionBase.from_value(context, container),
 				start=(None if start is None else ast.LiteralExpressionBase.from_value(context, start)),
-				end=(None if end is None else ast.LiteralExpressionBase.from_value(context, end))
+				stop=(None if end is None else ast.LiteralExpressionBase.from_value(context, end))
 			)
 			self.assertEqual(get_slice.evaluate({}), container[start:end])
 

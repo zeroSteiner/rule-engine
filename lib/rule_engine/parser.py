@@ -440,13 +440,13 @@ class Parser(ParserBase):
 		container = p[1]
 		colon_index = p[1:].index(':')
 		if colon_index == 2 and len(p) == 5:
-			start, end = None, None
+			start, stop = None, None
 		elif colon_index == 2 and len(p) == 6:
-			start, end = None, p[4]
+			start, stop = None, p[4]
 		elif colon_index == 3 and len(p) == 6:
-			start, end = p[3], None
+			start, stop = p[3], None
 		elif colon_index == 3 and len(p) == 7:
-			start, _, end = p[3:6]
+			start, _, stop = p[3:6]
 		else:
 			raise errors.RuleSyntaxError('invalid get slice expression')
-		p[0] = ast.GetSliceExpression(self.context, container, start, end).reduce()
+		p[0] = ast.GetSliceExpression(self.context, container, start, stop).reduce()

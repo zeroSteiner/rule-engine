@@ -852,7 +852,6 @@ class GetAttributeExpression(ExpressionBase):
 			resolved_obj = self.context.resolve(thing, self.object.name, scope=self.object.scope)
 		else:
 			resolved_obj = self.object.evaluate(thing)
-
 		if resolved_obj is None and self.safe:
 			return resolved_obj
 
@@ -902,7 +901,8 @@ class GetItemExpression(ExpressionBase):
 		elif isinstance(container.result_type, DataType.ARRAY.__class__):
 			self.result_type = container.result_type.value_type
 		elif container.result_type != DataType.UNDEFINED:
-			raise errors.EvaluationError('data type mismatch')
+			if not (container.result_type == DataType.NULL and safe):
+				raise errors.EvaluationError('data type mismatch')
 		self.item = item
 		self.safe = safe
 
@@ -911,7 +911,6 @@ class GetItemExpression(ExpressionBase):
 
 	def evaluate(self, thing):
 		resolved_obj = self.container.evaluate(thing)
-
 		if resolved_obj is None and self.safe:
 			return resolved_obj
 
@@ -921,6 +920,8 @@ class GetItemExpression(ExpressionBase):
 		try:
 			value = operator.getitem(resolved_obj, resolved_item)
 		except (IndexError, KeyError):
+			if self.safe:
+				return None
 			raise errors.EvaluationError()
 		return coerce_value(value, verify_type=False)
 
@@ -941,8 +942,19 @@ class GetSliceExpression(ExpressionBase):
 	A class representing an expression in which a range of items is retrieved
 	from a container *object*.
 	"""
-	__slots__ = ('container', 'start', 'end')
-	def __init__(self, context, container, start=None, end=None):
+	__slots__ = ('container', 'start', 'stop', 'safe')
+	def __init__(self, context, container, start=None, stop=None, safe=False):
+		"""
+		:param context: The context to use for evaluating the expression.
+		:type context: :py:class:`~rule_engine.engine.Context`
+		:param container: The container object from which to retrieve the item.
+		:param start: The expression that represents the starting index of the slice.
+		:param stop: The expression that represents the stopping index of the slice.
+		:param bool safe: Whether or not the safe version should be invoked.
+
+		.. versionchanged:: 2.4.0
+			Added the *safe* parameter.
+		"""
 		self.context = context
 		self.container = container
 		if container.result_type == DataType.STRING:
@@ -952,28 +964,35 @@ class GetSliceExpression(ExpressionBase):
 		elif isinstance(container.result_type, DataType.ARRAY.__class__):
 			self.result_type = container.result_type
 		elif container.result_type != DataType.UNDEFINED:
-			raise errors.EvaluationError('data type mismatch')
+			if not (container.result_type == DataType.NULL and safe):
+				raise errors.EvaluationError('data type mismatch')
 		self.start = start or LiteralExpressionBase.from_value(context, 0)
-		self.end = end or LiteralExpressionBase.from_value(context, None)
+		self.stop = stop or LiteralExpressionBase.from_value(context, None)
+		self.safe = safe
 
 	def __repr__(self):
-		return "<{0} container={1!r} start={2!r} end={3!r} >".format(self.__class__.__name__, self.container, self.start, self.end)
+		return "<{0} container={1!r} start={2!r} stop={3!r} >".format(self.__class__.__name__, self.container, self.start, self.stop)
 
 	def evaluate(self, thing):
 		resolved_obj = self.container.evaluate(thing)
+		if resolved_obj is None:
+			if self.safe:
+				return resolved_obj
+			raise errors.EvaluationError('data type mismatch')
+
 		resolved_start = self.start.evaluate(thing)
 		if resolved_start is not None:
 			_assert_is_integer_number(resolved_start)
 			resolved_start = int(resolved_start)
-		resolved_end = self.end.evaluate(thing)
-		if resolved_end is not None:
-			_assert_is_integer_number(resolved_end)
-			resolved_end = int(resolved_end)
-		value = operator.getitem(resolved_obj, slice(resolved_start, resolved_end))
+		resolved_stop = self.stop.evaluate(thing)
+		if resolved_stop is not None:
+			_assert_is_integer_number(resolved_stop)
+			resolved_stop = int(resolved_stop)
+		value = operator.getitem(resolved_obj, slice(resolved_start, resolved_stop))
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):
-		if not _is_reduced(self.container, self.start, self.end):
+		if not _is_reduced(self.container, self.start, self.stop):
 			return self
 		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 
@@ -981,10 +1000,10 @@ class GetSliceExpression(ExpressionBase):
 		super(GetSliceExpression, self).to_graphviz(digraph, *args, **kwargs)
 		self.container.to_graphviz(digraph, *args, **kwargs)
 		self.start.to_graphviz(digraph, *args, **kwargs)
-		self.end.to_graphviz(digraph, *args, **kwargs)
+		self.stop.to_graphviz(digraph, *args, **kwargs)
 		digraph.edge(str(id(self)), str(id(self.container)), label='container')
 		digraph.edge(str(id(self)), str(id(self.start)), label='start')
-		digraph.edge(str(id(self)), str(id(self.end)), label='end')
+		digraph.edge(str(id(self)), str(id(self.stop)), label='stop')
 
 class SymbolExpression(ExpressionBase):
 	"""

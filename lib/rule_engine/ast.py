@@ -64,6 +64,9 @@ def coerce_value(value, verify_type=True):
 	# FLOAT
 	elif isinstance(value, int) and not isinstance(value, bool):
 		value = float(value)
+	# MAPPING
+	elif isinstance(value, dict) and not isinstance(value, collections.OrderedDict):
+		value = collections.OrderedDict(value)
 	if verify_type:
 		DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
 	return value
@@ -200,29 +203,85 @@ class _DataTypeDef(object):
 		return not self.is_scalar
 
 _DATA_TYPE_UNDEFINED = _DataTypeDef('UNDEFINED', errors.UNDEFINED)
-class _SequenceDataTypeDef(_DataTypeDef):
+class _ArrayDataTypeDef(_DataTypeDef):
 	__slots__ = ('value_type', 'value_type_nullable')
 	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
 		if not issubclass(python_type, collections.abc.Sequence):
-			raise TypeError('the specified python_type is not a Sequence')
-		super(_SequenceDataTypeDef, self).__init__(name, python_type)
+			raise TypeError('the specified python_type is not an array')
+		super(_ArrayDataTypeDef, self).__init__(name, python_type)
 		self.is_scalar = False
 		self.value_type = value_type
 		self.value_type_nullable = value_type_nullable
 
 	def __call__(self, value_type, value_type_nullable=True):
-		return self.__class__(self.name, self.python_type, value_type=value_type, value_type_nullable=value_type_nullable)
+		return self.__class__(
+			self.name,
+			self.python_type,
+			value_type=value_type,
+			value_type_nullable=value_type_nullable
+		)
 
 	def __repr__(self):
-		return "<{} name={} python_type={} value_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__, self.value_type.name)
+		return "<{} name={} python_type={} value_type={} >".format(
+			self.__class__.__name__,
+			self.name,
+			self.python_type.__name__,
+			self.value_type.name
+		)
 
 	def __eq__(self, other):
 		if not super().__eq__(other):
 			return False
-		return self.value_type == other.value_type
+		return all((
+			self.value_type == other.value_type,
+			self.value_type_nullable == other.value_type_nullable
+		))
 
 	def __hash__(self):
-		return hash((self.python_type, self.is_scalar, hash(self.value_type)))
+		return hash((self.python_type, self.is_scalar, hash((self.value_type, self.value_type_nullable))))
+
+class _MappingDataTypeDef(_DataTypeDef):
+	__slots__ = ('key_type', 'value_type', 'value_type_nullable')
+	def __init__(self, name, python_type, key_type=_DATA_TYPE_UNDEFINED, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
+		if not issubclass(python_type, collections.abc.Mapping):
+			raise TypeError('the specified python_type is not a mapping')
+		super(_MappingDataTypeDef, self).__init__(name, python_type)
+		self.is_scalar = False
+		if key_type.is_compound:
+			raise errors.EngineError('compound data types may not be used as mapping keys')
+		self.key_type = key_type
+		self.value_type = value_type
+		self.value_type_nullable = value_type_nullable
+
+	def __call__(self, key_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
+		return self.__class__(
+			self.name,
+			self.python_type,
+			key_type=key_type,
+			value_type=value_type,
+			value_type_nullable=value_type_nullable
+		)
+
+	def __repr__(self):
+		return "<{} name={} python_type={} key_type={} value_type={} >".format(
+			self.__class__.__name__,
+			self.name,
+			self.python_type.__name__,
+			self.key_type.name,
+			self.value_type.name
+		)
+
+	def __eq__(self, other):
+		if not super().__eq__(other):
+			return False
+		return all((
+			self.key_type == other.key_type,
+			self.value_type == other.value_type,
+			self.value_type_nullable == other.value_type_nullable
+		))
+
+	def __hash__(self):
+		return hash((self.python_type, self.is_scalar, hash((self.key_type, self.value_type, self.value_type_nullable))))
 
 class DataTypeMeta(type):
 	def __new__(metacls, cls, bases, classdict):
@@ -250,7 +309,7 @@ class DataType(metaclass=DataTypeMeta):
 	"""
 	A collection of constants representing the different supported data types.
 	"""
-	ARRAY = _SequenceDataTypeDef('ARRAY', tuple)
+	ARRAY = _ArrayDataTypeDef('ARRAY', tuple)
 	"""
 	.. py:function:: __call__(value_type, value_type_nullable=True)
 	
@@ -260,6 +319,14 @@ class DataType(metaclass=DataTypeMeta):
 	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
 	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
 	FLOAT = _DataTypeDef('FLOAT', float)
+	MAPPING = _MappingDataTypeDef('MAPPING', dict)
+	"""
+	.. py:function:: __call__(key_type, value_type, value_type_nullable=True)
+	
+	:param key_type: The type of the mapping keys.
+	:param value_type: The type of the mapping values.
+	:param bool value_type_nullable: Whether or not mapping values are allowed to be :py:attr:`.NULL`.
+	"""
 	NULL = _DataTypeDef('NULL', NoneType)
 	STRING = _DataTypeDef('STRING', str)
 	UNDEFINED = _DATA_TYPE_UNDEFINED
@@ -296,7 +363,7 @@ class DataType(metaclass=DataTypeMeta):
 		"""
 		if not isinstance(python_type, type):
 			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
-		if python_type in (dict, list, range, tuple):
+		if python_type in (list, range, tuple):
 			return cls.ARRAY
 		elif python_type is bool:
 			return cls.BOOLEAN
@@ -304,6 +371,8 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.DATETIME
 		elif python_type in (float, int):
 			return cls.FLOAT
+		elif python_type is dict:
+			return cls.MAPPING
 		elif python_type is NoneType:
 			return cls.NULL
 		elif python_type is str:
@@ -331,7 +400,7 @@ class DataType(metaclass=DataTypeMeta):
 		elif isinstance(python_value, (str,)):
 			return cls.STRING
 		elif isinstance(python_value, collections.abc.Mapping):
-			return cls.ARRAY
+			return cls.MAPPING  # todo: define the key and value types here
 		elif isinstance(python_value, collections.abc.Sequence):
 			return cls.ARRAY(_sequence_member_value_type(python_value))
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
@@ -357,10 +426,14 @@ class DataType(metaclass=DataTypeMeta):
 		if dt1.is_scalar and dt2.is_scalar:
 			return dt1 == dt2
 		elif dt1.is_compound and dt2.is_compound:
-			if isinstance(dt1, _SequenceDataTypeDef):
-				if dt1.value_type is _DATA_TYPE_UNDEFINED or dt2.value_type is _DATA_TYPE_UNDEFINED:
-					return True
+			if isinstance(dt1, _ArrayDataTypeDef):
 				return cls.is_compatible(dt1.value_type, dt2.value_type)
+			elif isinstance(dt1, _MappingDataTypeDef):
+				if not cls.is_compatible(dt1.key_type, dt2.key_type):
+					return False
+				if not cls.is_compatible(dt1.value_type, dt2.value_type):
+					return False
+				return True
 			raise NotImplementedError()
 		return False
 

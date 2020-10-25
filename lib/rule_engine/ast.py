@@ -45,7 +45,7 @@ NoneType = type(None)
 
 def coerce_value(value, verify_type=True):
 	"""
-	Take a native Python *value* and convert it to a value of a data type which is can be represented by a Rule Engine
+	Take a native Python *value* and convert it to a value of a data type which can be represented by a Rule Engine
 	:py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as
 	when resolving a symbol from an object external to the engine.
 
@@ -134,7 +134,7 @@ def is_numeric(value):
 		return False
 	return True
 
-def _sequence_member_value_type(python_value):
+def _iterable_member_value_type(python_value):
 	"""
 	Take a native *python_value* and ensure that the types of each of it's members are either the same or NULL.
 
@@ -400,9 +400,12 @@ class DataType(metaclass=DataTypeMeta):
 		elif isinstance(python_value, (str,)):
 			return cls.STRING
 		elif isinstance(python_value, collections.abc.Mapping):
-			return cls.MAPPING  # todo: define the key and value types here
+			return cls.MAPPING(
+				key_type=_iterable_member_value_type(python_value.keys()),
+				value_type=_iterable_member_value_type(python_value.values())
+			)
 		elif isinstance(python_value, collections.abc.Sequence):
-			return cls.ARRAY(_sequence_member_value_type(python_value))
+			return cls.ARRAY(value_type=_iterable_member_value_type(python_value))
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
 	@classmethod
@@ -542,7 +545,7 @@ class ArrayExpression(LiteralExpressionBase):
 	result_type = DataType.ARRAY
 	def __init__(self, *args, **kwargs):
 		super(ArrayExpression, self).__init__(*args, **kwargs)
-		self.result_type = DataType.ARRAY(_sequence_member_value_type(self.value))
+		self.result_type = DataType.ARRAY(value_type=_iterable_member_value_type(self.value))
 
 	def evaluate(self, thing):
 		return tuple(member.evaluate(thing) for member in self.value)
@@ -583,6 +586,16 @@ class FloatExpression(LiteralExpressionBase):
 		if isinstance(value, int):
 			value = float(value)
 		super(FloatExpression, self).__init__(context, value)
+
+class MappingExpression(LiteralExpressionBase):
+	"""Literal mapping expression representing a set of associations between keys and values."""
+	result_type = DataType.MAPPING
+	def __init__(self, *args, **kwargs):
+		super(MappingExpression, self).__init__(*args, **kwargs)
+		self.result_type = DataType.MAPPING(
+			key_type=_iterable_member_value_type(self.value.keys()),
+			value_type=_iterable_member_value_type(self.value.values())
+		)
 
 class NullExpression(LiteralExpressionBase):
 	"""Literal null expressions representing null values. This expression type always evaluates to false."""

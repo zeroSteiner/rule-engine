@@ -429,15 +429,14 @@ class DataType(metaclass=DataTypeMeta):
 		if dt1.is_scalar and dt2.is_scalar:
 			return dt1 == dt2
 		elif dt1.is_compound and dt2.is_compound:
-			if isinstance(dt1, _ArrayDataTypeDef):
+			if isinstance(dt1, _ArrayDataTypeDef) and isinstance(dt2, _ArrayDataTypeDef):
 				return cls.is_compatible(dt1.value_type, dt2.value_type)
-			elif isinstance(dt1, _MappingDataTypeDef):
+			elif isinstance(dt1, _MappingDataTypeDef) and isinstance(dt2, _MappingDataTypeDef):
 				if not cls.is_compatible(dt1.key_type, dt2.key_type):
 					return False
 				if not cls.is_compatible(dt1.value_type, dt2.value_type):
 					return False
 				return True
-			raise NotImplementedError()
 		return False
 
 	@classmethod

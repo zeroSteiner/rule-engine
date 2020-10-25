@@ -823,13 +823,16 @@ class GetAttributeExpression(ExpressionBase):
 			return resolved_obj
 
 		try:
-			value = self.context.resolve(resolved_obj, self.name)
-		except errors.SymbolResolutionError:
+			value = self.context.resolve_attribute(thing, resolved_obj, self.name)
+		except errors.AttributeResolutionError:
 			pass
 		else:
 			return coerce_value(value, verify_type=False)
 
-		value = self.context.resolve_attribute(thing, resolved_obj, self.name)
+		try:
+			value = self.context.resolve(resolved_obj, self.name)
+		except errors.SymbolResolutionError:
+			raise errors.AttributeResolutionError(self.name, resolved_obj, thing=thing) from None
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):

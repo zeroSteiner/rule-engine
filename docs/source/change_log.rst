@@ -13,6 +13,7 @@ Version 2.4.0
 *In progress*
 
 * Added the Debug REPL utility
+* Added the safe navigation version of the attribute, item and slice operators
 
 Version 2.3.0
 ^^^^^^^^^^^^^

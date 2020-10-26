@@ -496,7 +496,7 @@ class LiteralExpressionBase(ExpressionBase):
 		:param value: The native Python value.
 		"""
 		self.context = context
-		if not isinstance(value, self.result_type.python_type):
+		if not isinstance(value, self.result_type.python_type) and self.result_type.is_scalar:
 			raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.python_type.__name__, type(value).__name__))
 		self.value = value
 
@@ -592,9 +592,29 @@ class MappingExpression(LiteralExpressionBase):
 	def __init__(self, *args, **kwargs):
 		super(MappingExpression, self).__init__(*args, **kwargs)
 		self.result_type = DataType.MAPPING(
-			key_type=_iterable_member_value_type(self.value.keys()),
-			value_type=_iterable_member_value_type(self.value.values())
+			key_type=_iterable_member_value_type(key for key, _ in self.value),
+			value_type=_iterable_member_value_type(value for _, value in self.value)
 		)
+
+	def evaluate(self, thing):
+		keys = collections.deque()
+		values = collections.deque()
+		for key, value in reversed(self.value):
+			key = key.evaluate(thing)
+			if DataType.from_value(key).is_compound:
+				raise errors.EngineError('compound data types may not be used as mapping keys')
+			if key in keys:
+				continue
+			keys.appendleft(key)
+			values.appendleft(value.evaluate(thing))
+		return collections.OrderedDict(zip(keys, values))
+
+	@property
+	def is_reduced(self):
+		return all(_is_reduced(key, value) for key, value in self.value)
+
+	def to_graphviz(self, digraph, *args, **kwargs):
+		raise NotImplementedError()
 
 class NullExpression(LiteralExpressionBase):
 	"""Literal null expressions representing null values. This expression type always evaluates to false."""

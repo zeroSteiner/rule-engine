@@ -134,7 +134,7 @@ class Parser(ParserBase):
 	tokens = (
 		'DATETIME', 'FLOAT', 'STRING', 'SYMBOL',
 		'LPAREN', 'RPAREN', 'QMARK', 'COLON', 'COMMA',
-		'LBRACKET', 'RBRACKET'
+		'LBRACKET', 'RBRACKET', 'LBRACE', 'RBRACE'
 	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
 
 	t_ignore = ' \t'
@@ -154,6 +154,8 @@ class Parser(ParserBase):
 	t_COMMA            = r'\,'
 	t_LBRACKET         = r'((?<=\S)&)?\['
 	t_RBRACKET         = r'\]'
+	t_LBRACE           = r'\{'
+	t_RBRACE           = r'\}'
 	t_FLOAT            = r'0(b[01]+|o[0-7]+|x[0-9a-fA-F]+)|[0-9]+(\.[0-9]*)?([eE][+-]?[0-9]+)?|\.[0-9]+([eE][+-]?[0-9]+)?'
 	# attributes must be valid symbol names so the right side is more specific
 	t_ATTR             = r'(?<=\S)\.(?=[a-zA-Z_][a-zA-Z0-9_]*)'
@@ -402,8 +404,8 @@ class Parser(ParserBase):
 	def p_expression_array(self, p):
 		"""
 		object : LBRACKET RBRACKET
-			   | LBRACKET members RBRACKET
-			   | LBRACKET members COMMA RBRACKET
+			   | LBRACKET ary_members RBRACKET
+			   | LBRACKET ary_members COMMA RBRACKET
 		"""
 		if len(p) < 4:
 			p[0] = ast.ArrayExpression(self.context, tuple()).reduce()
@@ -412,8 +414,8 @@ class Parser(ParserBase):
 
 	def p_expression_array_members(self, p):
 		"""
-		members : expression
-				| members COMMA expression
+		ary_members : expression
+					| ary_members COMMA expression
 		"""
 		if len(p) == 2:
 			deque = collections.deque()
@@ -422,6 +424,30 @@ class Parser(ParserBase):
 			deque = p[1]
 			deque.append(p[3])
 		p[0] = deque
+
+	def p_expression_mapping(self, p):
+		"""
+		object : LBRACE RBRACE
+			   | LBRACE map_members RBRACE
+			   | LBRACE map_members COMMA RBRACE
+		"""
+		if len(p) < 4:
+			p[0] = ast.MappingExpression(self.context, tuple()).reduce()
+		else:
+			p[0] = ast.MappingExpression(self.context, tuple(p[2])).reduce()
+
+	def p_expression_mapping_member(self, p):
+		"""
+		map_member : expression COLON expression
+		"""
+		p[0] = (p[1], p[3])
+
+	def p_expression_mapping_members(self, p):
+		"""
+		map_members : map_member
+					| map_members COMMA map_member
+		"""
+		return self.p_expression_array_members(p)
 
 	def p_expression_getitem(self, p):
 		"""

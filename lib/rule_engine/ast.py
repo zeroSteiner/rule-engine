@@ -152,6 +152,8 @@ def _iterable_member_value_type(python_value):
 		# treat NULL as a special case, allowing typed arrays to be a specified type *or* NULL
 		# this however makes it impossible to define an array with a type of NULL
 		subvalue_types.remove(DataType.NULL)
+	if DataType.UNDEFINED in subvalue_types:
+		subvalue_types.remove(DataType.UNDEFINED)
 	if len(subvalue_types) > 1:
 		raise TypeError('can not map python sequence type with multiple member types')
 	if subvalue_types:
@@ -612,9 +614,6 @@ class MappingExpression(LiteralExpressionBase):
 	@property
 	def is_reduced(self):
 		return all(_is_reduced(key, value) for key, value in self.value)
-
-	def to_graphviz(self, digraph, *args, **kwargs):
-		raise NotImplementedError()
 
 class NullExpression(LiteralExpressionBase):
 	"""Literal null expressions representing null values. This expression type always evaluates to false."""

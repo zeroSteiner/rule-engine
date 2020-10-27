@@ -41,10 +41,26 @@ class DataTypeTests(unittest.TestCase):
 	class _UnsupportedType(object):
 		pass
 
+	def test_data_type_equality(self):
+		dt1 = ast.DataType.ARRAY(ast.DataType.STRING)
+		self.assertIs(dt1.value_type, ast.DataType.STRING)
+		self.assertEqual(dt1, ast.DataType.ARRAY(ast.DataType.STRING))
+		self.assertNotEqual(dt1, ast.DataType.ARRAY)
+		self.assertNotEqual(dt1, ast.DataType.ARRAY(ast.DataType.STRING, value_type_nullable=False))
+
+		dt1 = ast.DataType.MAPPING(ast.DataType.STRING)
+		self.assertIs(dt1.key_type, ast.DataType.STRING)
+		self.assertEqual(dt1, ast.DataType.MAPPING(ast.DataType.STRING))
+		self.assertNotEqual(dt1, ast.DataType.MAPPING)
+		self.assertNotEqual(dt1, ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.STRING))
+		self.assertNotEqual(dt1, ast.DataType.MAPPING(ast.DataType.STRING, value_type_nullable=False))
+
 	def test_data_type_from_name(self):
+		self.assertIs(ast.DataType.from_name('ARRAY'), ast.DataType.ARRAY)
 		self.assertIs(ast.DataType.from_name('BOOLEAN'), ast.DataType.BOOLEAN)
 		self.assertIs(ast.DataType.from_name('DATETIME'), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_name('FLOAT'), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_name('MAPPING'), ast.DataType.MAPPING)
 		self.assertIs(ast.DataType.from_name('NULL'), ast.DataType.NULL)
 		self.assertIs(ast.DataType.from_name('STRING'), ast.DataType.STRING)
 
@@ -62,6 +78,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(ast.DataType.from_type(datetime.datetime), ast.DataType.DATETIME)
 		self.assertIs(ast.DataType.from_type(float), ast.DataType.FLOAT)
 		self.assertIs(ast.DataType.from_type(int), ast.DataType.FLOAT)
+		self.assertIs(ast.DataType.from_type(dict), ast.DataType.MAPPING)
 		self.assertIs(ast.DataType.from_type(type(None)), ast.DataType.NULL)
 		self.assertIs(ast.DataType.from_type(str), ast.DataType.STRING)
 
@@ -72,10 +89,18 @@ class DataTypeTests(unittest.TestCase):
 			ast.DataType.from_type(self._UnsupportedType)
 
 	def test_data_type_from_value_compound(self):
+		# ARRAY
 		for value in [list(), range(0), tuple()]:
 			value = ast.DataType.from_value(value)
 			self.assertEqual(value, ast.DataType.ARRAY)
 			self.assertIs(value.value_type, ast.DataType.UNDEFINED)
+		# MAPPING
+		for value in [{}]:
+			value = ast.DataType.from_value(value)
+			self.assertEqual(value, ast.DataType.MAPPING)
+			self.assertIs(value.key_type, ast.DataType.UNDEFINED)
+			self.assertIs(value.value_type, ast.DataType.UNDEFINED)
+		# STRING
 		value = ast.DataType.from_value(['test'])
 		self.assertEqual(value, ast.DataType.ARRAY(ast.DataType.STRING))
 		self.assertIs(value.value_type, ast.DataType.STRING)
@@ -98,7 +123,7 @@ class DataTypeTests(unittest.TestCase):
 			ast.DataType.from_value(self._UnsupportedType())
 
 	def test_data_type_definitions_describe_themselves(self):
-		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'FLOAT', 'NULL', 'STRING', 'UNDEFINED'):
+		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'FLOAT', 'MAPPING', 'NULL', 'STRING', 'UNDEFINED'):
 			data_type = getattr(ast.DataType, name)
 			self.assertRegex(repr(data_type), 'name=' + name)
 
@@ -124,6 +149,24 @@ class MetaDataTypeTests(unittest.TestCase):
 		_is_not_compat(ast.DataType.STRING, ast.DataType.ARRAY)
 		_is_not_compat(ast.DataType.STRING, ast.DataType.NULL)
 		_is_not_compat(ast.DataType.ARRAY(ast.DataType.STRING), ast.DataType.ARRAY(ast.DataType.FLOAT))
+
+		_is_compat(ast.DataType.MAPPING, ast.DataType.MAPPING)
+		_is_compat(
+			ast.DataType.MAPPING(ast.DataType.STRING),
+			ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.ARRAY)
+		)
+		_is_compat(
+			ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.ARRAY),
+			ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.ARRAY(ast.DataType.STRING))
+		)
+		_is_not_compat(
+			ast.DataType.MAPPING(ast.DataType.STRING),
+			ast.DataType.MAPPING(ast.DataType.FLOAT)
+		)
+		_is_not_compat(
+			ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.STRING),
+			ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.FLOAT)
+		)
 
 		with self.assertRaises(TypeError):
 			ast.DataType.is_compatible(ast.DataType.STRING, None)

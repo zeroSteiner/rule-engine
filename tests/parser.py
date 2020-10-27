@@ -163,10 +163,11 @@ class ParserLeftOperatorRightTests(ParserTestsBase):
 			self.assertStatementType(expression, ast.FuzzyComparisonExpression)
 
 class ParserLiteralTests(ParserTestsBase):
-	def assertLiteralAttributeStatementEqual(self, string, python_value, msg=None):
+	def assertLiteralStatementEvalEqual(self, string, python_value, msg=None):
 		statement = self._parse(string, self.context)
 		self.assertIsInstance(statement, ast.Statement, msg='the parser did not return a statement')
 		self.assertIsInstance(statement.expression, ast.LiteralExpressionBase, msg='the statement expression is not the correct type')
+		self.assertTrue(statement.expression.is_reduced)
 		value = statement.evaluate(None)
 		self.assertEqual(value, python_value, msg=msg or "{0!r} does not evaluate to {1!r}".format(string, python_value))
 
@@ -177,9 +178,9 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertEqual(statement.expression.value, python_value, msg=msg or "{0!r} does not evaluate to {1!r}".format(string, python_value))
 
 	def test_parse_array(self):
-		self.assertLiteralAttributeStatementEqual('[ ]', tuple())
-		self.assertLiteralAttributeStatementEqual('[1, 2]', tuple((1.0, 2.0)))
-		self.assertLiteralAttributeStatementEqual('[1, 2,]', tuple((1.0, 2.0)))
+		self.assertLiteralStatementEvalEqual('[ ]', tuple())
+		self.assertLiteralStatementEvalEqual('[1, 2]', tuple((1.0, 2.0)))
+		self.assertLiteralStatementEvalEqual('[1, 2,]', tuple((1.0, 2.0)))
 
 	def test_parse_array_getitem(self):
 		cases = (
@@ -187,15 +188,15 @@ class ParserLiteralTests(ParserTestsBase):
 			(('[0]', 't'), ('[1]', 'e'), ('[-1]', 'g'))
 		)
 		for (container, (getitem, answer)) in itertools.product(*cases):
-			self.assertLiteralAttributeStatementEqual(container + getitem, answer)
+			self.assertLiteralStatementEvalEqual(container + getitem, answer)
 
 	def test_parse_array_getslice(self):
-		self.assertLiteralAttributeStatementEqual('"testing"[:]', 'testing')
-		self.assertLiteralAttributeStatementEqual('"testing"[1:-1]', 'estin')
-		self.assertLiteralAttributeStatementEqual('"testing"[1:6]', 'estin')
-		self.assertLiteralAttributeStatementEqual('["t", "e", "s", "t", "i", "n", "g"][:]', tuple('testing'))
-		self.assertLiteralAttributeStatementEqual('["t", "e", "s", "t", "i", "n", "g"][1:-1]', tuple('estin'))
-		self.assertLiteralAttributeStatementEqual('["t", "e", "s", "t", "i", "n", "g"][1:6]', tuple('estin'))
+		self.assertLiteralStatementEvalEqual('"testing"[:]', 'testing')
+		self.assertLiteralStatementEvalEqual('"testing"[1:-1]', 'estin')
+		self.assertLiteralStatementEvalEqual('"testing"[1:6]', 'estin')
+		self.assertLiteralStatementEvalEqual('["t", "e", "s", "t", "i", "n", "g"][:]', tuple('testing'))
+		self.assertLiteralStatementEvalEqual('["t", "e", "s", "t", "i", "n", "g"][1:-1]', tuple('estin'))
+		self.assertLiteralStatementEvalEqual('["t", "e", "s", "t", "i", "n", "g"][1:6]', tuple('estin'))
 
 	def test_parse_boolean(self):
 		self.assertLiteralStatementEqual('true', ast.BooleanExpression, True)
@@ -206,17 +207,17 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual('d"2016-10-15 12:30"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, 12, 30, tzinfo=dateutil.tz.tzlocal()))
 
 	def test_parse_datetime_attributes(self):
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".date', datetime.datetime(2019, 9, 11, tzinfo=dateutil.tz.UTC))
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".day', 11)
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".hour', 20)
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".microsecond', 506406)
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".millisecond', 506.406)
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".minute', 46)
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".month', 9)
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".second', 57)
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".weekday', 'Wednesday')
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".year', 2019)
-		self.assertLiteralAttributeStatementEqual('d"2019-09-11T20:46:57.506406+00:00".zone_name', 'UTC')
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".date', datetime.datetime(2019, 9, 11, tzinfo=dateutil.tz.UTC))
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".day', 11)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".hour', 20)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".microsecond', 506406)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".millisecond', 506.406)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".minute', 46)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".month', 9)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".second', 57)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".weekday', 'Wednesday')
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".year', 2019)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".zone_name', 'UTC')
 
 	def test_parse_datetime_syntax_errors(self):
 		try:
@@ -266,6 +267,14 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertIsInstance(statement.expression, ast.FloatExpression, msg='the statement expression is not the correct literal type')
 		self.assertTrue(math.isnan(statement.expression.value), msg='the statement expression is not nan')
 
+	def test_parse_mapping(self):
+		self.assertLiteralStatementEvalEqual('{}', {})
+		self.assertLiteralStatementEvalEqual('{"one": 1}', {'one': 1})
+		self.assertLiteralStatementEvalEqual('{"one": 1,}', {'one': 1})
+		self.assertLiteralStatementEvalEqual('{"one": 1, "two": 2, "one": 1.11}', {'two': 2, 'one': 1.11})
+		with self.assertRaises(errors.EngineError):
+			self._parse('{ [1, asdfsadfasd]: "compound key" }', self.context)
+
 	def test_parse_null(self):
 		self.assertLiteralStatementEqual('null', ast.NullExpression, None)
 
@@ -277,8 +286,8 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual('s"Alice"', ast.StringExpression, 'Alice')
 
 	def test_parse_string_attributes(self):
-		self.assertLiteralAttributeStatementEqual('s"".is_empty', True)
-		self.assertLiteralAttributeStatementEqual('s"Alice".length', 5)
+		self.assertLiteralStatementEvalEqual('s"".is_empty', True)
+		self.assertLiteralStatementEvalEqual('s"Alice".length', 5)
 
 	def test_parse_string_escapes(self):
 		self.assertLiteralStatementEqual("'Alice\\\'s'", ast.StringExpression, 'Alice\'s')

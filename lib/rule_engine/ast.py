@@ -636,7 +636,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A base class for representing complex expressions composed of a left side and a right side, separated by an
 	operator.
 	"""
-	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
+	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.STRING)
 	"""
 	A tuple containing the compatible data types that the left and right expressions must return. This can for example
 	be used to indicate that arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but not
@@ -753,7 +753,7 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing comparison expressions from the grammar text such as equality checks."""
 	def _op_eq(self, thing):
 		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
-			if self.left.result_type is not self.right.result_type:
+			if not DataType.is_compatible(self.left.result_type, self.right.result_type):
 				return False
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
@@ -763,7 +763,7 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 
 	def _op_ne(self, thing):
 		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
-			if self.left.result_type is not self.right.result_type:
+			if not DataType.is_compatible(self.left.result_type, self.right.result_type):
 				return True
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)

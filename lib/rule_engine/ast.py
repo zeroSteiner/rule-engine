@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import collections
 import collections.abc
 import datetime
 import functools
@@ -599,17 +600,16 @@ class MappingExpression(LiteralExpressionBase):
 		)
 
 	def evaluate(self, thing):
-		keys = collections.deque()
-		values = collections.deque()
-		for key, value in reversed(self.value):
+		mapping = collections.OrderedDict()
+		for key, value in self.value:
 			key = key.evaluate(thing)
 			if DataType.from_value(key).is_compound:
 				raise errors.EngineError('compound data types may not be used as mapping keys')
-			if key in keys:
-				continue
-			keys.appendleft(key)
-			values.appendleft(value.evaluate(thing))
-		return collections.OrderedDict(zip(keys, values))
+			mapping[key] = value
+		# defer value evaluation to avoid evaluating values of duplicate keys
+		for key, value in mapping.items():
+			mapping[key] = value.evaluate(thing)
+		return mapping
 
 	@property
 	def is_reduced(self):

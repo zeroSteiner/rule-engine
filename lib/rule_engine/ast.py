@@ -523,7 +523,10 @@ class LiteralExpressionBase(ExpressionBase):
 		else:
 			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
 		if datatype.is_compound:
-			value = tuple(cls.from_value(context, val) for val in value)
+			if isinstance(datatype, DataType.ARRAY.__class__):
+				value = tuple(cls.from_value(context, v) for v in value)
+			elif isinstance(datatype, DataType.MAPPING.__class__):
+				value = tuple((cls.from_value(context, k), cls.from_value(context, v)) for k, v in value.items())
 		else:
 			value = coerce_value(value)
 		return subclass(context, value)
@@ -964,10 +967,18 @@ class GetItemExpression(ExpressionBase):
 		self.context = context
 		self.container = container
 		if container.result_type == DataType.STRING:
+			if not DataType.is_compatible(item.result_type, DataType.FLOAT):
+				raise errors.EvaluationError('data type mismatch (not an integer number)')
 			self.result_type = DataType.STRING
 		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
 		# is explicitly checking if result_type is an array with out checking the value_type
 		elif isinstance(container.result_type, DataType.ARRAY.__class__):
+			if not DataType.is_compatible(item.result_type, DataType.FLOAT):
+				raise errors.EvaluationError('data type mismatch (not an integer number)')
+			self.result_type = container.result_type.value_type
+		elif isinstance(container.result_type, DataType.MAPPING.__class__):
+			if not (safe or DataType.is_compatible(item.result_type, container.result_type.key_type)):
+				raise errors.LookupError(errors.UNDEFINED, errors.UNDEFINED)
 			self.result_type = container.result_type.value_type
 		elif container.result_type != DataType.UNDEFINED:
 			if not (container.result_type == DataType.NULL and safe):
@@ -983,11 +994,12 @@ class GetItemExpression(ExpressionBase):
 		if resolved_obj is None:
 			if self.safe:
 				return resolved_obj
-			raise errors.EvaluationError('data type mismatch')
+			raise errors.EvaluationError('data type mismatch (container is null)')
 
 		resolved_item = self.item.evaluate(thing)
-		_assert_is_integer_number(resolved_item)
-		resolved_item = int(resolved_item)
+		if isinstance(resolved_obj, (str, tuple)):
+			_assert_is_integer_number(resolved_item)
+			resolved_item = int(resolved_item)
 		try:
 			value = operator.getitem(resolved_obj, resolved_item)
 		except (IndexError, KeyError):
@@ -997,9 +1009,12 @@ class GetItemExpression(ExpressionBase):
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):
-		if not _is_reduced(self.container, self.item):
-			return self
-		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+		if isinstance(self.container.result_type, DataType.MAPPING.__class__):
+			if self.safe and not DataType.is_compatible(self.item.result_type, self.container.result_type.key_type):
+				return NullExpression(self.context)
+		if _is_reduced(self.container, self.item):
+			return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+		return self
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		super(GetItemExpression, self).to_graphviz(digraph, *args, **kwargs)

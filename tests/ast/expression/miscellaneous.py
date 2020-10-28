@@ -86,37 +86,50 @@ class ContainsExpressionTests(unittest.TestCase):
 			ast.ContainsExpression(context, container, member).evaluate(None)
 
 class GetItemExpressionTests(unittest.TestCase):
+	containers = {
+		ast.DataType.ARRAY:   ast.LiteralExpressionBase.from_value(context, ['one', 'two']),  # ARRAY
+		ast.DataType.MAPPING: ast.LiteralExpressionBase.from_value(context, {'foo': 'bar'}),  # MAPPING
+		ast.DataType.STRING:  ast.LiteralExpressionBase.from_value(context, 'Rule Engine!')   # STRING
+	}
 	def test_ast_expression_getitem(self):
-		container = ast.LiteralExpressionBase.from_value(context, range(5))
-
-		item_1 = ast.FloatExpression(context, 1.0)
-		get_item = ast.GetItemExpression(context, container, item_1)
-		self.assertEqual(get_item.evaluate(None), 1)
-		self.assertIsInstance(get_item.reduce(), ast.FloatExpression)
+		container = self.containers[ast.DataType.ARRAY]
+		item_0 = ast.FloatExpression(context, 0.0)
+		get_item = ast.GetItemExpression(context, container, item_0)
+		self.assertEqual(get_item.evaluate(None), 'one')
+		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
 
 		item_n1 = ast.FloatExpression(context, -1.0)
 		get_item = ast.GetItemExpression(context, container, item_n1)
-		self.assertEqual(get_item.evaluate(None), 4)
-		self.assertIsInstance(get_item.reduce(), ast.FloatExpression)
+		self.assertEqual(get_item.evaluate(None), 'two')
+		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
 
-		container = ast.StringExpression(context, 'Rule Engine')
-
-		get_item = ast.GetItemExpression(context, container, item_1)
-		self.assertEqual(get_item.evaluate(None), 'u')
+		container = self.containers[ast.DataType.STRING]
+		get_item = ast.GetItemExpression(context, container, item_0)
+		self.assertEqual(get_item.evaluate(None), 'R')
 		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
 
 		get_item = ast.GetItemExpression(context, container, item_n1)
-		self.assertEqual(get_item.evaluate(None), 'e')
+		self.assertEqual(get_item.evaluate(None), '!')
+		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
+
+	def test_ast_expression_getitem_mapping(self):
+		container = self.containers[ast.DataType.MAPPING]
+		item = ast.StringExpression(context, 'foo')
+		get_item = ast.GetItemExpression(context, container, item)
+		self.assertEqual(get_item.evaluate(None), 'bar')
 		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
 
 	def test_ast_expression_getitem_error(self):
-		container = ast.StringExpression(context, 'Rule Engine')
-		member = ast.FloatExpression(context, 100.0)
-		with self.assertRaises(errors.LookupError):
-			ast.GetItemExpression(context, container, member).evaluate(None)
-		member = ast.FloatExpression(context, 1.1)
-		with self.assertRaises(errors.EvaluationError):
-			ast.GetItemExpression(context, container, member).evaluate(None)
+		for container in self.containers.values():
+			member = ast.FloatExpression(context, 100.0)
+			with self.assertRaises(errors.LookupError):
+				ast.GetItemExpression(context, container, member).evaluate(None)
+			member = ast.FloatExpression(context, 1.1)
+			with self.assertRaises(errors.EvaluationError):
+				ast.GetItemExpression(context, container, member).evaluate(None)
+			member = ast.NullExpression(context)
+			with self.assertRaises(errors.EvaluationError):
+				ast.GetItemExpression(context, container, member)
 
 	def test_ast_expression_getitem_safe(self):
 		sym_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
@@ -127,6 +140,17 @@ class GetItemExpressionTests(unittest.TestCase):
 			get_item.evaluate({sym_name: None})
 		get_item = ast.GetItemExpression(context, container, member, safe=True)
 		self.assertIsNone(get_item.evaluate({sym_name: None}))
+
+		get_item = ast.GetItemExpression(context, container, member, safe=True)
+		self.assertIsNone(get_item.evaluate({sym_name: ''}))
+
+	def test_ast_expression_getitem_reduces(self):
+		container = ast.MappingExpression(context, (('one', 1), ('two', 2)))
+		member = ast.FloatExpression(context, 0)
+		with self.assertRaises(errors.LookupError):
+			get_item = ast.GetItemExpression(context, container, member)
+		get_item = ast.GetItemExpression(context, container, member, safe=True)
+		self.assertIsInstance(get_item.reduce(), ast.NullExpression)
 
 class GetSliceExpressionTests(unittest.TestCase):
 	def test_ast_expression_getslice(self):

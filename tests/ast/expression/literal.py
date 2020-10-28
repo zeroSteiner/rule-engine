@@ -84,13 +84,6 @@ class LiteralExpressionTests(unittest.TestCase):
 	def test_ast_expression_literal_array(self):
 		self.assertLiteralTests(ast.ArrayExpression, tuple(), tuple((ast.NullExpression(self.context),)))
 
-	def test_ast_expression_literall_array_error(self):
-		with self.assertRaises(TypeError):
-			ast.ArrayExpression(self.context, tuple((
-				ast.FloatExpression(self.context, 1.0),
-				ast.StringExpression(self.context, 'error')
-			)))
-
 	def test_ast_expression_literal_boolean(self):
 		self.assertLiteralTests(ast.BooleanExpression, False, True)
 

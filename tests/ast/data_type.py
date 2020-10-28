@@ -105,10 +105,6 @@ class DataTypeTests(unittest.TestCase):
 		self.assertEqual(value, ast.DataType.ARRAY(ast.DataType.STRING))
 		self.assertIs(value.value_type, ast.DataType.STRING)
 
-	def test_data_type_from_value_compound_error(self):
-		with self.assertRaises(TypeError):
-			ast.DataType.from_value([1.0, 'error'])
-
 	def test_data_type_from_value_scalar(self):
 		self.assertEqual(ast.DataType.from_value(False), ast.DataType.BOOLEAN)
 		self.assertEqual(ast.DataType.from_value(datetime.date.today()), ast.DataType.DATETIME)

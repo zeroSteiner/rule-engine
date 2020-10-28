@@ -137,7 +137,9 @@ def is_numeric(value):
 
 def _iterable_member_value_type(python_value):
 	"""
-	Take a native *python_value* and ensure that the types of each of it's members are either the same or NULL.
+	Take a native *python_value* and return the corresponding data type if type of each of its members are either the
+	same or NULL. NULL is considered a special case to allow nullable-values. This by extension means that an iterable
+	may not be defined as only capable of containing NULL values.
 
 	:return: The data type of the sequence members. This will never be NULL, because that is considered a special case.
 		It will either be UNSPECIFIED or one of the other types.
@@ -153,11 +155,7 @@ def _iterable_member_value_type(python_value):
 		# treat NULL as a special case, allowing typed arrays to be a specified type *or* NULL
 		# this however makes it impossible to define an array with a type of NULL
 		subvalue_types.remove(DataType.NULL)
-	if DataType.UNDEFINED in subvalue_types:
-		subvalue_types.remove(DataType.UNDEFINED)
-	if len(subvalue_types) > 1:
-		raise TypeError('can not map python sequence type with multiple member types')
-	if subvalue_types:
+	if len(subvalue_types) == 1:
 		subvalue_type = subvalue_types.pop()
 	else:
 		subvalue_type = DataType.UNDEFINED

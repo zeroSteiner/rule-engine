@@ -585,16 +585,18 @@ class DatetimeExpression(LiteralExpressionBase):
 class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
-	def __init__(self, context, value):
+	def __init__(self, context, value, **kwargs):
 		if isinstance(value, int):
 			value = float(value)
-		super(FloatExpression, self).__init__(context, value)
+		super(FloatExpression, self).__init__(context, value, **kwargs)
 
 class MappingExpression(LiteralExpressionBase):
 	"""Literal mapping expression representing a set of associations between keys and values."""
 	result_type = DataType.MAPPING
-	def __init__(self, *args, **kwargs):
-		super(MappingExpression, self).__init__(*args, **kwargs)
+	def __init__(self, context, value, **kwargs):
+		if isinstance(value, dict):
+			value = tuple(value.items())
+		super(MappingExpression, self).__init__(context, value, **kwargs)
 		self.result_type = DataType.MAPPING(
 			key_type=_iterable_member_value_type(key for key, _ in self.value),
 			value_type=_iterable_member_value_type(value for _, value in self.value)

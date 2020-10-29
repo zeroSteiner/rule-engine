@@ -97,6 +97,20 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
 
+	def test_ast_expression_mapping_attributes(self):
+		mapping = dict(one=1, two=2, three=3)
+		symbol = ast.SymbolExpression(context, 'map')
+
+		attributes = {
+			'keys': tuple(mapping.keys()),
+			'is_empty': len(mapping) == 0,
+			'length': len(mapping),
+			'values': tuple(mapping.values()),
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate({'map': mapping}), value, "attribute {} failed".format(attribute_name))
+
 	def test_ast_expression_string_attributes(self):
 		string = 'Rule Engine'
 		symbol = ast.StringExpression(context, string)

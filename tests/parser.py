@@ -273,7 +273,7 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEvalEqual('{"one": 1,}', {'one': 1})
 		self.assertLiteralStatementEvalEqual('{"one": 1, "two": 2, "one": 1.11}', {'two': 2, 'one': 1.11})
 		with self.assertRaises(errors.EngineError):
-			self._parse('{ [1, asdfsadfasd]: "compound key" }', self.context)
+			self._parse('{ {1: asdfsadfasd}: "compound key" }', self.context)
 
 	def test_parse_null(self):
 		self.assertLiteralStatementEqual('null', ast.NullExpression, None)

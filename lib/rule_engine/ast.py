@@ -248,8 +248,8 @@ class _MappingDataTypeDef(_DataTypeDef):
 			raise TypeError('the specified python_type is not a mapping')
 		super(_MappingDataTypeDef, self).__init__(name, python_type)
 		self.is_scalar = False
-		if key_type.is_compound:
-			raise errors.EngineError('compound data types may not be used as mapping keys')
+		if key_type.is_compound and not isinstance(key_type, DataType.ARRAY.__class__):
+			raise errors.EngineError("the {} data type may not be used for mapping keys".format(key_type.name))
 		self.key_type = key_type
 		self.value_type = value_type
 		self.value_type_nullable = value_type_nullable
@@ -604,8 +604,9 @@ class MappingExpression(LiteralExpressionBase):
 		mapping = collections.OrderedDict()
 		for key, value in self.value:
 			key = key.evaluate(thing)
-			if DataType.from_value(key).is_compound:
-				raise errors.EngineError('compound data types may not be used as mapping keys')
+			key_type = DataType.from_value(key)
+			if key_type.is_compound and not isinstance(key_type, DataType.ARRAY.__class__):
+				raise errors.EngineError("the {} data type may not be used for mapping keys".format(key_type.name))
 			mapping[key] = value
 		# defer value evaluation to avoid evaluating values of duplicate keys
 		for key, value in mapping.items():

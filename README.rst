@@ -52,9 +52,13 @@ operation is used. See `Type Hinting`_ for more information.
    rule = rule_engine.Rule('first_name + 1', context=context)
    # => EvaluationError: data type mismatch
 
+Want to give the rule expression language a try? Checkout the `Debug REPL`_ that makes experimentation easy. After
+installing just run ``python -m rule_engine.debug_repl``.
+
 Credits
 -------
 * Spencer McIntyre - zeroSteiner (`@zeroSteiner <https://twitter.com/zeroSteiner>`_)
 
 .. _Getting Started: https://zerosteiner.github.io/rule-engine/getting_started.html
 .. _Type Hinting: https://zerosteiner.github.io/rule-engine/getting_started.html#type-hinting
+.. _Debug REPL: https://zerosteiner.github.io/rule-engine/debug_repl.html

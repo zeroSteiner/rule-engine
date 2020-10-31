@@ -14,6 +14,9 @@ Version 2.4.0
 
 * Added the Debug REPL utility
 * Added the safe navigation version of the attribute, item and slice operators
+* Added the new :py:class:`~rule_engine.ast.DataType.MAPPING` data type
+* Switched from Travis-CI to GitHub Actions for continuous integration
+* Added support for iterables to have multiple member types
 
 Version 2.3.0
 ^^^^^^^^^^^^^

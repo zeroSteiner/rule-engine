@@ -20,6 +20,8 @@ on which the rule is being applied.
 | :py:attr:`~DataType.FLOAT`    | :py:class:`int`,              |
 |                               | :py:class:`float`             |
 +-------------------------------+-------------------------------+
+| :py:attr:`~DataType.MAPPING`  | :py:class:`dict`              |
++-------------------------------+-------------------------------+
 | :py:attr:`~DataType.NULL`     | :py:class:`NoneType`          |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.STRING`   | :py:class:`str`               |
@@ -76,13 +78,25 @@ The following table outlines all operators that can be used in Rule Engine expre
 +-----------+------------------------------+---------------------------------------------------------------+
 | **Arithmetic-Comparison Operators**                                                                      |
 +-----------+------------------------------+---------------------------------------------------------------+
-| ``>``     | Greater than                 | *ANY* :sup:`2`                                                |
+| ``>``     | Greater than                 | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.BOOLEAN`,     |
+|           |                              | :py:attr:`~DataType.DATETIME`, :py:attr:`~DataType.FLOAT`,    |
+|           |                              | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
+|           |                              | :sup:`2`                                                      |
 +-----------+------------------------------+---------------------------------------------------------------+
-| ``>=``    | Greater than or equal to     | *ANY* :sup:`2`                                                |
+| ``>=``    | Greater than or equal to     | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.BOOLEAN`,     |
+|           |                              | :py:attr:`~DataType.DATETIME`, :py:attr:`~DataType.FLOAT`,    |
+|           |                              | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
+|           |                              | :sup:`2`                                                      |
 +-----------+------------------------------+---------------------------------------------------------------+
-| ``<``     | Less than                    | *ANY* :sup:`2`                                                |
+| ``<``     | Less than                    | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.BOOLEAN`,     |
+|           |                              | :py:attr:`~DataType.DATETIME`, :py:attr:`~DataType.FLOAT`,    |
+|           |                              | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
+|           |                              | :sup:`2`                                                      |
 +-----------+------------------------------+---------------------------------------------------------------+
-| ``<=``    | Less than or equal to        | *ANY* :sup:`2`                                                |
+| ``<=``    | Less than or equal to        | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.BOOLEAN`,     |
+|           |                              | :py:attr:`~DataType.DATETIME`, :py:attr:`~DataType.FLOAT`,    |
+|           |                              | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
+|           |                              | :sup:`2`                                                      |
 +-----------+------------------------------+---------------------------------------------------------------+
 | **Fuzzy-Comparison Operators**                                                                           |
 +-----------+------------------------------+---------------------------------------------------------------+
@@ -105,15 +119,17 @@ The following table outlines all operators that can be used in Rule Engine expre
 | **Accessor Operators**                                                                                   |
 +-----------+------------------------------+---------------------------------------------------------------+
 | ``.``     | Attribute access             | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.DATETIME`,    |
-|           |                              | :py:attr:`~DataType.STRING`                                   |
+|           |                              | :py:attr:`~DataType.MAPPING`, :py:attr:`~DataType.STRING`     |
 +-----------+------------------------------+---------------------------------------------------------------+
 | ``&.``    | Safe attribute access        | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.DATETIME`,    |
-|           |                              | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
-+-----------+------------------------------+---------------------------------------------------------------+
-| ``[``     | Item lookup                  | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.STRING`       |
-+-----------+------------------------------+---------------------------------------------------------------+
-| ``&[``    | Safe item lookup             | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.NULL`,        |
+|           |                              | :py:attr:`~DataType.MAPPING`, :py:attr:`~DataType.NULL`,      |
 |           |                              | :py:attr:`~DataType.STRING`                                   |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``[``     | Item lookup                  | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.MAPPING`,     |
+|           |                              | :py:attr:`~DataType.STRING`                                   |
++-----------+------------------------------+---------------------------------------------------------------+
+| ``&[``    | Safe item lookup             | :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.MAPPING`,     |
+|           |                              | :py:attr:`~DataType.NULL`, :py:attr:`~DataType.STRING`        |
 +-----------+------------------------------+---------------------------------------------------------------+
 
 :sup:`1` Bitwise operations support floating point values, but if the value is not a natural number, an

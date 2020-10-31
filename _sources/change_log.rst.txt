@@ -12,7 +12,7 @@ Version 2.4.0
 
 *In progress*
 
-* Added the Debug REPL utility
+* Added the :ref:`debug-repl` utility
 * Added the safe navigation version of the attribute, item and slice operators
 * Added the new :py:class:`~rule_engine.ast.DataType.MAPPING` data type
 * Switched from Travis-CI to GitHub Actions for continuous integration

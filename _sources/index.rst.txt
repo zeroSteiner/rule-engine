@@ -40,6 +40,7 @@ See the `examples`_ folder for more.
    syntax.rst
    attributes.rst
    rule_engine/index.rst
+   debug_repl.rst
    change_log.rst
 
 Indices and tables

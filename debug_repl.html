@@ -1,0 +1,272 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Debug REPL &mdash; Rule Engine 2.4.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Change Log" href="change_log.html" />
+    <link rel="prev" title="parser" href="rule_engine/parser.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Rule Engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.4.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Debug REPL</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cli-arguments">CLI Arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-usage">Example Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Rule Engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Debug REPL</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/debug_repl.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="debug-repl">
+<span id="id1"></span><h1>Debug REPL<a class="headerlink" href="#debug-repl" title="Permalink to this headline">¶</a></h1>
+<p>Since version <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.4.0">v2.4.0</a>, the Rule Engine package includes a module which provides a Read Eval Print Loop (REPL)
+for debugging and testing purposes. This module can be executed using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">rule_engine.debug_repl</span></code>. Once
+started, the REPL loop can be used to evaluate rule expressions and view the results.</p>
+<div class="section" id="cli-arguments">
+<h2>CLI Arguments<a class="headerlink" href="#cli-arguments" title="Permalink to this headline">¶</a></h2>
+<p>The module when executed from the command line has the following options available.</p>
+<dl class="std option">
+<dt id="cmdoption-debug_repl-edit-console">
+<span id="cmdoption-debug-repl-edit-console"></span><code class="sig-name descname">--edit-console</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-debug_repl-edit-console" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start an interactive Python console that allows the user to setup the environment for the rule evaluation.</p>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-debug_repl-edit-file">
+<span id="cmdoption-debug-repl-edit-file"></span><code class="sig-name descname">--edit-file</code><code class="sig-prename descclassname"> &lt;path&gt;</code><a class="headerlink" href="#cmdoption-debug_repl-edit-file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the specified file containing Python source code, allowing it to setup the environment for the rule evaluation.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>When configured through either the <code class="docutils literal notranslate"><span class="pre">--edit-console</span></code> or <code class="docutils literal notranslate"><span class="pre">--edit-file</span></code> options, the <code class="docutils literal notranslate"><span class="pre">context</span></code> symbol may be
+customized using a user-defined <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance. Additionally, the object to evaluate
+can be configured through the <code class="docutils literal notranslate"><span class="pre">thing</span></code> symbol.</p>
+</div>
+<div class="section" id="example-usage">
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
+<p>The following example demonstrates using the Debug REPL with a <em>thing</em> (in this case a comic book) defined through the
+interactive console.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>python -m rule_engine.debug_repl --edit-console
+edit the &#39;context&#39; and &#39;thing&#39; objects as necessary
+&gt;&gt;&gt; thing = dict(title=&#39;Batman&#39;, publisher=&#39;DC&#39;, issue=1)
+&gt;&gt;&gt; exit()
+exiting the edit console...
+rule &gt; title == &#39;Superman&#39;
+result:
+False
+rule &gt; issue &lt; 5
+result:
+True
+rule &gt;
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="change_log.html" class="btn btn-neutral float-right" title="Change Log" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="rule_engine/parser.html" class="btn btn-neutral float-left" title="parser" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2019, Spencer McIntyre
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

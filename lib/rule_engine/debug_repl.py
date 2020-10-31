@@ -32,11 +32,24 @@
 
 import argparse
 import code
+import io
+import os
 import pprint
+import sys
 import traceback
 
 from . import __version__
 from . import engine
+
+def _console_interact(console, *args, **kwargs):
+	# see: https://bugs.python.org/issue34115
+	stdin = os.dup(0)
+	try:
+		console.interact(*args, **kwargs)
+	except SystemExit:
+		if 'exitmsg' in kwargs:
+			print(kwargs['exitmsg'])
+	sys.stdin = io.TextIOWrapper(io.BufferedReader(io.FileIO(stdin, mode='rb', closefd=False)))
 
 def main():
 	parser = argparse.ArgumentParser(description='Rule Engine: Debug REPL', conflict_handler='resolve')
@@ -48,6 +61,7 @@ def main():
 	)
 	parser.add_argument(
 		'--edit-file',
+		metavar='<path>',
 		type=argparse.FileType('r'),
 		help='edit the environment (via a file)'
 	)
@@ -69,7 +83,8 @@ def main():
 				symbol='exec'
 			))
 		if arguments.edit_console:
-			console.interact(
+			_console_interact(
+				console,
 				banner='edit the \'context\' and \'thing\' objects as necessary',
 				exitmsg='exiting the edit console...'
 			)

@@ -97,7 +97,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#advanced-usage">Advanced Usage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#setting-a-default-value">Setting A Default Value</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#custom-resolvers">Custom Resolvers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#type-hinting">Type Hinting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#type-hinting">Type Hinting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#compound-data-types">Compound Data Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-types-from-a-dictionary">Defining Types From A Dictionary</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#changing-builtin-symbols">Changing Builtin Symbols</a></li>
 </ul>
 </li>
@@ -441,21 +445,6 @@ type needs to be resolved. The return type should be a member of the <a class="r
 <span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">=</span><span class="n">type_resolver</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Compound data types such as <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code></a> can optionally specify member type information by calling
-their respective type. For example, an array of strings would be define as <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code>.</p>
-<p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be used to generate a <em>type_resolver</em>
-function from a dictionary mapping symbol names to their respective <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
-    <span class="n">type_resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">type_resolver_from_dict</span><span class="p">({</span>
-        <span class="c1"># map symbol names to their data types</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span>     <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
-        <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
-        <span class="s1">&#39;issue&#39;</span><span class="p">:</span>     <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
-        <span class="s1">&#39;released&#39;</span><span class="p">:</span>  <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
-    <span class="p">})</span>
-<span class="p">)</span>
-</pre></div>
-</div>
 <p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> can be defined as the data type for a valid symbol without specifying explicit type
 information. In this case, the rule object will know that it is a valid symbol, but will not validate any operations
 that reference it.</p>
@@ -474,6 +463,38 @@ that reference it.</p>
 <span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;author == &quot;Stan Lee&quot;&#39;</span><span class="p">)</span>
 <span class="c1"># =&gt; &lt;Rule text=&#39;author == &quot;Stan Lee&quot;&#39; &gt;</span>
 </pre></div>
+</div>
+<div class="section" id="compound-data-types">
+<h4>Compound Data Types<a class="headerlink" href="#compound-data-types" title="Permalink to this headline">¶</a></h4>
+<p>Compound data types such as the <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code></a> and <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-class docutils literal notranslate"><span class="pre">MAPPING</span></code></a> types can
+optionally specify member type information by calling their respective type. For example, an array of strings would be
+defined as <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code> while a mapping with string keys and float values would be defined as
+<code class="docutils literal notranslate"><span class="pre">DataType.MAPPING(DataType.STRING,</span> <span class="pre">DataType.FLOAT)</span></code>. For more information, see the documentation for the
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ARRAY()</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-meth docutils literal notranslate"><span class="pre">MAPPING()</span></code></a> functions.</p>
+<p>Compound member types can only be a single data type. In some cases the data type can optionally be nullable which means
+that the member value can be either the specified type or <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-class docutils literal notranslate"><span class="pre">NULL</span></code></a>. For example, a
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-class docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type whose values are all nullable strings may be defined, while a
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-class docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type with one value type of a <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-class docutils literal notranslate"><span class="pre">STRING</span></code></a> and another of a
+<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.BOOLEAN" title="rule_engine.ast.DataType.BOOLEAN"><code class="xref py py-class docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a> may not be defined. In this case, the key type may be defined while the value type is
+set to <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-class docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> which is the default value.</p>
+</div>
+<div class="section" id="defining-types-from-a-dictionary">
+<h4>Defining Types From A Dictionary<a class="headerlink" href="#defining-types-from-a-dictionary" title="Permalink to this headline">¶</a></h4>
+<p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be used to generate a <em>type_resolver</em>
+function from a dictionary mapping symbol names to their respective <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType" title="rule_engine.ast.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>. Starting with version
+<a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.1.0">v2.1.0</a> if a <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> is passed as the <em>type_resolver</em>, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a>
+function will be used automatically.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+    <span class="n">type_resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">type_resolver_from_dict</span><span class="p">({</span>
+        <span class="c1"># map symbol names to their data types</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span>     <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+        <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+        <span class="s1">&#39;issue&#39;</span><span class="p">:</span>     <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
+        <span class="s1">&#39;released&#39;</span><span class="p">:</span>  <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
+    <span class="p">})</span>
+<span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="changing-builtin-symbols">

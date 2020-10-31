@@ -45,6 +45,16 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-----------------+-------------------------------------+
 | ``zone_name``   | :py:attr:`~.DataType.STRING`        |
 +-----------------+-------------------------------------+
+| :py:attr:`~.DataType.MAPPING` **Attributes**          |
++-----------------+-------------------------------------+
+| ``is_empty``    | :py:attr:`~.DataType.BOOLEAN`       |
++-----------------+-------------------------------------+
+| ``keys``        | :py:attr:`~.DataType.ARRAY`         |
++-----------------+-------------------------------------+
+| ``length``      | :py:attr:`~.DataType.FLOAT`         |
++-----------------+-------------------------------------+
+| ``values``      | :py:attr:`~.DataType.ARRAY`         |
++-----------------+-------------------------------------+
 | :py:attr:`~.DataType.STRING` **Attributes**           |
 +-----------------+-------------------------------------+
 | ``as_lower``    | :py:attr:`~.DataType.STRING`        |

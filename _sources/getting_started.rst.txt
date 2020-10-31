@@ -242,24 +242,6 @@ type needs to be resolved. The return type should be a member of the :py:class:`
 
    context = rule_engine.Context(type_resolver=type_resolver)
 
-Compound data types such as :py:class:`~ast.DataType.ARRAY` can optionally specify member type information by calling
-their respective type. For example, an array of strings would be define as ``DataType.ARRAY(DataType.STRING)``.
-
-For convenience, the :py:func:`~engine.type_resolver_from_dict` function can be used to generate a *type_resolver*
-function from a dictionary mapping symbol names to their respective :py:class:`~ast.DataType`.
-
-.. code-block:: python
-
-   context = rule_engine.Context(
-       type_resolver=rule_engine.type_resolver_from_dict({
-           # map symbol names to their data types
-           'title':     rule_engine.DataType.STRING,
-           'publisher': rule_engine.DataType.STRING,
-           'issue':     rule_engine.DataType.FLOAT,
-           'released':  rule_engine.DataType.DATETIME
-       })
-   )
-
 :py:attr:`~ast.DataType.UNDEFINED` can be defined as the data type for a valid symbol without specifying explicit type
 information. In this case, the rule object will know that it is a valid symbol, but will not validate any operations
 that reference it.
@@ -281,6 +263,40 @@ In all cases, when a *type_resolver* is defined, the :py:class:`~engine.Rule` ob
    # this is valid: no type information is defined (context is omitted)
    rule = rule_engine.Rule('author == "Stan Lee"')
    # => <Rule text='author == "Stan Lee"' >
+
+Compound Data Types
+"""""""""""""""""""
+Compound data types such as the :py:class:`~ast.DataType.ARRAY` and :py:class:`~ast.DataType.MAPPING` types can
+optionally specify member type information by calling their respective type. For example, an array of strings would be
+defined as ``DataType.ARRAY(DataType.STRING)`` while a mapping with string keys and float values would be defined as
+``DataType.MAPPING(DataType.STRING, DataType.FLOAT)``. For more information, see the documentation for the
+:py:meth:`~ast.DataType.ARRAY`, :py:meth:`~ast.DataType.MAPPING` functions.
+
+Compound member types can only be a single data type. In some cases the data type can optionally be nullable which means
+that the member value can be either the specified type or :py:class:`~ast.DataType.NULL`. For example, a
+:py:class:`~ast.DataType.MAPPING` type whose values are all nullable strings may be defined, while a
+:py:class:`~ast.DataType.MAPPING` type with one value type of a :py:class:`~ast.DataType.STRING` and another of a
+:py:class:`~ast.DataType.BOOLEAN` may not be defined. In this case, the key type may be defined while the value type is
+set to :py:class:`~ast.DataType.UNDEFINED` which is the default value.
+
+Defining Types From A Dictionary
+""""""""""""""""""""""""""""""""
+For convenience, the :py:func:`~engine.type_resolver_from_dict` function can be used to generate a *type_resolver*
+function from a dictionary mapping symbol names to their respective :py:class:`~ast.DataType`. Starting with version
+:release:`2.1.0` if a :py:class:`dict` is passed as the *type_resolver*, the :py:func:`~engine.type_resolver_from_dict`
+function will be used automatically.
+
+.. code-block:: python
+
+   context = rule_engine.Context(
+       type_resolver=rule_engine.type_resolver_from_dict({
+           # map symbol names to their data types
+           'title':     rule_engine.DataType.STRING,
+           'publisher': rule_engine.DataType.STRING,
+           'issue':     rule_engine.DataType.FLOAT,
+           'released':  rule_engine.DataType.DATETIME
+       })
+   )
 
 Changing Builtin Symbols
 ^^^^^^^^^^^^^^^^^^^^^^^^

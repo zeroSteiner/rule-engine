@@ -2,6 +2,7 @@
 *.py[cod]
 
 .coverage
+.github/workflows/*.jnj
 .pylintrc
 .python-version
 Pipfile.lock

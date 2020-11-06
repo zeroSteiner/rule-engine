@@ -18,6 +18,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install build essentials
+        run: sudo apt-get --yes install build-essential
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -42,12 +45,15 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install build essentials
+        run: sudo apt-get --yes install build-essential
+
       - name: Set up Python
         uses: actions/setup-python@v2
 
       - name: Install dependencies
         run: |
-          pip install pipenv
+          pip install pip==19.0.3 pipenv==2018.11.26
           pipenv install --dev
 
       - name: Build the documentation
@@ -72,12 +78,15 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install build essentials
+        run: sudo apt-get --yes install build-essential
+
       - name: Set up Python
         uses: actions/setup-python@v2
 
       - name: Install dependencies
         run: |
-          pip install pipenv
+          pip install pip==19.0.3 pipenv==2018.11.26
           pipenv install --dev
 
       - name: Create the distribution
@@ -97,3 +106,4 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
+

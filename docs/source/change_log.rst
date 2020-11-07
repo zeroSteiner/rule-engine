@@ -10,7 +10,7 @@ Version 2.x.x
 Version 2.4.0
 ^^^^^^^^^^^^^
 
-*In progress*
+Released :release:`2.4.0` on November 7th, 2020
 
 * Added the :ref:`debug-repl` utility
 * Added the safe navigation version of the attribute, item and slice operators

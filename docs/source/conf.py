@@ -6,10 +6,11 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/stable/config
 
-# -- Path setup --------------------------------------------------------------
+import datetime
 import os
 import sys
 
+# -- Path setup --------------------------------------------------------------
 _prj_root = os.path.dirname(__file__)
 _prj_root = os.path.relpath(os.path.join('..', '..', 'lib'), _prj_root)
 _prj_root = os.path.abspath(_prj_root)
@@ -17,12 +18,11 @@ sys.path.insert(1, _prj_root)
 import rule_engine
 
 # -- Project information -----------------------------------------------------
-
 project = 'Rule Engine'
-copyright = '2019, Spencer McIntyre'
+copyright = "{.year}, Spencer McIntyre".format(datetime.datetime.now())
 author = 'Spencer McIntyre'
 
-# The short X.Y version
+# The short X.Y.Z version
 version = rule_engine.__version__
 # The full version, including alpha/beta/rc tags
 release = version

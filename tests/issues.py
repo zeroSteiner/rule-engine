@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/__init__.py
+#  tests/issues.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,8 +30,20 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from .ast import *
-from .engine import *
-from .errors import *
-from .issues import *
-from .parser import *
+import random
+import unittest
+
+import rule_engine.engine as engine
+
+class GitHubIssueTests(unittest.TestCase):
+	def test_number_10(self):
+		value = random.randint(1, 10000)
+		thing = {
+			'c': {
+				'c1': value,
+			}
+		}
+		rule_text = 'c.c1 == ' + str(value)
+		rule1 = engine.Rule(rule_text, context=engine.Context())
+		rule2 = engine.Rule(rule_text, context=engine.Context(default_value=None))
+		self.assertEqual(rule1.evaluate(thing), rule2.evaluate(thing))

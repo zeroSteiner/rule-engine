@@ -551,12 +551,7 @@
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">Builtins</span><span class="p">):</span>
 			<span class="k">return</span> <span class="n">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 		<span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-			<span class="k">try</span><span class="p">:</span>
-				<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-			<span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">:</span>
-				<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
-					<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span>
-				<span class="k">raise</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">)</span></div>
 
 	<span class="n">__resolve_attribute</span> <span class="o">=</span> <span class="n">_AttributeResolver</span><span class="p">()</span>
@@ -570,12 +565,7 @@
 <span class="sd">		:param str name: The attribute name that is being resolved.</span>
 <span class="sd">		:return: The value for the corresponding attribute *name*.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">try</span><span class="p">:</span>
-			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-		<span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">AttributeResolutionError</span><span class="p">:</span>
-			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
-				<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span>
-			<span class="k">raise</span></div>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 	<span class="n">resolve_attribute_type</span> <span class="o">=</span> <span class="n">__resolve_attribute</span><span class="o">.</span><span class="n">resolve_type</span>
 
 <div class="viewcode-block" id="Context.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>

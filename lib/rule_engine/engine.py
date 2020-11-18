@@ -392,12 +392,7 @@ class Context(object):
 		if isinstance(thing, Builtins):
 			return resolve_item(thing, name)
 		if scope is None:
-			try:
-				return self.__resolver(thing, name)
-			except errors.SymbolResolutionError:
-				if self.default_value is not errors.UNDEFINED:
-					return self.default_value
-				raise
+			return self.__resolver(thing, name)
 		raise errors.SymbolResolutionError(name, symbol_scope=scope, thing=thing)
 
 	__resolve_attribute = _AttributeResolver()
@@ -411,12 +406,7 @@ class Context(object):
 		:param str name: The attribute name that is being resolved.
 		:return: The value for the corresponding attribute *name*.
 		"""
-		try:
-			return self.__resolve_attribute(thing, object_, name)
-		except errors.AttributeResolutionError:
-			if self.default_value is not errors.UNDEFINED:
-				return self.default_value
-			raise
+		return self.__resolve_attribute(thing, object_, name)
 	resolve_attribute_type = __resolve_attribute.resolve_type
 
 	def resolve_type(self, name, scope=None):

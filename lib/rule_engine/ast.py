@@ -923,10 +923,7 @@ class GetAttributeExpression(ExpressionBase):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
 	def evaluate(self, thing):
-		if isinstance(self.object, SymbolExpression):
-			resolved_obj = self.context.resolve(thing, self.object.name, scope=self.object.scope)
-		else:
-			resolved_obj = self.object.evaluate(thing)
+		resolved_obj = self.object.evaluate(thing)
 		if resolved_obj is None and self.safe:
 			return resolved_obj
 
@@ -940,7 +937,10 @@ class GetAttributeExpression(ExpressionBase):
 		try:
 			value = self.context.resolve(resolved_obj, self.name)
 		except errors.SymbolResolutionError:
-			raise errors.AttributeResolutionError(self.name, resolved_obj, thing=thing) from None
+			default_value = self.context.default_value
+			if default_value is errors.UNDEFINED:
+				raise errors.AttributeResolutionError(self.name, resolved_obj, thing=thing) from None
+			value = default_value
 		return coerce_value(value, verify_type=False)
 
 	def reduce(self):
@@ -1117,7 +1117,13 @@ class SymbolExpression(ExpressionBase):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
 	def evaluate(self, thing):
-		value = self.context.resolve(thing, self.name, scope=self.scope)
+		try:
+			value = self.context.resolve(thing, self.name, scope=self.scope)
+		except errors.SymbolResolutionError:
+			default_value = self.context.default_value
+			if default_value is errors.UNDEFINED:
+				raise
+			value = default_value
 		value = coerce_value(value, verify_type=False)
 		if isinstance(value, datetime.datetime) and value.tzinfo is None:
 			value = value.replace(tzinfo=self.context.default_timezone)

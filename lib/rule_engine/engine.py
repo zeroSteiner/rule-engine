@@ -156,6 +156,7 @@ class _AttributeResolver(object):
 
 		:param object_type: The data type of the object that *name* is an attribute of.
 		:param str name: The name of the attribute to retrieve the data type of.
+		:return: The data type of the specified attribute.
 		"""
 		return self._get_resolver(object_type, name).result_type
 
@@ -255,6 +256,7 @@ class Builtins(collections.abc.Mapping):
 	a symbol name with the ``$`` prefix.
 	"""
 	scope_name = 'built-in'
+	"""The identity name of the scope for builtin symbols."""
 	def __init__(self, values, namespace=None, timezone=None, value_types=None):
 		"""
 		:param dict values: A mapping of string keys to be used as symbol names with values of either Python literals or
@@ -274,6 +276,12 @@ class Builtins(collections.abc.Mapping):
 		self.timezone = timezone or dateutil.tz.tzlocal()
 
 	def resolve_type(self, name):
+		"""
+		The method to use for resolving the data type of a builtin symbol.
+
+		:param str name: The name of the symbol to retrieve the data type of.
+		:return: The data type of the symbol or :py:attr:`~rule_engine.ast.DataType.UNDEFINED`.
+		"""
 		return self.__value_types.get(name, ast.DataType.UNDEFINED)
 
 	def __repr__(self):
@@ -429,7 +437,8 @@ class Context(object):
 		return :py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.
 
 		:param str name: The symbol name to provide a type hint for.
-		:return: The type of the specified symbol
+		:param str scope: An optional scope name that identifies from where to resolve the name.
+		:return: The type of the specified symbol.
 		"""
 		if scope == Builtins.scope_name:
 			return self.builtins.resolve_type(name)

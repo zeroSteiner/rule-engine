@@ -310,6 +310,12 @@
 		<span class="k">return</span> <span class="n">resolver</span>
 
 	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		The method to use for resolving the data type of an attribute.</span>
+
+<span class="sd">		:param object_type: The data type of the object that *name* is an attribute of.</span>
+<span class="sd">		:param str name: The name of the attribute to retrieve the data type of.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_resolver</span><span class="p">(</span><span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">result_type</span>
 
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">)</span>
@@ -542,6 +548,9 @@
 <span class="sd">		*scope* is ``None`` the resolver specified in :py:meth:`~.Context.__init__` is used which defaults to</span>
 <span class="sd">		:py:func:`resolve_item`.</span>
 
+<span class="sd">		If *name* fails to resolve, this method will raise :py:exc:`~rule_engine.errors.SymbolResolutionError`. It is</span>
+<span class="sd">		then up to the caller to determine whether or not it is appropriate to use :py:attr:`.default_value`.</span>
+
 <span class="sd">		:param thing: The object from which the *name* item will be accessed.</span>
 <span class="sd">		:param str name: The symbol name that is being resolved.</span>
 <span class="sd">		:return: The value for the corresponding symbol *name*.</span>
@@ -559,6 +568,9 @@
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		The method to use for resolving attributes from values. This function must return a compatible value for the</span>
 <span class="sd">		specified attribute name.</span>
+
+<span class="sd">		If *name* fails to resolve, this method will raise :py:exc:`~rule_engine.errors.AttributeResolutionError`. It is</span>
+<span class="sd">		then up to the caller to determine whether or not it is appropriate to use :py:attr:`.default_value`.</span>
 
 <span class="sd">		:param thing: The object from which the *object_* was retrieved.</span>
 <span class="sd">		:param object_: The object from which the *name* attribute will be accessed.</span>

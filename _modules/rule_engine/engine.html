@@ -315,6 +315,7 @@
 
 <span class="sd">		:param object_type: The data type of the object that *name* is an attribute of.</span>
 <span class="sd">		:param str name: The name of the attribute to retrieve the data type of.</span>
+<span class="sd">		:return: The data type of the specified attribute.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_resolver</span><span class="p">(</span><span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">result_type</span>
 
@@ -414,6 +415,7 @@
 <span class="sd">	a symbol name with the ``$`` prefix.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">scope_name</span> <span class="o">=</span> <span class="s1">&#39;built-in&#39;</span>
+	<span class="sd">&quot;&quot;&quot;The identity name of the scope for builtin symbols.&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Builtins.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Builtins.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param dict values: A mapping of string keys to be used as symbol names with values of either Python literals or</span>
@@ -433,6 +435,12 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span> <span class="ow">or</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">tz</span><span class="o">.</span><span class="n">tzlocal</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Builtins.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Builtins.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		The method to use for resolving the data type of a builtin symbol.</span>
+
+<span class="sd">		:param str name: The name of the symbol to retrieve the data type of.</span>
+<span class="sd">		:return: The data type of the symbol or :py:attr:`~rule_engine.ast.DataType.UNDEFINED`.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span></div>
 
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -588,7 +596,8 @@
 <span class="sd">		return :py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.</span>
 
 <span class="sd">		:param str name: The symbol name to provide a type hint for.</span>
-<span class="sd">		:return: The type of the specified symbol</span>
+<span class="sd">		:param str scope: An optional scope name that identifies from where to resolve the name.</span>
+<span class="sd">		:return: The type of the specified symbol.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="n">Builtins</span><span class="o">.</span><span class="n">scope_name</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>

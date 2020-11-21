@@ -151,6 +151,12 @@ class _AttributeResolver(object):
 		return resolver
 
 	def resolve_type(self, object_type, name):
+		"""
+		The method to use for resolving the data type of an attribute.
+
+		:param object_type: The data type of the object that *name* is an attribute of.
+		:param str name: The name of the attribute to retrieve the data type of.
+		"""
 		return self._get_resolver(object_type, name).result_type
 
 	@attribute('date', ast.DataType.DATETIME, result_type=ast.DataType.DATETIME)
@@ -383,6 +389,9 @@ class Context(object):
 		*scope* is ``None`` the resolver specified in :py:meth:`~.Context.__init__` is used which defaults to
 		:py:func:`resolve_item`.
 
+		If *name* fails to resolve, this method will raise :py:exc:`~rule_engine.errors.SymbolResolutionError`. It is
+		then up to the caller to determine whether or not it is appropriate to use :py:attr:`.default_value`.
+
 		:param thing: The object from which the *name* item will be accessed.
 		:param str name: The symbol name that is being resolved.
 		:return: The value for the corresponding symbol *name*.
@@ -400,6 +409,9 @@ class Context(object):
 		"""
 		The method to use for resolving attributes from values. This function must return a compatible value for the
 		specified attribute name.
+
+		If *name* fails to resolve, this method will raise :py:exc:`~rule_engine.errors.AttributeResolutionError`. It is
+		then up to the caller to determine whether or not it is appropriate to use :py:attr:`.default_value`.
 
 		:param thing: The object from which the *object_* was retrieved.
 		:param object_: The object from which the *name* attribute will be accessed.

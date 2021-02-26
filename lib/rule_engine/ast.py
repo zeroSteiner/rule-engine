@@ -66,8 +66,10 @@ def coerce_value(value, verify_type=True):
 	elif isinstance(value, int) and not isinstance(value, bool):
 		value = float(value)
 	# MAPPING
-	elif isinstance(value, dict) and not isinstance(value, collections.OrderedDict):
-		value = collections.OrderedDict(value)
+	elif isinstance(value, (dict, collections.OrderedDict)):
+		value = collections.OrderedDict(
+			(coerce_value(k, verify_type=verify_type), coerce_value(v, verify_type=verify_type)) for k, v in value.items()
+		)
 	if verify_type:
 		DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
 	return value

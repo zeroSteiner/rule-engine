@@ -33,6 +33,7 @@
 import collections
 import collections.abc
 import datetime
+import decimal
 import functools
 import math
 import re
@@ -329,7 +330,15 @@ class Context(object):
 	An object defining the context for a rule's evaluation. This can be used to change the behavior of certain aspects
 	of the rule such as how symbols are resolved and what regex flags should be used.
 	"""
-	def __init__(self, regex_flags=0, resolver=None, type_resolver=None, default_timezone='local', default_value=errors.UNDEFINED):
+	def __init__(
+			self,
+			regex_flags=0,
+			resolver=None,
+			type_resolver=None,
+			default_timezone='local',
+			default_value=errors.UNDEFINED,
+			decimal_context=None
+	):
 		"""
 		:param int regex_flags: The flags to provide to functions in the :py:mod:`re` module when calling either the
 			:py:func:`~re.match` or :py:func:`~re.search` functions for comparison expressions.
@@ -342,13 +351,19 @@ class Context(object):
 			specially supported (case-insensitive) values of "local" or "utc".
 		:type default_timezone: str, :py:class:`~datetime.tzinfo`
 		:param default_value: The default value to return when resolving either a missing symbol or attribute.
-
+		:param decimal_context: A specific :py:class:`decimal.Context` object to use for evaluation of ``FLOAT`` values.
+			The default value will be taken from the current thread and will be used by all evaluations using this
+			:py:class:`~rule_engine.engine.Context` regardless of the decimal context of the thread which evaluates the
+			rule. This causes the rule evaluation to be consistent regardless of the calling thread.
 		.. versionchanged:: 2.0.0
 			Added the *default_value* parameter.
 
 		.. versionchanged:: 2.1.0
 			If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict` will be called on it automatically
 			and the result will be used as the callback.
+
+		.. versionchanged:: 3.0.0
+			Added the *decimal_context* parameter.
 		"""
 		self.regex_flags = regex_flags
 		"""The *regex_flags* parameter from :py:meth:`~__init__`"""
@@ -379,6 +394,8 @@ class Context(object):
 			timezone=default_timezone
 		)
 		"""An instance of :py:class:`Builtins` to provided a default set of builtin symbol values."""
+		self.decimal_context = decimal_context or decimal.getcontext()
+		"""The *decimal_context* parameter from :py:meth:`~__init__`"""
 		if isinstance(type_resolver, collections.abc.Mapping):
 			type_resolver = type_resolver_from_dict(type_resolver)
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
@@ -511,7 +528,8 @@ class Rule(object):
 			boolean.
 		"""
 		self.context._tls.clear()
-		return self.statement.evaluate(thing)
+		with decimal.localcontext(self.context.decimal_context):
+			return self.statement.evaluate(thing)
 
 	def matches(self, thing):
 		"""

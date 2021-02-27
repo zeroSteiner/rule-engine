@@ -3,30 +3,9 @@
 Rule Syntax
 ===========
 The syntax for creating rules is based off of logical expressions evaluating to either True (matching) or False (non-
-matching). Rules support a small set of data types which can be defined as constants or resolved using the Python object
-on which the rule is being applied.
-
-+-------------------------------+-------------------------------+
-| Rule Engine Data Type         | Compatible Python Types       |
-+-------------------------------+-------------------------------+
-| :py:attr:`~DataType.ARRAY`    | :py:class:`list`,             |
-|                               | :py:class:`tuple`             |
-+-------------------------------+-------------------------------+
-| :py:attr:`~DataType.BOOLEAN`  | :py:class:`bool`              |
-+-------------------------------+-------------------------------+
-| :py:attr:`~DataType.DATETIME` | :py:class:`datetime.date`,    |
-|                               | :py:class:`datetime.datetime` |
-+-------------------------------+-------------------------------+
-| :py:attr:`~DataType.FLOAT`    | :py:class:`int`,              |
-|                               | :py:class:`float`             |
-|                               | :py:class:`decimal.Decimal`   |
-+-------------------------------+-------------------------------+
-| :py:attr:`~DataType.MAPPING`  | :py:class:`dict`              |
-+-------------------------------+-------------------------------+
-| :py:attr:`~DataType.NULL`     | :py:class:`NoneType`          |
-+-------------------------------+-------------------------------+
-| :py:attr:`~DataType.STRING`   | :py:class:`str`               |
-+-------------------------------+-------------------------------+
+matching). Rules support a small set of data types which can be defined as literals or resolved using the Python object
+on which the rule is being applied. See the :ref:`Data Types<data-types>` table for a comprehensive list of the
+supported types.
 
 Not all supported operations work with all data types as noted in the table below. Rules follow a standard `order of
 operations`_.
@@ -35,6 +14,8 @@ Grammar
 -------
 The expression grammar supports a number of operations including basic arithmetic for numerical data and regular
 expressions for strings. Operations are type aware and will raise an exception when an incompatible type is used.
+
+.. _data-type-operations:
 
 Supported Operations
 ^^^^^^^^^^^^^^^^^^^^

@@ -38,6 +38,7 @@ See the `examples`_ folder for more.
 
    getting_started.rst
    syntax.rst
+   types.rst
    attributes.rst
    rule_engine/index.rst
    debug_repl.rst

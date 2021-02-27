@@ -31,6 +31,7 @@
 #
 
 import datetime
+import decimal
 import itertools
 import random
 import string
@@ -221,7 +222,7 @@ class SymbolExpressionTests(unittest.TestCase):
 		symbol = ast.SymbolExpression(context, 'test', scope='built-in')
 		expression = ast.GetAttributeExpression(context, symbol, 'one')
 		value = expression.evaluate(None)
-		self.assertIsInstance(value, float)
+		self.assertIsInstance(value, decimal.Decimal)
 		self.assertEqual(value, 1.0)
 
 	def test_ast_expression_symbol_scope_error(self):
@@ -286,7 +287,7 @@ class SymbolExpressionConversionTests(unittest.TestCase):
 
 	def test_ast_expression_symbol_type_converts_int(self):
 		result = self.symbol.evaluate({self.sym_name: 1})
-		self.assertIsInstance(result, float)
+		self.assertIsInstance(result, decimal.Decimal)
 		self.assertEqual(result, 1.0)
 
 	def test_ast_expression_symbol_type_converts_range(self):

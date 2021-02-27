@@ -31,6 +31,7 @@
 #
 
 import datetime
+import decimal
 import math
 import unittest
 
@@ -85,7 +86,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			'day': 11,
 			'hour': 20,
 			'microsecond': 506406,
-			'millisecond': 506.406,
+			'millisecond': decimal.Decimal('506.406'),
 			'minute': 46,
 			'month': 9,
 			'second': 57,

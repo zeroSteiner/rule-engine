@@ -31,11 +31,11 @@
 #
 
 import datetime
+import decimal
 import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
-import rule_engine.errors as errors
 
 __all__ = ('LiteralExpressionTests',)
 
@@ -92,7 +92,7 @@ class LiteralExpressionTests(unittest.TestCase):
 		self.assertLiteralTests(ast.FloatExpression, 0.0, float('nan'), *trueish_floats)
 		# converts ints to floats automatically
 		int_float = ast.FloatExpression(context, 1)
-		self.assertIsInstance(int_float.value, float)
+		self.assertIsInstance(int_float.value, decimal.Decimal)
 		self.assertEqual(int_float.value, 1.0)
 
 	def test_ast_expression_literal_null(self):

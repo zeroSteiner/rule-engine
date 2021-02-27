@@ -19,6 +19,7 @@ on which the rule is being applied.
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.FLOAT`    | :py:class:`int`,              |
 |                               | :py:class:`float`             |
+|                               | :py:class:`decimal.Decimal`   |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.MAPPING`  | :py:class:`dict`              |
 +-------------------------------+-------------------------------+

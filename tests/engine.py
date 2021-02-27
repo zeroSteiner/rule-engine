@@ -32,6 +32,7 @@
 
 import collections
 import datetime
+import decimal
 import os
 import random
 import re
@@ -209,7 +210,7 @@ class EngineRuleTests(unittest.TestCase):
 		self.assertTrue(rule.evaluate({'a': {'b': {'c': True}}}))
 
 		value = rule.evaluate({'a': {'b': {'c': 1}}})
-		self.assertIsInstance(value, float)
+		self.assertIsInstance(value, decimal.Decimal)
 		self.assertEqual(value, 1.0)
 
 		value = rule.evaluate({'a': {'b': {'c': {'d': None}}}})

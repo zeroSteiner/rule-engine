@@ -31,6 +31,7 @@
 #
 
 import datetime
+import decimal
 import itertools
 import math
 import unittest
@@ -66,7 +67,7 @@ class ParserTests(ParserTestsBase):
 		for case in cases:
 			statement = self._parse(case, self.context)
 			self.assertIsInstance(statement.expression, ast.FloatExpression)
-			self.assertEqual(statement.evaluate(None), 100)
+			self.assertEqual(statement.evaluate(None), decimal.Decimal('100'))
 
 	def test_parser_raises_syntax_error(self):
 		with self.assertRaises(errors.RuleSyntaxError):
@@ -179,8 +180,8 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_array(self):
 		self.assertLiteralStatementEvalEqual('[ ]', tuple())
-		self.assertLiteralStatementEvalEqual('[1, 2]', tuple((1.0, 2.0)))
-		self.assertLiteralStatementEvalEqual('[1, 2,]', tuple((1.0, 2.0)))
+		self.assertLiteralStatementEvalEqual('[1, 2]', tuple((decimal.Decimal('1.0'), decimal.Decimal('2.0'))))
+		self.assertLiteralStatementEvalEqual('[1, 2,]', tuple((decimal.Decimal('1.0'), decimal.Decimal('2.0'))))
 
 	def test_parse_array_getitem(self):
 		cases = (
@@ -208,15 +209,15 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_datetime_attributes(self):
 		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".date', datetime.datetime(2019, 9, 11, tzinfo=dateutil.tz.UTC))
-		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".day', 11)
-		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".hour', 20)
-		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".microsecond', 506406)
-		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".millisecond', 506.406)
-		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".minute', 46)
-		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".month', 9)
-		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".second', 57)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".day', decimal.Decimal('11'))
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".hour', decimal.Decimal('20'))
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".microsecond', decimal.Decimal('506406'))
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".millisecond', decimal.Decimal('506.406'))
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".minute', decimal.Decimal('46'))
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".month', decimal.Decimal('9'))
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".second', decimal.Decimal('57'))
 		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".weekday', 'Wednesday')
-		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".year', 2019)
+		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".year', decimal.Decimal('2019'))
 		self.assertLiteralStatementEvalEqual('d"2019-09-11T20:46:57.506406+00:00".zone_name', 'UTC')
 
 	def test_parse_datetime_syntax_errors(self):
@@ -228,38 +229,38 @@ class ParserLiteralTests(ParserTestsBase):
 			self.fail('DatetimeSyntaxError was not raised')
 
 	def test_parse_float(self):
-		self.assertLiteralStatementEqual('3.14', ast.FloatExpression, 3.14)
-		self.assertLiteralStatementEqual('3.140', ast.FloatExpression, 3.140)
-		self.assertLiteralStatementEqual('.314', ast.FloatExpression, 0.314)
-		self.assertLiteralStatementEqual('0.314', ast.FloatExpression, 0.314)
+		self.assertLiteralStatementEqual('3.14', ast.FloatExpression, decimal.Decimal('3.14'))
+		self.assertLiteralStatementEqual('3.140', ast.FloatExpression, decimal.Decimal('3.140'))
+		self.assertLiteralStatementEqual('.314', ast.FloatExpression, decimal.Decimal('0.314'))
+		self.assertLiteralStatementEqual('0.314', ast.FloatExpression, decimal.Decimal('0.314'))
 
 	def test_parse_float_exponent(self):
-		self.assertLiteralStatementEqual('3.14e5', ast.FloatExpression, 314000.0)
-		self.assertLiteralStatementEqual('3.14e+3', ast.FloatExpression, 3140.0)
-		self.assertLiteralStatementEqual('3.14e-3', ast.FloatExpression, 0.00314)
-		self.assertLiteralStatementEqual('3.14E5', ast.FloatExpression, 314000.0)
-		self.assertLiteralStatementEqual('3.14E+3', ast.FloatExpression, 3140.0)
-		self.assertLiteralStatementEqual('3.14E-3', ast.FloatExpression, 0.00314)
+		self.assertLiteralStatementEqual('3.14e5', ast.FloatExpression, decimal.Decimal('314000.0'))
+		self.assertLiteralStatementEqual('3.14e+3', ast.FloatExpression, decimal.Decimal('3140.0'))
+		self.assertLiteralStatementEqual('3.14e-3', ast.FloatExpression, decimal.Decimal('0.00314'))
+		self.assertLiteralStatementEqual('3.14E5', ast.FloatExpression, decimal.Decimal('314000.0'))
+		self.assertLiteralStatementEqual('3.14E+3', ast.FloatExpression, decimal.Decimal('3140.0'))
+		self.assertLiteralStatementEqual('3.14E-3', ast.FloatExpression, decimal.Decimal('0.00314'))
 
 	def test_parse_float_base_2(self):
-		self.assertLiteralStatementEqual('0b00', ast.FloatExpression, 0)
-		self.assertLiteralStatementEqual('0b11', ast.FloatExpression, 3)
+		self.assertLiteralStatementEqual('0b00', ast.FloatExpression, decimal.Decimal('0'))
+		self.assertLiteralStatementEqual('0b11', ast.FloatExpression, decimal.Decimal('3'))
 
 	def test_parse_float_base_8(self):
-		self.assertLiteralStatementEqual('0o00', ast.FloatExpression, 0)
-		self.assertLiteralStatementEqual('0o77', ast.FloatExpression, 63)
+		self.assertLiteralStatementEqual('0o00', ast.FloatExpression, decimal.Decimal('0'))
+		self.assertLiteralStatementEqual('0o77', ast.FloatExpression, decimal.Decimal('63'))
 
 	def test_parse_float_base_10(self):
-		self.assertLiteralStatementEqual('00', ast.FloatExpression, 0)
-		self.assertLiteralStatementEqual('99', ast.FloatExpression, 99)
+		self.assertLiteralStatementEqual('00', ast.FloatExpression, decimal.Decimal('0'))
+		self.assertLiteralStatementEqual('99', ast.FloatExpression, decimal.Decimal('99'))
 
 	def test_parse_float_base_16(self):
-		self.assertLiteralStatementEqual('0x00', ast.FloatExpression, 0)
-		self.assertLiteralStatementEqual('0xdeadbeef', ast.FloatExpression, 3735928559)
-		self.assertLiteralStatementEqual('0xdeADbeEF', ast.FloatExpression, 3735928559)
+		self.assertLiteralStatementEqual('0x00', ast.FloatExpression, decimal.Decimal('0'))
+		self.assertLiteralStatementEqual('0xdeadbeef', ast.FloatExpression, decimal.Decimal('3735928559'))
+		self.assertLiteralStatementEqual('0xdeADbeEF', ast.FloatExpression, decimal.Decimal('3735928559'))
 
 	def test_parse_float_inf(self):
-		self.assertLiteralStatementEqual('inf', ast.FloatExpression, float('inf'))
+		self.assertLiteralStatementEqual('inf', ast.FloatExpression, decimal.Decimal('inf'))
 
 	def test_parse_float_nan(self):
 		statement = self._parse('nan', self.context)
@@ -269,9 +270,9 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_mapping(self):
 		self.assertLiteralStatementEvalEqual('{}', {})
-		self.assertLiteralStatementEvalEqual('{"one": 1}', {'one': 1})
-		self.assertLiteralStatementEvalEqual('{"one": 1,}', {'one': 1})
-		self.assertLiteralStatementEvalEqual('{"one": 1, "two": 2, "one": 1.11}', {'two': 2, 'one': 1.11})
+		self.assertLiteralStatementEvalEqual('{"one": 1}', {'one': decimal.Decimal('1')})
+		self.assertLiteralStatementEvalEqual('{"one": 1,}', {'one': decimal.Decimal('1')})
+		self.assertLiteralStatementEvalEqual('{"one": 1, "two": 2, "one": 1.11}', {'two': decimal.Decimal('2'), 'one': decimal.Decimal('1.11')})
 		with self.assertRaises(errors.EngineError):
 			self._parse('{ {1: asdfsadfasd}: "compound key" }', self.context)
 
@@ -287,7 +288,7 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_string_attributes(self):
 		self.assertLiteralStatementEvalEqual('s"".is_empty', True)
-		self.assertLiteralStatementEvalEqual('s"Alice".length', 5)
+		self.assertLiteralStatementEvalEqual('s"Alice".length', decimal.Decimal('5'))
 
 	def test_parse_string_escapes(self):
 		self.assertLiteralStatementEqual("'Alice\\\'s'", ast.StringExpression, 'Alice\'s')
@@ -296,14 +297,14 @@ class ParserLiteralTests(ParserTestsBase):
 	def test_parse_xxx_edge_cases(self):
 		# test the safe getattr parsing for weird edge cases
 		self.assertLiteralStatementEqual('null&.doesnotexist', ast.NullExpression, None)
-		self.assertLiteralStatementEqual('2&.0', ast.FloatExpression, 0)
-		self.assertLiteralStatementEqual('1 & .0', ast.FloatExpression, 0)
-		self.assertLiteralStatementEqual('"test"&.length', ast.FloatExpression, 4)
-		self.assertLiteralStatementEqual('("test").length', ast.FloatExpression, 4)
+		self.assertLiteralStatementEqual('2&.0', ast.FloatExpression, decimal.Decimal('0'))
+		self.assertLiteralStatementEqual('1 & .0', ast.FloatExpression, decimal.Decimal('0'))
+		self.assertLiteralStatementEqual('"test"&.length', ast.FloatExpression, decimal.Decimal('4'))
+		self.assertLiteralStatementEqual('("test").length', ast.FloatExpression, decimal.Decimal('4'))
 		with self.assertRaises(errors.RuleSyntaxError):
-			self.assertLiteralStatementEqual('"test"(.length)', ast.FloatExpression, 4)
+			self.assertLiteralStatementEqual('"test"(.length)', ast.FloatExpression, decimal.Decimal('4'))
 		with self.assertRaises(errors.RuleSyntaxError):
-			self.assertLiteralStatementEqual('"test".(length)', ast.FloatExpression, 4)
+			self.assertLiteralStatementEqual('"test".(length)', ast.FloatExpression, decimal.Decimal('4'))
 
 if __name__ == '__main__':
 	unittest.main()

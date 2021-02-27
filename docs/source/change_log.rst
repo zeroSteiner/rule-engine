@@ -4,6 +4,13 @@ Change Log
 This document contains notes on the major changes for each version of the Rule Engine. In comparison to the git log,
 this list is curated by the development team for note worthy changes.
 
+Version 3.x.x
+-------------
+
+*In progress*
+
+* Switched the ``FLOAT`` datatype to use Python's :py:class:`~decimal.Decimal` from :py:class:`float` internally
+
 Version 2.x.x
 -------------
 

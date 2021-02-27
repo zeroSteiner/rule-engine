@@ -33,6 +33,7 @@
 import collections
 import collections.abc
 import datetime
+import decimal
 import functools
 import math
 import operator
@@ -43,6 +44,11 @@ from . import errors
 import dateutil.parser
 
 NoneType = type(None)
+
+def _to_decimal(value):
+	if isinstance(value, decimal.Decimal):
+		return value
+	return decimal.Decimal(repr(value))
 
 def coerce_value(value, verify_type=True):
 	"""
@@ -63,8 +69,8 @@ def coerce_value(value, verify_type=True):
 	elif isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
 		value = datetime.datetime(value.year, value.month, value.day)
 	# FLOAT
-	elif isinstance(value, int) and not isinstance(value, bool):
-		value = float(value)
+	elif isinstance(value, (float, int)) and not isinstance(value, bool):
+		value = _to_decimal(value)
 	# MAPPING
 	elif isinstance(value, (dict, collections.OrderedDict)):
 		value = collections.OrderedDict(
@@ -131,7 +137,7 @@ def is_numeric(value):
 	:return: Whether or not the value is numeric.
 	:rtype: bool
 	"""
-	if not isinstance(value, (int, float)):
+	if not isinstance(value, (decimal.Decimal, float, int)):
 		return False
 	if isinstance(value, bool):
 		return False
@@ -321,7 +327,7 @@ class DataType(metaclass=DataTypeMeta):
 	"""
 	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
 	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
-	FLOAT = _DataTypeDef('FLOAT', float)
+	FLOAT = _DataTypeDef('FLOAT', decimal.Decimal)
 	MAPPING = _MappingDataTypeDef('MAPPING', dict)
 	"""
 	.. py:function:: __call__(key_type, value_type, value_type_nullable=True)
@@ -372,7 +378,7 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.BOOLEAN
 		elif python_type is datetime.date or python_type is datetime.datetime:
 			return cls.DATETIME
-		elif python_type in (float, int):
+		elif python_type in (decimal.Decimal, float, int):
 			return cls.FLOAT
 		elif python_type is dict:
 			return cls.MAPPING
@@ -396,7 +402,7 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.BOOLEAN
 		elif isinstance(python_value, (datetime.date, datetime.datetime)):
 			return cls.DATETIME
-		elif isinstance(python_value, (float, int)):
+		elif isinstance(python_value, (decimal.Decimal, float, int)):
 			return cls.FLOAT
 		elif python_value is None:
 			return cls.NULL
@@ -588,8 +594,7 @@ class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
 	def __init__(self, context, value, **kwargs):
-		if isinstance(value, int):
-			value = float(value)
+		value = _to_decimal(value)
 		super(FloatExpression, self).__init__(context, value, **kwargs)
 
 class MappingExpression(LiteralExpressionBase):
@@ -703,11 +708,11 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	result_expression = FloatExpression
 	result_type = DataType.FLOAT
 	def __op_arithmetic(self, op, thing):
-		left = self.left.evaluate(thing)
-		_assert_is_numeric(left)
-		right = self.right.evaluate(thing)
-		_assert_is_numeric(right)
-		return float(op(left, right))
+		left_value = self.left.evaluate(thing)
+		_assert_is_numeric(left_value)
+		right_value = self.right.evaluate(thing)
+		_assert_is_numeric(right_value)
+		return op(left_value, right_value)
 
 	_op_add  = functools.partialmethod(__op_arithmetic, operator.add)
 	_op_sub  = functools.partialmethod(__op_arithmetic, operator.sub)
@@ -736,7 +741,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 		_assert_is_natural_number(left)
 		right = self.right.evaluate(thing)
 		_assert_is_natural_number(right)
-		return float(op(int(left), int(right)))
+		return _to_decimal(op(int(left), int(right)))
 
 	_op_bwand = functools.partialmethod(__op_bitwise, operator.and_)
 	_op_bwor  = functools.partialmethod(__op_bitwise, operator.or_)

@@ -98,6 +98,25 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
 
+	def test_ast_expression_float_attributes(self):
+		flt = decimal.Decimal('3.14159')
+		symbol = ast.SymbolExpression(context, 'flt')
+
+		attributes = {
+			'ceiling': decimal.Decimal('4'),
+			'floor': decimal.Decimal('3'),
+			'to_str': '3.14159'
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate({'flt': flt}), value, "attribute {} failed".format(attribute_name))
+
+		# check special values too
+		expression = ast.GetAttributeExpression(context, symbol, 'to_str')
+		for value in ('nan', 'inf', '-inf'):
+			flt = decimal.Decimal(value)
+			self.assertEqual(expression.evaluate({'flt': flt}), value, "attribute {} failed".format(attribute_name))
+
 	def test_ast_expression_mapping_attributes(self):
 		mapping = dict(one=1, two=2, three=3)
 		symbol = ast.SymbolExpression(context, 'map')

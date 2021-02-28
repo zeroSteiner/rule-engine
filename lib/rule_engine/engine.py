@@ -94,6 +94,11 @@ def _type_resolver(type_map, name):
 		raise errors.SymbolResolutionError(name)
 	return type_map[name]
 
+def _float_op(value, op):
+	if value.is_nan() or value.is_infinite():
+		return value
+	return op(value)
+
 def type_resolver_from_dict(dictionary):
 	"""
 	Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a dictionary. If
@@ -206,6 +211,26 @@ class _AttributeResolver(object):
 	def datetime_zone_name(self, value):
 		return value.tzname()
 
+	@attribute('ceiling', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
+	def float_ceiling(self, value):
+		return _float_op(value, math.ceil)
+
+	@attribute('floor', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
+	def float_floor(self, value):
+		return _float_op(value, math.floor)
+
+	@attribute('to_str', ast.DataType.FLOAT, result_type=ast.DataType.STRING)
+	def float_to_str(self, value):
+		# keep the string representations consistent for nan, inf, -inf
+		if value.is_nan():
+			return 'nan'
+		elif value.is_infinite():
+			if value.is_signed():
+				return '-inf'
+			else:
+				return 'inf'
+		return str(value)
+
 	@attribute('keys', ast.DataType.MAPPING, result_type=ast.DataType.ARRAY)
 	def mapping_keys(self, value):
 		return tuple(value.keys())
@@ -230,10 +255,10 @@ class _AttributeResolver(object):
 	def string_to_flt(self, value):
 		value = value.strip()
 		if re.match(r'-?inf', value):
-			return float(value)
+			return decimal.Decimal(value)
 		match = re.match(r'^(' + parser.Parser.t_FLOAT + ')$', value)
 		if match is None:
-			return float('nan')
+			return decimal.Decimal('nan')
 		return parser.literal_eval(match.group(0))
 
 	@attribute('to_int', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
@@ -309,9 +334,10 @@ class Builtins(collections.abc.Mapping):
 	@classmethod
 	def from_defaults(cls, values=None, **kwargs):
 		"""Initialize a :py:class:`Builtins` instance with a set of default values."""
+		# there may be errors here if the decimal.Context precision exceeds what is provided by the math constants
 		default_values = {
-			'e': math.e,
-			'pi': math.pi,
+			'e': decimal.Decimal(repr(math.e)),
+			'pi': decimal.Decimal(repr(math.pi)),
 			'now': _now,
 			'today': _today
 		}

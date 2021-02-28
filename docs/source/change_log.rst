@@ -10,6 +10,11 @@ Version 3.x.x
 *In progress*
 
 * Switched the ``FLOAT`` datatype to use Python's :py:class:`~decimal.Decimal` from :py:class:`float` internally
+* Reserved the ``if``, ``elif``, ``else``, ``for`` and ``while`` keywords for future use, they can no longer be used as
+  symbol names
+* Added some new data attributes
+
+    * Added ``ceiling``, ``floor`` and ``to_str`` to :py:class:`~rule_engine.ast.DataType.FLOAT`
 
 Version 2.x.x
 -------------

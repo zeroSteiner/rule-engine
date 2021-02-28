@@ -228,6 +228,8 @@ class Parser(ParserBase):
 
 	def t_SYMBOL(self, t):
 		r'\$?[a-zA-Z_][a-zA-Z0-9_]*'
+		if t.value in ('if', 'elif', 'else', 'for', 'while'):
+			raise errors.RuleSyntaxError("syntax error (the {} keyword is reserved for future use)".format(t.value))
 		t.type = self.reserved_words.get(t.value, 'SYMBOL')
 		return t
 

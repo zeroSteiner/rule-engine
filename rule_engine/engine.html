@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>engine &mdash; Rule Engine 2.4.2 documentation</title>
+  <title>engine &mdash; Rule Engine 3.0.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                2.4.2
+                3.0.0
               </div>
             
           
@@ -93,6 +93,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../types.html">Data Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../attributes.html">Data Attributes</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ast.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a></li>
@@ -304,13 +305,13 @@ single argument, which is the instance of <a class="reference internal" href="#r
 
 <dl class="py class">
 <dt id="rule_engine.engine.Context">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Context</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regex_flags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'local'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.Context" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Context</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regex_flags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'local'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimal_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.Context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An object defining the context for a rule’s evaluation. This can be used to change the behavior of certain aspects
 of the rule such as how symbols are resolved and what regex flags should be used.</p>
 <dl class="py method">
 <dt id="rule_engine.engine.Context.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regex_flags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'local'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.Context.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regex_flags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'local'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimal_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.Context.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -323,6 +324,10 @@ have one specified. This is necessary for comparison operations. The value shoul
 <a class="reference external" href="https://docs.python.org/3.9/library/datetime.html#datetime.tzinfo" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> instance, or a string. If <em>default_timzezone</em> is a string it must be one of the
 specially supported (case-insensitive) values of “local” or “utc”.</p></li>
 <li><p><strong>default_value</strong> – The default value to return when resolving either a missing symbol or attribute.</p></li>
+<li><p><strong>decimal_context</strong> – A specific <a class="reference external" href="https://docs.python.org/3.9/library/decimal.html#decimal.Context" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Context</span></code></a> object to use for evaluation of <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> values.
+The default value will be taken from the current thread and will be used by all evaluations using this
+<a class="reference internal" href="#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> regardless of the decimal context of the thread which evaluates the
+rule. This causes the rule evaluation to be consistent regardless of the calling thread.</p></li>
 </ul>
 </dd>
 </dl>
@@ -333,12 +338,21 @@ specially supported (case-insensitive) values of “local” or “utc”.</p></
 <p><span class="versionmodified changed">Changed in version 2.1.0: </span>If <em>type_resolver</em> is a dictionary, <a class="reference internal" href="#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> will be called on it automatically
 and the result will be used as the callback.</p>
 </div>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 3.0.0: </span>Added the <em>decimal_context</em> parameter.</p>
+</div>
 </dd></dl>
 
 <dl class="py attribute">
 <dt id="rule_engine.engine.Context.builtins">
 <code class="sig-name descname"><span class="pre">builtins</span></code><a class="headerlink" href="#rule_engine.engine.Context.builtins" title="Permalink to this definition">¶</a></dt>
 <dd><p>An instance of <a class="reference internal" href="#rule_engine.engine.Builtins" title="rule_engine.engine.Builtins"><code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code></a> to provided a default set of builtin symbol values.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="rule_engine.engine.Context.decimal_context">
+<code class="sig-name descname"><span class="pre">decimal_context</span></code><a class="headerlink" href="#rule_engine.engine.Context.decimal_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <em>decimal_context</em> parameter from <a class="reference internal" href="#rule_engine.engine.Context.__init__" title="rule_engine.engine.Context.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a></p>
 </dd></dl>
 
 <dl class="py attribute">

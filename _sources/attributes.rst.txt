@@ -45,6 +45,14 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-----------------+-------------------------------------+
 | ``zone_name``   | :py:attr:`~.DataType.STRING`        |
 +-----------------+-------------------------------------+
+| :py:attr:`~.DataType.FLOAT`   **Attributes** :sup:`1` |
++-----------------+-------------------------------------+
+| ``ceiling``     | :py:attr:`~.DataType.FLOAT`         |
++-----------------+-------------------------------------+
+| ``floor``       | :py:attr:`~.DataType.FLOAT`         |
++-----------------+-------------------------------------+
+| ``to_str``      | :py:attr:`~.DataType.STRING`        |
++-----------------+-------------------------------------+
 | :py:attr:`~.DataType.MAPPING` **Attributes**          |
 +-----------------+-------------------------------------+
 | ``is_empty``    | :py:attr:`~.DataType.BOOLEAN`       |
@@ -71,3 +79,8 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-----------------+-------------------------------------+
 | ``length``      | :py:attr:`~.DataType.FLOAT`         |
 +-----------------+-------------------------------------+
+
+FLOAT Attributes :sup:`1`
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Due to the syntax of floating point literals, the attributes must be accessed using parenthesis. For example
+``3.14.to_str`` is invalid while ``(3.14).to_str`` is valid.

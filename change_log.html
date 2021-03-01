@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Change Log &mdash; Rule Engine 2.4.2 documentation</title>
+  <title>Change Log &mdash; Rule Engine 3.0.0 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                2.4.2
+                3.0.0
               </div>
             
           
@@ -92,10 +92,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">Data Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="debug_repl.html">Debug REPL</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-x-x">Version 3.x.x</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-2-x-x">Version 2.x.x</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#version-2-4-0">Version 2.4.0</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version-2-3-0">Version 2.3.0</a></li>
@@ -182,6 +184,22 @@
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
 <p>This document contains notes on the major changes for each version of the Rule Engine. In comparison to the git log,
 this list is curated by the development team for note worthy changes.</p>
+<div class="section" id="version-3-x-x">
+<h2>Version 3.x.x<a class="headerlink" href="#version-3-x-x" title="Permalink to this headline">¶</a></h2>
+<p><em>In progress</em></p>
+<ul>
+<li><p>Switched the <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> datatype to use Python’s <a class="reference external" href="https://docs.python.org/3.9/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> from <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> internally</p></li>
+<li><p>Reserved the <code class="docutils literal notranslate"><span class="pre">if</span></code>, <code class="docutils literal notranslate"><span class="pre">elif</span></code>, <code class="docutils literal notranslate"><span class="pre">else</span></code>, <code class="docutils literal notranslate"><span class="pre">for</span></code> and <code class="docutils literal notranslate"><span class="pre">while</span></code> keywords for future use, they can no longer be used as
+symbol names</p></li>
+<li><p>Added some new data attributes</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">ceiling</span></code>, <code class="docutils literal notranslate"><span class="pre">floor</span></code> and <code class="docutils literal notranslate"><span class="pre">to_str</span></code> to <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-class docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div>
 <div class="section" id="version-2-x-x">
 <h2>Version 2.x.x<a class="headerlink" href="#version-2-x-x" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="version-2-4-0">

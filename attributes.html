@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Data Attributes &mdash; Rule Engine 2.4.2 documentation</title>
+  <title>Data Attributes &mdash; Rule Engine 3.0.0 documentation</title>
   
 
   
@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="rule_engine" href="rule_engine/index.html" />
-    <link rel="prev" title="Rule Syntax" href="syntax.html" /> 
+    <link rel="prev" title="Data Types" href="types.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                2.4.2
+                3.0.0
               </div>
             
           
@@ -93,8 +93,12 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="types.html">Data Types</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Data Attributes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#builtin-attributes">Builtin Attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#builtin-attributes">Builtin Attributes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#float-attributes-1">FLOAT Attributes <sup>1</sup></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
@@ -227,6 +231,17 @@ submembers. If the resolver function fails, the attribute will be checked to det
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">zone_name</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 </tr>
+<tr class="row-odd"><td colspan="2"><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>   <strong>Attributes</strong> <sup>1</sup></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ceiling</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">floor</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">to_str</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+</tr>
 <tr class="row-odd"><td colspan="2"><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> <strong>Attributes</strong></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">is_empty</span></code></p></td>
@@ -266,6 +281,11 @@ submembers. If the resolver function fails, the attribute will be checked to det
 </tr>
 </tbody>
 </table>
+<div class="section" id="float-attributes-1">
+<h3>FLOAT Attributes <sup>1</sup><a class="headerlink" href="#float-attributes-1" title="Permalink to this headline">¶</a></h3>
+<p>Due to the syntax of floating point literals, the attributes must be accessed using parenthesis. For example
+<code class="docutils literal notranslate"><span class="pre">3.14.to_str</span></code> is invalid while <code class="docutils literal notranslate"><span class="pre">(3.14).to_str</span></code> is valid.</p>
+</div>
 </div>
 </div>
 
@@ -276,7 +296,7 @@ submembers. If the resolver function fails, the attribute will be checked to det
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="rule_engine/index.html" class="btn btn-neutral float-right" title="rule_engine" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="syntax.html" class="btn btn-neutral float-left" title="Rule Syntax" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="types.html" class="btn btn-neutral float-left" title="Data Types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

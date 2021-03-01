@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rule_engine.engine &mdash; Rule Engine 2.4.2 documentation</title>
+  <title>rule_engine.engine &mdash; Rule Engine 3.0.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                2.4.2
+                3.0.0
               </div>
             
           
@@ -91,6 +91,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../types.html">Data Types</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../attributes.html">Data Attributes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../debug_repl.html">Debug REPL</a></li>
@@ -196,6 +197,7 @@
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">collections.abc</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -255,6 +257,11 @@
 	<span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">type_map</span><span class="p">:</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 	<span class="k">return</span> <span class="n">type_map</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">_float_op</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_nan</span><span class="p">()</span> <span class="ow">or</span> <span class="n">value</span><span class="o">.</span><span class="n">is_infinite</span><span class="p">():</span>
+		<span class="k">return</span> <span class="n">value</span>
+	<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 <div class="viewcode-block" id="type_resolver_from_dict"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict">[docs]</a><span class="k">def</span> <span class="nf">type_resolver_from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -368,6 +375,26 @@
 	<span class="k">def</span> <span class="nf">datetime_zone_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">tzname</span><span class="p">()</span>
 
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;ceiling&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">float_ceiling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">_float_op</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">)</span>
+
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;floor&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">float_floor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">_float_op</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">)</span>
+
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_str&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="c1"># keep the string representations consistent for nan, inf, -inf</span>
+		<span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_nan</span><span class="p">():</span>
+			<span class="k">return</span> <span class="s1">&#39;nan&#39;</span>
+		<span class="k">elif</span> <span class="n">value</span><span class="o">.</span><span class="n">is_infinite</span><span class="p">():</span>
+			<span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_signed</span><span class="p">():</span>
+				<span class="k">return</span> <span class="s1">&#39;-inf&#39;</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">return</span> <span class="s1">&#39;inf&#39;</span>
+		<span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">mapping_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -392,10 +419,10 @@
 	<span class="k">def</span> <span class="nf">string_to_flt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 		<span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;-?inf&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-			<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+			<span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 		<span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^(&#39;</span> <span class="o">+</span> <span class="n">parser</span><span class="o">.</span><span class="n">Parser</span><span class="o">.</span><span class="n">t_FLOAT</span> <span class="o">+</span> <span class="s1">&#39;)$&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 		<span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-			<span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+			<span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_int&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
@@ -471,9 +498,10 @@
 <div class="viewcode-block" id="Builtins.from_defaults"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Builtins.from_defaults">[docs]</a>	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">from_defaults</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;Initialize a :py:class:`Builtins` instance with a set of default values.&quot;&quot;&quot;</span>
+		<span class="c1"># there may be errors here if the decimal.Context precision exceeds what is provided by the math constants</span>
 		<span class="n">default_values</span> <span class="o">=</span> <span class="p">{</span>
-			<span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
-			<span class="s1">&#39;pi&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+			<span class="s1">&#39;e&#39;</span><span class="p">:</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">e</span><span class="p">)),</span>
+			<span class="s1">&#39;pi&#39;</span><span class="p">:</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)),</span>
 			<span class="s1">&#39;now&#39;</span><span class="p">:</span> <span class="n">_now</span><span class="p">,</span>
 			<span class="s1">&#39;today&#39;</span><span class="p">:</span> <span class="n">_today</span>
 		<span class="p">}</span>
@@ -492,7 +520,15 @@
 <span class="sd">	An object defining the context for a rule&#39;s evaluation. This can be used to change the behavior of certain aspects</span>
 <span class="sd">	of the rule such as how symbols are resolved and what regex flags should be used.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regex_flags</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_timezone</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">,</span> <span class="n">default_value</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">):</span>
+<div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+			<span class="bp">self</span><span class="p">,</span>
+			<span class="n">regex_flags</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+			<span class="n">resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+			<span class="n">type_resolver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+			<span class="n">default_timezone</span><span class="o">=</span><span class="s1">&#39;local&#39;</span><span class="p">,</span>
+			<span class="n">default_value</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">,</span>
+			<span class="n">decimal_context</span><span class="o">=</span><span class="kc">None</span>
+	<span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param int regex_flags: The flags to provide to functions in the :py:mod:`re` module when calling either the</span>
 <span class="sd">			:py:func:`~re.match` or :py:func:`~re.search` functions for comparison expressions.</span>
@@ -505,13 +541,19 @@
 <span class="sd">			specially supported (case-insensitive) values of &quot;local&quot; or &quot;utc&quot;.</span>
 <span class="sd">		:type default_timezone: str, :py:class:`~datetime.tzinfo`</span>
 <span class="sd">		:param default_value: The default value to return when resolving either a missing symbol or attribute.</span>
-
+<span class="sd">		:param decimal_context: A specific :py:class:`decimal.Context` object to use for evaluation of ``FLOAT`` values.</span>
+<span class="sd">			The default value will be taken from the current thread and will be used by all evaluations using this</span>
+<span class="sd">			:py:class:`~rule_engine.engine.Context` regardless of the decimal context of the thread which evaluates the</span>
+<span class="sd">			rule. This causes the rule evaluation to be consistent regardless of the calling thread.</span>
 <span class="sd">		.. versionchanged:: 2.0.0</span>
 <span class="sd">			Added the *default_value* parameter.</span>
 
 <span class="sd">		.. versionchanged:: 2.1.0</span>
 <span class="sd">			If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict` will be called on it automatically</span>
 <span class="sd">			and the result will be used as the callback.</span>
+
+<span class="sd">		.. versionchanged:: 3.0.0</span>
+<span class="sd">			Added the *decimal_context* parameter.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">regex_flags</span>
 		<span class="sd">&quot;&quot;&quot;The *regex_flags* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
@@ -542,6 +584,8 @@
 			<span class="n">timezone</span><span class="o">=</span><span class="n">default_timezone</span>
 		<span class="p">)</span>
 		<span class="sd">&quot;&quot;&quot;An instance of :py:class:`Builtins` to provided a default set of builtin symbol values.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">decimal_context</span> <span class="o">=</span> <span class="n">decimal_context</span> <span class="ow">or</span> <span class="n">decimal</span><span class="o">.</span><span class="n">getcontext</span><span class="p">()</span>
+		<span class="sd">&quot;&quot;&quot;The *decimal_context* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">type_resolver</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
 			<span class="n">type_resolver</span> <span class="o">=</span> <span class="n">type_resolver_from_dict</span><span class="p">(</span><span class="n">type_resolver</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>
@@ -674,7 +718,8 @@
 <span class="sd">			boolean.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span></div>
+		<span class="k">with</span> <span class="n">decimal</span><span class="o">.</span><span class="n">localcontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">decimal_context</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rule.matches"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.matches">[docs]</a>	<span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>

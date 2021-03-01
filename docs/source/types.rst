@@ -46,7 +46,7 @@ point arithmetic, a :py:class:`decimal.Context` can be specified by the :py:clas
 
 Since Python's :py:class:`~decimal.Decimal` values are not always equivalent to themselves (e.g.
 ``0.1 != Decimal('0.1')``) it's important to know that Rule Engine will coerce and normalize these values. That means
-that while in Python `0.1 in [ Decimal('0.1') ]` will evaluate to ``False``, in a rule it will evaluate to ``True``
+that while in Python ``0.1 in [ Decimal('0.1') ]`` will evaluate to ``False``, in a rule it will evaluate to ``True``
 (e.g. ``Rule('0.1 in numbers').evaluate({'numbers': [Decimal('0.1')]})``). This also affects Python dictionaries that
 are converted to Rule Engine ``MAPPING`` values. While in Python the value ``{0.1: 'a', Decimal('0.1'): 'a'}`` would
 have a length of 2 with two unique keys, the same value once converted into a Rule Engine ``MAPPING`` would have a

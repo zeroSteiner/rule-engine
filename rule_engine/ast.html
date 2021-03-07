@@ -186,6 +186,14 @@
   <div class="section" id="module-rule_engine.ast">
 <span id="ast"></span><h1><a class="reference external" href="https://docs.python.org/3.9/library/ast.html#module-ast" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a><a class="headerlink" href="#module-rule_engine.ast" title="Permalink to this headline">¶</a></h1>
 <p>This module contains the nodes which comprise the abstract syntax tree generated from parsed grammar text.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The content of this module should be treated as private.</p>
+</div>
+<p>While the code within this module is documented, it is <em>not</em> meant to be used by consumers of the package. Directly
+accessing and using any object or function within this module should be done with care. Breaking API changes within this
+module may not always cause a major version bump. The reason for this is that it is often necessary to update the AST in
+an API breaking way in order to add new features.</p>
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">

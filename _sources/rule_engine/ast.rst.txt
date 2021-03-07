@@ -6,6 +6,14 @@
 
 This module contains the nodes which comprise the abstract syntax tree generated from parsed grammar text.
 
+.. warning::
+    The content of this module should be treated as private.
+
+While the code within this module is documented, it is *not* meant to be used by consumers of the package. Directly
+accessing and using any object or function within this module should be done with care. Breaking API changes within this
+module may not always cause a major version bump. The reason for this is that it is often necessary to update the AST in
+an API breaking way in order to add new features.
+
 Functions
 ---------
 

@@ -212,12 +212,12 @@ class _DataTypeDef(object):
 		return not self.is_scalar
 
 _DATA_TYPE_UNDEFINED = _DataTypeDef('UNDEFINED', errors.UNDEFINED)
-class _ArrayDataTypeDef(_DataTypeDef):
+class _CollectionDataTypeDef(_DataTypeDef):
 	__slots__ = ('value_type', 'value_type_nullable')
 	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
-		if not issubclass(python_type, collections.abc.Sequence):
-			raise TypeError('the specified python_type is not an array')
-		super(_ArrayDataTypeDef, self).__init__(name, python_type)
+		if not issubclass(python_type, collections.abc.Collection):
+			raise TypeError('the specified python_type is not a collection')
+		super(_CollectionDataTypeDef, self).__init__(name, python_type)
 		self.is_scalar = False
 		self.value_type = value_type
 		self.value_type_nullable = value_type_nullable
@@ -248,6 +248,12 @@ class _ArrayDataTypeDef(_DataTypeDef):
 
 	def __hash__(self):
 		return hash((self.python_type, self.is_scalar, hash((self.value_type, self.value_type_nullable))))
+
+class _ArrayDataTypeDef(_CollectionDataTypeDef):
+	pass
+
+class _SetDataTypeDef(_CollectionDataTypeDef):
+	pass
 
 class _MappingDataTypeDef(_DataTypeDef):
 	__slots__ = ('key_type', 'value_type', 'value_type_nullable')
@@ -337,6 +343,7 @@ class DataType(metaclass=DataTypeMeta):
 	:param bool value_type_nullable: Whether or not mapping values are allowed to be :py:attr:`.NULL`.
 	"""
 	NULL = _DataTypeDef('NULL', NoneType)
+	SET = _SetDataTypeDef('SET', set)
 	STRING = _DataTypeDef('STRING', str)
 	UNDEFINED = _DATA_TYPE_UNDEFINED
 	"""
@@ -384,6 +391,8 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.MAPPING
 		elif python_type is NoneType:
 			return cls.NULL
+		elif python_type is set:
+			return cls.SET
 		elif python_type is str:
 			return cls.STRING
 		raise ValueError("can not map python type {0!r} to a compatible data type".format(python_type.__name__))
@@ -406,6 +415,8 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.FLOAT
 		elif python_value is None:
 			return cls.NULL
+		elif isinstance(python_value, (set,)):
+			return cls.SET
 		elif isinstance(python_value, (str,)):
 			return cls.STRING
 		elif isinstance(python_value, collections.abc.Mapping):
@@ -446,6 +457,8 @@ class DataType(metaclass=DataTypeMeta):
 				if not cls.is_compatible(dt1.value_type, dt2.value_type):
 					return False
 				return True
+			elif isinstance(dt1, _SetDataTypeDef) and isinstance(dt2, _SetDataTypeDef):
+				return cls.is_compatible(dt1.value_type, dt2.value_type)
 		return False
 
 	@classmethod
@@ -531,8 +544,8 @@ class LiteralExpressionBase(ExpressionBase):
 		else:
 			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
 		if datatype.is_compound:
-			if isinstance(datatype, DataType.ARRAY.__class__):
-				value = tuple(cls.from_value(context, v) for v in value)
+			if isinstance(datatype, _CollectionDataTypeDef):
+				value = datatype.python_type(cls.from_value(context, v) for v in value)
 			elif isinstance(datatype, DataType.MAPPING.__class__):
 				value = tuple((cls.from_value(context, k), cls.from_value(context, v)) for k, v in value.items())
 		else:
@@ -982,7 +995,7 @@ class GetItemExpression(ExpressionBase):
 			self.result_type = DataType.STRING
 		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
 		# is explicitly checking if result_type is an array with out checking the value_type
-		elif isinstance(container.result_type, DataType.ARRAY.__class__):
+		elif isinstance(container.result_type, _CollectionDataTypeDef):
 			if not DataType.is_compatible(item.result_type, DataType.FLOAT):
 				raise errors.EvaluationError('data type mismatch (not an integer number)')
 			self.result_type = container.result_type.value_type
@@ -1054,7 +1067,7 @@ class GetSliceExpression(ExpressionBase):
 			self.result_type = DataType.STRING
 		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
 		# is explicitly checking if result_type is an array with out checking the value_type
-		elif isinstance(container.result_type, DataType.ARRAY.__class__):
+		elif isinstance(container.result_type, _CollectionDataTypeDef):
 			self.result_type = container.result_type
 		elif container.result_type != DataType.UNDEFINED:
 			if not (container.result_type == DataType.NULL and safe):

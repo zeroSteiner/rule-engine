@@ -262,6 +262,8 @@ class _MappingDataTypeDef(_DataTypeDef):
 			raise TypeError('the specified python_type is not a mapping')
 		super(_MappingDataTypeDef, self).__init__(name, python_type)
 		self.is_scalar = False
+		# ARRAY is the only compound data type that can be used as a mapping key, this is because ARRAY's are backed by
+		# Python tuple's while SET and MAPPING objects are set and dict instances, respectively which are not hashable.
 		if key_type.is_compound and not isinstance(key_type, DataType.ARRAY.__class__):
 			raise errors.EngineError("the {} data type may not be used for mapping keys".format(key_type.name))
 		self.key_type = key_type
@@ -539,6 +541,8 @@ class LiteralExpressionBase(ExpressionBase):
 		"""
 		datatype = DataType.from_value(value)
 		for subclass in cls.__subclasses__():
+			if subclass.__name__.startswith('_'):
+				continue
 			if DataType.is_compatible(subclass.result_type, datatype):
 				break
 		else:
@@ -564,25 +568,26 @@ class LiteralExpressionBase(ExpressionBase):
 ################################################################################
 # Literal Expressions
 ################################################################################
-class ArrayExpression(LiteralExpressionBase):
-	"""Literal array expressions containing 0 or more sub-expressions."""
-	result_type = DataType.ARRAY
-	def __init__(self, *args, **kwargs):
-		super(ArrayExpression, self).__init__(*args, **kwargs)
-		self.result_type = DataType.ARRAY(value_type=_iterable_member_value_type(self.value))
-
+class _CollectionMixin(object):
 	def evaluate(self, thing):
-		return tuple(member.evaluate(thing) for member in self.value)
+		return self.result_type.python_type(member.evaluate(thing) for member in self.value)
 
 	@property
 	def is_reduced(self):
 		return _is_reduced(*self.value)
 
 	def to_graphviz(self, digraph, *args, **kwargs):
-		super(ArrayExpression, self).to_graphviz(digraph, *args, **kwargs)
+		super(_CollectionMixin, self).to_graphviz(digraph, *args, **kwargs)
 		for member in self.value:
 			member.to_graphviz(digraph, *args, **kwargs)
 			digraph.edge(str(id(self)), str(id(member)))
+
+class ArrayExpression(_CollectionMixin, LiteralExpressionBase):
+	"""Literal array expressions containing 0 or more sub-expressions."""
+	result_type = DataType.ARRAY
+	def __init__(self, *args, **kwargs):
+		super(ArrayExpression, self).__init__(*args, **kwargs)
+		self.result_type = DataType.ARRAY(value_type=_iterable_member_value_type(self.value))
 
 class BooleanExpression(LiteralExpressionBase):
 	"""Literal boolean expressions representing True or False."""
@@ -647,6 +652,13 @@ class NullExpression(LiteralExpressionBase):
 		if value is not None:
 			raise TypeError('value must be None')
 		super(NullExpression, self).__init__(context, value=None)
+
+class SetExpression(_CollectionMixin, LiteralExpressionBase):
+	"""Literal set expressions containing 0 or more sub-expressions."""
+	result_type = DataType.SET
+	def __init__(self, *args, **kwargs):
+		super(SetExpression, self).__init__(*args, **kwargs)
+		self.result_type = DataType.SET(value_type=_iterable_member_value_type(self.value))
 
 class StringExpression(LiteralExpressionBase):
 	"""Literal string expressions representing an array of characters."""

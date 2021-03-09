@@ -42,6 +42,7 @@ import rule_engine.errors as errors
 __all__ = (
 	'ArithmeticExpressionTests',
 	'BitwiseExpressionTests',
+	'BitwiseShiftExpressionTests',
 	'LogicExpressionTests',
 	# comparison expressions
 	'ComparisonExpressionTests',
@@ -105,11 +106,31 @@ class BitwiseExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('bwand', equals_value=1.0)
 		self.assertExpressionTests('bwor', equals_value=7.0)
 		self.assertExpressionTests('bwxor', equals_value=6.0)
+
+	def test_ast_expression_left_operator_right_bitwise_type_errors(self):
+		for operation in ('bwand', 'bwor', 'bwxor'):
+			with self.assertRaises(errors.EvaluationError):
+				self.assertExpressionTests(operation, ast.FloatExpression(context, 3.1), ast.FloatExpression(context, 5.0))
+			with self.assertRaises(errors.EvaluationError):
+				self.assertExpressionTests(operation, ast.FloatExpression(context, 3.0), ast.FloatExpression(context, 5.1))
+			with self.assertRaises(errors.EvaluationError):
+				self.assertExpressionTests(operation, ast.FloatExpression(context, -3.0), ast.FloatExpression(context, 5.0))
+			with self.assertRaises(errors.EvaluationError):
+				self.assertExpressionTests(operation, ast.FloatExpression(context, 3.0), ast.FloatExpression(context, -5.0))
+			for left, right in itertools.product(trueish, falseish):
+				if isinstance(left, ast.FloatExpression) and isinstance(right, ast.FloatExpression):
+					continue
+				with self.assertRaises(errors.EvaluationError):
+					self.assertExpressionTests(operation, left, right)
+
+class BitwiseShiftExpressionTests(BitwiseExpressionTests):
+	ExpressionClass = ast.BitwiseShiftExpression
+	def test_ast_expression_left_operator_right_bitwise(self):
 		self.assertExpressionTests('bwlsh', equals_value=96.0)
 		self.assertExpressionTests('bwrsh', equals_value=0.0)
 
 	def test_ast_expression_left_operator_right_bitwise_type_errors(self):
-		for operation in ('bwand', 'bwor', 'bwxor', 'bwlsh', 'bwrsh'):
+		for operation in ('bwlsh', 'bwrsh'):
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, ast.FloatExpression(context, 3.1), ast.FloatExpression(context, 5.0))
 			with self.assertRaises(errors.EvaluationError):

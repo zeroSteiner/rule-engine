@@ -288,12 +288,19 @@ class Parser(ParserBase):
 		expression : expression BWAND  expression
 				   | expression BWOR   expression
 				   | expression BWXOR  expression
-				   | expression BWLSH  expression
-				   | expression BWRSH  expression
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
 		p[0] = ast.BitwiseExpression(self.context, op_name, left, right).reduce()
+
+	def p_expression_bitwise_shift(self, p):
+		"""
+		expression : expression BWLSH  expression
+				   | expression BWRSH  expression
+		"""
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = ast.BitwiseShiftExpression(self.context, op_name, left, right).reduce()
 
 	def p_expression_contains(self, p):
 		"""

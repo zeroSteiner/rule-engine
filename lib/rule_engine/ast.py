@@ -672,7 +672,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A base class for representing complex expressions composed of a left side and a right side, separated by an
 	operator.
 	"""
-	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.STRING)
+	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.SET, DataType.STRING)
 	"""
 	A tuple containing the compatible data types that the left and right expressions must return. This can for example
 	be used to indicate that arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but not
@@ -761,18 +761,22 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 		if _is_reduced(self.right):
 			_assert_is_natural_number(self.right.evaluate(None))
 
-	def __op_bitwise(self, op, thing):
+	def _op_bitwise(self, op, thing):
 		left = self.left.evaluate(thing)
 		_assert_is_natural_number(left)
 		right = self.right.evaluate(thing)
 		_assert_is_natural_number(right)
 		return _to_decimal(op(int(left), int(right)))
 
-	_op_bwand = functools.partialmethod(__op_bitwise, operator.and_)
-	_op_bwor  = functools.partialmethod(__op_bitwise, operator.or_)
-	_op_bwxor = functools.partialmethod(__op_bitwise, operator.xor)
-	_op_bwlsh = functools.partialmethod(__op_bitwise, operator.lshift)
-	_op_bwrsh = functools.partialmethod(__op_bitwise, operator.rshift)
+	_op_bwand = functools.partialmethod(_op_bitwise, operator.and_)
+	_op_bwor  = functools.partialmethod(_op_bitwise, operator.or_)
+	_op_bwxor = functools.partialmethod(_op_bitwise, operator.xor)
+
+class BitwiseShiftExpression(BitwiseExpression):
+	def _op_bitwise_shift(self, *args, **kwargs):
+		return self._op_bitwise(*args, **kwargs)
+	_op_bwlsh = functools.partialmethod(_op_bitwise_shift, operator.lshift)
+	_op_bwrsh = functools.partialmethod(_op_bitwise_shift, operator.rshift)
 
 class LogicExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing logical expressions from the grammar text such as "and" and "or"."""

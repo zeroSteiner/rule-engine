@@ -399,6 +399,13 @@ class Parser(ParserBase):
 		# null is an object because of the safe operator
 		p[0] = ast.NullExpression(self.context)
 
+	def p_expression_set(self, p):
+		"""
+		object : LBRACE ary_members RBRACE
+			   | LBRACE ary_members COMMA RBRACE
+		"""
+		p[0] = ast.SetExpression(self.context, tuple(p[2])).reduce()
+
 	def p_expression_string(self, p):
 		'object : STRING'
 		p[0] = ast.StringExpression(self.context, literal_eval(p[1]))

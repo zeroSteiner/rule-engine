@@ -215,8 +215,13 @@ _DATA_TYPE_UNDEFINED = _DataTypeDef('UNDEFINED', errors.UNDEFINED)
 class _CollectionDataTypeDef(_DataTypeDef):
 	__slots__ = ('value_type', 'value_type_nullable')
 	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
-		if not issubclass(python_type, collections.abc.Collection):
-			raise TypeError('the specified python_type is not a collection')
+		# check these three classes individually instead of using Collection which isn't available before Python v3.6
+		if not issubclass(python_type, collections.abc.Container):
+			raise TypeError('the specified python_type is not a container')
+		if not issubclass(python_type, collections.abc.Iterable):
+			raise TypeError('the specified python_type is not an iterable')
+		if not issubclass(python_type, collections.abc.Sized):
+			raise TypeError('the specified python_type is not a sized')
 		super(_CollectionDataTypeDef, self).__init__(name, python_type)
 		self.is_scalar = False
 		self.value_type = value_type

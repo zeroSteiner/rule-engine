@@ -1036,7 +1036,7 @@ class GetItemExpression(ExpressionBase):
 			self.result_type = DataType.STRING
 		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
 		# is explicitly checking if result_type is an array with out checking the value_type
-		elif isinstance(container.result_type, _CollectionDataTypeDef):
+		elif isinstance(container.result_type, DataType.ARRAY.__class__):
 			if not DataType.is_compatible(item.result_type, DataType.FLOAT):
 				raise errors.EvaluationError('data type mismatch (not an integer number)')
 			self.result_type = container.result_type.value_type
@@ -1044,6 +1044,8 @@ class GetItemExpression(ExpressionBase):
 			if not (safe or DataType.is_compatible(item.result_type, container.result_type.key_type)):
 				raise errors.LookupError(errors.UNDEFINED, errors.UNDEFINED)
 			self.result_type = container.result_type.value_type
+		elif isinstance(container.result_type, DataType.SET.__class__):
+			raise errors.EvaluationError('data type mismatch (container is a set)')
 		elif container.result_type != DataType.UNDEFINED:
 			if not (container.result_type == DataType.NULL and safe):
 				raise errors.EvaluationError('data type mismatch')
@@ -1108,8 +1110,10 @@ class GetSliceExpression(ExpressionBase):
 			self.result_type = DataType.STRING
 		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
 		# is explicitly checking if result_type is an array with out checking the value_type
-		elif isinstance(container.result_type, _CollectionDataTypeDef):
+		elif isinstance(container.result_type, DataType.ARRAY.__class__):
 			self.result_type = container.result_type
+		elif isinstance(container.result_type, DataType.SET.__class__):
+			raise errors.EvaluationError('data type mismatch (container is a set)')
 		elif container.result_type != DataType.UNDEFINED:
 			if not (container.result_type == DataType.NULL and safe):
 				raise errors.EvaluationError('data type mismatch')

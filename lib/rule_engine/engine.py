@@ -239,6 +239,10 @@ class _AttributeResolver(object):
 	def mapping_values(self, value):
 		return tuple(value.values())
 
+	@attribute('to_ary', ast.DataType.SET, result_type=ast.DataType.ARRAY)
+	def set_to_ary(self, value):
+		return tuple(value)
+
 	@attribute('as_lower', ast.DataType.STRING, result_type=ast.DataType.STRING)
 	def string_as_lower(self, value):
 		return value.lower()
@@ -268,13 +272,17 @@ class _AttributeResolver(object):
 			raise errors.EvaluationError('data type mismatch (not an integer number)')
 		return value
 
-	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.STRING, ast.DataType.MAPPING, result_type=ast.DataType.BOOLEAN)
+	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.BOOLEAN)
 	def value_is_empty(self, value):
 		return len(value) == 0
 
-	@attribute('length', ast.DataType.ARRAY, ast.DataType.STRING, ast.DataType.MAPPING, result_type=ast.DataType.FLOAT)
+	@attribute('length', ast.DataType.ARRAY, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.FLOAT)
 	def value_length(self, value):
 		return len(value)
+
+	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.STRING, result_type=ast.DataType.SET)
+	def value_to_set(self, value):
+		return set(value)
 
 class Builtins(collections.abc.Mapping):
 	"""

@@ -351,6 +351,12 @@ class DataType(metaclass=DataTypeMeta):
 	"""
 	NULL = _DataTypeDef('NULL', NoneType)
 	SET = _SetDataTypeDef('SET', set)
+	"""
+	.. py:function:: __call__(value_type, value_type_nullable=True)
+
+	:param value_type: The type of the set members.
+	:param bool value_type_nullable: Whether or not set members are allowed to be :py:attr:`.NULL`.
+	"""
 	STRING = _DataTypeDef('STRING', str)
 	UNDEFINED = _DATA_TYPE_UNDEFINED
 	"""

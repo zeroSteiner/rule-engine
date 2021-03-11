@@ -389,6 +389,7 @@ class Context(object):
 			The default value will be taken from the current thread and will be used by all evaluations using this
 			:py:class:`~rule_engine.engine.Context` regardless of the decimal context of the thread which evaluates the
 			rule. This causes the rule evaluation to be consistent regardless of the calling thread.
+
 		.. versionchanged:: 2.0.0
 			Added the *default_value* parameter.
 

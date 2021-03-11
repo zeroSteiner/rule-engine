@@ -21,6 +21,8 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-----------------+-------------------------------------+
 | ``length``      | :py:attr:`~.DataType.FLOAT`         |
 +-----------------+-------------------------------------+
+| ``to_set``      | :py:attr:`~.DataType.SET`           |
++-----------------+-------------------------------------+
 | :py:attr:`~.DataType.DATETIME` **Attributes**         |
 +-----------------+-------------------------------------+
 | ``date``        | :py:attr:`~.DataType.DATETIME`      |
@@ -63,6 +65,14 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-----------------+-------------------------------------+
 | ``values``      | :py:attr:`~.DataType.ARRAY`         |
 +-----------------+-------------------------------------+
+| :py:attr:`~.DataType.SET` **Attributes**              |
++-----------------+-------------------------------------+
+| ``is_empty``    | :py:attr:`~.DataType.BOOLEAN`       |
++-----------------+-------------------------------------+
+| ``length``      | :py:attr:`~.DataType.FLOAT`         |
++-----------------+-------------------------------------+
+| ``to_ary``      | :py:attr:`~.DataType.ARRAY`         |
++-----------------+-------------------------------------+
 | :py:attr:`~.DataType.STRING` **Attributes**           |
 +-----------------+-------------------------------------+
 | ``as_lower``    | :py:attr:`~.DataType.STRING`        |
@@ -72,6 +82,8 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 | ``to_ary``      | :py:attr:`~.DataType.ARRAY`         |
 +-----------------+-------------------------------------+
 | ``to_flt``      | :py:attr:`~.DataType.FLOAT`         |
++-----------------+-------------------------------------+
+| ``to_set``      | :py:attr:`~.DataType.SET`           |
 +-----------------+-------------------------------------+
 | ``to_int``      | :py:attr:`~.DataType.FLOAT`         |
 +-----------------+-------------------------------------+

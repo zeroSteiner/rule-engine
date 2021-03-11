@@ -683,7 +683,6 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	be used to indicate that arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but not
 	:py:attr:`~.DataType.STRING` values.
 	"""
-	result_expression = BooleanExpression
 	result_type = DataType.BOOLEAN
 	def __init__(self, context, type_, left, right):
 		"""
@@ -723,7 +722,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	def reduce(self):
 		if not _is_reduced(self.left, self.right):
 			return self
-		return self.result_expression(self.context, self.evaluate(None))
+		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type))
@@ -735,7 +734,6 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing arithmetic expressions from the grammar text such as addition and subtraction."""
 	compatible_types = (DataType.FLOAT,)
-	result_expression = FloatExpression
 	result_type = DataType.FLOAT
 	def __op_arithmetic(self, op, thing):
 		left_value = self.left.evaluate(thing)
@@ -756,28 +754,52 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 	"""
 	A class for representing bitwise arithmetic expressions from the grammar text such as XOR and shifting operations.
 	"""
-	compatible_types = (DataType.FLOAT,)
-	result_expression = FloatExpression
-	result_type = DataType.FLOAT
+	compatible_types = (DataType.FLOAT, DataType.SET)
+	result_type = DataType.UNDEFINED
 	def __init__(self, *args, **kwargs):
 		super(BitwiseExpression, self).__init__(*args, **kwargs)
-		if _is_reduced(self.left):
-			_assert_is_natural_number(self.left.evaluate(None))
-		if _is_reduced(self.right):
-			_assert_is_natural_number(self.right.evaluate(None))
+		# don't use DataType.is_compatible, because for sets the member type isn't important
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
+			if self.left.result_type != self.right.result_type:
+				raise errors.EvaluationError('data type mismatch')
+		if self.left.result_type == DataType.FLOAT:
+			if _is_reduced(self.left):
+				_assert_is_natural_number(self.left.evaluate(None))
+			self.result_type = DataType.FLOAT
+		if self.right.result_type == DataType.FLOAT:
+			if _is_reduced(self.right):
+				_assert_is_natural_number(self.right.evaluate(None))
+			self.result_type = DataType.FLOAT
+		if isinstance(self.left.result_type, _SetDataTypeDef) or isinstance(self.right.result_type, _SetDataTypeDef):
+			self.result_type = DataType.SET  # this discards the member type info
 
 	def _op_bitwise(self, op, thing):
 		left = self.left.evaluate(thing)
+		if DataType.from_value(left) == DataType.FLOAT:
+			return self._op_bitwise_float(op, thing, left)
+		elif DataType.from_value(left) == DataType.SET:
+			return self._op_bitwise_set(op, thing, left)
+		raise errors.EvaluationError('data type mismatch')
+
+	def _op_bitwise_float(self, op, thing, left):
 		_assert_is_natural_number(left)
 		right = self.right.evaluate(thing)
 		_assert_is_natural_number(right)
 		return _to_decimal(op(int(left), int(right)))
+
+	def _op_bitwise_set(self, op, thing, left):
+		right = self.right.evaluate(thing)
+		if DataType.from_value(right) != DataType.SET:
+			raise errors.EvaluationError('data type mismatch')
+		return op(left, right)
 
 	_op_bwand = functools.partialmethod(_op_bitwise, operator.and_)
 	_op_bwor  = functools.partialmethod(_op_bitwise, operator.or_)
 	_op_bwxor = functools.partialmethod(_op_bitwise, operator.xor)
 
 class BitwiseShiftExpression(BitwiseExpression):
+	compatible_types = (DataType.FLOAT,)
+	result_type = DataType.FLOAT
 	def _op_bitwise_shift(self, *args, **kwargs):
 		return self._op_bitwise(*args, **kwargs)
 	_op_bwlsh = functools.partialmethod(_op_bitwise_shift, operator.lshift)
@@ -797,9 +819,8 @@ class LogicExpression(LeftOperatorRightExpressionBase):
 class ComparisonExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing comparison expressions from the grammar text such as equality checks."""
 	def _op_eq(self, thing):
-		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
-			if not DataType.is_compatible(self.left.result_type, self.right.result_type):
-				return False
+		if not DataType.is_compatible(self.left.result_type, self.right.result_type):
+			return False
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
 		if type(left_value) is not type(right_value):
@@ -807,9 +828,8 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 		return operator.eq(left_value, right_value)
 
 	def _op_ne(self, thing):
-		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
-			if not DataType.is_compatible(self.left.result_type, self.right.result_type):
-				return True
+		if not DataType.is_compatible(self.left.result_type, self.right.result_type):
+			return True
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
 		if type(left_value) is not type(right_value):

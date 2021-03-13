@@ -88,6 +88,19 @@ class ParserTests(ParserTestsBase):
 			self.assertEqual(expression.name, text)
 			self.assertEqual(expression.scope, 'built-in')
 
+	def test_parser_contains_expressions(self):
+		expressions = []
+		expression = self.assertStatementType('member in container', ast.ContainsExpression).expression
+		expressions.append(expression)
+		expression = self.assertStatementType('member not in container', ast.UnaryExpression).expression
+		self.assertIsInstance(expression.right, ast.ContainsExpression)
+		expressions.append(expression.right)
+		for expression in expressions:
+			self.assertIsInstance(expression.member, ast.SymbolExpression)
+			self.assertEqual(expression.member.name, 'member')
+			self.assertIsInstance(expression.container, ast.SymbolExpression)
+			self.assertEqual(expression.container.name, 'container')
+
 	def test_parser_ternary_expressions(self):
 		statement = self.assertStatementType('condition ? case_true : case_false', ast.TernaryExpression)
 		self.assertIsInstance(statement.expression.condition, ast.SymbolExpression)

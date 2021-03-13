@@ -329,7 +329,29 @@ class DataTypeMeta(type):
 
 class DataType(metaclass=DataTypeMeta):
 	"""
-	A collection of constants representing the different supported data types.
+	A collection of constants representing the different supported data types. There are three ways to compare data
+	types. All three are effectively the same when dealing with scalars.
+
+	Equality checking
+	  .. code-block::
+
+	    dt == DataType.TYPE
+	  This is the most explicit form of testing and when dealing with compound data types, it recursively checks that
+	  all of the member types are also equal.
+
+	Class checking
+	  .. code-block::
+
+	    isinstance(dt, DataType.TYPE.__class__)
+	  This checks that the data types are the same but when dealing with compound data types, the member types are
+	  ignored.
+
+	Compatibility checking
+	  .. code-block::
+
+	    DataType.is_compatible(dt, DataType.TYPE)
+	  This checks that the types are compatible without any kind of conversion. When dealing with compound data types,
+	  this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.
 	"""
 	ARRAY = _ArrayDataTypeDef('ARRAY', tuple)
 	"""

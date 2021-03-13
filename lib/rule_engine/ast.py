@@ -462,15 +462,15 @@ class DataType(metaclass=DataTypeMeta):
 		if dt1.is_scalar and dt2.is_scalar:
 			return dt1 == dt2
 		elif dt1.is_compound and dt2.is_compound:
-			if isinstance(dt1, _ArrayDataTypeDef) and isinstance(dt2, _ArrayDataTypeDef):
+			if isinstance(dt1, DataType.ARRAY.__class__) and isinstance(dt2, DataType.ARRAY.__class__):
 				return cls.is_compatible(dt1.value_type, dt2.value_type)
-			elif isinstance(dt1, _MappingDataTypeDef) and isinstance(dt2, _MappingDataTypeDef):
+			elif isinstance(dt1, DataType.MAPPING.__class__) and isinstance(dt2, DataType.MAPPING.__class__):
 				if not cls.is_compatible(dt1.key_type, dt2.key_type):
 					return False
 				if not cls.is_compatible(dt1.value_type, dt2.value_type):
 					return False
 				return True
-			elif isinstance(dt1, _SetDataTypeDef) and isinstance(dt2, _SetDataTypeDef):
+			elif isinstance(dt1, DataType.SET.__class__) and isinstance(dt2, DataType.SET.__class__):
 				return cls.is_compatible(dt1.value_type, dt2.value_type)
 		return False
 
@@ -776,7 +776,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 			if _is_reduced(self.right):
 				_assert_is_natural_number(self.right.evaluate(None))
 			self.result_type = DataType.FLOAT
-		if isinstance(self.left.result_type, _SetDataTypeDef) or isinstance(self.right.result_type, _SetDataTypeDef):
+		if isinstance(self.left.result_type, DataType.SET.__class__) or isinstance(self.right.result_type, DataType.SET.__class__):
 			self.result_type = DataType.SET  # this discards the member type info
 
 	def _op_bitwise(self, op, thing):

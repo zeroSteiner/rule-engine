@@ -30,7 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__version__ = '3.0.1'
+__version__ = '3.1.0'
 from .ast import DataType
 
 from .engine import resolve_attribute

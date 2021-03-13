@@ -766,7 +766,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 		super(BitwiseExpression, self).__init__(*args, **kwargs)
 		# don't use DataType.is_compatible, because for sets the member type isn't important
 		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
-			if self.left.result_type != self.right.result_type:
+			if self.left.result_type.__class__ != self.right.result_type.__class__:
 				raise errors.EvaluationError('data type mismatch')
 		if self.left.result_type == DataType.FLOAT:
 			if _is_reduced(self.left):
@@ -783,7 +783,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 		left = self.left.evaluate(thing)
 		if DataType.from_value(left) == DataType.FLOAT:
 			return self._op_bitwise_float(op, thing, left)
-		elif DataType.is_compatible(DataType.from_value(left), DataType.SET):
+		elif isinstance(DataType.from_value(left), DataType.SET.__class__):
 			return self._op_bitwise_set(op, thing, left)
 		raise errors.EvaluationError('data type mismatch')
 

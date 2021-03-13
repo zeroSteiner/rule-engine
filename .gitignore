@@ -6,6 +6,7 @@
 .pylintrc
 .python-version
 Pipfile.lock
+repl_setup.py
 build/*
 dist/*
 docs/build/*

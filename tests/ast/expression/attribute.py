@@ -170,7 +170,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
 
-	def test_ast_expression_string_flt_attributes(self):
+	def test_ast_expression_string_attributes_flt(self):
 		combos = (
 			('3.14159', decimal.Decimal('3.14159')),
 			('0xdead', 0xdead),
@@ -181,7 +181,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			expression = ast.GetAttributeExpression(context, symbol, 'to_flt')
 			self.assertEqual(expression.evaluate(None), flt_value, "attribute {} failed".format(str_value))
 
-	def test_ast_expression_string_int_attributes(self):
+	def test_ast_expression_string_attributes_int(self):
 		tens = ('0b1010', '0o12', '10', '0xa', '1e1')
 		for ten in tens:
 			symbol = ast.StringExpression(context, ten)

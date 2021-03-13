@@ -73,6 +73,12 @@ class ParserTests(ParserTestsBase):
 		with self.assertRaises(errors.RuleSyntaxError):
 			self._parse('test[', self.context)
 
+	def test_parser_reserved_keywords(self):
+		keywords = ('if', 'elif', 'else', 'for', 'while')
+		for keyword in keywords:
+			with self.assertRaises(errors.RuleSyntaxError):
+				self.assertStatementType(keyword, ast.SymbolExpression)
+
 	def test_parser_returns_statement(self):
 		expression = self._parse('true', self.context)
 		self.assertIsInstance(expression, ast.Statement)
@@ -206,6 +212,8 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_array_getslice(self):
 		self.assertLiteralStatementEvalEqual('"testing"[:]', 'testing')
+		self.assertLiteralStatementEvalEqual('"testing"[4:]', 'ing')
+		self.assertLiteralStatementEvalEqual('"testing"[:4]', 'test')
 		self.assertLiteralStatementEvalEqual('"testing"[1:-1]', 'estin')
 		self.assertLiteralStatementEvalEqual('"testing"[1:6]', 'estin')
 		self.assertLiteralStatementEvalEqual('["t", "e", "s", "t", "i", "n", "g"][:]', tuple('testing'))
@@ -291,6 +299,10 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_null(self):
 		self.assertLiteralStatementEqual('null', ast.NullExpression, None)
+
+	def test_parse_set(self):
+		self.assertLiteralStatementEvalEqual("{1}", set([decimal.Decimal('1')]))
+		self.assertLiteralStatementEvalEqual("{'Alice', 'Bob'}", set(['Alice', 'Bob']))
 
 	def test_parse_string(self):
 		self.assertLiteralStatementEqual("'Alice'", ast.StringExpression, 'Alice')

@@ -78,6 +78,18 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		expression = ast.GetAttributeExpression(context, ast.NullExpression(context), 'undefined', safe=True)
 		self.assertIsNone(expression.evaluate(None))
 
+	def test_ast_expression_array_attributes(self):
+		ary = [1, 2, 3]
+		symbol = ast.SymbolExpression(context, 'ary')
+
+		attributes = {
+			'length': len(ary),
+			'to_set': set(ary)
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate({'ary': ary}), value, "attribute {} failed".format(attribute_name))
+
 	def test_ast_expression_datetime_attributes(self):
 		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)
 		symbol = ast.DatetimeExpression(context, timestamp)
@@ -131,6 +143,18 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate({'map': mapping}), value, "attribute {} failed".format(attribute_name))
 
+	def test_ast_expression_set_attributes(self):
+		set_ = {1, 2, 3}
+		symbol = ast.SymbolExpression(context, 'set')
+
+		attributes = {
+			'length': len(set_),
+			'to_ary': tuple(set_)
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate({'set': set_}), value, "attribute {} failed".format(attribute_name))
+
 	def test_ast_expression_string_attributes(self):
 		string = 'Rule Engine'
 		symbol = ast.StringExpression(context, string)
@@ -139,11 +163,35 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			'as_lower': string.lower(),
 			'as_upper': string.upper(),
 			'to_ary': tuple(string.split()),
+			'to_set': set(string),
 			'length': len(string),
 		}
 		for attribute_name, value in attributes.items():
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
+
+	def test_ast_expression_string_flt_attributes(self):
+		combos = (
+			('3.14159', decimal.Decimal('3.14159')),
+			('0xdead', 0xdead),
+			('3.14e5', decimal.Decimal('3.14e5'))
+		)
+		for str_value, flt_value in combos:
+			symbol = ast.StringExpression(context, str_value)
+			expression = ast.GetAttributeExpression(context, symbol, 'to_flt')
+			self.assertEqual(expression.evaluate(None), flt_value, "attribute {} failed".format(str_value))
+
+	def test_ast_expression_string_int_attributes(self):
+		tens = ('0b1010', '0o12', '10', '0xa', '1e1')
+		for ten in tens:
+			symbol = ast.StringExpression(context, ten)
+			expression = ast.GetAttributeExpression(context, symbol, 'to_int')
+			self.assertEqual(expression.evaluate(None), 10, "attribute {} failed".format(ten))
+
+		symbol = ast.StringExpression(context, '3.14159')
+		expression = ast.GetAttributeExpression(context, symbol, 'to_int')
+		with self.assertRaises(errors.EvaluationError):
+			expression.evaluate(None)
 
 	def test_ast_expression_string_attributes_numeric(self):
 		symbol = ast.StringExpression(context, '123')

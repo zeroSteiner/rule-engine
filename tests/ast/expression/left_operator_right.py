@@ -42,6 +42,7 @@ import rule_engine.errors as errors
 __all__ = (
 	'ArithmeticExpressionTests',
 	'BitwiseExpressionTests',
+	'BitwiseExpressionSetTests',
 	'BitwiseShiftExpressionTests',
 	'LogicExpressionTests',
 	# comparison expressions
@@ -122,6 +123,15 @@ class BitwiseExpressionTests(LeftOperatorRightExpresisonTestsBase):
 					continue
 				with self.assertRaises(errors.EvaluationError):
 					self.assertExpressionTests(operation, left, right)
+
+class BitwiseExpressionSetTests(BitwiseExpressionTests):
+	false_value = set()
+	left_value = ast.LiteralExpressionBase.from_value(context, set([1, 2, 3]))
+	right_value = ast.LiteralExpressionBase.from_value(context, set([3, 4, 5]))
+	def test_ast_expression_left_operator_right_bitwise(self):
+		self.assertExpressionTests('bwand', equals_value=set([3]))
+		self.assertExpressionTests('bwor', equals_value=set([1, 2, 3, 4, 5]))
+		self.assertExpressionTests('bwxor', equals_value=set([1, 2, 4, 5]))
 
 class BitwiseShiftExpressionTests(BitwiseExpressionTests):
 	ExpressionClass = ast.BitwiseShiftExpression

@@ -429,7 +429,7 @@ class DataType(metaclass=DataTypeMeta):
 		elif python_value is None:
 			return cls.NULL
 		elif isinstance(python_value, (set,)):
-			return cls.SET
+			return cls.SET(value_type=_iterable_member_value_type(python_value))
 		elif isinstance(python_value, (str,)):
 			return cls.STRING
 		elif isinstance(python_value, collections.abc.Mapping):
@@ -783,7 +783,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 		left = self.left.evaluate(thing)
 		if DataType.from_value(left) == DataType.FLOAT:
 			return self._op_bitwise_float(op, thing, left)
-		elif DataType.from_value(left) == DataType.SET:
+		elif DataType.is_compatible(DataType.from_value(left), DataType.SET):
 			return self._op_bitwise_set(op, thing, left)
 		raise errors.EvaluationError('data type mismatch')
 
@@ -795,7 +795,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 
 	def _op_bitwise_set(self, op, thing, left):
 		right = self.right.evaluate(thing)
-		if DataType.from_value(right) != DataType.SET:
+		if not DataType.is_compatible(DataType.from_value(right), DataType.SET):
 			raise errors.EvaluationError('data type mismatch')
 		return op(left, right)
 

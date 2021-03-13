@@ -55,6 +55,12 @@ class DataTypeTests(unittest.TestCase):
 		self.assertNotEqual(dt1, ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.STRING))
 		self.assertNotEqual(dt1, ast.DataType.MAPPING(ast.DataType.STRING, value_type_nullable=False))
 
+		dt1 = ast.DataType.SET(ast.DataType.STRING)
+		self.assertIs(dt1.value_type, ast.DataType.STRING)
+		self.assertEqual(dt1, ast.DataType.SET(ast.DataType.STRING))
+		self.assertNotEqual(dt1, ast.DataType.SET)
+		self.assertNotEqual(dt1, ast.DataType.SET(ast.DataType.STRING, value_type_nullable=False))
+
 	def test_data_type_from_name(self):
 		self.assertIs(ast.DataType.from_name('ARRAY'), ast.DataType.ARRAY)
 		self.assertIs(ast.DataType.from_name('BOOLEAN'), ast.DataType.BOOLEAN)
@@ -62,6 +68,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(ast.DataType.from_name('FLOAT'), ast.DataType.FLOAT)
 		self.assertIs(ast.DataType.from_name('MAPPING'), ast.DataType.MAPPING)
 		self.assertIs(ast.DataType.from_name('NULL'), ast.DataType.NULL)
+		self.assertIs(ast.DataType.from_name('SET'), ast.DataType.SET)
 		self.assertIs(ast.DataType.from_name('STRING'), ast.DataType.STRING)
 
 	def test_data_type_from_name_error(self):
@@ -80,6 +87,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(ast.DataType.from_type(int), ast.DataType.FLOAT)
 		self.assertIs(ast.DataType.from_type(dict), ast.DataType.MAPPING)
 		self.assertIs(ast.DataType.from_type(type(None)), ast.DataType.NULL)
+		self.assertIs(ast.DataType.from_type(set), ast.DataType.SET)
 		self.assertIs(ast.DataType.from_type(str), ast.DataType.STRING)
 
 	def test_data_type_from_type_error(self):
@@ -88,21 +96,33 @@ class DataTypeTests(unittest.TestCase):
 		with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
 			ast.DataType.from_type(self._UnsupportedType)
 
-	def test_data_type_from_value_compound(self):
-		# ARRAY
+	def test_data_type_from_value_compound_array(self):
 		for value in [list(), range(0), tuple()]:
 			value = ast.DataType.from_value(value)
 			self.assertEqual(value, ast.DataType.ARRAY)
 			self.assertIs(value.value_type, ast.DataType.UNDEFINED)
-		# MAPPING
-		for value in [{}]:
-			value = ast.DataType.from_value(value)
-			self.assertEqual(value, ast.DataType.MAPPING)
-			self.assertIs(value.key_type, ast.DataType.UNDEFINED)
-			self.assertIs(value.value_type, ast.DataType.UNDEFINED)
-		# STRING
 		value = ast.DataType.from_value(['test'])
 		self.assertEqual(value, ast.DataType.ARRAY(ast.DataType.STRING))
+		self.assertIs(value.value_type, ast.DataType.STRING)
+
+	def test_data_type_from_value_compound_mapping(self):
+		value = ast.DataType.from_value({})
+		self.assertEqual(value, ast.DataType.MAPPING)
+		self.assertIs(value.key_type, ast.DataType.UNDEFINED)
+		self.assertIs(value.value_type, ast.DataType.UNDEFINED)
+
+		value = ast.DataType.from_value({'one': 1})
+		self.assertEqual(value, ast.DataType.MAPPING(ast.DataType.STRING, ast.DataType.FLOAT))
+		self.assertIs(value.key_type, ast.DataType.STRING)
+		self.assertIs(value.value_type, ast.DataType.FLOAT)
+
+	def test_data_type_from_value_compound_set(self):
+		value = ast.DataType.from_value(set())
+		self.assertEqual(value, ast.DataType.SET)
+		self.assertIs(value.value_type, ast.DataType.UNDEFINED)
+
+		value = ast.DataType.from_value({'test'})
+		self.assertEqual(value, ast.DataType.SET(ast.DataType.STRING))
 		self.assertIs(value.value_type, ast.DataType.STRING)
 
 	def test_data_type_from_value_scalar(self):

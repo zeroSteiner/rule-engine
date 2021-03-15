@@ -7,7 +7,7 @@ on:
 jobs:
   unit-tests:
     name: Test on Python v${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         python-version: [3.4, 3.5, 3.6, 3.7, 3.8, 3.9]

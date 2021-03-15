@@ -10,7 +10,7 @@ Version 3.x.x
 Version 3.1.0
 ^^^^^^^^^^^^^
 
-*In progress*
+Released :release:`3.1.0` on March 15th, 2021
 
 * Added the new :py:class:`~rule_engine.ast.DataType.SET` data type
 

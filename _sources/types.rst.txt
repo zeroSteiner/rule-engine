@@ -1,4 +1,4 @@
-.. py:currentmodule:: rule_engine
+.. py:currentmodule:: rule_engine.ast
 
 Data Types
 ==========
@@ -26,6 +26,8 @@ compatible with. For a information regarding supported operations, see the
 | :py:attr:`~DataType.MAPPING`  | :py:class:`dict`              |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.NULL`     | :py:class:`NoneType`          |
++-------------------------------+-------------------------------+
+| :py:attr:`~DataType.SET`      | :py:class:`set`               |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.STRING`   | :py:class:`str`               |
 +-------------------------------+-------------------------------+

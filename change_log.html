@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Change Log &mdash; Rule Engine 3.0.1 documentation</title>
+  <title>Change Log &mdash; Rule Engine 3.1.0 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                3.0.1
+                3.1.0
               </div>
             
           
@@ -97,7 +97,11 @@
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="debug_repl.html">Debug REPL</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#version-3-x-x">Version 3.x.x</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-3-x-x">Version 3.x.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#version-3-1-0">Version 3.1.0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-3-0-0">Version 3.0.0</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#version-2-x-x">Version 2.x.x</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#version-2-4-0">Version 2.4.0</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version-2-3-0">Version 2.3.0</a></li>
@@ -186,7 +190,16 @@
 this list is curated by the development team for note worthy changes.</p>
 <div class="section" id="version-3-x-x">
 <h2>Version 3.x.x<a class="headerlink" href="#version-3-x-x" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="version-3-1-0">
+<h3>Version 3.1.0<a class="headerlink" href="#version-3-1-0" title="Permalink to this headline">¶</a></h3>
 <p><em>In progress</em></p>
+<ul class="simple">
+<li><p>Added the new <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.SET" title="rule_engine.ast.DataType.SET"><code class="xref py py-class docutils literal notranslate"><span class="pre">SET</span></code></a> data type</p></li>
+</ul>
+</div>
+<div class="section" id="version-3-0-0">
+<h3>Version 3.0.0<a class="headerlink" href="#version-3-0-0" title="Permalink to this headline">¶</a></h3>
+<p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.0.0">v3.0.0</a> on March 1st, 2021</p>
 <ul>
 <li><p>Switched the <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> datatype to use Python’s <a class="reference external" href="https://docs.python.org/3.9/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> from <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> internally</p></li>
 <li><p>Reserved the <code class="docutils literal notranslate"><span class="pre">if</span></code>, <code class="docutils literal notranslate"><span class="pre">elif</span></code>, <code class="docutils literal notranslate"><span class="pre">else</span></code>, <code class="docutils literal notranslate"><span class="pre">for</span></code> and <code class="docutils literal notranslate"><span class="pre">while</span></code> keywords for future use, they can no longer be used as
@@ -199,6 +212,7 @@ symbol names</p></li>
 </div></blockquote>
 </li>
 </ul>
+</div>
 </div>
 <div class="section" id="version-2-x-x">
 <h2>Version 2.x.x<a class="headerlink" href="#version-2-x-x" title="Permalink to this headline">¶</a></h2>

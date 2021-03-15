@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Index &mdash; Rule Engine 3.0.1 documentation</title>
+  <title>Index &mdash; Rule Engine 3.1.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                3.0.1
+                3.1.0
               </div>
             
           
@@ -258,6 +258,8 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY">ARRAY (DataType attribute)</a>
 </li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.ArrayExpression">ArrayExpression (class in rule_engine.ast)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError.attribute_name">attribute_name (AttributeResolutionError attribute)</a>
@@ -277,6 +279,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.BitwiseExpression">BitwiseExpression (class in rule_engine.ast)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.BitwiseShiftExpression">BitwiseShiftExpression (class in rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.BOOLEAN">BOOLEAN (DataType attribute)</a>
 </li>
@@ -316,12 +320,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType">DataType (class in rule_engine.ast)</a>
 </li>
-      <li><a href="rule_engine/ast.html#id0">DataType.__call__() (in module rule_engine.ast)</a>, <a href="rule_engine/ast.html#rule_engine.ast.DataType.__call__">[1]</a>
+      <li><a href="rule_engine/ast.html#id0">DataType.__call__() (in module rule_engine.ast)</a>, <a href="rule_engine/ast.html#id1">[1]</a>, <a href="rule_engine/ast.html#rule_engine.ast.DataType.__call__">[2]</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME">DATETIME (DataType attribute)</a>
 </li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DatetimeExpression">DatetimeExpression (class in rule_engine.ast)</a>
+</li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError">DatetimeSyntaxError</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     debug_repl command line option
 
@@ -331,8 +339,6 @@
         <li><a href="debug_repl.html#cmdoption-debug_repl-edit-file">--edit-file &lt;path&gt;</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.decimal_context">decimal_context (Context attribute)</a>
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone">default_timezone (Context attribute)</a>
@@ -400,6 +406,12 @@
       <li><a href="rule_engine/ast.html#rule_engine.ast.GetAttributeExpression">GetAttributeExpression (class in rule_engine.ast)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.GetItemExpression">GetItemExpression (class in rule_engine.ast)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.GetSliceExpression">GetSliceExpression (class in rule_engine.ast)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="I">I</h2>
@@ -459,10 +471,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING">MAPPING (DataType attribute)</a>
 </li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.MappingExpression">MappingExpression (class in rule_engine.ast)</a>
+</li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.matches">matches() (Rule method)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.EngineError.message">message (EngineError attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -555,13 +571,19 @@
       <ul>
         <li><a href="rule_engine/ast.html#rule_engine.ast.ArithmeticExpression.result_type">(ArithmeticExpression attribute)</a>
 </li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.ArrayExpression.result_type">(ArrayExpression attribute)</a>
+</li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.BitwiseExpression.result_type">(BitwiseExpression attribute)</a>
+</li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.BitwiseShiftExpression.result_type">(BitwiseShiftExpression attribute)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.BooleanExpression.result_type">(BooleanExpression attribute)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.ComparisonExpression.result_type">(ComparisonExpression attribute)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.ContainsExpression.result_type">(ContainsExpression attribute)</a>
+</li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.DatetimeExpression.result_type">(DatetimeExpression attribute)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.ExpressionBase.result_type">(ExpressionBase attribute)</a>
 </li>
@@ -571,9 +593,17 @@
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.GetAttributeExpression.result_type">(GetAttributeExpression attribute)</a>
 </li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.GetItemExpression.result_type">(GetItemExpression attribute)</a>
+</li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.GetSliceExpression.result_type">(GetSliceExpression attribute)</a>
+</li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.LogicExpression.result_type">(LogicExpression attribute)</a>
 </li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.MappingExpression.result_type">(MappingExpression attribute)</a>
+</li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.NullExpression.result_type">(NullExpression attribute)</a>
+</li>
+        <li><a href="rule_engine/ast.html#rule_engine.ast.SetExpression.result_type">(SetExpression attribute)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.StringExpression.result_type">(StringExpression attribute)</a>
 </li>
@@ -625,6 +655,10 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins.scope_name">scope_name (Builtins attribute)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.DataType.SET">SET (DataType attribute)</a>
+</li>
+      <li><a href="rule_engine/ast.html#rule_engine.ast.SetExpression">SetExpression (class in rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.Statement">Statement (class in rule_engine.ast)</a>
 </li>

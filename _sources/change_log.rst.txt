@@ -7,7 +7,17 @@ this list is curated by the development team for note worthy changes.
 Version 3.x.x
 -------------
 
+Version 3.1.0
+^^^^^^^^^^^^^
+
 *In progress*
+
+* Added the new :py:class:`~rule_engine.ast.DataType.SET` data type
+
+Version 3.0.0
+^^^^^^^^^^^^^
+
+Released :release:`3.0.0` on March 1st, 2021
 
 * Switched the ``FLOAT`` datatype to use Python's :py:class:`~decimal.Decimal` from :py:class:`float` internally
 * Reserved the ``if``, ``elif``, ``else``, ``for`` and ``while`` keywords for future use, they can no longer be used as

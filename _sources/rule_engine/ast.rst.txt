@@ -32,7 +32,7 @@ Classes
 
 .. autoclass:: DataType
    :members:
-   :exclude-members: ARRAY, MAPPING
+   :exclude-members: ARRAY, MAPPING, SET
    :show-inheritance:
 
    .. autoattribute:: ARRAY
@@ -51,6 +51,9 @@ Classes
       :annotation:
 
    .. autoattribute:: NULL
+      :annotation:
+
+   .. autoattribute:: SET
       :annotation:
 
    .. autoattribute:: STRING
@@ -103,6 +106,12 @@ Left-Operator-Right Expressions
    :show-inheritance:
 
    .. autoattribute:: result_type
+      :annotation: = UNDEFINED
+
+.. autoclass:: BitwiseShiftExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
       :annotation: = FLOAT
 
 .. autoclass:: ComparisonExpression
@@ -126,11 +135,23 @@ Left-Operator-Right Expressions
 Literal Expressions
 ~~~~~~~~~~~~~~~~~~~
 
+.. autoclass:: ArrayExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = ARRAY
+
 .. autoclass:: BooleanExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = BOOLEAN
+
+.. autoclass:: DatetimeExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = DATETIME
 
 .. autoclass:: FloatExpression
    :show-inheritance:
@@ -138,11 +159,23 @@ Literal Expressions
    .. autoattribute:: result_type
       :annotation: = FLOAT
 
+.. autoclass:: MappingExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = MAPPING
+
 .. autoclass:: NullExpression
    :show-inheritance:
 
    .. autoattribute:: result_type
       :annotation: = NULL
+
+.. autoclass:: SetExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = SET
 
 .. autoclass:: StringExpression
    :show-inheritance:
@@ -160,6 +193,18 @@ Miscellaneous Expressions
       :annotation: = BOOLEAN
 
 .. autoclass:: GetAttributeExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = UNDEFINED
+
+.. autoclass:: GetItemExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = UNDEFINED
+
+.. autoclass:: GetSliceExpression
    :show-inheritance:
 
    .. autoattribute:: result_type

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Rule Syntax &mdash; Rule Engine 3.0.1 documentation</title>
+  <title>Rule Syntax &mdash; Rule Engine 3.1.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                3.0.1
+                3.1.0
               </div>
             
           
@@ -96,6 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#grammar">Grammar</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#supported-operations">Supported Operations</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#accessor-operators">Accessor Operators</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ternary-operators">Ternary Operators</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#reserved-keywords">Reserved Keywords</a></li>
@@ -199,9 +200,9 @@ expressions for strings. Operations are type aware and will raise an exception w
 <p>The following table outlines all operators that can be used in Rule Engine expressions.</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 11%" />
-<col style="width: 29%" />
-<col style="width: 61%" />
+<col style="width: 13%" />
+<col style="width: 28%" />
+<col style="width: 59%" />
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p>Operation</p></td>
@@ -242,15 +243,15 @@ expressions for strings. Operations are type aware and will raise an exception w
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&amp;</span></code></p></td>
 <td><p>Bitwise-and <sup>1</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.SET" title="rule_engine.ast.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">|</span></code></p></td>
 <td><p>Bitwise-or <sup>1</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.SET" title="rule_engine.ast.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">^</span></code></p></td>
 <td><p>Bitwise-xor <sup>1</sup></p></td>
-<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.SET" title="rule_engine.ast.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code></p></td>
 <td><p>Bitwise right shift <sup>1</sup></p></td>
@@ -332,25 +333,29 @@ expressions for strings. Operations are type aware and will raise an exception w
 <td><p>Logical or</p></td>
 <td><p><em>ANY</em></p></td>
 </tr>
-<tr class="row-odd"><td colspan="3"><p><strong>Accessor Operators</strong></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">?</span></code>, <code class="docutils literal notranslate"><span class="pre">:</span></code></p></td>
+<td><p>Ternary Operator</p></td>
+<td><p><em>ANY</em></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">.</span></code></p></td>
+<tr class="row-even"><td colspan="3"><p><strong>Accessor Operators</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">.</span></code></p></td>
 <td><p>Attribute access</p></td>
 <td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
 <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&amp;.</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&amp;.</span></code></p></td>
 <td><p>Safe attribute access</p></td>
 <td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>,
 <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>,
 <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">[</span></code></p></td>
 <td><p>Item lookup</p></td>
 <td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a>,
 <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&amp;[</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&amp;[</span></code></p></td>
 <td><p>Safe item lookup</p></td>
 <td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a>,
 <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>, <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
@@ -382,6 +387,13 @@ not held within the container. This is analogous the Python’s <a class="refere
 <p>The item lookup operation can also evaluate to an array when a stop boundary is provided. For example to reference the
 first four elements of a string by appending <code class="docutils literal notranslate"><span class="pre">[0:4]</span></code> to the end of the value. Alternatively, only the ending index
 may be specified using <code class="docutils literal notranslate"><span class="pre">[:4]</span></code>. Finally, just as in Python, negative values can be used to reference the last elements.</p>
+</div>
+<div class="section" id="ternary-operators">
+<h4>Ternary Operators<a class="headerlink" href="#ternary-operators" title="Permalink to this headline">¶</a></h4>
+<p>The ternary operator can be used in place of a traditional “if-then-else” statement. Like other languages the question
+mark and colon are used as the expression delimiters. A ternary expression is a combination of a condition followed by
+an expression used when the condition is true and ending with an expression used when the condition is false.</p>
+<p>For example: <code class="docutils literal notranslate"><span class="pre">condition</span> <span class="pre">?</span> <span class="pre">true_case</span> <span class="pre">:</span> <span class="pre">false_case</span></code></p>
 </div>
 </div>
 <div class="section" id="reserved-keywords">

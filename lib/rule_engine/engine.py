@@ -32,6 +32,7 @@
 
 import collections
 import collections.abc
+import contextlib
 import datetime
 import decimal
 import functools
@@ -435,6 +436,15 @@ class Context(object):
 			type_resolver = type_resolver_from_dict(type_resolver)
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
+		self._assignment_scopes = collections.deque()
+
+	@contextlib.contextmanager
+	def assignment_scope(self, assignments):
+		self._assignment_scopes.append(assignments)
+		try:
+			yield
+		finally:
+			self._assignment_scopes.pop()
 
 	@property
 	def _tls(self):
@@ -461,6 +471,9 @@ class Context(object):
 		if isinstance(thing, Builtins):
 			return resolve_item(thing, name)
 		if scope is None:
+			for assignments in self._assignment_scopes:
+				if name in assignments:
+					return assignments[name]
 			return self.__resolver(thing, name)
 		raise errors.SymbolResolutionError(name, symbol_scope=scope, thing=thing)
 

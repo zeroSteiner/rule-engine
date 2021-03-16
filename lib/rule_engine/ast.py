@@ -944,6 +944,25 @@ class FuzzyComparisonExpression(ComparisonExpression):
 ################################################################################
 # Miscellaneous Expressions
 ################################################################################
+class ComprehensionExpression(ExpressionBase):
+	result_type = DataType.ARRAY
+	def __init__(self, context, result, variable, iterable, condition=None):
+		self.context = context
+		self.result = result
+		self.variable = variable
+		self.iterable = iterable
+		self.condition = condition
+
+	def evaluate(self, thing):
+		output_array = collections.deque()
+		input_array = self.iterable.evaluate(thing)
+		for value in input_array:
+			assignments = {self.variable: value}
+			with self.context.assignment_scope(assignments):
+				if self.condition is None or self.condition.evaluate(thing):
+					output_array.append(self.result.evaluate(thing))
+		return tuple(output_array)
+
 class ContainsExpression(ExpressionBase):
 	"""An expression used to test whether an item exists within a container."""
 	__slots__ = ('container', 'member')
@@ -973,7 +992,6 @@ class ContainsExpression(ExpressionBase):
 		if not _is_reduced(self.container, self.member):
 			return self
 		return BooleanExpression(self.context, self.evaluate(None))
-
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		super(ContainsExpression, self).to_graphviz(digraph, *args, **kwargs)

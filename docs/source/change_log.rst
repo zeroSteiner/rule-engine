@@ -7,6 +7,11 @@ this list is curated by the development team for note worthy changes.
 Version 3.x.x
 -------------
 
+Version 3.2.0
+^^^^^^^^^^^^^
+
+*In progress*
+
 Version 3.1.0
 ^^^^^^^^^^^^^
 

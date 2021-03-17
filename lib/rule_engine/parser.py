@@ -111,7 +111,7 @@ class Parser(ParserBase):
 		'<':   'LT',    '<=': 'LE',
 		# logical operators
 		'and': 'AND',   'or': 'OR',     'not': 'NOT',
-		'for': 'FOR',
+		'for': 'FOR',   'if': 'IF',
 		# other operators
 		'.':   'ATTR',
 		'&.':  'ATTR_SAFE',
@@ -131,7 +131,8 @@ class Parser(ParserBase):
 		'in': 'IN',
 		'or': 'OR',
 		'not': 'NOT',
-		'for': 'FOR'
+		'for': 'FOR',
+		'if': 'IF'
 	}
 	tokens = (
 		'DATETIME', 'FLOAT', 'STRING', 'SYMBOL',
@@ -230,7 +231,7 @@ class Parser(ParserBase):
 
 	def t_SYMBOL(self, t):
 		r'\$?[a-zA-Z_][a-zA-Z0-9_]*'
-		if t.value in ('if', 'elif', 'else', 'while'):
+		if t.value in ('elif', 'else', 'while'):
 			raise errors.RuleSyntaxError("syntax error (the {} keyword is reserved for future use)".format(t.value))
 		t.type = self.reserved_words.get(t.value, 'SYMBOL')
 		return t
@@ -433,8 +434,12 @@ class Parser(ParserBase):
 	def p_expression_array_comprehension(self, p):
 		"""
 		object : LBRACKET expression FOR SYMBOL IN expression RBRACKET
+			   | LBRACKET expression FOR SYMBOL IN expression IF expression RBRACKET
 		"""
-		p[0] = ast.ComprehensionExpression(self.context, p[2], p[4], p[6])
+		condition = None
+		if len(p) == 10:
+			condition = p[8]
+		p[0] = ast.ComprehensionExpression(self.context, p[2], p[4], p[6], condition=condition)
 
 	def p_expression_array_members(self, p):
 		"""

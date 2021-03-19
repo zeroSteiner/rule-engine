@@ -33,7 +33,9 @@
 import random
 import unittest
 
+import rule_engine.ast as ast
 import rule_engine.engine as engine
+import rule_engine.errors as errors
 
 class GitHubIssueTests(unittest.TestCase):
 	def test_number_10(self):
@@ -47,3 +49,15 @@ class GitHubIssueTests(unittest.TestCase):
 		rule1 = engine.Rule(rule_text, context=engine.Context())
 		rule2 = engine.Rule(rule_text, context=engine.Context(default_value=None))
 		self.assertEqual(rule1.evaluate(thing), rule2.evaluate(thing))
+
+	def test_number_14(self):
+		context = engine.Context(
+			type_resolver=engine.type_resolver_from_dict({
+				'TEST_FLOAT': ast.DataType.FLOAT,
+			})
+		)
+		rule = engine.Rule(
+			'(TEST_FLOAT == null ? 0 : TEST_FLOAT) < 42',
+			context=context
+		)
+		rule.matches({'TEST_FLOAT': None})

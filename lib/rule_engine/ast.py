@@ -847,8 +847,6 @@ class LogicExpression(LeftOperatorRightExpressionBase):
 class ComparisonExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing comparison expressions from the grammar text such as equality checks."""
 	def _op_eq(self, thing):
-		if not DataType.is_compatible(self.left.result_type, self.right.result_type):
-			return False
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
 		if type(left_value) is not type(right_value):
@@ -856,8 +854,6 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 		return operator.eq(left_value, right_value)
 
 	def _op_ne(self, thing):
-		if not DataType.is_compatible(self.left.result_type, self.right.result_type):
-			return True
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
 		if type(left_value) is not type(right_value):

@@ -42,6 +42,20 @@ import ply.yacc as yacc
 
 literal_eval = ast_.literal_eval
 
+class _DeferredAstNode(object):
+	__slots__ = ('cls', 'args', 'kwargs', 'method')
+	def __init__(self, cls, *, args, kwargs=None, method='build'):
+		if not issubclass(cls, ast.ASTNodeBase):
+			raise TypeError('cls is not a subclass of AstNodeBase')
+		self.cls = cls
+		self.args = args
+		self.kwargs = kwargs or {}
+		self.method = method
+
+	def build(self):
+		constructor = getattr(self.cls, self.method)
+		return constructor(*self.args, **self.kwargs)
+
 class ParserBase(object):
 	"""
 	A base class for parser objects to inherit from. This does not provide any
@@ -83,7 +97,7 @@ class ParserBase(object):
 			self.context = context
 			result = self._parser.parse(text, **kwargs)
 			self.context = None
-		return result
+		return result.build()
 
 class Parser(ParserBase):
 	"""
@@ -249,7 +263,7 @@ class Parser(ParserBase):
 
 	def p_statement_expr(self, p):
 		'statement : expression'
-		p[0] = ast.Statement(self.context, p[1])
+		p[0] = _DeferredAstNode(ast.Statement, args=(self.context, p[1]))
 
 	def p_expression_getattr(self, p):
 		"""
@@ -257,7 +271,7 @@ class Parser(ParserBase):
 		       | object ATTR_SAFE SYMBOL
 		"""
 		op_name = self.op_names.get(p[2])
-		p[0] = ast.GetAttributeExpression(self.context, p[1], p[3], safe=op_name == 'ATTR_SAFE').reduce()
+		p[0] = _DeferredAstNode(ast.GetAttributeExpression, args=(self.context, p[1], p[3]), kwargs={'safe': op_name == 'ATTR_SAFE'})
 
 	def p_expression_object(self, p):
 		"""
@@ -270,7 +284,7 @@ class Parser(ParserBase):
 		expression : expression QMARK expression COLON expression
 		"""
 		condition, _, case_true, _, case_false = p[1:6]
-		p[0] = ast.TernaryExpression(self.context, condition, case_true, case_false).reduce()
+		p[0] = _DeferredAstNode(ast.TernaryExpression, args=(self.context, condition, case_true, case_false))
 
 	def p_expression_arithmetic(self, p):
 		"""
@@ -284,7 +298,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.ArithmeticExpression(self.context, op_name, left, right).reduce()
+		p[0] = _DeferredAstNode(ast.ArithmeticExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_bitwise(self, p):
 		"""
@@ -294,7 +308,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.BitwiseExpression(self.context, op_name, left, right).reduce()
+		p[0] = _DeferredAstNode(ast.BitwiseExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_bitwise_shift(self, p):
 		"""
@@ -303,7 +317,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.BitwiseShiftExpression(self.context, op_name, left, right).reduce()
+		p[0] = _DeferredAstNode(ast.BitwiseShiftExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_contains(self, p):
 		"""
@@ -312,11 +326,11 @@ class Parser(ParserBase):
 		"""
 		if len(p) == 4:
 			member, _, container = p[1:4]
-			p[0] = ast.ContainsExpression(self.context, container, member).reduce()
+			p[0] = _DeferredAstNode(ast.ContainsExpression, args=(self.context, container, member))
 		else:
 			member, _, _, container = p[1:5]
-			p[0] = ast.ContainsExpression(self.context, container, member).reduce()
-			p[0] = ast.UnaryExpression(self.context, 'NOT', p[0]).reduce()
+			p[0] = _DeferredAstNode(ast.ContainsExpression, args=(self.context, container, member))
+			p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, 'NOT', p[0]))
 
 	def p_expression_comparison(self, p):
 		"""
@@ -325,7 +339,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.ComparisonExpression(self.context, op_name, left, right).reduce()
+		p[0] = _DeferredAstNode(ast.ComparisonExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_arithmetic_comparison(self, p):
 		"""
@@ -336,7 +350,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.ArithmeticComparisonExpression(self.context, op_name, left, right).reduce()
+		p[0] = _DeferredAstNode(ast.ArithmeticComparisonExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_fuzzy_comparison(self, p):
 		"""
@@ -347,7 +361,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.FuzzyComparisonExpression(self.context, op_name, left, right).reduce()
+		p[0] = _DeferredAstNode(ast.FuzzyComparisonExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_logic(self, p):
 		"""
@@ -356,7 +370,7 @@ class Parser(ParserBase):
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
-		p[0] = ast.LogicExpression(self.context, op_name, left, right).reduce()
+		p[0] = _DeferredAstNode(ast.LogicExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_group(self, p):
 		'object : LPAREN expression RPAREN'
@@ -364,7 +378,7 @@ class Parser(ParserBase):
 
 	def p_expression_negate(self, p):
 		'expression : NOT expression'
-		p[0] = ast.UnaryExpression(self.context, 'NOT', p[2]).reduce()
+		p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, 'NOT', p[2]))
 
 	def p_expression_symbol(self, p):
 		'object : SYMBOL'
@@ -373,12 +387,12 @@ class Parser(ParserBase):
 		if name[0] == '$':
 			scope = 'built-in'
 			name = name[1:]
-		p[0] = ast.SymbolExpression(self.context, name, scope=scope).reduce()
+		p[0] = _DeferredAstNode(ast.SymbolExpression, args=(self.context, name), kwargs={'scope': scope})
 
 	def p_expression_uminus(self, p):
 		'expression : SUB expression %prec UMINUS'
 		names = {'-': 'UMINUS'}
-		p[0] = ast.UnaryExpression(self.context, names[p[1]], p[2]).reduce()
+		p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, names[p[1]], p[2]))
 
 	# Literal expressions
 	def p_expression_boolean(self, p):
@@ -386,39 +400,39 @@ class Parser(ParserBase):
 		expression : TRUE
 				   | FALSE
 		"""
-		p[0] = ast.BooleanExpression(self.context, p[1] == 'true')
+		p[0] = _DeferredAstNode(ast.BooleanExpression, args=(self.context, p[1] == 'true'))
 
 	def p_expression_datetime(self, p):
 		'object : DATETIME'
-		p[0] = ast.DatetimeExpression.from_string(self.context, literal_eval(p[1]))
+		p[0] = _DeferredAstNode(ast.DatetimeExpression, args=(self.context, literal_eval(p[1])), method='from_string')
 
 	def p_expression_float(self, p):
 		'expression : FLOAT'
-		p[0] = ast.FloatExpression(self.context, float(literal_eval(p[1])))
+		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, float(literal_eval(p[1]))))
 
 	def p_expression_float_nan(self, p):
 		'expression : FLOAT_NAN'
-		p[0] = ast.FloatExpression(self.context, float('nan'))
+		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, float('nan')))
 
 	def p_expression_float_inf(self, p):
 		'expression : FLOAT_INF'
-		p[0] = ast.FloatExpression(self.context, float('inf'))
+		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, float('inf')))
 
 	def p_expression_null(self, p):
 		'object : NULL'
 		# null is an object because of the safe operator
-		p[0] = ast.NullExpression(self.context)
+		p[0] = _DeferredAstNode(ast.NullExpression, args=(self.context,))
 
 	def p_expression_set(self, p):
 		"""
 		object : LBRACE ary_members RBRACE
 			   | LBRACE ary_members COMMA RBRACE
 		"""
-		p[0] = ast.SetExpression(self.context, tuple(p[2])).reduce()
+		p[0] = _DeferredAstNode(ast.SetExpression, args=(self.context, tuple(p[2])))
 
 	def p_expression_string(self, p):
 		'object : STRING'
-		p[0] = ast.StringExpression(self.context, literal_eval(p[1]))
+		p[0] = _DeferredAstNode(ast.StringExpression, args=(self.context, literal_eval(p[1])))
 
 	def p_expression_array(self, p):
 		"""
@@ -427,9 +441,9 @@ class Parser(ParserBase):
 			   | LBRACKET ary_members COMMA RBRACKET
 		"""
 		if len(p) < 4:
-			p[0] = ast.ArrayExpression(self.context, tuple()).reduce()
+			p[0] = _DeferredAstNode(ast.ArrayExpression, args=(self.context, tuple()))
 		else:
-			p[0] = ast.ArrayExpression(self.context, tuple(p[2])).reduce()
+			p[0] = _DeferredAstNode(ast.ArrayExpression, args=(self.context, tuple(p[2])))
 
 	def p_expression_array_comprehension(self, p):
 		"""
@@ -439,7 +453,7 @@ class Parser(ParserBase):
 		condition = None
 		if len(p) == 10:
 			condition = p[8]
-		p[0] = ast.ComprehensionExpression(self.context, p[2], p[4], p[6], condition=condition)
+		p[0] = _DeferredAstNode(ast.ComprehensionExpression, args=(self.context, p[2], p[4], p[6]), kwargs={'condition': condition})
 
 	def p_expression_array_members(self, p):
 		"""
@@ -461,9 +475,9 @@ class Parser(ParserBase):
 			   | LBRACE map_members COMMA RBRACE
 		"""
 		if len(p) < 4:
-			p[0] = ast.MappingExpression(self.context, tuple()).reduce()
+			p[0] = _DeferredAstNode(ast.MappingExpression, args=(self.context, tuple()))
 		else:
-			p[0] = ast.MappingExpression(self.context, tuple(p[2])).reduce()
+			p[0] = _DeferredAstNode(ast.MappingExpression, args=(self.context, tuple(p[2])))
 
 	def p_expression_mapping_member(self, p):
 		"""
@@ -483,7 +497,7 @@ class Parser(ParserBase):
 		object : object LBRACKET expression RBRACKET
 		"""
 		container, lbracket, item = p[1:4]
-		p[0] = ast.GetItemExpression(self.context, container, item, safe=lbracket == '&[').reduce()
+		p[0] = _DeferredAstNode(ast.GetItemExpression, args=(self.context, container, item), kwargs={'safe': lbracket == '&['})
 
 	def p_expression_getslice(self, p):
 		"""
@@ -505,4 +519,4 @@ class Parser(ParserBase):
 			start, _, stop = p[3:6]
 		else:
 			raise errors.RuleSyntaxError('invalid get slice expression')
-		p[0] = ast.GetSliceExpression(self.context, container, start, stop, safe=safe).reduce()
+		p[0] = _DeferredAstNode(ast.GetSliceExpression, args=(self.context, container, start, stop), kwargs={'safe': safe})

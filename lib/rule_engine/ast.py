@@ -513,15 +513,9 @@ class ASTNodeBase(object):
 	def to_graphviz(self, digraph):
 		digraph.node(str(id(self)), self.__class__.__name__)
 
-################################################################################
-# Base Expression Classes
-################################################################################
-class ExpressionBase(ASTNodeBase):
-	__slots__ = ('context',)
-	result_type = DataType.UNDEFINED
-	"""The data type of the result of successful evaluation."""
-	def __repr__(self):
-		return "<{0} >".format(self.__class__.__name__)
+	@classmethod
+	def build(cls, *args, **kwargs):
+		return cls(*args, **kwargs).reduce()
 
 	def evaluate(self, thing):
 		"""
@@ -541,6 +535,16 @@ class ExpressionBase(ASTNodeBase):
 		:rtype: :py:class:`.ExpressionBase`
 		"""
 		return self
+
+################################################################################
+# Base Expression Classes
+################################################################################
+class ExpressionBase(ASTNodeBase):
+	__slots__ = ('context',)
+	result_type = DataType.UNDEFINED
+	"""The data type of the result of successful evaluation."""
+	def __repr__(self):
+		return "<{0} >".format(self.__class__.__name__)
 
 class LiteralExpressionBase(ExpressionBase):
 	"""A base class for representing literal values from the grammar text."""
@@ -622,6 +626,10 @@ class ArrayExpression(_CollectionMixin, LiteralExpressionBase):
 		super(ArrayExpression, self).__init__(*args, **kwargs)
 		self.result_type = DataType.ARRAY(value_type=_iterable_member_value_type(self.value))
 
+	@classmethod
+	def build(cls, context, value):
+		return cls(context, [member.build() for member in value])
+
 class BooleanExpression(LiteralExpressionBase):
 	"""Literal boolean expressions representing True or False."""
 	result_type = DataType.BOOLEAN
@@ -660,6 +668,12 @@ class MappingExpression(LiteralExpressionBase):
 			value_type=_iterable_member_value_type(value for _, value in self.value)
 		)
 
+	@classmethod
+	def build(cls, context, value):
+		value = collections.OrderedDict(value)
+		value = collections.OrderedDict((k.build(), v.build()) for k, v in value.items())
+		return cls(context, value)
+
 	def evaluate(self, thing):
 		mapping = collections.OrderedDict()
 		for key, value in self.value:
@@ -692,6 +706,11 @@ class SetExpression(_CollectionMixin, LiteralExpressionBase):
 	def __init__(self, *args, **kwargs):
 		super(SetExpression, self).__init__(*args, **kwargs)
 		self.result_type = DataType.SET(value_type=_iterable_member_value_type(self.value))
+
+	@classmethod
+	def build(cls, context, value):
+		value = set(member.build() for member in value)
+		return cls(context, value)
 
 class StringExpression(LiteralExpressionBase):
 	"""Literal string expressions representing an array of characters."""
@@ -733,6 +752,10 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		self.left = left
 		self._assert_type_is_compatible(right)
 		self.right = right
+
+	@classmethod
+	def build(cls, context, type_, left, right):
+		return cls(context, type_, left.build(), right.build()).reduce()
 
 	def _assert_type_is_compatible(self, value):
 		if value.result_type == DataType.UNDEFINED:
@@ -953,6 +976,11 @@ class ComprehensionExpression(ExpressionBase):
 		self.iterable = iterable
 		self.condition = condition
 
+	@classmethod
+	def build(cls, context, result, variable, iterable, condition=None):
+		# todo: implement this
+		return cls(context, result, variable, iterable, condition=condition).reduce()
+
 	def evaluate(self, thing):
 		output_array = collections.deque()
 		input_array = self.iterable.evaluate(thing)
@@ -976,6 +1004,10 @@ class ContainsExpression(ExpressionBase):
 		self.context = context
 		self.member = member
 		self.container = container
+
+	@classmethod
+	def build(cls, context, container, member):
+		return cls(context, container.build(), member.build()).reduce()
 
 	def __repr__(self):
 		return "<{0} container={1!r} member={2!r} >".format(self.__class__.__name__, self.container, self.member)
@@ -1027,6 +1059,10 @@ class GetAttributeExpression(ExpressionBase):
 					# leave the result type undefined because the name could be a mapping key or attribute
 		self.name = name
 		self.safe = safe
+
+	@classmethod
+	def build(cls, context, object_, name, safe=False):
+		return cls(context, object_.build(), name, safe=safe).reduce()
 
 	def __repr__(self):
 		return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
@@ -1100,6 +1136,10 @@ class GetItemExpression(ExpressionBase):
 		self.item = item
 		self.safe = safe
 
+	@classmethod
+	def build(cls, context, container, item, safe=False):
+		return cls(context, container.build(), item.build(), safe=safe).reduce()
+
 	def __repr__(self):
 		return "<{0} container={1!r} item={2!r} >".format(self.__class__.__name__, self.container, self.item)
 
@@ -1168,6 +1208,14 @@ class GetSliceExpression(ExpressionBase):
 		self.start = start or LiteralExpressionBase.from_value(context, 0)
 		self.stop = stop or LiteralExpressionBase.from_value(context, None)
 		self.safe = safe
+
+	@classmethod
+	def build(cls, context, container, start=None, stop=None, safe=False):
+		if start is not None:
+			start = start.build()
+		if stop is not None:
+			stop = stop.build()
+		return cls(context, container.build(), start=start, stop=stop, safe=safe).reduce()
 
 	def __repr__(self):
 		return "<{0} container={1!r} start={2!r} stop={3!r} >".format(self.__class__.__name__, self.container, self.start, self.stop)
@@ -1282,6 +1330,10 @@ class Statement(ASTNodeBase):
 		self.context = context
 		self.expression = expression
 
+	@classmethod
+	def build(cls, context, expression):
+		return cls(context, expression.build()).reduce()
+
 	def evaluate(self, thing):
 		return self.expression.evaluate(thing)
 
@@ -1312,6 +1364,10 @@ class TernaryExpression(ExpressionBase):
 			self.result_type = self.case_true.result_type
 		elif isinstance(self.case_true.result_type, DataType.ARRAY.__class__) and isinstance(self.case_false.result_type, DataType.ARRAY.__class__):
 			self.result_type = DataType.ARRAY
+
+	@classmethod
+	def build(cls, context, condition, case_true, case_false):
+		return cls(context, condition.build(), case_true.build(), case_false.build()).reduce()
 
 	def evaluate(self, thing):
 		case = (self.case_true if self.condition.evaluate(thing) else self.case_false)
@@ -1356,6 +1412,10 @@ class UnaryExpression(ExpressionBase):
 			'uminus': DataType.FLOAT
 		}[type_]
 		self.right = right
+
+	@classmethod
+	def build(cls, context, type_, right):
+		return cls(context, type_, right.build()).reduce()
 
 	def __repr__(self):
 		return "<{} type={!r} >".format(self.__class__.__name__, self.type)

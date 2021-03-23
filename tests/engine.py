@@ -139,17 +139,17 @@ class EngineTests(unittest.TestCase):
 	def test_engine_builtins_re_groups(self):
 		context = engine.Context()
 		rule = engine.Rule('words =~ "(\\w+) (\\w+) (\\w+)" and $re_groups[0] == word0', context=context)
-		self.assertNotIn('regex.groups', context._tls)
+		self.assertIsNone(context._tls.regex_groups)
 		words = (
 			''.join(random.choice(string.ascii_letters) for _ in range(random.randint(4, 12))),
 			''.join(random.choice(string.ascii_letters) for _ in range(random.randint(4, 12))),
 			''.join(random.choice(string.ascii_letters) for _ in range(random.randint(4, 12)))
 		)
 		self.assertTrue(rule.matches({'words': ' '.join(words), 'word0': words[0]}))
-		self.assertEqual(context._tls['regex.groups'], words)
+		self.assertEqual(context._tls.regex_groups, words)
 
 		self.assertFalse(rule.matches({'words': ''.join(words), 'word0': words[0]}))
-		self.assertNotIn('regex.groups', context._tls)
+		self.assertIsNone(context._tls.regex_groups)
 
 
 class EngineRuleTests(unittest.TestCase):

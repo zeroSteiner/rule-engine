@@ -83,8 +83,9 @@ class ParserBase(object):
 
 	def parse(self, text, context, **kwargs):
 		"""
-		Parse the specified text in an abstract syntax tree of nodes that can
-		later be evaluated.
+		Parse the specified text in an abstract syntax tree of nodes that can later be evaluated. This is done in two
+		phases. First, the syntax is parsed and a tree of deferred / uninitialized AST nodes are constructed. Next each
+		node is built recursively using it's respective :py:meth:`rule_engine.ast.ASTNodeBase.build`.
 
 		:param str text: The grammar text to parse into an AST.
 		:param context: A context for specifying parsing and evaluation options.
@@ -95,8 +96,10 @@ class ParserBase(object):
 		kwargs['lexer'] = kwargs.pop('lexer', self._lexer)
 		with self.__mutex:
 			self.context = context
+			# phase 1: parse the string into a tree of deferred nodes
 			result = self._parser.parse(text, **kwargs)
 			self.context = None
+		# phase 2: initialize each AST node recursively, providing them with an opportunity to define assignments
 		return result.build()
 
 class Parser(ParserBase):

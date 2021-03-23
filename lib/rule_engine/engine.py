@@ -54,7 +54,7 @@ def _today(builtins):
 
 def _tls_getter(thread_local, key, _builtins):
 	# a function stub to be used with functools.partial for retrieving thread-local values
-	return thread_local.storage.get(key)
+	return getattr(thread_local.storage, key)
 
 def resolve_attribute(thing, name):
 	"""
@@ -360,6 +360,21 @@ class Builtins(collections.abc.Mapping):
 		default_value_types.update(kwargs.pop('value_types', {}))
 		return cls(default_values, value_types=default_value_types, **kwargs)
 
+class _ThreadLocalStorage(object):
+	"""
+	An object whose attributes are required to be tracked separately among multiple threads. This is to guarantee that
+	if a context is used by one or more rules that are being evaluated simultaneously in multiple threads, that the
+	states are kept isolated.
+	"""
+	__slots__ = ('assignment_scopes', 'regex_groups')
+	def __init__(self):
+		self.assignment_scopes = collections.deque()
+		self.regex_groups = None
+
+	def reset(self):
+		self.assignment_scopes.clear()
+		self.regex_groups = None
+
 class Context(object):
 	"""
 	An object defining the context for a rule's evaluation. This can be used to change the behavior of certain aspects
@@ -425,7 +440,7 @@ class Context(object):
 		self.default_value = default_value
 		"""The *default_value* parameter from :py:meth:`~__init__`"""
 		self.builtins = Builtins.from_defaults(
-			values={'re_groups': functools.partial(_tls_getter, self._thread_local, 'regex.groups')},
+			values={'re_groups': functools.partial(_tls_getter, self._thread_local, 'regex_groups')},
 			value_types={'re_groups': ast.DataType.ARRAY(ast.DataType.STRING)},
 			timezone=default_timezone
 		)
@@ -436,20 +451,19 @@ class Context(object):
 			type_resolver = type_resolver_from_dict(type_resolver)
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
-		self._assignment_scopes = collections.deque()
 
 	@contextlib.contextmanager
-	def assignment_scope(self, assignments):
-		self._assignment_scopes.append(assignments)
+	def assignments(self, *assignments):
+		self._tls.assignment_scopes.append({assign.name: assign for assign in assignments})
 		try:
 			yield
 		finally:
-			self._assignment_scopes.pop()
+			self._tls.assignment_scopes.pop()
 
 	@property
 	def _tls(self):
 		if not hasattr(self._thread_local, 'storage'):
-			self._thread_local.storage = {}
+			self._thread_local.storage = _ThreadLocalStorage()
 		return self._thread_local.storage
 
 	def resolve(self, thing, name, scope=None):
@@ -471,9 +485,9 @@ class Context(object):
 		if isinstance(thing, Builtins):
 			return resolve_item(thing, name)
 		if scope is None:
-			for assignments in self._assignment_scopes:
+			for assignments in self._tls.assignment_scopes:
 				if name in assignments:
-					return assignments[name]
+					return assignments[name].value
 			return self.__resolver(thing, name)
 		raise errors.SymbolResolutionError(name, symbol_scope=scope, thing=thing)
 
@@ -507,6 +521,9 @@ class Context(object):
 		"""
 		if scope == Builtins.scope_name:
 			return self.builtins.resolve_type(name)
+		for assignments in self._tls.assignment_scopes:
+			if name in assignments:
+				return assignments[name].value_type
 		return self.__type_resolver(name)
 
 class Rule(object):
@@ -575,7 +592,7 @@ class Rule(object):
 		:return: The value the rule evaluates to. Unlike the :py:meth:`.matches` method, this is not necessarily a
 			boolean.
 		"""
-		self.context._tls.clear()
+		self.context._tls.reset()
 		with decimal.localcontext(self.context.decimal_context):
 			return self.statement.evaluate(thing)
 

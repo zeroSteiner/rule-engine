@@ -190,11 +190,15 @@ def _is_reduced(*values):
 	return all((isinstance(value, LiteralExpressionBase) and value.is_reduced) for value in values)
 
 class _DataTypeDef(object):
-	__slots__ = ('name', 'python_type', 'is_scalar')
+	__slots__ = ('name', 'python_type', 'is_scalar', 'iterable_type')
 	def __init__(self, name, python_type):
 		self.name = name
 		self.python_type = python_type
 		self.is_scalar = True
+
+	@property
+	def is_iterable(self):
+		return getattr(self, 'iterable_type', None) is not None
 
 	def __eq__(self, other):
 		if not isinstance(other, self.__class__):
@@ -226,6 +230,10 @@ class _CollectionDataTypeDef(_DataTypeDef):
 		self.is_scalar = False
 		self.value_type = value_type
 		self.value_type_nullable = value_type_nullable
+
+	@property
+	def iterable_type(self):
+		return self.value_type
 
 	def __call__(self, value_type, value_type_nullable=True):
 		return self.__class__(
@@ -274,6 +282,10 @@ class _MappingDataTypeDef(_DataTypeDef):
 		self.key_type = key_type
 		self.value_type = value_type
 		self.value_type_nullable = value_type_nullable
+
+	@property
+	def iterable_type(self):
+		return self.key_type
 
 	def __call__(self, key_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
 		return self.__class__(
@@ -508,6 +520,17 @@ class DataType(metaclass=DataTypeMeta):
 		:rtype: bool
 		"""
 		return isinstance(value, _DataTypeDef)
+
+class Assignment(object):
+	__slots__ = ('name', 'value', 'value_type')
+	def __init__(self, name, value, value_type=DataType.UNDEFINED):
+		self.name = name
+		self.value = value
+		self.value_type = value_type
+
+	@classmethod
+	def from_value(cls, name, value):
+		return cls(name, value, value_type=DataType.from_value(value))
 
 class ASTNodeBase(object):
 	def to_graphviz(self, digraph):
@@ -956,7 +979,7 @@ class FuzzyComparisonExpression(ComparisonExpression):
 			return not modifier(left, regex)
 		match = getattr(regex, regex_function)(left)
 		if match is not None:
-			self.context._tls['regex.groups'] = coerce_value(match.groups())
+			self.context._tls.regex_groups = coerce_value(match.groups())
 		return modifier(match, None)
 
 	_op_eq_fzm = functools.partialmethod(__op_regex, 'match', operator.is_not)
@@ -975,18 +998,28 @@ class ComprehensionExpression(ExpressionBase):
 		self.variable = variable
 		self.iterable = iterable
 		self.condition = condition
+		self.result_type = DataType.ARRAY(self.result.result_type)
 
 	@classmethod
 	def build(cls, context, result, variable, iterable, condition=None):
-		# todo: implement this
+		iterable = iterable.build()
+		if iterable.result_type is not DataType.UNDEFINED and not iterable.result_type.is_iterable:
+			raise errors.EvaluationError('data type mismatch (comprehension requires an iterable)')
+		assignment = Assignment(variable, DataType.UNDEFINED, value_type=getattr(iterable.result_type, 'iterable_type', DataType.UNDEFINED))
+		with context.assignments(assignment):
+			if condition is not None:
+				condition = condition.build()
+			result = result.build()
 		return cls(context, result, variable, iterable, condition=condition).reduce()
 
 	def evaluate(self, thing):
 		output_array = collections.deque()
-		input_array = self.iterable.evaluate(thing)
-		for value in input_array:
-			assignments = {self.variable: value}
-			with self.context.assignment_scope(assignments):
+		input_iterable = self.iterable.evaluate(thing)
+		if not DataType.from_value(input_iterable).is_iterable:
+			raise errors.EvaluationError('data type mismatch (comprehension requires an iterable)')
+		for value in input_iterable:
+			assignment = Assignment.from_value(self.variable, value)
+			with self.context.assignments(assignment):
 				if self.condition is None or self.condition.evaluate(thing):
 					output_array.append(self.result.evaluate(thing))
 		return tuple(output_array)

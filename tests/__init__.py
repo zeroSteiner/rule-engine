@@ -35,3 +35,4 @@ from .engine import *
 from .errors import *
 from .issues import *
 from .parser import *
+from .thread_safety import *

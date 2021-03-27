@@ -32,9 +32,7 @@
 
 import unittest
 
-from .data_type import *
 from .expression import *
-from .value_is import *
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine

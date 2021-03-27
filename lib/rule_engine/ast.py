@@ -1000,7 +1000,12 @@ class GetAttributeExpression(ExpressionBase):
 		self.object = object_
 		if self.object.result_type != DataType.UNDEFINED:
 			if not (self.object.result_type == DataType.NULL and safe):
-				self.result_type = context.resolve_attribute_type(self.object.result_type, name)
+				try:
+					self.result_type = context.resolve_attribute_type(self.object.result_type, name)
+				except errors.AttributeResolutionError as error:
+					# this is necessary because MAPPING objects can have their keys accessed as attributes
+					if not isinstance(self.object.result_type, DataType.MAPPING.__class__):
+						raise error
 		self.name = name
 		self.safe = safe
 

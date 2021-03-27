@@ -33,141 +33,15 @@
 import collections
 import collections.abc
 import datetime
-import decimal
 import functools
 import math
 import operator
 import re
 
 from . import errors
+from .types import *
 
 import dateutil.parser
-
-NoneType = type(None)
-
-def _to_decimal(value):
-	if isinstance(value, decimal.Decimal):
-		return value
-	return decimal.Decimal(repr(value))
-
-def coerce_value(value, verify_type=True):
-	"""
-	Take a native Python *value* and convert it to a value of a data type which can be represented by a Rule Engine
-	:py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as
-	when resolving a symbol from an object external to the engine.
-
-	.. versionadded:: 2.0.0
-
-	:param value: The value to convert.
-	:param bool verify_type: Whether or not to verify the converted value's type.
-	:return: The converted value.
-	"""
-	# ARRAY
-	if isinstance(value, (list, range, tuple)):
-		value = tuple(coerce_value(v, verify_type=verify_type) for v in value)
-	# DATETIME
-	elif isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
-		value = datetime.datetime(value.year, value.month, value.day)
-	# FLOAT
-	elif isinstance(value, (float, int)) and not isinstance(value, bool):
-		value = _to_decimal(value)
-	# MAPPING
-	elif isinstance(value, (dict, collections.OrderedDict)):
-		value = collections.OrderedDict(
-			(coerce_value(k, verify_type=verify_type), coerce_value(v, verify_type=verify_type)) for k, v in value.items()
-		)
-	if verify_type:
-		DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
-	return value
-
-def is_integer_number(value):
-	"""
-	Check whether *value* is an integer number (i.e. a whole, number). This can, for example, be used to check if a
-	floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
-
-	.. versionadded:: 2.1.0
-
-	:param value: The value to check. This value is a native Python type.
-	:return: Whether or not the value is an integer number.
-	:rtype: bool
-	"""
-	if not is_real_number(value):
-		return False
-	if math.floor(value) != value:
-		return False
-	return True
-
-def is_natural_number(value):
-	"""
-	Check whether *value* is a natural number (i.e. a whole, non-negative number). This can, for example, be used to
-	check if a floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
-
-	:param value: The value to check. This value is a native Python type.
-	:return: Whether or not the value is a natural number.
-	:rtype: bool
-	"""
-	if not is_integer_number(value):
-		return False
-	if value < 0:
-		return False
-	return True
-
-def is_real_number(value):
-	"""
-	Check whether *value* is a real number (i.e. capable of being represented as a floating point value without loss of
-	information as well as being finite). Despite being able to be represented as a float, ``NaN`` is not considered a
-	real number for the purposes of this function.
-
-	:param value: The value to check. This value is a native Python type.
-	:return: Whether or not the value is a natural number.
-	:rtype: bool
-	"""
-	if not is_numeric(value):
-		return False
-	if not math.isfinite(value):
-		return False
-	return True
-
-def is_numeric(value):
-	"""
-	Check whether *value* is a numeric value (i.e. capable of being represented as a floating point value without loss
-	of information).
-
-	:param value: The value to check. This value is a native Python type.
-	:return: Whether or not the value is numeric.
-	:rtype: bool
-	"""
-	if not isinstance(value, (decimal.Decimal, float, int)):
-		return False
-	if isinstance(value, bool):
-		return False
-	return True
-
-def _iterable_member_value_type(python_value):
-	"""
-	Take a native *python_value* and return the corresponding data type if type of each of its members are either the
-	same or NULL. NULL is considered a special case to allow nullable-values. This by extension means that an iterable
-	may not be defined as only capable of containing NULL values.
-
-	:return: The data type of the sequence members. This will never be NULL, because that is considered a special case.
-		It will either be UNSPECIFIED or one of the other types.
-	"""
-	subvalue_types = set()
-	for subvalue in python_value:
-		if isinstance(subvalue, ExpressionBase):
-			subvalue_type = subvalue.result_type
-		else:
-			subvalue_type = DataType.from_value(subvalue)
-		subvalue_types.add(subvalue_type)
-	if DataType.NULL in subvalue_types:
-		# treat NULL as a special case, allowing typed arrays to be a specified type *or* NULL
-		# this however makes it impossible to define an array with a type of NULL
-		subvalue_types.remove(DataType.NULL)
-	if len(subvalue_types) == 1:
-		subvalue_type = subvalue_types.pop()
-	else:
-		subvalue_type = DataType.UNDEFINED
-	return subvalue_type
 
 def _assert_is_integer_number(*values):
 	if not all(map(is_integer_number, values)):
@@ -189,337 +63,11 @@ def _is_reduced(*values):
 	"""
 	return all((isinstance(value, LiteralExpressionBase) and value.is_reduced) for value in values)
 
-class _DataTypeDef(object):
-	__slots__ = ('name', 'python_type', 'is_scalar', 'iterable_type')
-	def __init__(self, name, python_type):
-		self.name = name
-		self.python_type = python_type
-		self.is_scalar = True
-
-	@property
-	def is_iterable(self):
-		return getattr(self, 'iterable_type', None) is not None
-
-	def __eq__(self, other):
-		if not isinstance(other, self.__class__):
-			return False
-		return self.name == other.name
-
-	def __hash__(self):
-		return hash((self.python_type, self.is_scalar))
-
-	def __repr__(self):
-		return "<{} name={} python_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__)
-
-	@property
-	def is_compound(self):
-		return not self.is_scalar
-
-_DATA_TYPE_UNDEFINED = _DataTypeDef('UNDEFINED', errors.UNDEFINED)
-class _CollectionDataTypeDef(_DataTypeDef):
-	__slots__ = ('value_type', 'value_type_nullable')
-	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
-		# check these three classes individually instead of using Collection which isn't available before Python v3.6
-		if not issubclass(python_type, collections.abc.Container):
-			raise TypeError('the specified python_type is not a container')
-		if not issubclass(python_type, collections.abc.Iterable):
-			raise TypeError('the specified python_type is not an iterable')
-		if not issubclass(python_type, collections.abc.Sized):
-			raise TypeError('the specified python_type is not a sized')
-		super(_CollectionDataTypeDef, self).__init__(name, python_type)
-		self.is_scalar = False
-		self.value_type = value_type
-		self.value_type_nullable = value_type_nullable
-
-	@property
-	def iterable_type(self):
-		return self.value_type
-
-	def __call__(self, value_type, value_type_nullable=True):
-		return self.__class__(
-			self.name,
-			self.python_type,
-			value_type=value_type,
-			value_type_nullable=value_type_nullable
-		)
-
-	def __repr__(self):
-		return "<{} name={} python_type={} value_type={} >".format(
-			self.__class__.__name__,
-			self.name,
-			self.python_type.__name__,
-			self.value_type.name
-		)
-
-	def __eq__(self, other):
-		if not super().__eq__(other):
-			return False
-		return all((
-			self.value_type == other.value_type,
-			self.value_type_nullable == other.value_type_nullable
-		))
-
-	def __hash__(self):
-		return hash((self.python_type, self.is_scalar, hash((self.value_type, self.value_type_nullable))))
-
-class _ArrayDataTypeDef(_CollectionDataTypeDef):
-	pass
-
-class _SetDataTypeDef(_CollectionDataTypeDef):
-	pass
-
-class _MappingDataTypeDef(_DataTypeDef):
-	__slots__ = ('key_type', 'value_type', 'value_type_nullable')
-	def __init__(self, name, python_type, key_type=_DATA_TYPE_UNDEFINED, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
-		if not issubclass(python_type, collections.abc.Mapping):
-			raise TypeError('the specified python_type is not a mapping')
-		super(_MappingDataTypeDef, self).__init__(name, python_type)
-		self.is_scalar = False
-		# ARRAY is the only compound data type that can be used as a mapping key, this is because ARRAY's are backed by
-		# Python tuple's while SET and MAPPING objects are set and dict instances, respectively which are not hashable.
-		if key_type.is_compound and not isinstance(key_type, DataType.ARRAY.__class__):
-			raise errors.EngineError("the {} data type may not be used for mapping keys".format(key_type.name))
-		self.key_type = key_type
-		self.value_type = value_type
-		self.value_type_nullable = value_type_nullable
-
-	@property
-	def iterable_type(self):
-		return self.key_type
-
-	def __call__(self, key_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
-		return self.__class__(
-			self.name,
-			self.python_type,
-			key_type=key_type,
-			value_type=value_type,
-			value_type_nullable=value_type_nullable
-		)
-
-	def __repr__(self):
-		return "<{} name={} python_type={} key_type={} value_type={} >".format(
-			self.__class__.__name__,
-			self.name,
-			self.python_type.__name__,
-			self.key_type.name,
-			self.value_type.name
-		)
-
-	def __eq__(self, other):
-		if not super().__eq__(other):
-			return False
-		return all((
-			self.key_type == other.key_type,
-			self.value_type == other.value_type,
-			self.value_type_nullable == other.value_type_nullable
-		))
-
-	def __hash__(self):
-		return hash((self.python_type, self.is_scalar, hash((self.key_type, self.value_type, self.value_type_nullable))))
-
-class DataTypeMeta(type):
-	def __new__(metacls, cls, bases, classdict):
-		data_type = super().__new__(metacls, cls, bases, classdict)
-		data_type._member_map_ = collections.OrderedDict()
-		for key, value in classdict.items():
-			if not isinstance(value, _DataTypeDef):
-				continue
-			data_type._member_map_[key] = value
-		return data_type
-
-	def __contains__(self, item):
-		return item in self._member_map_
-
-	def __getitem__(cls, item):
-		return cls._member_map_[item]
-
-	def __iter__(cls):
-		yield from cls._member_map_
-
-	def __len__(cls):
-		return len(cls._member_map_)
-
-class DataType(metaclass=DataTypeMeta):
-	"""
-	A collection of constants representing the different supported data types. There are three ways to compare data
-	types. All three are effectively the same when dealing with scalars.
-
-	Equality checking
-	  .. code-block::
-
-	    dt == DataType.TYPE
-	  This is the most explicit form of testing and when dealing with compound data types, it recursively checks that
-	  all of the member types are also equal.
-
-	Class checking
-	  .. code-block::
-
-	    isinstance(dt, DataType.TYPE.__class__)
-	  This checks that the data types are the same but when dealing with compound data types, the member types are
-	  ignored.
-
-	Compatibility checking
-	  .. code-block::
-
-	    DataType.is_compatible(dt, DataType.TYPE)
-	  This checks that the types are compatible without any kind of conversion. When dealing with compound data types,
-	  this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.
-	"""
-	ARRAY = _ArrayDataTypeDef('ARRAY', tuple)
-	"""
-	.. py:function:: __call__(value_type, value_type_nullable=True)
-	
-	:param value_type: The type of the array members.
-	:param bool value_type_nullable: Whether or not array members are allowed to be :py:attr:`.NULL`.
-	"""
-	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
-	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
-	FLOAT = _DataTypeDef('FLOAT', decimal.Decimal)
-	MAPPING = _MappingDataTypeDef('MAPPING', dict)
-	"""
-	.. py:function:: __call__(key_type, value_type, value_type_nullable=True)
-	
-	:param key_type: The type of the mapping keys.
-	:param value_type: The type of the mapping values.
-	:param bool value_type_nullable: Whether or not mapping values are allowed to be :py:attr:`.NULL`.
-	"""
-	NULL = _DataTypeDef('NULL', NoneType)
-	SET = _SetDataTypeDef('SET', set)
-	"""
-	.. py:function:: __call__(value_type, value_type_nullable=True)
-
-	:param value_type: The type of the set members.
-	:param bool value_type_nullable: Whether or not set members are allowed to be :py:attr:`.NULL`.
-	"""
-	STRING = _DataTypeDef('STRING', str)
-	UNDEFINED = _DATA_TYPE_UNDEFINED
-	"""
-	Undefined values. This constant can be used to indicate that a particular symbol is valid, but it's data type is
-	currently unknown.
-	"""
-	@classmethod
-	def from_name(cls, name):
-		"""
-		Get the data type from its name.
-
-		.. versionadded:: 2.0.0
-
-		:param str name: The name of the data type to retrieve.
-		:return: One of the constants.
-		"""
-		if not isinstance(name, str):
-			raise TypeError('from_name argument 1 must be str, not ' + type(name).__name__)
-		dt = getattr(cls, name, None)
-		if not isinstance(dt, _DataTypeDef):
-			raise ValueError("can not map name {0!r} to a compatible data type".format(name))
-		return dt
-
-	@classmethod
-	def from_type(cls, python_type):
-		"""
-		Get the supported data type constant for the specified Python type. If the type can not be mapped to a supported
-		data type, then a :py:exc:`ValueError` exception will be raised. This function will not return
-		:py:attr:`.UNDEFINED`.
-
-		:param type python_type: The native Python type to retrieve the corresponding type constant for.
-		:return: One of the constants.
-		"""
-		if not isinstance(python_type, type):
-			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
-		if python_type in (list, range, tuple):
-			return cls.ARRAY
-		elif python_type is bool:
-			return cls.BOOLEAN
-		elif python_type is datetime.date or python_type is datetime.datetime:
-			return cls.DATETIME
-		elif python_type in (decimal.Decimal, float, int):
-			return cls.FLOAT
-		elif python_type is dict:
-			return cls.MAPPING
-		elif python_type is NoneType:
-			return cls.NULL
-		elif python_type is set:
-			return cls.SET
-		elif python_type is str:
-			return cls.STRING
-		raise ValueError("can not map python type {0!r} to a compatible data type".format(python_type.__name__))
-
-	@classmethod
-	def from_value(cls, python_value):
-		"""
-		Get the supported data type constant for the specified Python value. If the value can not be mapped to a
-		supported data type, then a :py:exc:`TypeError` exception will be raised. This function will not return
-		:py:attr:`.UNDEFINED`.
-
-		:param python_value: The native Python value to retrieve the corresponding data type constant for.
-		:return: One of the constants.
-		"""
-		if isinstance(python_value, bool):
-			return cls.BOOLEAN
-		elif isinstance(python_value, (datetime.date, datetime.datetime)):
-			return cls.DATETIME
-		elif isinstance(python_value, (decimal.Decimal, float, int)):
-			return cls.FLOAT
-		elif python_value is None:
-			return cls.NULL
-		elif isinstance(python_value, (set,)):
-			return cls.SET(value_type=_iterable_member_value_type(python_value))
-		elif isinstance(python_value, (str,)):
-			return cls.STRING
-		elif isinstance(python_value, collections.abc.Mapping):
-			return cls.MAPPING(
-				key_type=_iterable_member_value_type(python_value.keys()),
-				value_type=_iterable_member_value_type(python_value.values())
-			)
-		elif isinstance(python_value, collections.abc.Sequence):
-			return cls.ARRAY(value_type=_iterable_member_value_type(python_value))
-		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
-
-	@classmethod
-	def is_compatible(cls, dt1, dt2):
-		"""
-		Check if two data type definitions are compatible without any kind of conversion. This evaluates to ``True``
-		when one or both are :py:attr:`.UNDEFINED` or both types are the same. In the case of compound data types (such
-		as :py:attr:`.ARRAY`) the member types are checked recursively in the same manner.
-
-		.. versionadded:: 2.1.0
-
-		:param dt1: The first data type to compare.
-		:param dt2: The second data type to compare.
-		:return: Whether or not the two types are compatible.
-		:rtype: bool
-		"""
-		if not (cls.is_definition(dt1) and cls.is_definition(dt2)):
-			raise TypeError('argument is not a data type definition')
-		if dt1 is _DATA_TYPE_UNDEFINED or dt2 is _DATA_TYPE_UNDEFINED:
-			return True
-		if dt1.is_scalar and dt2.is_scalar:
-			return dt1 == dt2
-		elif dt1.is_compound and dt2.is_compound:
-			if isinstance(dt1, DataType.ARRAY.__class__) and isinstance(dt2, DataType.ARRAY.__class__):
-				return cls.is_compatible(dt1.value_type, dt2.value_type)
-			elif isinstance(dt1, DataType.MAPPING.__class__) and isinstance(dt2, DataType.MAPPING.__class__):
-				if not cls.is_compatible(dt1.key_type, dt2.key_type):
-					return False
-				if not cls.is_compatible(dt1.value_type, dt2.value_type):
-					return False
-				return True
-			elif isinstance(dt1, DataType.SET.__class__) and isinstance(dt2, DataType.SET.__class__):
-				return cls.is_compatible(dt1.value_type, dt2.value_type)
-		return False
-
-	@classmethod
-	def is_definition(cls, value):
-		"""
-		Check if *value* is a data type definition.
-
-		.. versionadded:: 2.1.0
-
-		:param value: The value to check.
-		:return: ``True`` if *value* is a data type definition.
-		:rtype: bool
-		"""
-		return isinstance(value, _DataTypeDef)
+def _iterable_member_value_type(value):
+	value = (
+		member.result_type if isinstance(member, ExpressionBase) else member for member in value
+	)
+	return iterable_member_value_type(value)
 
 class Assignment(object):
 	__slots__ = ('name', 'value', 'value_type')
@@ -608,7 +156,7 @@ class LiteralExpressionBase(ExpressionBase):
 		else:
 			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
 		if datatype.is_compound:
-			if isinstance(datatype, _CollectionDataTypeDef):
+			if isinstance(datatype, DataType.ARRAY.__class__) or isinstance(datatype, DataType.SET.__class__):
 				value = datatype.python_type(cls.from_value(context, v) for v in value)
 			elif isinstance(datatype, DataType.MAPPING.__class__):
 				value = tuple((cls.from_value(context, k), cls.from_value(context, v)) for k, v in value.items())
@@ -676,7 +224,7 @@ class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
 	def __init__(self, context, value, **kwargs):
-		value = _to_decimal(value)
+		value = coerce_value(value)
 		super(FloatExpression, self).__init__(context, value, **kwargs)
 
 class MappingExpression(LiteralExpressionBase):
@@ -859,7 +407,7 @@ class BitwiseExpression(LeftOperatorRightExpressionBase):
 		_assert_is_natural_number(left)
 		right = self.right.evaluate(thing)
 		_assert_is_natural_number(right)
-		return _to_decimal(op(int(left), int(right)))
+		return coerce_value(op(int(left), int(right)))
 
 	def _op_bitwise_set(self, op, thing, left):
 		right = self.right.evaluate(thing)

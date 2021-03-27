@@ -1027,6 +1027,16 @@ class ComprehensionExpression(ExpressionBase):
 					output_array.append(self.result.evaluate(thing))
 		return tuple(output_array)
 
+	def to_graphviz(self, digraph, *args, **kwargs):
+		digraph.node(str(id(self)), "{}\nvariable={!r}".format(self.__class__.__name__, self.variable))
+		self.result.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.result)), label='result')
+		self.iterable.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.iterable)), label='iterable')
+		if self.condition is not None:
+			self.condition.to_graphviz(digraph, *args, **kwargs)
+			digraph.edge(str(id(self)), str(id(self.condition)), label='condition')
+
 class ContainsExpression(ExpressionBase):
 	"""An expression used to test whether an item exists within a container."""
 	__slots__ = ('container', 'member')

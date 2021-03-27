@@ -178,6 +178,12 @@ class EngineRuleTests(unittest.TestCase):
 		digraph = rule.to_graphviz()
 		self.assertIsInstance(digraph, graphviz.Digraph)
 
+	@unittest.skipUnless(has_graphviz, 'graphviz is unavailable')
+	def test_engine_rule_to_graphviz_3(self):
+		rule = engine.Rule('[member for member in iterable if member]')
+		digraph = rule.to_graphviz()
+		self.assertIsInstance(digraph, graphviz.Digraph)
+
 	def test_engine_rule_to_strings(self):
 		rule = engine.Rule(self.rule_text)
 		self.assertEqual(str(rule), self.rule_text)

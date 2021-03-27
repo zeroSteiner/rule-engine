@@ -334,6 +334,7 @@ class DataType(metaclass=DataTypeMeta):
 	  .. code-block::
 
 	    dt == DataType.TYPE
+
 	  This is the most explicit form of testing and when dealing with compound data types, it recursively checks that
 	  all of the member types are also equal.
 
@@ -341,6 +342,7 @@ class DataType(metaclass=DataTypeMeta):
 	  .. code-block::
 
 	    isinstance(dt, DataType.TYPE.__class__)
+
 	  This checks that the data types are the same but when dealing with compound data types, the member types are
 	  ignored.
 
@@ -348,6 +350,7 @@ class DataType(metaclass=DataTypeMeta):
 	  .. code-block::
 
 	    DataType.is_compatible(dt, DataType.TYPE)
+
 	  This checks that the types are compatible without any kind of conversion. When dealing with compound data types,
 	  this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.
 	"""

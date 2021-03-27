@@ -14,50 +14,8 @@ accessing and using any object or function within this module should be done wit
 module may not always cause a major version bump. The reason for this is that it is often necessary to update the AST in
 an API breaking way in order to add new features.
 
-Functions
----------
-
-.. autofunction:: coerce_value
-
-.. autofunction:: is_integer_number
-
-.. autofunction:: is_natural_number
-
-.. autofunction:: is_numeric
-
-.. autofunction:: is_real_number
-
 Classes
 -------
-
-.. autoclass:: DataType
-   :members:
-   :exclude-members: ARRAY, MAPPING, SET
-   :show-inheritance:
-
-   .. autoattribute:: ARRAY
-      :annotation:
-
-   .. autoattribute:: BOOLEAN
-      :annotation:
-
-   .. autoattribute:: DATETIME
-      :annotation:
-
-   .. autoattribute:: FLOAT
-      :annotation:
-
-   .. autoattribute:: MAPPING
-      :annotation:
-
-   .. autoattribute:: NULL
-      :annotation:
-
-   .. autoattribute:: SET
-      :annotation:
-
-   .. autoattribute:: STRING
-      :annotation:
 
 .. autoclass:: Statement
    :show-inheritance:

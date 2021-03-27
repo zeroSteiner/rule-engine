@@ -31,7 +31,6 @@
 #
 
 __version__ = '3.2.0'
-from .ast import DataType
 
 from .engine import resolve_attribute
 from .engine import resolve_item
@@ -44,3 +43,5 @@ from .errors import EngineError
 from .errors import EvaluationError
 from .errors import RuleSyntaxError
 from .errors import SymbolResolutionError
+
+from .types import DataType

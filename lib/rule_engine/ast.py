@@ -1012,6 +1012,9 @@ class ComprehensionExpression(ExpressionBase):
 			result = result.build()
 		return cls(context, result, variable, iterable, condition=condition).reduce()
 
+	def __repr__(self):
+		return "<{0} iterable={1!r} result={2!r} condition={3!r} >".format(self.__class__.__name__, self.iterable, self.result, self.condition)
+
 	def evaluate(self, thing):
 		output_array = collections.deque()
 		input_iterable = self.iterable.evaluate(thing)

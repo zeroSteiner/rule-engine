@@ -45,6 +45,7 @@ import rule_engine.errors as errors
 import dateutil.tz
 
 __all__ = (
+	'ComprehensionExpressionTests',
 	'ContainsExpressionTests',
 	'GetItemExpressionTests',
 	'GetSliceExpressionTests',
@@ -53,6 +54,36 @@ __all__ = (
 	'TernaryExpressionTests',
 	'UnaryExpressionTests'
 )
+
+class ComprehensionExpressionTests(unittest.TestCase):
+	def test_ast_conditional_comprehension(self):
+		iterable = (None,)
+		iterable_expression = ast.LiteralExpressionBase.from_value(context, iterable)
+		comprehension = ast.ComprehensionExpression(
+			context,
+			ast.NullExpression(context),
+			'test',
+			iterable_expression,
+			condition=ast.SymbolExpression(context, 'test')
+		)
+		self.assertEqual(comprehension.evaluate(None), ())
+
+	def test_ast_conditional_comprehension_error(self):
+		iterable_expression = ast.SymbolExpression(context, 'iterable')
+		comprehension = ast.ComprehensionExpression(
+			context,
+			ast.NullExpression(context),
+			'member',
+			iterable_expression
+		)
+		with self.assertRaises(errors.EvaluationError):
+			comprehension.evaluate({'iterable': None})
+
+	def test_ast_unconditional_comprehension(self):
+		iterable = (None,)
+		iterable_expression = ast.LiteralExpressionBase.from_value(context, iterable)
+		comprehension = ast.ComprehensionExpression(context, ast.NullExpression(context), 'test', iterable_expression)
+		self.assertEqual(comprehension.evaluate(None), iterable)
 
 class ContainsExpressionTests(unittest.TestCase):
 	def test_ast_expression_contains(self):

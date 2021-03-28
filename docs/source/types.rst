@@ -1,5 +1,3 @@
-.. py:currentmodule:: rule_engine.ast
-
 Data Types
 ==========
 The following table describes the data types supported by the Rule Engine and the Python data types that each is
@@ -31,6 +29,20 @@ compatible with. For a information regarding supported operations, see the
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.STRING`   | :py:class:`str`               |
 +-------------------------------+-------------------------------+
+
+Compound Types
+--------------
+The compound data types (:py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.SET`, and :py:attr:`~DataType.MAPPING`) are all
+capable of containing zero or more values of other data types (though it should be noted that
+:py:attr:`~DataType.MAPPING` keys **must be scalars** while the values can be anything). The member types of compound
+data types can be defined, but only if the members are all of the same type. For an example, an array containing floats
+can be defined, and an mapping with string keys to string values can also be defined, but a mapping with string keys to
+values that are either floats, strings or booleans **may not be completely defined**. For more information, see the
+section on :ref:`getting-started-compound-data-types` in the Getting Started page.
+
+Compound data types are also iterable, meaning that array comprehension operations can be applied to them. Iteration
+operations apply to the members of :py:attr:`~DataType.ARRAY` and :py:attr:`~DataType.SET` values, and the keys of
+:py:attr:`~DataType.MAPPING` values. This allows the types to behave in the same was as they do in Python.
 
 FLOAT
 -----

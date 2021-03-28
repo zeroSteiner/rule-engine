@@ -144,6 +144,12 @@ Literal Expressions
 Miscellaneous Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. autoclass:: ComprehensionExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = ARRAY
+
 .. autoclass:: ContainsExpression
    :show-inheritance:
 

@@ -264,6 +264,8 @@ In all cases, when a *type_resolver* is defined, the :py:class:`~engine.Rule` ob
    rule = rule_engine.Rule('author == "Stan Lee"')
    # => <Rule text='author == "Stan Lee"' >
 
+.. _getting-started-compound-data-types:
+
 Compound Data Types
 """""""""""""""""""
 Compound data types such as the :py:class:`~ast.DataType.ARRAY` and :py:class:`~ast.DataType.MAPPING` types can

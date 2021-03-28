@@ -134,7 +134,7 @@ class ParserTests(ParserTestsBase):
 			self._parse('test[', self.context)
 
 	def test_parser_reserved_keywords(self):
-		keywords = ('if', 'elif', 'else', 'for', 'while')
+		keywords = ('elif', 'else', 'while')
 		for keyword in keywords:
 			with self.assertRaises(errors.RuleSyntaxError):
 				self.assertStatementType(keyword, ast.SymbolExpression)

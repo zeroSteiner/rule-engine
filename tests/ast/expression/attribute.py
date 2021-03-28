@@ -143,6 +143,10 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate({'map': mapping}), value, "attribute {} failed".format(attribute_name))
 
+		# verify that accessing mapping keys as attributes maintains the preference of attributes over keys
+		expression = ast.GetAttributeExpression(context, symbol, 'length')
+		self.assertEqual(expression.evaluate({'map': {'length': -1}}), 1)
+
 	def test_ast_expression_set_attributes(self):
 		set_ = {1, 2, 3}
 		symbol = ast.SymbolExpression(context, 'set')
@@ -211,7 +215,6 @@ class GetAttributeExpressionTests(unittest.TestCase):
 
 		expression = ast.GetAttributeExpression(context, ast.StringExpression(context, 'inf'), 'to_flt')
 		self.assertEqual(expression.evaluate(None), float('inf'))
-
 
 if __name__ == '__main__':
 	unittest.main()

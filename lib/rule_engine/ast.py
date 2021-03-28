@@ -1006,6 +1006,7 @@ class GetAttributeExpression(ExpressionBase):
 					# this is necessary because MAPPING objects can have their keys accessed as attributes
 					if not isinstance(self.object.result_type, DataType.MAPPING.__class__):
 						raise error
+					# leave the result type undefined because the name could be a mapping key or attribute
 		self.name = name
 		self.safe = safe
 

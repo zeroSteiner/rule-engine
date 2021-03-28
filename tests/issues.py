@@ -35,7 +35,6 @@ import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
-import rule_engine.errors as errors
 
 class GitHubIssueTests(unittest.TestCase):
 	def test_number_10(self):
@@ -61,3 +60,15 @@ class GitHubIssueTests(unittest.TestCase):
 			context=context
 		)
 		rule.matches({'TEST_FLOAT': None})
+
+	def test_number_19(self):
+		context = engine.Context(
+			type_resolver=engine.type_resolver_from_dict({
+				'facts': ast.DataType.MAPPING(
+					key_type=ast.DataType.STRING,
+					value_type=ast.DataType.STRING
+				)
+			})
+		)
+		rule = engine.Rule('facts.abc == "def"', context=context)
+		self.assertTrue(rule.matches({'facts': {'abc': 'def'}}))

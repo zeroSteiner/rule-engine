@@ -41,6 +41,7 @@ from .literal import context, trueish, falseish
 import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
+import rule_engine.types as types
 
 import dateutil.tz
 
@@ -85,6 +86,16 @@ class ComprehensionExpressionTests(unittest.TestCase):
 		comprehension = ast.ComprehensionExpression(context, ast.NullExpression(context), 'test', iterable_expression)
 		self.assertEqual(comprehension.evaluate(None), iterable)
 
+	def test_ast_comprehension_result_type(self):
+		iterable = (None,)
+		iterable_expression = ast.LiteralExpressionBase.from_value(context, iterable)
+
+		comprehension = ast.ComprehensionExpression(context, ast.NullExpression(context), 'test', iterable_expression)
+		self.assertEqual(comprehension.result_type, types.DataType.ARRAY(types.DataType.NULL))
+
+		comprehension = ast.ComprehensionExpression(context, ast.FloatExpression(context, 1), 'test', iterable_expression)
+		self.assertEqual(comprehension.result_type, types.DataType.ARRAY(types.DataType.FLOAT))
+
 class ContainsExpressionTests(unittest.TestCase):
 	def test_ast_expression_contains(self):
 		container = ast.LiteralExpressionBase.from_value(context, range(3))
@@ -119,12 +130,12 @@ class ContainsExpressionTests(unittest.TestCase):
 
 class GetItemExpressionTests(unittest.TestCase):
 	containers = {
-		ast.DataType.ARRAY:   ast.LiteralExpressionBase.from_value(context, ['one', 'two']),  # ARRAY
-		ast.DataType.MAPPING: ast.LiteralExpressionBase.from_value(context, {'foo': 'bar'}),  # MAPPING
-		ast.DataType.STRING:  ast.LiteralExpressionBase.from_value(context, 'Rule Engine!')   # STRING
+		types.DataType.ARRAY:   ast.LiteralExpressionBase.from_value(context, ['one', 'two']),  # ARRAY
+		types.DataType.MAPPING: ast.LiteralExpressionBase.from_value(context, {'foo': 'bar'}),  # MAPPING
+		types.DataType.STRING:  ast.LiteralExpressionBase.from_value(context, 'Rule Engine!')   # STRING
 	}
 	def test_ast_expression_getitem(self):
-		container = self.containers[ast.DataType.ARRAY]
+		container = self.containers[types.DataType.ARRAY]
 		item_0 = ast.FloatExpression(context, 0.0)
 		get_item = ast.GetItemExpression(context, container, item_0)
 		self.assertEqual(get_item.evaluate(None), 'one')
@@ -135,7 +146,7 @@ class GetItemExpressionTests(unittest.TestCase):
 		self.assertEqual(get_item.evaluate(None), 'two')
 		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
 
-		container = self.containers[ast.DataType.STRING]
+		container = self.containers[types.DataType.STRING]
 		get_item = ast.GetItemExpression(context, container, item_0)
 		self.assertEqual(get_item.evaluate(None), 'R')
 		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
@@ -145,7 +156,7 @@ class GetItemExpressionTests(unittest.TestCase):
 		self.assertIsInstance(get_item.reduce(), ast.StringExpression)
 
 	def test_ast_expression_getitem_mapping(self):
-		container = self.containers[ast.DataType.MAPPING]
+		container = self.containers[types.DataType.MAPPING]
 		item = ast.StringExpression(context, 'foo')
 		get_item = ast.GetItemExpression(context, container, item)
 		self.assertEqual(get_item.evaluate(None), 'bar')
@@ -234,18 +245,18 @@ class SymbolExpressionTests(unittest.TestCase):
 
 	def _type_resolver(self, name):
 		if name == self.sym_aryname:
-			return ast.DataType.ARRAY(ast.DataType.FLOAT, value_type_nullable=False)
+			return types.DataType.ARRAY(types.DataType.FLOAT, value_type_nullable=False)
 		elif name == self.sym_aryname_nontyped:
-			return ast.DataType.ARRAY
+			return types.DataType.ARRAY
 		elif name == self.sym_aryname_nullable:
-			return ast.DataType.ARRAY(ast.DataType.FLOAT, value_type_nullable=True)
+			return types.DataType.ARRAY(types.DataType.FLOAT, value_type_nullable=True)
 		elif name == self.sym_strname:
-			return ast.DataType.STRING
-		return ast.DataType.UNDEFINED
+			return types.DataType.STRING
+		return types.DataType.UNDEFINED
 
 	def test_ast_expression_symbol(self):
 		symbol = ast.SymbolExpression(engine.Context(), self.sym_strname)
-		self.assertIs(symbol.result_type, ast.DataType.UNDEFINED)
+		self.assertIs(symbol.result_type, types.DataType.UNDEFINED)
 		self.assertEqual(symbol.name, self.sym_strname)
 		self.assertEqual(symbol.evaluate({self.sym_strname: self.sym_strvalue}), self.sym_strvalue)
 
@@ -269,14 +280,14 @@ class SymbolExpressionTests(unittest.TestCase):
 	def test_ast_expression_symbol_type(self):
 		context = engine.Context(type_resolver=self._type_resolver)
 		symbol = ast.SymbolExpression(context, self.sym_strname)
-		self.assertIs(symbol.result_type, ast.DataType.STRING)
+		self.assertIs(symbol.result_type, types.DataType.STRING)
 		self.assertEqual(symbol.name, self.sym_strname)
 		self.assertEqual(symbol.evaluate({self.sym_strname: self.sym_strvalue}), self.sym_strvalue)
 
 	def test_ast_expression_symbol_type_errors(self):
 		context = engine.Context(type_resolver=self._type_resolver)
 		symbol = ast.SymbolExpression(context, self.sym_strname)
-		self.assertIs(symbol.result_type, ast.DataType.STRING)
+		self.assertIs(symbol.result_type, types.DataType.STRING)
 		self.assertEqual(symbol.name, self.sym_strname)
 		with self.assertRaises(errors.SymbolTypeError):
 			self.assertEqual(symbol.evaluate({self.sym_strname: not self.sym_strvalue}), self.sym_strvalue)

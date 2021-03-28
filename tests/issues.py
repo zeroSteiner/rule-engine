@@ -33,8 +33,8 @@
 import random
 import unittest
 
-import rule_engine.ast as ast
 import rule_engine.engine as engine
+import rule_engine.types as types
 
 class GitHubIssueTests(unittest.TestCase):
 	def test_number_10(self):
@@ -52,7 +52,7 @@ class GitHubIssueTests(unittest.TestCase):
 	def test_number_14(self):
 		context = engine.Context(
 			type_resolver=engine.type_resolver_from_dict({
-				'TEST_FLOAT': ast.DataType.FLOAT,
+				'TEST_FLOAT': types.DataType.FLOAT,
 			})
 		)
 		rule = engine.Rule(
@@ -64,9 +64,9 @@ class GitHubIssueTests(unittest.TestCase):
 	def test_number_19(self):
 		context = engine.Context(
 			type_resolver=engine.type_resolver_from_dict({
-				'facts': ast.DataType.MAPPING(
-					key_type=ast.DataType.STRING,
-					value_type=ast.DataType.STRING
+				'facts': types.DataType.MAPPING(
+					key_type=types.DataType.STRING,
+					value_type=types.DataType.STRING
 				)
 			})
 		)

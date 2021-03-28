@@ -40,6 +40,7 @@ import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 import rule_engine.parser as parser
+import rule_engine.types as types
 
 import dateutil.tz
 
@@ -47,7 +48,7 @@ class ParserTestsBase(unittest.TestCase):
 	_parser = parser.Parser()
 	context = engine.Context()
 	def _parse(self, string, context):
-		return self._parser.parse(string, self.context)
+		return self._parser.parse(string, context)
 
 	def assertStatementType(self, string, ast_expression):
 		statement = self._parse(string, self.context)
@@ -81,12 +82,27 @@ class ParserTests(ParserTestsBase):
 			self.assertIsInstance(expression.result, ast.SymbolExpression)
 			self.assertEqual(expression.result.name, 'member')
 
+	def test_parser_comprehension_expressions_errors(self):
 		# test non-iterables raise an exception
 		with self.assertRaises(errors.EvaluationError):
 			self._parse('[null for something in null]', self.context)
+
 		# test invalid assignments raise an exception
 		with self.assertRaises(errors.SyntaxError):
 			self._parse('[null for null in something]', self.context)
+
+		# test that data types are propagated...
+		typed_context = engine.Context(type_resolver=engine.type_resolver_from_dict({
+			'words': types.DataType.ARRAY(types.DataType.STRING)
+		}))
+		# ... the result expression
+		self._parse('[word =~ ".*" for word in words]', typed_context)
+		with self.assertRaises(errors.EvaluationError):
+			self._parse('[word % 2 for word in words]', typed_context)
+		# ... and the condition expression
+		self._parse('[null for word in words if word =~ ".*"]', typed_context)
+		with self.assertRaises(errors.EvaluationError):
+			self._parse('[null for word in words if word % 2]', typed_context)
 
 	def test_parser_contains_expressions(self):
 		expressions = []

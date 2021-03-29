@@ -70,15 +70,23 @@ def _iterable_member_value_type(value):
 	return iterable_member_value_type(value)
 
 class Assignment(object):
+	"""An internal assignment where by a symbol is populated with a value of the specified type."""
 	__slots__ = ('name', 'value', 'value_type')
-	def __init__(self, name, value, value_type=DataType.UNDEFINED):
+	def __init__(self, name, *, value=errors.UNDEFINED, value_type=None):
+		"""
+		:param str name: The symbol name that the assignment is defining.
+		:param value: The value of the assignment.
+		:param value_type: The data type of the assignment.
+		:type value_type: :py:class:`~.DataType`
+		"""
 		self.name = name
 		self.value = value
+		if value is not errors.UNDEFINED and value_type is not None:
+			value_type = DataType.from_value(value)
 		self.value_type = value_type
 
-	@classmethod
-	def from_value(cls, name, value):
-		return cls(name, value, value_type=DataType.from_value(value))
+	def __repr__(self):
+		return "<{} name={!r} value={!r} value_type={!r} >".format(self.__class__.__name__, self.name, self.value, self.value_type)
 
 class ASTNodeBase(object):
 	def to_graphviz(self, digraph):
@@ -553,7 +561,7 @@ class ComprehensionExpression(ExpressionBase):
 		iterable = iterable.build()
 		if iterable.result_type is not DataType.UNDEFINED and not iterable.result_type.is_iterable:
 			raise errors.EvaluationError('data type mismatch (comprehension requires an iterable)')
-		assignment = Assignment(variable, DataType.UNDEFINED, value_type=getattr(iterable.result_type, 'iterable_type', DataType.UNDEFINED))
+		assignment = Assignment(variable, value_type=getattr(iterable.result_type, 'iterable_type', DataType.UNDEFINED))
 		with context.assignments(assignment):
 			if condition is not None:
 				condition = condition.build()
@@ -569,7 +577,7 @@ class ComprehensionExpression(ExpressionBase):
 		if not DataType.from_value(input_iterable).is_iterable:
 			raise errors.EvaluationError('data type mismatch (comprehension requires an iterable)')
 		for value in input_iterable:
-			assignment = Assignment.from_value(self.variable, value)
+			assignment = Assignment(self.variable, value=value)
 			with self.context.assignments(assignment):
 				if self.condition is None or self.condition.evaluate(thing):
 					output_array.append(self.result.evaluate(thing))

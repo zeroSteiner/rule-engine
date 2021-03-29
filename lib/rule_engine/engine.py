@@ -454,6 +454,13 @@ class Context(object):
 
 	@contextlib.contextmanager
 	def assignments(self, *assignments):
+		"""
+		Add the specified assignments to a thread-specific scope. This is used when an assignment originates from an
+		expression.
+
+		:param assignment: The one or more assignments to define.
+		:type assignment: :py:class:`~rule_engine.ast.Assignment`
+		"""
 		self._tls.assignment_scopes.append({assign.name: assign for assign in assignments})
 		try:
 			yield

@@ -17,6 +17,12 @@ an API breaking way in order to add new features.
 Classes
 -------
 
+.. autoclass:: Assignment
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+   :undoc-members:
+
 .. autoclass:: Statement
    :show-inheritance:
 

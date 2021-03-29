@@ -218,7 +218,7 @@ The following keywords are reserved and can not be used as the names of symbols.
 +-----------+-----------------------------------------------------------------+
 | **Reserved For Future Use**                                                 |
 +-----------+-----------------------------------------------------------------+
-| ``elif`   | Reserved for future use                                         |
+| ``elif``  | Reserved for future use                                         |
 +-----------+-----------------------------------------------------------------+
 | ``else``  | Reserved for future use                                         |
 +-----------+-----------------------------------------------------------------+

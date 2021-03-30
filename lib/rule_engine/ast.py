@@ -674,10 +674,11 @@ class GetAttributeExpression(ExpressionBase):
 		if resolved_obj is None and self.safe:
 			return resolved_obj
 
+		attribute_error = None
 		try:
 			value = self.context.resolve_attribute(thing, resolved_obj, self.name)
-		except errors.AttributeResolutionError:
-			pass
+		except errors.AttributeResolutionError as error:
+			attribute_error = error
 		else:
 			return coerce_value(value, verify_type=False)
 
@@ -686,7 +687,7 @@ class GetAttributeExpression(ExpressionBase):
 		except errors.SymbolResolutionError:
 			default_value = self.context.default_value
 			if default_value is errors.UNDEFINED:
-				raise errors.AttributeResolutionError(self.name, resolved_obj, thing=thing) from None
+				raise attribute_error from None
 			value = default_value
 		return coerce_value(value, verify_type=False)
 

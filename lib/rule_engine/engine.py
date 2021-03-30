@@ -36,6 +36,7 @@ import contextlib
 import datetime
 import decimal
 import functools
+import itertools
 import math
 import re
 import threading
@@ -46,8 +47,38 @@ from . import parser
 
 import dateutil.tz
 
+def _levenshtein(str1, str2):
+	# calculate the levenshtein distance between two strings, 0 is a perfect match
+	size_x = len(str1) + 1
+	size_y = len(str2) + 1
+	matrix = [[0] * size_y for _ in range(size_x)]
+	for x in range(size_x):
+		matrix[x][0] = x
+	for y in range(size_y):
+		matrix[0][y] = y
+
+	for x, y in itertools.product(range(1, size_x), range(1, size_y)):
+		if str1[x - 1] == str2[y - 1]:
+			matrix[x][y] = min(
+				matrix[x - 1][y] + 1,
+				matrix[x - 1][y - 1],
+				matrix[x][y - 1] + 1
+			)
+		else:
+			matrix[x][y] = min(
+				matrix[x - 1][y] + 1,
+				matrix[x - 1][y - 1] + 1,
+				matrix[x][y - 1] + 1
+			)
+	return (matrix[size_x - 1][size_y - 1])
+
 def _now(builtins):
 	return datetime.datetime.now(tz=builtins.timezone)
+
+def _suggest(word, options):
+	if not len(options):
+		return None
+	return sorted(options, key=functools.partial(_levenshtein, word))[0]
 
 def _today(builtins):
 	return _now(builtins).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -71,7 +102,7 @@ def resolve_attribute(thing, name):
 	:return: The value for the corresponding attribute *name*.
 	"""
 	if not hasattr(thing, name):
-		raise errors.SymbolResolutionError(name, thing=thing)
+		raise errors.SymbolResolutionError(name, thing=thing, suggestion=_suggest(name, dir(thing)))
 	return getattr(thing, name)
 
 def resolve_item(thing, name):
@@ -84,15 +115,15 @@ def resolve_item(thing, name):
 	:param str name: The symbol name that is being resolved.
 	:return: The value for the corresponding attribute *name*.
 	"""
-	if not isinstance(thing, collections.abc.Iterable):
+	if not isinstance(thing, collections.abc.Mapping):
 		raise errors.SymbolResolutionError(name, thing=thing)
 	if name not in thing:
-		raise errors.SymbolResolutionError(name, thing=thing)
+		raise errors.SymbolResolutionError(name, thing=thing, suggestion=_suggest(name, thing.keys()))
 	return thing[name]
 
 def _type_resolver(type_map, name):
 	if name not in type_map:
-		raise errors.SymbolResolutionError(name)
+		raise errors.SymbolResolutionError(name, suggestion=_suggest(name, type_map.keys()))
 	return type_map[name]
 
 def _float_op(value, op):
@@ -154,7 +185,7 @@ class _AttributeResolver(object):
 			raise errors.AttributeResolutionError(name, object_type, thing=thing)
 		resolver = attribute_resolvers.get(name)
 		if resolver is None:
-			raise errors.AttributeResolutionError(name, object_type, thing=thing)
+			raise errors.AttributeResolutionError(name, object_type, thing=thing, suggestion=_suggest(name, attribute_resolvers.keys()))
 		return resolver
 
 	def resolve_type(self, object_type, name):

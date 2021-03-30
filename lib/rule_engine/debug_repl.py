@@ -40,6 +40,7 @@ import traceback
 
 from . import __version__
 from . import engine
+from . import errors
 
 def _console_interact(console, *args, **kwargs):
 	# see: https://bugs.python.org/issue34115
@@ -53,6 +54,12 @@ def _console_interact(console, *args, **kwargs):
 
 def main():
 	parser = argparse.ArgumentParser(description='Rule Engine: Debug REPL', conflict_handler='resolve')
+	parser.add_argument(
+		'--debug',
+		action='store_true',
+		default=False,
+		help='enable debugging output'
+	)
 	parser.add_argument(
 		'--edit-console',
 		action='store_true',
@@ -100,7 +107,13 @@ def main():
 		try:
 			rule = engine.Rule(rule_text, context=context)
 			result = rule.evaluate(thing)
-		except Exception:
+		except errors.EngineError as error:
+			print("{}: {}".format(error.__class__.__name__, error.message))
+			if isinstance(error, (errors.AttributeResolutionError, errors.SymbolResolutionError)) and error.suggestion:
+				print("Did you mean '{}'?".format(error.suggestion))
+			if arguments.debug:
+				traceback.print_exc()
+		except Exception as error:
 			traceback.print_exc()
 		else:
 			print('result: ')

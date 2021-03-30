@@ -53,6 +53,9 @@ class EngineError(Exception):
 		self.message = message
 		"""A text description of what error occurred."""
 
+	def __repr__(self):
+		return "<{} message={!r} >".format(self.__class__.__name__, self.message)
+
 class EvaluationError(EngineError):
 	"""
 	An error raised for issues which occur while the rule is being evaluated. This can occur at parse time while AST
@@ -110,13 +113,17 @@ class AttributeResolutionError(EvaluationError):
 	"""
 	An error raised with an attribute can not be resolved to a value.
 
-	..versionadded:: 2.0.0
+	.. versionadded:: 2.0.0
 	"""
-	def __init__(self, attribute_name, object_, thing=UNDEFINED):
+	def __init__(self, attribute_name, object_, thing=UNDEFINED, suggestion=None):
 		"""
 		:param str attribute_name: The name of the symbol that can not be resolved.
 		:param object_: The value that *attribute_name* was used as an attribute for.
 		:param thing: The root-object that was used to resolve *object*.
+		:param str suggestion: An optional suggestion for a valid attribute name.
+
+		.. versionchanged:: 3.2.0
+			Added the *suggestion* parameter.
 		"""
 		self.attribute_name = attribute_name
 		"""The name of the symbol that can not be resolved."""
@@ -124,7 +131,12 @@ class AttributeResolutionError(EvaluationError):
 		"""The value that *attribute_name* was used as an attribute for."""
 		self.thing = thing
 		"""The root-object that was used to resolve *object*."""
+		self.suggestion = suggestion
+		"""An optional suggestion for a valid attribute name."""
 		super(AttributeResolutionError, self).__init__("unknown attribute: {0!r}".format(attribute_name))
+
+	def __repr__(self):
+		return "<{} message={!r} suggestion={!r} >".format(self.__class__.__name__, self.message, self.suggestion)
 
 class AttributeTypeError(EvaluationError):
 	"""
@@ -176,14 +188,17 @@ class LookupError(EvaluationError):
 
 class SymbolResolutionError(EvaluationError):
 	"""An error raised when a symbol name is not able to be resolved to a value."""
-	def __init__(self, symbol_name, symbol_scope=None, thing=UNDEFINED):
+	def __init__(self, symbol_name, symbol_scope=None, thing=UNDEFINED, suggestion=None):
 		"""
 		:param str symbol_name: The name of the symbol that can not be resolved.
 		:param str symbol_scope: The scope of where the symbol should be valid for resolution.
 		:param thing: The root-object that was used to resolve the symbol.
+		:param str suggestion: An optional suggestion for a valid symbol name.
 
 		.. versionchanged:: 2.0.0
 			Added the *thing* parameter.
+		.. versionchanged:: 3.2.0
+			Added the *suggestion* parameter.
 		"""
 		self.symbol_name = symbol_name
 		"""The name of the symbol that can not be resolved."""
@@ -191,7 +206,12 @@ class SymbolResolutionError(EvaluationError):
 		"""The scope of where the symbol should be valid for resolution."""
 		self.thing = thing
 		"""The root-object that was used to resolve the symbol."""
+		self.suggestion = suggestion
+		"""An optional suggestion for a valid symbol name."""
 		super(SymbolResolutionError, self).__init__("unknown symbol: {0!r}".format(symbol_name))
+
+	def __repr__(self):
+		return "<{} message={!r} suggestion={!r} >".format(self.__class__.__name__, self.message, self.suggestion)
 
 class SymbolTypeError(EvaluationError):
 	"""An error raised when a symbol with type information is resolved to a Python value that is not of that type."""

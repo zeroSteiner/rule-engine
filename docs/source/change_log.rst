@@ -15,6 +15,8 @@ Version 3.2.0
 * Refactored the :py:mod:`~rule_engine.ast` module to move the :py:class:`~rule_engine.types.DataType` class into a new,
   dedicated :py:mod:`~rule_engine.types` module.
 * Added the new :py:class:`~rule_engine.ast.ComprehensionExpression`
+* Added suggestions to :py:class:`~rule_engine.errors.AttributeResolutionError` and
+  :py:class:`~rule_engine.errors.SymbolResolutionError`
 
 Version 3.1.0
 ^^^^^^^^^^^^^

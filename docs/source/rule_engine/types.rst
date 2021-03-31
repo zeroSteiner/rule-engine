@@ -4,6 +4,8 @@
 .. module:: rule_engine.types
    :synopsis:
 
+.. versionadded:: 3.2.0
+
 This module contains the internal type definitions and utility functions for working with them.
 
 Functions

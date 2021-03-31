@@ -9,4 +9,5 @@
    engine.rst
    errors.rst
    parser.rst
+   suggestions.rst
    types.rst

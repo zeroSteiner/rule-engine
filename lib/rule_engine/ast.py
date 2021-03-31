@@ -39,6 +39,7 @@ import operator
 import re
 
 from . import errors
+from .suggestions import suggest_symbol
 from .types import *
 
 import dateutil.parser
@@ -684,9 +685,14 @@ class GetAttributeExpression(ExpressionBase):
 
 		try:
 			value = self.context.resolve(resolved_obj, self.name)
-		except errors.SymbolResolutionError:
+		except errors.SymbolResolutionError as symbol_error:
 			default_value = self.context.default_value
 			if default_value is errors.UNDEFINED:
+				suggestion = attribute_error.suggestion or symbol_error.suggestion
+				if attribute_error.suggestion and symbol_error.suggestion:
+					# if there are two suggestions, select the best one
+					suggestion = suggest_symbol(self.name, (attribute_error.suggestion, symbol_error.suggestion))
+				attribute_error.suggestion = suggestion
 				raise attribute_error from None
 			value = default_value
 		return coerce_value(value, verify_type=False)

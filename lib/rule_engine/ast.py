@@ -776,7 +776,7 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)
 	_op_mod  = functools.partialmethod(__op_arithmetic, operator.mod)
 	_op_mul  = functools.partialmethod(__op_arithmetic, operator.mul)
-	_op_pow  = functools.partialmethod(__op_arithmetic, math.pow)
+	_op_pow  = functools.partialmethod(__op_arithmetic, operator.pow)
 
 class BitwiseExpression(LeftOperatorRightExpressionBase):
 	"""

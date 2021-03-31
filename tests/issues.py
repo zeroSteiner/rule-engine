@@ -72,3 +72,7 @@ class GitHubIssueTests(unittest.TestCase):
 		)
 		rule = engine.Rule('facts.abc == "def"', context=context)
 		self.assertTrue(rule.matches({'facts': {'abc': 'def'}}))
+
+	def test_number_20(self):
+		rule = engine.Rule('a / b ** 2')
+		self.assertEqual(rule.evaluate({'a': 8, 'b': 4}), 0.5)

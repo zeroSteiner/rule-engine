@@ -34,8 +34,6 @@ import functools
 import itertools
 import re
 
-from .parser import Parser
-
 def _levenshtein(str1, str2):
 	# calculate the levenshtein distance between two strings, 0 is a perfect match
 	size_x = len(str1) + 1
@@ -76,5 +74,6 @@ def suggest_symbol(word, options):
 	:return: The best replacement for *word*.
 	:rtype: str
 	"""
+	from .parser import Parser  # avoid circular imports
 	symbol_regex = '^' + Parser.get_token_regex('SYMBOL') + '$'
 	return _suggest(word, [option for option in options if re.match(symbol_regex, option)])

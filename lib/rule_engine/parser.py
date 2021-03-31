@@ -30,9 +30,10 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import ast as ast_
+import ast as pyast
 import collections
 import threading
+import types as pytypes
 
 from . import ast
 from . import errors
@@ -40,7 +41,7 @@ from . import errors
 import ply.lex as lex
 import ply.yacc as yacc
 
-literal_eval = ast_.literal_eval
+literal_eval = pyast.literal_eval
 
 class _DeferredAstNode(object):
 	__slots__ = ('cls', 'args', 'kwargs', 'method')
@@ -200,6 +201,21 @@ class Parser(ParserBase):
 		('right',    'UMINUS'),
 		('left',     'ATTR', 'ATTR_SAFE'),
 	)
+
+	@classmethod
+	def get_token_regex(cls, token_name):
+		"""
+		Return the regex that is used by the specified token.
+
+		:param str token_name: The token for which to return the regex.
+		:rtype: str
+		"""
+		obj = getattr(cls, 't_' + token_name, None)
+		if isinstance(obj, str):
+			return obj
+		elif isinstance(obj, pytypes.FunctionType):
+			return obj.__doc__
+		raise ValueError('unknown token: ' + token_name)
 
 	def t_POW(self, t):
 		r'\*\*?'

@@ -292,7 +292,7 @@ class _AttributeResolver(object):
 		value = value.strip()
 		if re.match(r'-?inf', value):
 			return decimal.Decimal(value)
-		match = re.match(r'^(' + parser.Parser.t_FLOAT + ')$', value)
+		match = re.match(r'^(' + parser.Parser.get_token_regex('FLOAT') + ')$', value)
 		if match is None:
 			return decimal.Decimal('nan')
 		return parser.literal_eval(match.group(0))

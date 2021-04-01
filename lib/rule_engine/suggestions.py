@@ -31,38 +31,61 @@
 #
 
 import functools
-import itertools
 import re
 
-def _levenshtein(str1, str2):
-	# calculate the levenshtein distance between two strings, 0 is a perfect match
-	size_x = len(str1) + 1
-	size_y = len(str2) + 1
-	matrix = [[0] * size_y for _ in range(size_x)]
-	for x in range(size_x):
-		matrix[x][0] = x
-	for y in range(size_y):
-		matrix[0][y] = y
+def jaro_distance(str1, str2):
+	if str1 == str2:
+		return 1.0
 
-	for x, y in itertools.product(range(1, size_x), range(1, size_y)):
-		if str1[x - 1] == str2[y - 1]:
-			matrix[x][y] = min(
-				matrix[x - 1][y] + 1,
-				matrix[x - 1][y - 1],
-				matrix[x][y - 1] + 1
-			)
-		else:
-			matrix[x][y] = min(
-				matrix[x - 1][y] + 1,
-				matrix[x - 1][y - 1] + 1,
-				matrix[x][y - 1] + 1
-			)
-	return (matrix[size_x - 1][size_y - 1])
+	str1_len = len(str1)
+	str2_len = len(str2)
+	max_len = max(str1_len, str2_len)
+	match_distance = (max_len // 2) - 1
+	str1_matches = [False] * max_len
+	str2_matches = [False] * max_len
+	matches = 0.0
+
+	for i in range(str1_len):
+		start = max(0, i - match_distance)
+		end = min(i + match_distance, str2_len - 1) + 1
+		for j in range(start, end):
+			if not str2_matches[j] and str1[i] == str2[j]:
+				str1_matches[i] = True
+				str2_matches[j] = True
+				matches += 1
+				break
+
+	if matches == 0.0:
+		return 0.0
+
+	k = 0
+	transpositions = 0.0
+	for i in range(str1_len):
+		if not str1_matches[i]:
+			continue
+		while not str2_matches[k]:
+			k += 1
+		if str1[i] != str2[k]:
+			transpositions += 1.0
+		k += 1
+	return ((matches / str1_len) + (matches / str2_len) + ((matches - transpositions / 2.0) / matches)) / 3.0
+
+def jaro_winkler_distance(str1, str2, scale=0.1):
+	jaro_dist = jaro_distance(str1, str2)
+	if jaro_dist > 0.7:
+		prefix = 0
+		while prefix < min(len(str1), len(str2), 5) and str1[prefix] == str2[prefix]:
+			prefix += 1
+		jaro_dist += scale * prefix * (1 - jaro_dist)
+	return jaro_dist
+
+def jaro_winkler_similarity(*args, **kwargs):
+	return 1 - jaro_winkler_distance(*args, **kwargs)
 
 def _suggest(word, options):
 	if not len(options):
 		return None
-	return sorted(options, key=functools.partial(_levenshtein, word))[0]
+	return sorted(options, key=functools.partial(jaro_winkler_similarity, word))[0]
 
 def suggest_symbol(word, options):
 	"""

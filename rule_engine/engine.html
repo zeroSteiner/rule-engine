@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>engine &mdash; Rule Engine 3.1.2 documentation</title>
+  <title>engine &mdash; Rule Engine 3.2.0 documentation</title>
   
 
   
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                3.1.2
+                3.2.0
               </div>
             
           
@@ -89,7 +90,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../syntax.html">Rule Syntax</a></li>
@@ -104,6 +105,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">errors</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="parser.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="suggestions.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">suggestions</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="types.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">types</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../debug_repl.html">Debug REPL</a></li>
@@ -177,10 +180,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-rule_engine.engine">
+  <section id="module-rule_engine.engine">
 <span id="engine"></span><h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">engine</span></code><a class="headerlink" href="#module-rule_engine.engine" title="Permalink to this headline">¶</a></h1>
 <p>This module contains the primary externally facing API for the package.</p>
-<div class="section" id="functions">
+<section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="rule_engine.engine.resolve_attribute">
@@ -246,8 +249,8 @@ interface) from which to create the callback function.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="classes">
+</section>
+<section id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="rule_engine.engine.Builtins">
@@ -290,7 +293,7 @@ single argument, which is the instance of <a class="reference internal" href="#r
 <dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The name of the symbol to retrieve the data type of.</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The data type of the symbol or <a class="reference internal" href="ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+<dd class="field-even"><p>The data type of the symbol or <code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code>.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -341,6 +344,18 @@ and the result will be used as the callback.</p>
 <div class="versionchanged">
 <p><span class="versionmodified changed">Changed in version 3.0.0: </span>Added the <em>decimal_context</em> parameter.</p>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="rule_engine.engine.Context.assignments">
+<code class="sig-name descname"><span class="pre">assignments</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">assignments</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context.assignments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.Context.assignments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the specified assignments to a thread-specific scope. This is used when an assignment originates from an
+expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>assignment</strong> (<a class="reference internal" href="ast.html#rule_engine.ast.Assignment" title="rule_engine.ast.Assignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">Assignment</span></code></a>) – The one or more assignments to define.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -439,7 +454,7 @@ then up to the caller to determine whether or not it is appropriate to use <a cl
 <dd><p>A method for providing type hints while the rule is being generated. This can be used to ensure that all symbol
 names are valid and that the types are appropriate for the operations being performed. It must then return one
 of the compatible data type constants if the symbol is valid or raise an exception. The default behavior is to
-return <a class="reference internal" href="ast.html#rule_engine.ast.DataType.UNDEFINED" title="rule_engine.ast.DataType.UNDEFINED"><code class="xref py py-data docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> for all symbols.</p>
+return <code class="xref py py-data docutils literal notranslate"><span class="pre">UNDEFINED</span></code> for all symbols.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -576,8 +591,8 @@ abstract syntax tree (AST) for evaluation.</p>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

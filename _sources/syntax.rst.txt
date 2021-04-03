@@ -147,6 +147,28 @@ The item lookup operation can also evaluate to an array when a stop boundary is 
 first four elements of a string by appending ``[0:4]`` to the end of the value. Alternatively, only the ending index
 may be specified using ``[:4]``. Finally, just as in Python, negative values can be used to reference the last elements.
 
+Array Comprehension
+"""""""""""""""""""
+An operation may be able to be applied to each member of an iterable value to generate a new :py:attr:`~DataType.ARRAY`
+composed of the resulting expressions. This could for example be used to determine how many values within an array
+match an arbitrary condition. The syntax is very similar to the list comprehension within Python and is composed of
+three mandatory components with an optional condition expression. The three required components in order from left to
+right are the result expression, the variable assignment and the iterable (followed by the optional condition). Each
+component uses a reserved keyword as a delimiter and the entire expression is wrapped within brackets just like an array
+literal.
+
+For example, to square an array of numbers: ``[ v ** 2 for v in [1, 2, 3] ]``. In this case, the resulting expression is
+the square operation (``v ** 2``) which uses the variable ``v`` defined in the assignment. Finally, the operation is
+applied to the array literal ``[1, 2, 3]``, which could have been any iterable value.
+
+An optional condition may be applied to the value before the resulting expression is evaluated using the ``if`` keyword.
+Building on the previous example, if only the squares of each odd number was needed, the expression could be updated to:
+``[ v ** 2 for v in [1, 2, 3] if v % 2]``. This example uses the modulo operator to filter out even values.
+
+One limitation to the array comprehension syntax when compared to Python's list comprehension is that the variable
+assignment may not contain more than one value. There is currently no support for unpacking multiple values like Python
+does, (e.g. ``[ v for k,v in my_dict.items() if test(k) ]``.
+
 Ternary Operators
 """""""""""""""""
 The ternary operator can be used in place of a traditional "if-then-else" statement. Like other languages the question
@@ -159,35 +181,49 @@ Reserved Keywords
 ^^^^^^^^^^^^^^^^^
 The following keywords are reserved and can not be used as the names of symbols.
 
-+-----------+----------------------------------------------+
-| Keyword   | Description                                  |
-+-----------+----------------------------------------------+
-| ``null``  | The :py:class:`NullExpression` literal value |
-+-----------+----------------------------------------------+
-| **Booleans** (:py:class:`BooleanExpression` Literals)    |
-+-----------+----------------------------------------------+
-| ``true``  | The "True" boolean value                     |
-+-----------+----------------------------------------------+
-| ``false`` | The "False" boolean value                    |
-+-----------+----------------------------------------------+
-| **Floats** (:py:class:`FloatExpression` Literals)        |
-+-----------+----------------------------------------------+
-| ``inf``   | Floating point value for infinity            |
-+-----------+----------------------------------------------+
-| ``nan``   | Floating point value for not-a-number        |
-+-----------+----------------------------------------------+
-| **Logical Operators**                                    |
-+-----------+----------------------------------------------+
-| ``and``   | Logical "and" operator                       |
-+-----------+----------------------------------------------+
-| ``not``   | Logical "not" operator                       |
-+-----------+----------------------------------------------+
-| ``or``    | Logical "or" operator                        |
-+-----------+----------------------------------------------+
-| **Membership Operators**                                 |
-+-----------+----------------------------------------------+
-| ``in``    | Checks member is in the container            |
-+-----------+----------------------------------------------+
++-----------+-----------------------------------------------------------------+
+| Keyword   | Description                                                     |
++-----------+-----------------------------------------------------------------+
+| ``null``  | The :py:class:`NullExpression` literal value                    |
++-----------+-----------------------------------------------------------------+
+| **Array Comprehension**                                                     |
++-----------+-----------------------------------------------------------------+
+| ``for``   | Array comprehension result and assignment delimiter             |
++-----------+-----------------------------------------------------------------+
+| ``if``    | Array comprehension iterable and (optional) condition delimiter |
++-----------+-----------------------------------------------------------------+
+| **Booleans** (:py:class:`BooleanExpression` Literals)                       |
++-----------+-----------------------------------------------------------------+
+| ``true``  | The "True" boolean value                                        |
++-----------+-----------------------------------------------------------------+
+| ``false`` | The "False" boolean value                                       |
++-----------+-----------------------------------------------------------------+
+| **Floats** (:py:class:`FloatExpression` Literals)                           |
++-----------+-----------------------------------------------------------------+
+| ``inf``   | Floating point value for infinity                               |
++-----------+-----------------------------------------------------------------+
+| ``nan``   | Floating point value for not-a-number                           |
++-----------+-----------------------------------------------------------------+
+| **Logical Operators**                                                       |
++-----------+-----------------------------------------------------------------+
+| ``and``   | Logical "and" operator                                          |
++-----------+-----------------------------------------------------------------+
+| ``not``   | Logical "not" operator                                          |
++-----------+-----------------------------------------------------------------+
+| ``or``    | Logical "or" operator                                           |
++-----------+-----------------------------------------------------------------+
+| **Membership Operators**                                                    |
++-----------+-----------------------------------------------------------------+
+| ``in``    | Checks member is in the container                               |
++-----------+-----------------------------------------------------------------+
+| **Reserved For Future Use**                                                 |
++-----------+-----------------------------------------------------------------+
+| ``elif``  | Reserved for future use                                         |
++-----------+-----------------------------------------------------------------+
+| ``else``  | Reserved for future use                                         |
++-----------+-----------------------------------------------------------------+
+| ``while`` | Reserved for future use                                         |
++-----------+-----------------------------------------------------------------+
 
 .. _literal-values:
 

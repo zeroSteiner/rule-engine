@@ -1,0 +1,721 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>rule_engine.types &mdash; Rule Engine 3.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Rule Engine
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                3.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../types.html">Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../debug_repl.html">Debug REPL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../change_log.html">Change Log</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Rule Engine</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>rule_engine.types</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for rule_engine.types</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  rule_engine/types.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">collections.abc</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">decimal</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
+	<span class="s1">&#39;DataType&#39;</span><span class="p">,</span>
+	<span class="s1">&#39;NoneType&#39;</span><span class="p">,</span>
+	<span class="s1">&#39;coerce_value&#39;</span><span class="p">,</span>
+	<span class="s1">&#39;is_integer_number&#39;</span><span class="p">,</span>
+	<span class="s1">&#39;is_natural_number&#39;</span><span class="p">,</span>
+	<span class="s1">&#39;is_numeric&#39;</span><span class="p">,</span>
+	<span class="s1">&#39;is_real_number&#39;</span><span class="p">,</span>
+	<span class="s1">&#39;iterable_member_value_type&#39;</span>
+<span class="p">)</span>
+
+<span class="n">NoneType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_to_decimal</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">value</span>
+	<span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+<div class="viewcode-block" id="coerce_value"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.coerce_value">[docs]</a><span class="k">def</span> <span class="nf">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Take a native Python *value* and convert it to a value of a data type which can be represented by a Rule Engine</span>
+<span class="sd">	:py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as</span>
+<span class="sd">	when resolving a symbol from an object external to the engine.</span>
+
+<span class="sd">	.. versionadded:: 2.0.0</span>
+
+<span class="sd">	:param value: The value to convert.</span>
+<span class="sd">	:param bool verify_type: Whether or not to verify the converted value&#39;s type.</span>
+<span class="sd">	:return: The converted value.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="c1"># ARRAY</span>
+	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">coerce_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+	<span class="c1"># DATETIME</span>
+	<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+	<span class="c1"># FLOAT</span>
+	<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="n">_to_decimal</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+	<span class="c1"># MAPPING</span>
+	<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">)):</span>
+		<span class="n">value</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span>
+			<span class="p">(</span><span class="n">coerce_value</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">),</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+		<span class="p">)</span>
+	<span class="k">if</span> <span class="n">verify_type</span><span class="p">:</span>
+		<span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># use this to raise a TypeError, if the type is incompatible</span>
+	<span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="is_integer_number"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.is_integer_number">[docs]</a><span class="k">def</span> <span class="nf">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Check whether *value* is an integer number (i.e. a whole, number). This can, for example, be used to check if a</span>
+<span class="sd">	floating point number such as ``3.0`` can safely be converted to an integer without loss of information.</span>
+
+<span class="sd">	.. versionadded:: 2.1.0</span>
+
+<span class="sd">	:param value: The value to check. This value is a native Python type.</span>
+<span class="sd">	:return: Whether or not the value is an integer number.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="is_natural_number"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.is_natural_number">[docs]</a><span class="k">def</span> <span class="nf">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Check whether *value* is a natural number (i.e. a whole, non-negative number). This can, for example, be used to</span>
+<span class="sd">	check if a floating point number such as ``3.0`` can safely be converted to an integer without loss of information.</span>
+
+<span class="sd">	:param value: The value to check. This value is a native Python type.</span>
+<span class="sd">	:return: Whether or not the value is a natural number.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="is_real_number"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.is_real_number">[docs]</a><span class="k">def</span> <span class="nf">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Check whether *value* is a real number (i.e. capable of being represented as a floating point value without loss of</span>
+<span class="sd">	information as well as being finite). Despite being able to be represented as a float, ``NaN`` is not considered a</span>
+<span class="sd">	real number for the purposes of this function.</span>
+
+<span class="sd">	:param value: The value to check. This value is a native Python type.</span>
+<span class="sd">	:return: Whether or not the value is a natural number.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="is_numeric"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.is_numeric">[docs]</a><span class="k">def</span> <span class="nf">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Check whether *value* is a numeric value (i.e. capable of being represented as a floating point value without loss</span>
+<span class="sd">	of information).</span>
+
+<span class="sd">	:param value: The value to check. This value is a native Python type.</span>
+<span class="sd">	:return: Whether or not the value is numeric.</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+		<span class="k">return</span> <span class="kc">False</span>
+	<span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="iterable_member_value_type"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.iterable_member_value_type">[docs]</a><span class="k">def</span> <span class="nf">iterable_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Take a native *python_value* and return the corresponding data type of each of its members if the types are either</span>
+<span class="sd">	the same or NULL. NULL is considered a special case to allow nullable-values. This by extension means that an</span>
+<span class="sd">	iterable may not be defined as only capable of containing NULL values.</span>
+
+<span class="sd">	:return: The data type of the sequence members. This will never be NULL, because that is considered a special case.</span>
+<span class="sd">		It will either be UNSPECIFIED or one of the other types.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">subvalue_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">subvalue</span> <span class="ow">in</span> <span class="n">python_value</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_definition</span><span class="p">(</span><span class="n">subvalue</span><span class="p">):</span>
+			<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">subvalue</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">subvalue</span><span class="p">)</span>
+		<span class="n">subvalue_types</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">subvalue_type</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span> <span class="ow">in</span> <span class="n">subvalue_types</span><span class="p">:</span>
+		<span class="c1"># treat NULL as a special case, allowing typed arrays to be a specified type *or* NULL</span>
+		<span class="c1"># this however makes it impossible to define an array with a type of NULL</span>
+		<span class="n">subvalue_types</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subvalue_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">subvalue_types</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">subvalue_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+	<span class="k">return</span> <span class="n">subvalue_type</span></div>
+
+<span class="k">class</span> <span class="nc">_DataTypeDef</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;python_type&#39;</span><span class="p">,</span> <span class="s1">&#39;is_scalar&#39;</span><span class="p">,</span> <span class="s1">&#39;iterable_type&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">python_type</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">python_type</span> <span class="o">=</span> <span class="n">python_type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span> <span class="o">=</span> <span class="kc">True</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">is_iterable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;iterable_type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+	<span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+			<span class="k">return</span> <span class="kc">False</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+
+	<span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">))</span>
+
+	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> name=</span><span class="si">{}</span><span class="s2"> python_type=</span><span class="si">{}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>  <span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">is_compound</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span>
+
+<span class="n">_DATA_TYPE_UNDEFINED</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;UNDEFINED&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">_CollectionDataTypeDef</span><span class="p">(</span><span class="n">_DataTypeDef</span><span class="p">):</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;value_type&#39;</span><span class="p">,</span> <span class="s1">&#39;value_type_nullable&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">python_type</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">,</span> <span class="n">value_type_nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+		<span class="c1"># check these three classes individually instead of using Collection which isn&#39;t available before Python v3.6</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Container</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;the specified python_type is not a container&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Iterable</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;the specified python_type is not an iterable&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sized</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;the specified python_type is not a sized&#39;</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">_CollectionDataTypeDef</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">python_type</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span> <span class="o">=</span> <span class="kc">False</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">=</span> <span class="n">value_type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value_type_nullable</span> <span class="o">=</span> <span class="n">value_type_nullable</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">iterable_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span>
+
+	<span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_type</span><span class="p">,</span> <span class="n">value_type_nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span>
+			<span class="n">value_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span>
+			<span class="n">value_type_nullable</span><span class="o">=</span><span class="n">value_type_nullable</span>
+		<span class="p">)</span>
+
+	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> name=</span><span class="si">{}</span><span class="s2"> python_type=</span><span class="si">{}</span><span class="s2"> value_type=</span><span class="si">{}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+			<span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">name</span>
+		<span class="p">)</span>
+
+	<span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+			<span class="k">return</span> <span class="kc">False</span>
+		<span class="k">return</span> <span class="nb">all</span><span class="p">((</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">value_type_nullable</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value_type_nullable</span>
+		<span class="p">))</span>
+
+	<span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">,</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type_nullable</span><span class="p">))))</span>
+
+<span class="k">class</span> <span class="nc">_ArrayDataTypeDef</span><span class="p">(</span><span class="n">_CollectionDataTypeDef</span><span class="p">):</span>
+	<span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">_SetDataTypeDef</span><span class="p">(</span><span class="n">_CollectionDataTypeDef</span><span class="p">):</span>
+	<span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">_MappingDataTypeDef</span><span class="p">(</span><span class="n">_DataTypeDef</span><span class="p">):</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;key_type&#39;</span><span class="p">,</span> <span class="s1">&#39;value_type&#39;</span><span class="p">,</span> <span class="s1">&#39;value_type_nullable&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">python_type</span><span class="p">,</span> <span class="n">key_type</span><span class="o">=</span><span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">,</span> <span class="n">value_type_nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;the specified python_type is not a mapping&#39;</span><span class="p">)</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">_MappingDataTypeDef</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">python_type</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span> <span class="o">=</span> <span class="kc">False</span>
+		<span class="c1"># ARRAY is the only compound data type that can be used as a mapping key, this is because ARRAY&#39;s are backed by</span>
+		<span class="c1"># Python tuple&#39;s while SET and MAPPING objects are set and dict instances, respectively which are not hashable.</span>
+		<span class="k">if</span> <span class="n">key_type</span><span class="o">.</span><span class="n">is_compound</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EngineError</span><span class="p">(</span><span class="s2">&quot;the </span><span class="si">{}</span><span class="s2"> data type may not be used for mapping keys&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key_type</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">=</span> <span class="n">key_type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">=</span> <span class="n">value_type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value_type_nullable</span> <span class="o">=</span> <span class="n">value_type_nullable</span>
+
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">iterable_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span>
+
+	<span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_type</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">,</span> <span class="n">value_type_nullable</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span>
+			<span class="n">key_type</span><span class="o">=</span><span class="n">key_type</span><span class="p">,</span>
+			<span class="n">value_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span>
+			<span class="n">value_type_nullable</span><span class="o">=</span><span class="n">value_type_nullable</span>
+		<span class="p">)</span>
+
+	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> name=</span><span class="si">{}</span><span class="s2"> python_type=</span><span class="si">{}</span><span class="s2"> key_type=</span><span class="si">{}</span><span class="s2"> value_type=</span><span class="si">{}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+			<span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="o">.</span><span class="n">name</span>
+		<span class="p">)</span>
+
+	<span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+			<span class="k">return</span> <span class="kc">False</span>
+		<span class="k">return</span> <span class="nb">all</span><span class="p">((</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">key_type</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">value_type_nullable</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">value_type_nullable</span>
+		<span class="p">))</span>
+
+	<span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">,</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">key_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type_nullable</span><span class="p">))))</span>
+
+<span class="k">class</span> <span class="nc">DataTypeMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+	<span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="n">metacls</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">classdict</span><span class="p">):</span>
+		<span class="n">data_type</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="n">metacls</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">classdict</span><span class="p">)</span>
+		<span class="n">data_type</span><span class="o">.</span><span class="n">_member_map_</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+		<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">classdict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">):</span>
+				<span class="k">continue</span>
+			<span class="n">data_type</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+		<span class="k">return</span> <span class="n">data_type</span>
+
+	<span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_member_map_</span>
+
+	<span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+	<span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+		<span class="k">yield from</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_member_map_</span>
+
+	<span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataType"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType">[docs]</a><span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">DataTypeMeta</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A collection of constants representing the different supported data types. There are three ways to compare data</span>
+<span class="sd">	types. All three are effectively the same when dealing with scalars.</span>
+
+<span class="sd">	Equality checking</span>
+<span class="sd">	  .. code-block::</span>
+
+<span class="sd">	    dt == DataType.TYPE</span>
+
+<span class="sd">	  This is the most explicit form of testing and when dealing with compound data types, it recursively checks that</span>
+<span class="sd">	  all of the member types are also equal.</span>
+
+<span class="sd">	Class checking</span>
+<span class="sd">	  .. code-block::</span>
+
+<span class="sd">	    isinstance(dt, DataType.TYPE.__class__)</span>
+
+<span class="sd">	  This checks that the data types are the same but when dealing with compound data types, the member types are</span>
+<span class="sd">	  ignored.</span>
+
+<span class="sd">	Compatibility checking</span>
+<span class="sd">	  .. code-block::</span>
+
+<span class="sd">	    DataType.is_compatible(dt, DataType.TYPE)</span>
+
+<span class="sd">	  This checks that the types are compatible without any kind of conversion. When dealing with compound data types,</span>
+<span class="sd">	  this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">ARRAY</span> <span class="o">=</span> <span class="n">_ArrayDataTypeDef</span><span class="p">(</span><span class="s1">&#39;ARRAY&#39;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	.. py:function:: __call__(value_type, value_type_nullable=True)</span>
+<span class="sd">	</span>
+<span class="sd">	:param value_type: The type of the array members.</span>
+<span class="sd">	:param bool value_type_nullable: Whether or not array members are allowed to be :py:attr:`.NULL`.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">BOOLEAN</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;BOOLEAN&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+	<span class="n">DATETIME</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;DATETIME&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+	<span class="n">FLOAT</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">)</span>
+	<span class="n">MAPPING</span> <span class="o">=</span> <span class="n">_MappingDataTypeDef</span><span class="p">(</span><span class="s1">&#39;MAPPING&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	.. py:function:: __call__(key_type, value_type, value_type_nullable=True)</span>
+<span class="sd">	</span>
+<span class="sd">	:param key_type: The type of the mapping keys.</span>
+<span class="sd">	:param value_type: The type of the mapping values.</span>
+<span class="sd">	:param bool value_type_nullable: Whether or not mapping values are allowed to be :py:attr:`.NULL`.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">NULL</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;NULL&#39;</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">)</span>
+	<span class="n">SET</span> <span class="o">=</span> <span class="n">_SetDataTypeDef</span><span class="p">(</span><span class="s1">&#39;SET&#39;</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	.. py:function:: __call__(value_type, value_type_nullable=True)</span>
+
+<span class="sd">	:param value_type: The type of the set members.</span>
+<span class="sd">	:param bool value_type_nullable: Whether or not set members are allowed to be :py:attr:`.NULL`.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">STRING</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;STRING&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+	<span class="n">UNDEFINED</span> <span class="o">=</span> <span class="n">_DATA_TYPE_UNDEFINED</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Undefined values. This constant can be used to indicate that a particular symbol is valid, but it&#39;s data type is</span>
+<span class="sd">	currently unknown.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DataType.from_name"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.from_name">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">from_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Get the data type from its name.</span>
+
+<span class="sd">		.. versionadded:: 2.0.0</span>
+
+<span class="sd">		:param str name: The name of the data type to retrieve.</span>
+<span class="sd">		:return: One of the constants.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;from_name argument 1 must be str, not &#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+		<span class="n">dt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;can not map name </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+		<span class="k">return</span> <span class="n">dt</span></div>
+
+<div class="viewcode-block" id="DataType.from_type"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.from_type">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">from_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">python_type</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Get the supported data type constant for the specified Python type. If the type can not be mapped to a supported</span>
+<span class="sd">		data type, then a :py:exc:`ValueError` exception will be raised. This function will not return</span>
+<span class="sd">		:py:attr:`.UNDEFINED`.</span>
+
+<span class="sd">		:param type python_type: The native Python type to retrieve the corresponding type constant for.</span>
+<span class="sd">		:return: One of the constants.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;from_type argument 1 must be type, not &#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="n">python_type</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">python_type</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ARRAY</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span> <span class="ow">or</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATETIME</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">MAPPING</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">NoneType</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">NULL</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">set</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">SET</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span>
+		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DataType.from_value"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.from_value">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">from_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">python_value</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Get the supported data type constant for the specified Python value. If the value can not be mapped to a</span>
+<span class="sd">		supported data type, then a :py:exc:`TypeError` exception will be raised. This function will not return</span>
+<span class="sd">		:py:attr:`.UNDEFINED`.</span>
+
+<span class="sd">		:param python_value: The native Python value to retrieve the corresponding data type constant for.</span>
+<span class="sd">		:return: One of the constants.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATETIME</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
+		<span class="k">elif</span> <span class="n">python_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">NULL</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">set</span><span class="p">,)):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">SET</span><span class="p">(</span><span class="n">value_type</span><span class="o">=</span><span class="n">iterable_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="p">))</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,)):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">STRING</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">MAPPING</span><span class="p">(</span>
+				<span class="n">key_type</span><span class="o">=</span><span class="n">iterable_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+				<span class="n">value_type</span><span class="o">=</span><span class="n">iterable_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+			<span class="p">)</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Sequence</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">value_type</span><span class="o">=</span><span class="n">iterable_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="p">))</span>
+		<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;can not map python type </span><span class="si">{0!r}</span><span class="s2"> to a compatible data type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">python_value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="DataType.is_compatible"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.is_compatible">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">is_compatible</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dt1</span><span class="p">,</span> <span class="n">dt2</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Check if two data type definitions are compatible without any kind of conversion. This evaluates to ``True``</span>
+<span class="sd">		when one or both are :py:attr:`.UNDEFINED` or both types are the same. In the case of compound data types (such</span>
+<span class="sd">		as :py:attr:`.ARRAY`) the member types are checked recursively in the same manner.</span>
+
+<span class="sd">		.. versionadded:: 2.1.0</span>
+
+<span class="sd">		:param dt1: The first data type to compare.</span>
+<span class="sd">		:param dt2: The second data type to compare.</span>
+<span class="sd">		:return: Whether or not the two types are compatible.</span>
+<span class="sd">		:rtype: bool</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">is_definition</span><span class="p">(</span><span class="n">dt1</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_definition</span><span class="p">(</span><span class="n">dt2</span><span class="p">)):</span>
+			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;argument is not a data type definition&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">dt1</span> <span class="ow">is</span> <span class="n">_DATA_TYPE_UNDEFINED</span> <span class="ow">or</span> <span class="n">dt2</span> <span class="ow">is</span> <span class="n">_DATA_TYPE_UNDEFINED</span><span class="p">:</span>
+			<span class="k">return</span> <span class="kc">True</span>
+		<span class="k">if</span> <span class="n">dt1</span><span class="o">.</span><span class="n">is_scalar</span> <span class="ow">and</span> <span class="n">dt2</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
+			<span class="k">return</span> <span class="n">dt1</span> <span class="o">==</span> <span class="n">dt2</span>
+		<span class="k">elif</span> <span class="n">dt1</span><span class="o">.</span><span class="n">is_compound</span> <span class="ow">and</span> <span class="n">dt2</span><span class="o">.</span><span class="n">is_compound</span><span class="p">:</span>
+			<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt1</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt2</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+				<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">dt1</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">dt2</span><span class="o">.</span><span class="n">value_type</span><span class="p">)</span>
+			<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt1</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt2</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">dt1</span><span class="o">.</span><span class="n">key_type</span><span class="p">,</span> <span class="n">dt2</span><span class="o">.</span><span class="n">key_type</span><span class="p">):</span>
+					<span class="k">return</span> <span class="kc">False</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">dt1</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">dt2</span><span class="o">.</span><span class="n">value_type</span><span class="p">):</span>
+					<span class="k">return</span> <span class="kc">False</span>
+				<span class="k">return</span> <span class="kc">True</span>
+			<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt1</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dt2</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+				<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">dt1</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">dt2</span><span class="o">.</span><span class="n">value_type</span><span class="p">)</span>
+		<span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="DataType.is_definition"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.is_definition">[docs]</a>	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">is_definition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Check if *value* is a data type definition.</span>
+
+<span class="sd">		.. versionadded:: 2.1.0</span>
+
+<span class="sd">		:param value: The value to check.</span>
+<span class="sd">		:return: ``True`` if *value* is a data type definition.</span>
+<span class="sd">		:rtype: bool</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Spencer McIntyre.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

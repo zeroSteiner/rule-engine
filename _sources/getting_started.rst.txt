@@ -210,6 +210,13 @@ rule is being applied to and *name* is the symbol name as a Python string of the
 the resolver function fails for any reason, it should raise a :py:class:`~errors.SymbolResolutionError`, forwarding
 *thing* via keyword argument. This ensures consistency in how exceptions are raised and handled by the engine.
 
+Suggestions
+"""""""""""
+When raising a :py:class:`~errors.SymbolResolutionError`, a custom resolver can optionally make a suggestion for a valid
+symbol name. In this case, the resolver may use the :py:class:`~suggestions.suggest_symbol` function, passing it the
+invalid name and a list of valid names. The result may then be passed as the *suggestion* keyword. This suggestion may
+then assist rule authors in correcting mistakes.
+
 Type Hinting
 ^^^^^^^^^^^^
 Symbol type information can be provided to the :py:class:`~engine.Rule` through the :py:class:`~engine.Context` instance
@@ -263,6 +270,8 @@ In all cases, when a *type_resolver* is defined, the :py:class:`~engine.Rule` ob
    # this is valid: no type information is defined (context is omitted)
    rule = rule_engine.Rule('author == "Stan Lee"')
    # => <Rule text='author == "Stan Lee"' >
+
+.. _getting-started-compound-data-types:
 
 Compound Data Types
 """""""""""""""""""

@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Data Types &mdash; Rule Engine 3.1.2 documentation</title>
+  <title>Data Types &mdash; Rule Engine 3.2.0 documentation</title>
   
 
   
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                3.1.2
+                3.2.0
               </div>
             
           
@@ -89,11 +90,12 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Data Types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#compound-types">Compound Types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#float">FLOAT</a></li>
 </ul>
 </li>
@@ -168,7 +170,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="data-types">
+  <section id="data-types">
 <h1>Data Types<a class="headerlink" href="#data-types" title="Permalink to this headline">¶</a></h1>
 <p>The following table describes the data types supported by the Rule Engine and the Python data types that each is
 compatible with. For a information regarding supported operations, see the
@@ -182,37 +184,50 @@ compatible with. For a information regarding supported operations, see the
 <tr class="row-odd"><td><p>Rule Engine Data Type</p></td>
 <td><p>Compatible Python Types</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.ARRAY" title="rule_engine.ast.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#list" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>,
 <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#tuple" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.BOOLEAN" title="rule_engine.ast.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.DATETIME" title="rule_engine.ast.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.9/library/datetime.html#datetime.date" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></a>,
 <a class="reference external" href="https://docs.python.org/3.9/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.FLOAT" title="rule_engine.ast.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.9/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>,
 <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>
 <a class="reference external" href="https://docs.python.org/3.9/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.MAPPING" title="rule_engine.ast.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.NULL" title="rule_engine.ast.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></p></td>
 <td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.SET" title="rule_engine.ast.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#set" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.DataType.STRING" title="rule_engine.ast.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 </tr>
 </tbody>
 </table>
-<div class="section" id="float">
+<section id="compound-types">
+<h2>Compound Types<a class="headerlink" href="#compound-types" title="Permalink to this headline">¶</a></h2>
+<p>The compound data types (<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code>, and <code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code>) are all
+capable of containing zero or more values of other data types (though it should be noted that
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code> keys <strong>must be scalars</strong> while the values can be anything). The member types of compound
+data types can be defined, but only if the members are all of the same type. For an example, an array containing floats
+can be defined, and an mapping with string keys to string values can also be defined, but a mapping with string keys to
+values that are either floats, strings or booleans <strong>may not be completely defined</strong>. For more information, see the
+section on <a class="reference internal" href="getting_started.html#getting-started-compound-data-types"><span class="std std-ref">Compound Data Types</span></a> in the Getting Started page.</p>
+<p>Compound data types are also iterable, meaning that array comprehension operations can be applied to them. Iteration
+operations apply to the members of <code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code> values, and the keys of
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code> values. This allows the types to behave in the same was as they do in Python.</p>
+</section>
+<section id="float">
 <h2>FLOAT<a class="headerlink" href="#float" title="Permalink to this headline">¶</a></h2>
 <p>Starting in <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.0.0">v3.0.0</a>, the <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> datatype is backed by Python’s <a class="reference external" href="https://docs.python.org/3.9/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> object. This
 makes the evaluation of arithmetic more intuitive for the audience of rule authors who are not assumed to be familiar
@@ -232,8 +247,8 @@ are converted to Rule Engine <code class="docutils literal notranslate"><span cl
 have a length of 2 with two unique keys, the same value once converted into a Rule Engine <code class="docutils literal notranslate"><span class="pre">MAPPING</span></code> would have a
 length of 1 with a single unique key. For this reason, developers using Rule Engine should take care to not use compound
 data types with a mix of Python <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> and <a class="reference external" href="https://docs.python.org/3.9/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> values.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

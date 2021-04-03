@@ -7,6 +7,17 @@ this list is curated by the development team for note worthy changes.
 Version 3.x.x
 -------------
 
+Version 3.2.0
+^^^^^^^^^^^^^
+
+Released :release:`3.2.0` on April 3rd, 2021
+
+* Refactored the :py:mod:`~rule_engine.ast` module to move the :py:class:`~rule_engine.types.DataType` class into a new,
+  dedicated :py:mod:`~rule_engine.types` module.
+* Added the new :py:class:`~rule_engine.ast.ComprehensionExpression`
+* Added suggestions to :py:class:`~rule_engine.errors.AttributeResolutionError` and
+  :py:class:`~rule_engine.errors.SymbolResolutionError`
+
 Version 3.1.0
 ^^^^^^^^^^^^^
 

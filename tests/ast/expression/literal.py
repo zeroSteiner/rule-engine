@@ -36,6 +36,7 @@ import unittest
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
+import rule_engine.errors as errors
 
 __all__ = ('LiteralExpressionTests',)
 
@@ -81,6 +82,23 @@ class LiteralExpressionTests(unittest.TestCase):
 			expression = ExpressionClass(self.context, true_value)
 			self.assertTrue(expression.evaluate(None))
 
+	def test_ast_expression_literal(self):
+		expressions = (
+			(ast.ArrayExpression, ()),
+			(ast.BooleanExpression, False),
+			(ast.DatetimeExpression, datetime.datetime(2020, 1, 1)),
+			(ast.FloatExpression, 0),
+			(ast.MappingExpression, {}),
+			(ast.SetExpression, set()),
+			(ast.StringExpression, ''),
+		)
+		for expression_class, value in expressions:
+			expression = ast.LiteralExpressionBase.from_value(context, value)
+			self.assertIsInstance(expression, expression_class)
+
+		with self.assertRaises(TypeError):
+			ast.LiteralExpressionBase.from_value(context, object())
+
 	def test_ast_expression_literal_array(self):
 		self.assertLiteralTests(ast.ArrayExpression, tuple(), tuple((ast.NullExpression(self.context),)))
 
@@ -95,9 +113,21 @@ class LiteralExpressionTests(unittest.TestCase):
 		self.assertIsInstance(int_float.value, decimal.Decimal)
 		self.assertEqual(int_float.value, 1.0)
 
+	def test_ast_expression_literal_mapping(self):
+		self.assertLiteralTests(ast.MappingExpression, {}, {ast.StringExpression(context, 'one'): ast.FloatExpression(context, 1)})
+
+		with self.assertRaises(errors.EngineError):
+			expression = ast.MappingExpression(context, {ast.MappingExpression(context, {}): ast.NullExpression(context)})
+
+		expression = ast.MappingExpression(context, {ast.SymbolExpression(context, 'map'): ast.NullExpression(context)})
+		with self.assertRaises(errors.EngineError):
+			expression.evaluate({'map': {}})
+
 	def test_ast_expression_literal_null(self):
 		expression = ast.NullExpression(self.context)
 		self.assertIsNone(expression.evaluate(None))
+		with self.assertRaises(TypeError):
+			ast.NullExpression(self.context, False)
 
 	def test_ast_expression_literal_string(self):
 		self.assertLiteralTests(ast.StringExpression, '', 'non-empty')

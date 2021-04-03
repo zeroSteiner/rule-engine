@@ -157,8 +157,6 @@ class LiteralExpressionBase(ExpressionBase):
 		"""
 		datatype = DataType.from_value(value)
 		for subclass in cls.__subclasses__():
-			if subclass.__name__.startswith('_'):
-				continue
 			if DataType.is_compatible(subclass.result_type, datatype):
 				break
 		else:

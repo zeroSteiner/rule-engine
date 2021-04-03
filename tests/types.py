@@ -104,29 +104,35 @@ class DataTypeTests(unittest.TestCase):
 			value = DataType.from_value(value)
 			self.assertEqual(value, DataType.ARRAY)
 			self.assertIs(value.value_type, DataType.UNDEFINED)
+			self.assertIs(value.iterable_type, DataType.UNDEFINED)
 		value = DataType.from_value(['test'])
 		self.assertEqual(value, DataType.ARRAY(DataType.STRING))
 		self.assertIs(value.value_type, DataType.STRING)
+		self.assertIs(value.iterable_type, DataType.STRING)
 
 	def test_data_type_from_value_compound_mapping(self):
 		value = DataType.from_value({})
 		self.assertEqual(value, DataType.MAPPING)
 		self.assertIs(value.key_type, DataType.UNDEFINED)
 		self.assertIs(value.value_type, DataType.UNDEFINED)
+		self.assertIs(value.iterable_type, DataType.UNDEFINED)
 
 		value = DataType.from_value({'one': 1})
 		self.assertEqual(value, DataType.MAPPING(DataType.STRING, DataType.FLOAT))
 		self.assertIs(value.key_type, DataType.STRING)
 		self.assertIs(value.value_type, DataType.FLOAT)
+		self.assertIs(value.iterable_type, DataType.STRING)
 
 	def test_data_type_from_value_compound_set(self):
 		value = DataType.from_value(set())
 		self.assertEqual(value, DataType.SET)
 		self.assertIs(value.value_type, DataType.UNDEFINED)
+		self.assertIs(value.iterable_type, DataType.UNDEFINED)
 
 		value = DataType.from_value({'test'})
 		self.assertEqual(value, DataType.SET(DataType.STRING))
 		self.assertIs(value.value_type, DataType.STRING)
+		self.assertIs(value.iterable_type, DataType.STRING)
 
 	def test_data_type_from_value_scalar(self):
 		self.assertEqual(DataType.from_value(False), DataType.BOOLEAN)
@@ -142,7 +148,7 @@ class DataTypeTests(unittest.TestCase):
 			DataType.from_value(self._UnsupportedType())
 
 	def test_data_type_definitions_describe_themselves(self):
-		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'FLOAT', 'MAPPING', 'NULL', 'STRING', 'UNDEFINED'):
+		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'FLOAT', 'MAPPING', 'NULL', 'SET', 'STRING', 'UNDEFINED'):
 			data_type = getattr(DataType, name)
 			self.assertRegex(repr(data_type), 'name=' + name)
 

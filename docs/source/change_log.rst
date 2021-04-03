@@ -10,7 +10,7 @@ Version 3.x.x
 Version 3.2.0
 ^^^^^^^^^^^^^
 
-*In progress*
+Released :release:`3.2.0` on April 3rd, 2021
 
 * Refactored the :py:mod:`~rule_engine.ast` module to move the :py:class:`~rule_engine.types.DataType` class into a new,
   dedicated :py:mod:`~rule_engine.types` module.

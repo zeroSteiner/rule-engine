@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Data Types &mdash; Rule Engine 3.2.1 documentation</title>
@@ -90,7 +89,7 @@
               
             
             
-              <p><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
@@ -170,7 +169,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="data-types">
+  <div class="section" id="data-types">
 <h1>Data Types<a class="headerlink" href="#data-types" title="Permalink to this headline">¶</a></h1>
 <p>The following table describes the data types supported by the Rule Engine and the Python data types that each is
 compatible with. For a information regarding supported operations, see the
@@ -214,7 +213,7 @@ compatible with. For a information regarding supported operations, see the
 </tr>
 </tbody>
 </table>
-<section id="compound-types">
+<div class="section" id="compound-types">
 <h2>Compound Types<a class="headerlink" href="#compound-types" title="Permalink to this headline">¶</a></h2>
 <p>The compound data types (<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code>, <code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code>, and <code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code>) are all
 capable of containing zero or more values of other data types (though it should be noted that
@@ -226,8 +225,8 @@ section on <a class="reference internal" href="getting_started.html#getting-star
 <p>Compound data types are also iterable, meaning that array comprehension operations can be applied to them. Iteration
 operations apply to the members of <code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code> values, and the keys of
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code> values. This allows the types to behave in the same was as they do in Python.</p>
-</section>
-<section id="float">
+</div>
+<div class="section" id="float">
 <h2>FLOAT<a class="headerlink" href="#float" title="Permalink to this headline">¶</a></h2>
 <p>Starting in <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.0.0">v3.0.0</a>, the <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> datatype is backed by Python’s <a class="reference external" href="https://docs.python.org/3.9/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> object. This
 makes the evaluation of arithmetic more intuitive for the audience of rule authors who are not assumed to be familiar
@@ -247,8 +246,8 @@ are converted to Rule Engine <code class="docutils literal notranslate"><span cl
 have a length of 2 with two unique keys, the same value once converted into a Rule Engine <code class="docutils literal notranslate"><span class="pre">MAPPING</span></code> would have a
 length of 1 with a single unique key. For this reason, developers using Rule Engine should take care to not use compound
 data types with a mix of Python <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> and <a class="reference external" href="https://docs.python.org/3.9/library/decimal.html#decimal.Decimal" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> values.</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

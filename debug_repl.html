@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Debug REPL &mdash; Rule Engine 3.2.1 documentation</title>
@@ -90,7 +89,7 @@
               
             
             
-              <p><span class="caption-text">Contents:</span></p>
+              <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
@@ -171,12 +170,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="debug-repl">
+  <div class="section" id="debug-repl">
 <span id="id1"></span><h1>Debug REPL<a class="headerlink" href="#debug-repl" title="Permalink to this headline">¶</a></h1>
 <p>Since version <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.4.0">v2.4.0</a>, the Rule Engine package includes a module which provides a Read Eval Print Loop (REPL)
 for debugging and testing purposes. This module can be executed using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">rule_engine.debug_repl</span></code>. Once
 started, the REPL loop can be used to evaluate rule expressions and view the results.</p>
-<section id="cli-arguments">
+<div class="section" id="cli-arguments">
 <h2>CLI Arguments<a class="headerlink" href="#cli-arguments" title="Permalink to this headline">¶</a></h2>
 <p>The module when executed from the command line has the following options available.</p>
 <dl class="std option">
@@ -191,14 +190,14 @@ started, the REPL loop can be used to evaluate rule expressions and view the res
 <dd><p>Run the specified file containing Python source code, allowing it to setup the environment for the rule evaluation.</p>
 </dd></dl>
 
-</section>
-<section id="configuration">
+</div>
+<div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>When configured through either the <code class="docutils literal notranslate"><span class="pre">--edit-console</span></code> or <code class="docutils literal notranslate"><span class="pre">--edit-file</span></code> options, the <code class="docutils literal notranslate"><span class="pre">context</span></code> symbol may be
 customized using a user-defined <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance. Additionally, the object to evaluate
 can be configured through the <code class="docutils literal notranslate"><span class="pre">thing</span></code> symbol.</p>
-</section>
-<section id="example-usage">
+</div>
+<div class="section" id="example-usage">
 <h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">¶</a></h2>
 <p>The following example demonstrates using the Debug REPL with a <em>thing</em> (in this case a comic book) defined through the
 interactive console.</p>
@@ -216,8 +215,8 @@ True
 rule &gt;
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

@@ -76,15 +76,19 @@ private purposes. For more information, see the `LICENSE`_ file.
 
 .. |badge-build| image:: https://img.shields.io/github/workflow/status/zeroSteiner/rule-engine/Continuous%20Integration/master?style=flat-square
    :alt: GitHub Workflow Status (branch)
+   :target: https://github.com/zeroSteiner/rule-engine/actions/workflows/ci.yml
 
 .. |badge-pypi| image:: https://img.shields.io/pypi/v/rule-engine?style=flat-square
    :alt: PyPI
+   :target: https://pypi.org/project/rule-engine/
 
 .. |social-github| image:: https://img.shields.io/github/followers/zeroSteiner?style=social
    :alt: GitHub followers
+   :target: https://github.com/zeroSteiner
 
 .. |social-twitter| image:: https://img.shields.io/twitter/follow/zeroSteiner
    :alt: Twitter Follow
+   :target: https://twitter.com/zeroSteiner
 
 .. _Change Log: https://zerosteiner.github.io/rule-engine/change_log.html
 .. _Debug REPL: https://zerosteiner.github.io/rule-engine/debug_repl.html

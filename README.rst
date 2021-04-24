@@ -1,19 +1,23 @@
 Rule Engine
 ===========
+|badge-build| |badge-pypi|
+
 A lightweight, optionally typed expression language with a custom grammar for matching arbitrary Python objects.
 
 Documentation is available at https://zeroSteiner.github.io/rule-engine/.
 
-Rule Engine expressions are written in their own language, defined as strings in Python. Some features of this language
-includes:
+Rule Engine expressions are written in their own language, defined as strings in Python. The syntax is most similar to
+Python with some inspiration from Ruby. Some features of this language includes:
 
 - Optional type hinting
 - Matching strings with regular expressions
 - Datetime datatypes
+- Compound datatypes (equivalents for Python dict, list and set types)
 - Data attributes
+- Thread safety
 
-Example
--------
+Example Usage
+-------------
 The following example demonstrates the basic usage of defining a rule object and applying it to two dictionaries,
 showing that one matches while the other does not. See `Getting Started`_ for more information.
 
@@ -55,10 +59,36 @@ operation is used. See `Type Hinting`_ for more information.
 Want to give the rule expression language a try? Checkout the `Debug REPL`_ that makes experimentation easy. After
 installing just run ``python -m rule_engine.debug_repl``.
 
+Installation
+------------
+Install the latest release from PyPi using ``pip install rule-engine``. Releases follow `Semantic Versioning`_ to
+indicate in each new version whether it fixes bugs, adds features or breaks backwards compatibility. See the
+`Change Log`_ for a curated list of changes.
+
 Credits
 -------
-* Spencer McIntyre - zeroSteiner (`@zeroSteiner <https://twitter.com/zeroSteiner>`_)
+* Spencer McIntyre - zeroSteiner |social-github|
 
-.. _Getting Started: https://zerosteiner.github.io/rule-engine/getting_started.html
-.. _Type Hinting: https://zerosteiner.github.io/rule-engine/getting_started.html#type-hinting
+License
+-------
+The Rule Engine library is released under the BSD 3-Clause license. It is able to be used for both commercial and
+private purposes. For more information, see the `LICENSE`_ file.
+
+.. |badge-build| image:: https://img.shields.io/github/workflow/status/zeroSteiner/rule-engine/Continuous%20Integration/master?style=flat-square
+   :alt: GitHub Workflow Status (branch)
+
+.. |badge-pypi| image:: https://img.shields.io/pypi/v/rule-engine?style=flat-square
+   :alt: PyPI
+
+.. |social-github| image:: https://img.shields.io/github/followers/zeroSteiner?style=social
+   :alt: GitHub followers
+
+.. |social-twitter| image:: https://img.shields.io/twitter/follow/zeroSteiner
+   :alt: Twitter Follow
+
+.. _Change Log: https://zerosteiner.github.io/rule-engine/change_log.html
 .. _Debug REPL: https://zerosteiner.github.io/rule-engine/debug_repl.html
+.. _Getting Started: https://zerosteiner.github.io/rule-engine/getting_started.html
+.. _LICENSE: https://github.com/zeroSteiner/rule-engine/blob/master/LICENSE
+.. _Semantic Versioning: https://semver.org/
+.. _Type Hinting: https://zerosteiner.github.io/rule-engine/getting_started.html#type-hinting

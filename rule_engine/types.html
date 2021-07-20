@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>types &mdash; Rule Engine 3.2.1 documentation</title>
+  <title>types &mdash; Rule Engine 3.3.0 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
 
   
@@ -30,6 +32,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -64,7 +67,7 @@
             
             
               <div class="version">
-                3.2.1
+                3.3.0
               </div>
             
           
@@ -89,7 +92,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../syntax.html">Rule Syntax</a></li>
@@ -188,8 +191,8 @@
 <div class="section" id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
-<dt id="rule_engine.types.coerce_value">
-<code class="sig-name descname"><span class="pre">coerce_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#coerce_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.coerce_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.coerce_value">
+<span class="sig-name descname"><span class="pre">coerce_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verify_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#coerce_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.coerce_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a native Python <em>value</em> and convert it to a value of a data type which can be represented by a Rule Engine
 <a class="reference internal" href="#rule_engine.types.DataType" title="rule_engine.types.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>. This function is useful for converting native Python values at the engine boundaries such as
 when resolving a symbol from an object external to the engine.</p>
@@ -210,8 +213,8 @@ when resolving a symbol from an object external to the engine.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="rule_engine.types.is_integer_number">
-<code class="sig-name descname"><span class="pre">is_integer_number</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#is_integer_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.is_integer_number" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.is_integer_number">
+<span class="sig-name descname"><span class="pre">is_integer_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#is_integer_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.is_integer_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is an integer number (i.e. a whole, number). This can, for example, be used to check if a
 floating point number such as <code class="docutils literal notranslate"><span class="pre">3.0</span></code> can safely be converted to an integer without loss of information.</p>
 <div class="versionadded">
@@ -231,8 +234,8 @@ floating point number such as <code class="docutils literal notranslate"><span c
 </dd></dl>
 
 <dl class="py function">
-<dt id="rule_engine.types.is_natural_number">
-<code class="sig-name descname"><span class="pre">is_natural_number</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#is_natural_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.is_natural_number" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.is_natural_number">
+<span class="sig-name descname"><span class="pre">is_natural_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#is_natural_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.is_natural_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a natural number (i.e. a whole, non-negative number). This can, for example, be used to
 check if a floating point number such as <code class="docutils literal notranslate"><span class="pre">3.0</span></code> can safely be converted to an integer without loss of information.</p>
 <dl class="field-list simple">
@@ -249,8 +252,8 @@ check if a floating point number such as <code class="docutils literal notransla
 </dd></dl>
 
 <dl class="py function">
-<dt id="rule_engine.types.is_numeric">
-<code class="sig-name descname"><span class="pre">is_numeric</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#is_numeric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.is_numeric" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.is_numeric">
+<span class="sig-name descname"><span class="pre">is_numeric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#is_numeric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.is_numeric" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a numeric value (i.e. capable of being represented as a floating point value without loss
 of information).</p>
 <dl class="field-list simple">
@@ -267,8 +270,8 @@ of information).</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="rule_engine.types.is_real_number">
-<code class="sig-name descname"><span class="pre">is_real_number</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#is_real_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.is_real_number" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.is_real_number">
+<span class="sig-name descname"><span class="pre">is_real_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#is_real_number"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.is_real_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether <em>value</em> is a real number (i.e. capable of being represented as a floating point value without loss of
 information as well as being finite). Despite being able to be represented as a float, <code class="docutils literal notranslate"><span class="pre">NaN</span></code> is not considered a
 real number for the purposes of this function.</p>
@@ -286,8 +289,8 @@ real number for the purposes of this function.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="rule_engine.types.iterable_member_value_type">
-<code class="sig-name descname"><span class="pre">iterable_member_value_type</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#iterable_member_value_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.iterable_member_value_type" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.iterable_member_value_type">
+<span class="sig-name descname"><span class="pre">iterable_member_value_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#iterable_member_value_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.iterable_member_value_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Take a native <em>python_value</em> and return the corresponding data type of each of its members if the types are either
 the same or NULL. NULL is considered a special case to allow nullable-values. This by extension means that an
 iterable may not be defined as only capable of containing NULL values.</p>
@@ -303,8 +306,8 @@ It will either be UNSPECIFIED or one of the other types.</p>
 <div class="section" id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="rule_engine.types.DataType">
-<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">DataType</span></code><a class="reference internal" href="../_modules/rule_engine/types.html#DataType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType">
+<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">DataType</span></span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A collection of constants representing the different supported data types. There are three ways to compare data
 types. All three are effectively the same when dealing with scalars.</p>
@@ -329,11 +332,11 @@ this ensures that the member types are either the same or <a class="reference in
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.ARRAY">
-<code class="sig-name descname"><span class="pre">ARRAY</span></code><a class="headerlink" href="#rule_engine.types.DataType.ARRAY" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.ARRAY">
+<span class="sig-name descname"><span class="pre">ARRAY</span></span><a class="headerlink" href="#rule_engine.types.DataType.ARRAY" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py function">
-<dt id="rule_engine.types.DataType.__call__">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.types.DataType.__call__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.types.DataType.__call__" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="field-list simple">
@@ -347,26 +350,26 @@ this ensures that the member types are either the same or <a class="reference in
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.BOOLEAN">
-<code class="sig-name descname"><span class="pre">BOOLEAN</span></code><a class="headerlink" href="#rule_engine.types.DataType.BOOLEAN" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.BOOLEAN">
+<span class="sig-name descname"><span class="pre">BOOLEAN</span></span><a class="headerlink" href="#rule_engine.types.DataType.BOOLEAN" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.DATETIME">
-<code class="sig-name descname"><span class="pre">DATETIME</span></code><a class="headerlink" href="#rule_engine.types.DataType.DATETIME" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.DATETIME">
+<span class="sig-name descname"><span class="pre">DATETIME</span></span><a class="headerlink" href="#rule_engine.types.DataType.DATETIME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.FLOAT">
-<code class="sig-name descname"><span class="pre">FLOAT</span></code><a class="headerlink" href="#rule_engine.types.DataType.FLOAT" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.FLOAT">
+<span class="sig-name descname"><span class="pre">FLOAT</span></span><a class="headerlink" href="#rule_engine.types.DataType.FLOAT" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.MAPPING">
-<code class="sig-name descname"><span class="pre">MAPPING</span></code><a class="headerlink" href="#rule_engine.types.DataType.MAPPING" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.MAPPING">
+<span class="sig-name descname"><span class="pre">MAPPING</span></span><a class="headerlink" href="#rule_engine.types.DataType.MAPPING" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py function">
-<dt id="id0">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="field-list simple">
@@ -381,16 +384,16 @@ this ensures that the member types are either the same or <a class="reference in
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.NULL">
-<code class="sig-name descname"><span class="pre">NULL</span></code><a class="headerlink" href="#rule_engine.types.DataType.NULL" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.NULL">
+<span class="sig-name descname"><span class="pre">NULL</span></span><a class="headerlink" href="#rule_engine.types.DataType.NULL" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.SET">
-<code class="sig-name descname"><span class="pre">SET</span></code><a class="headerlink" href="#rule_engine.types.DataType.SET" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.SET">
+<span class="sig-name descname"><span class="pre">SET</span></span><a class="headerlink" href="#rule_engine.types.DataType.SET" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py function">
-<dt id="id1">
-<code class="sig-name descname"><span class="pre">__call__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="field-list simple">
@@ -404,20 +407,20 @@ this ensures that the member types are either the same or <a class="reference in
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.STRING">
-<code class="sig-name descname"><span class="pre">STRING</span></code><a class="headerlink" href="#rule_engine.types.DataType.STRING" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.STRING">
+<span class="sig-name descname"><span class="pre">STRING</span></span><a class="headerlink" href="#rule_engine.types.DataType.STRING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt id="rule_engine.types.DataType.UNDEFINED">
-<code class="sig-name descname"><span class="pre">UNDEFINED</span></code><em class="property"> <span class="pre">=</span> <span class="pre">&lt;_DataTypeDef</span> <span class="pre">name=UNDEFINED</span> <span class="pre">python_type=UNDEFINED</span> <span class="pre">&gt;</span></em><a class="headerlink" href="#rule_engine.types.DataType.UNDEFINED" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.UNDEFINED">
+<span class="sig-name descname"><span class="pre">UNDEFINED</span></span><em class="property"> <span class="pre">=</span> <span class="pre">&lt;_DataTypeDef</span> <span class="pre">name=UNDEFINED</span> <span class="pre">python_type=UNDEFINED</span> <span class="pre">&gt;</span></em><a class="headerlink" href="#rule_engine.types.DataType.UNDEFINED" title="Permalink to this definition">¶</a></dt>
 <dd><p>Undefined values. This constant can be used to indicate that a particular symbol is valid, but it’s data type is
 currently unknown.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rule_engine.types.DataType.from_name">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_name</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.from_name">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the data type from its name.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.0.0.</span></p>
@@ -433,8 +436,8 @@ currently unknown.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="rule_engine.types.DataType.from_type">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_type</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_type" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.from_type">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the supported data type constant for the specified Python type. If the type can not be mapped to a supported
 data type, then a <a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#ValueError" title="(in Python v3.9)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised. This function will not return
 <a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
@@ -449,8 +452,8 @@ data type, then a <a class="reference external" href="https://docs.python.org/3.
 </dd></dl>
 
 <dl class="py method">
-<dt id="rule_engine.types.DataType.from_value">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_value" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.from_value">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_value" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the supported data type constant for the specified Python value. If the value can not be mapped to a
 supported data type, then a <a class="reference external" href="https://docs.python.org/3.9/library/exceptions.html#TypeError" title="(in Python v3.9)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> exception will be raised. This function will not return
 <a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
@@ -465,8 +468,8 @@ supported data type, then a <a class="reference external" href="https://docs.pyt
 </dd></dl>
 
 <dl class="py method">
-<dt id="rule_engine.types.DataType.is_compatible">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">is_compatible</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.is_compatible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.is_compatible" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.is_compatible">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_compatible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.is_compatible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.is_compatible" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if two data type definitions are compatible without any kind of conversion. This evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code>
 when one or both are <a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> or both types are the same. In the case of compound data types (such
 as <a class="reference internal" href="#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>) the member types are checked recursively in the same manner.</p>
@@ -490,8 +493,8 @@ as <a class="reference internal" href="#rule_engine.types.DataType.ARRAY" title=
 </dd></dl>
 
 <dl class="py method">
-<dt id="rule_engine.types.DataType.is_definition">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">is_definition</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.is_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.is_definition" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="rule_engine.types.DataType.is_definition">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">is_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.is_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.is_definition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if <em>value</em> is a data type definition.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.0.</span></p>

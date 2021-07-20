@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>rule_engine.engine &mdash; Rule Engine 3.2.1 documentation</title>
+  <title>rule_engine.engine &mdash; Rule Engine 3.3.0 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
 
   
@@ -30,6 +32,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -62,7 +65,7 @@
             
             
               <div class="version">
-                3.2.1
+                3.3.0
               </div>
             
           
@@ -87,7 +90,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../syntax.html">Rule Syntax</a></li>
@@ -331,6 +334,10 @@
 <span class="sd">		:return: The data type of the specified attribute.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_resolver</span><span class="p">(</span><span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">result_type</span>
+
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_epoch&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">datetime_to_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
 
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">datetime_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>

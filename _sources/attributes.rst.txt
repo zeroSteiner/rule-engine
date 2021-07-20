@@ -41,6 +41,8 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-----------------+-------------------------------------+
 | ``second``      | :py:attr:`~.DataType.FLOAT`         |
 +-----------------+-------------------------------------+
+| ``to_epoch``    | :py:attr:`~.DataType.FLOAT`         |
++-----------------+-------------------------------------+
 | ``weekday``     | :py:attr:`~.DataType.STRING`        |
 +-----------------+-------------------------------------+
 | ``year``        | :py:attr:`~.DataType.FLOAT`         |

@@ -168,6 +168,10 @@ class _AttributeResolver(object):
 		"""
 		return self._get_resolver(object_type, name).result_type
 
+	@attribute('to_epoch', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	def datetime_to_epoch(self, value):
+		return value.timestamp()
+
 	@attribute('date', ast.DataType.DATETIME, result_type=ast.DataType.DATETIME)
 	def datetime_date(self, value):
 		return value.replace(hour=0, minute=0, second=0, microsecond=0)

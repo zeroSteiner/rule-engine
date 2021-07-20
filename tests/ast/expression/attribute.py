@@ -95,6 +95,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		symbol = ast.DatetimeExpression(context, timestamp)
 
 		attributes = {
+			'to_epoch': decimal.Decimal(str(timestamp.timestamp())),
 			'day': 11,
 			'hour': 20,
 			'microsecond': 506406,

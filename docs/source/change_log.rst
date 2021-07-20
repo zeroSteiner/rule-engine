@@ -7,6 +7,13 @@ this list is curated by the development team for note worthy changes.
 Version 3.x.x
 -------------
 
+Version 3.3.0
+^^^^^^^^^^^^^
+
+Released :release:`3.3.0` on July 20th, 2021
+
+* Added ``to_epoch`` to :py:class:`~rule_engine.types.DataType.DATETIME`
+
 Version 3.2.0
 ^^^^^^^^^^^^^
 
@@ -23,7 +30,7 @@ Version 3.1.0
 
 Released :release:`3.1.0` on March 15th, 2021
 
-* Added the new :py:class:`~rule_engine.ast.DataType.SET` data type
+* Added the new :py:class:`~rule_engine.types.DataType.SET` data type
 
 Version 3.0.0
 ^^^^^^^^^^^^^
@@ -35,7 +42,7 @@ Released :release:`3.0.0` on March 1st, 2021
   symbol names
 * Added some new data attributes
 
-    * Added ``ceiling``, ``floor`` and ``to_str`` to :py:class:`~rule_engine.ast.DataType.FLOAT`
+    * Added ``ceiling``, ``floor`` and ``to_str`` to :py:class:`~rule_engine.types.DataType.FLOAT`
 
 Version 2.x.x
 -------------
@@ -47,7 +54,7 @@ Released :release:`2.4.0` on November 7th, 2020
 
 * Added the :ref:`debug-repl` utility
 * Added the safe navigation version of the attribute, item and slice operators
-* Added the new :py:class:`~rule_engine.ast.DataType.MAPPING` data type
+* Added the new :py:class:`~rule_engine.types.DataType.MAPPING` data type
 * Switched from Travis-CI to GitHub Actions for continuous integration
 * Added support for iterables to have multiple member types
 
@@ -61,8 +68,8 @@ Released :release:`2.3.0` on October 11th, 2020
 * Added the ``$re_groups`` builtin symbol for extracting groups from a regular expression match
 * Added some new data attributes
 
-    * Added ``to_ary`` to :py:class:`~rule_engine.ast.DataType.STRING`
-    * Added ``to_int`` and ``to_flt`` to :py:class:`~rule_engine.ast.DataType.STRING`
+    * Added ``to_ary`` to :py:class:`~rule_engine.types.DataType.STRING`
+    * Added ``to_int`` and ``to_flt`` to :py:class:`~rule_engine.types.DataType.STRING`
 
 Version 2.2.0
 ^^^^^^^^^^^^^
@@ -78,8 +85,8 @@ Version 2.1.0
 Released :release:`2.1.0` on August 3rd, 2020
 
 * Added coverage reporting to Travis-CI
-* Changed :py:class:`~rule_engine.ast.DataType` from an enum to a custom class
-* Improvements for the :py:class:`~rule_engine.ast.DataType.ARRAY` data type
+* Changed :py:class:`~rule_engine.types.DataType. from an enum to a custom class
+* Improvements for the :py:class:`~rule_engine.types.DataType.ARRAY` data type
 
     * Added ``get[item]`` support for arrays, allowing items to be retrieved by index
     * Added ability for specifying the member type and optionally null
@@ -92,7 +99,7 @@ Released :release:`2.0.0` on October 2nd, 2019
 * Added proper support for attributes
 * Added a change log
 * Added additional information to the Graphviz output
-* Added the new :py:class:`~rule_engine.ast.DataType.ARRAY` data type
+* Added the new :py:class:`~rule_engine.types.DataType.ARRAY` data type
 * Started using Travis-CI
 
     * Added automatic unit testing using Travis-CI

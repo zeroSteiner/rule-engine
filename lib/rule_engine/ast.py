@@ -125,6 +125,13 @@ class ExpressionBase(ASTNodeBase):
 	def __repr__(self):
 		return "<{0} >".format(self.__class__.__name__)
 
+	def _new_value(self, *args, **kwargs):
+		# perform a context aware load of value
+		value = coerce_value(*args, **kwargs)
+		if isinstance(value, datetime.datetime) and value.tzinfo is None:
+			value = value.replace(tzinfo=self.context.default_timezone)
+		return value
+
 class LiteralExpressionBase(ExpressionBase):
 	"""A base class for representing literal values from the grammar text."""
 	__slots__ = ('value',)
@@ -678,7 +685,7 @@ class GetAttributeExpression(ExpressionBase):
 		except errors.AttributeResolutionError as error:
 			attribute_error = error
 		else:
-			return coerce_value(value, verify_type=False)
+			return self._new_value(value, verify_type=False)
 
 		try:
 			value = self.context.resolve(resolved_obj, self.name)
@@ -692,7 +699,7 @@ class GetAttributeExpression(ExpressionBase):
 				attribute_error.suggestion = suggestion
 				raise attribute_error from None
 			value = default_value
-		return coerce_value(value, verify_type=False)
+		return self._new_value(value, verify_type=False)
 
 	def reduce(self):
 		if not _is_reduced(self.object):
@@ -766,7 +773,7 @@ class GetItemExpression(ExpressionBase):
 			if self.safe:
 				return None
 			raise errors.LookupError(resolved_obj, resolved_item)
-		return coerce_value(value, verify_type=False)
+		return self._new_value(value, verify_type=False)
 
 	def reduce(self):
 		if isinstance(self.container.result_type, DataType.MAPPING.__class__):
@@ -891,9 +898,7 @@ class SymbolExpression(ExpressionBase):
 			if default_value is errors.UNDEFINED:
 				raise
 			value = default_value
-		value = coerce_value(value, verify_type=False)
-		if isinstance(value, datetime.datetime) and value.tzinfo is None:
-			value = value.replace(tzinfo=self.context.default_timezone)
+		value = self._new_value(value, verify_type=False)
 
 		# if the expected result type is undefined, return the value
 		if self.result_type == DataType.UNDEFINED:

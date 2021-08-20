@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import random
 import unittest
 
@@ -76,3 +77,11 @@ class GitHubIssueTests(unittest.TestCase):
 	def test_number_20(self):
 		rule = engine.Rule('a / b ** 2')
 		self.assertEqual(rule.evaluate({'a': 8, 'b': 4}), 0.5)
+
+	def test_number_22(self):
+		rules = ('object["timestamp"] > $now', 'object.timestamp > $now')
+		for rule in rules:
+			rule = engine.Rule(rule)
+			self.assertFalse(rule.evaluate({
+				'object': {'timestamp': datetime.datetime(2021, 8, 19)}
+			}))

@@ -59,10 +59,10 @@ Basic Usage
 
    * In the case of the comic book collection, these symbols would be: ``title``, ``publisher``, ``issue``, and
      ``released``. Notice that these attribute names are also valid symbol names, i.e. they start with a letter and
-     contain note whitespace or punctuation. Just like in Python, Rule Engine symbols must follow these rules. For
+     contain no whitespace or punctuation. Just like in Python, Rule Engine symbols must follow these rules. For
      example, ``released`` is a valid symbol while ``Released Date`` is not (because of the space).
 
-   * An simple rule for the comic book collection which matches the ``publisher`` symbol to the string ``"DC"`` might
+   * A simple rule for the comic book collection which matches the ``publisher`` symbol to the string ``"DC"`` might
      look like:
 
       .. code-block:: python
@@ -126,9 +126,9 @@ Basic Usage
 Attribute-Backed Objects
 ^^^^^^^^^^^^^^^^^^^^^^^^
 In the previous example, the target objects were Python dictionaries. The keys in the dictionary were used as symbols
-and while this is the default behavior it can be modified to use object attributes instead. This would necessary if the
-target objects had variable attributes (like a Python class object) instead of variable items (like a Python dictionary
-object).
+and while this is the default behavior it can be modified to use object attributes instead. This would be necessary if
+the target objects had variable attributes (like a Python class object) instead of variable items (like a Python
+dictionary object).
 
    * An example comic book collection using an object-based attribute-backed data structure might look like:
 
@@ -153,7 +153,7 @@ up symbols to their values for comparison given a target object. The following r
 Engine:
 
 * :py:func:`~engine.resolve_attribute` -- Resolve symbols by looking them up as attributes on an object.
-* :py:func:`~engine.resolve_item` -- **Default** Resolve symbols by looking them up as keys on a dictionary (or
+* :py:func:`~engine.resolve_item` -- **(Default)** Resolve symbols by looking them up as keys on a dictionary (or
   dictionary-like) object.
 
 To change the resolver, create a :py:class:`~engine.Context` object, and specify the *resolver* function as a keyword
@@ -180,7 +180,7 @@ Setting A Default Value
 ^^^^^^^^^^^^^^^^^^^^^^^
 By default, :py:class:`engine.Rule` will raise a :py:class:`~errors.SymbolResolutionError` for invalid symbols. In some
 cases, it may be desirable to change the way in which the language behaves to instead treat unknown symbols with a
-default value (most often ``None`` / :py:attr:`ast.DataType.NULL` is used for this purpose, but value of a supported
+default value (most often ``None`` / :py:attr:`ast.DataType.NULL` is used for this purpose, but any value of a supported
 type can be used). To change this behavior, set the *default_value* parameter when initializing the
 :py:class:`~engine.Context` instance.
 
@@ -208,7 +208,7 @@ reason, neither of those are suitable for the target object then a custom one ca
 The custom resolver should use the signature ``resolver(thing, name)`` where *thing* is the arbitrary object that the
 rule is being applied to and *name* is the symbol name as a Python string of the attribute that is to be accessed. If
 the resolver function fails for any reason, it should raise a :py:class:`~errors.SymbolResolutionError`, forwarding
-*thing* via keyword argument. This ensures consistency in how exceptions are raised and handled by the engine.
+*thing* in a keyword argument. This ensures consistency in how exceptions are raised and handled by the engine.
 
 Suggestions
 """""""""""

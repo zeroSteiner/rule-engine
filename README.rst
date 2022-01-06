@@ -56,6 +56,24 @@ operation is used. See `Type Hinting`_ for more information.
    rule = rule_engine.Rule('first_name + 1', context=context)
    # => EvaluationError: data type mismatch
 
+Finally, the last example demonstrates the ability to work with compound data types and obtain the result of the rule
+expression. In this scenario, the ``people`` symbol is an array of Python dictionaries, each representing an individual.
+The `evaluate method`_ will return the result of the rule evaluation instead of just a boolean indicating whether or not
+it matched.
+
+.. code-block:: python
+
+   import rule_engine
+   # count how many people have the last name of 'Skywalker'
+   rule = rule_engine.Rule(
+       '[person for person in people if person["last_name"] == "Skywalker"].length'
+   ) # => <Rule text='[person for person in people if person["last_name"] == "Skywalker"].length' >
+
+   rule.evaluate({'people': [
+       {'first_name': 'Luke', 'last_name': 'Skywalker', 'email': 'luke@rebels.org'},
+       {'first_name': 'Darth', 'last_name': 'Vader', 'email': 'dvader@empire.net'}
+   ]}) # => Decimal('1')
+
 Want to give the rule expression language a try? Checkout the `Debug REPL`_ that makes experimentation easy. After
 installing just run ``python -m rule_engine.debug_repl``.
 
@@ -96,3 +114,4 @@ private purposes. For more information, see the `LICENSE`_ file.
 .. _LICENSE: https://github.com/zeroSteiner/rule-engine/blob/master/LICENSE
 .. _Semantic Versioning: https://semver.org/
 .. _Type Hinting: https://zerosteiner.github.io/rule-engine/getting_started.html#type-hinting
+.. _evaluate method: https://zerosteiner.github.io/rule-engine/rule_engine/engine.html#rule_engine.engine.Rule.evaluate

@@ -41,6 +41,7 @@ import rule_engine.errors as errors
 
 __all__ = (
 	'ArithmeticExpressionTests',
+	'AddExpressionTests',
 	'BitwiseExpressionTests',
 	'BitwiseExpressionSetTests',
 	'BitwiseShiftExpressionTests',
@@ -97,6 +98,29 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 				self.assertExpressionTests(operation, ast.FloatExpression(context, 2.0), ast.BooleanExpression(context, True))
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, ast.BooleanExpression(context, True), ast.FloatExpression(context, 4.0))
+
+class AddExpressionTests(LeftOperatorRightExpresisonTestsBase):
+	ExpressionClass = ast.AddExpression
+	false_value = 0.0
+	left_value = two = ast.FloatExpression(context, 2.0)
+	right_value = four = ast.FloatExpression(context, 4.0)
+	def test_ast_expression_left_operator_right_add(self):
+		self.assertExpressionTests('add', equals_value=6.0)
+		self.assertExpressionTests('add', left_value=ast.StringExpression(context,'a'), right_value=ast.StringExpression(context,'b'), equals_value='ab')
+
+	def test_ast_expression_left_operator_right_add_type_errors(self):
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.FloatExpression(context, 2.0), ast.StringExpression(context, '4.0'))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.StringExpression(context, '2.0'), ast.FloatExpression(context, 4.0))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.FloatExpression(context, 2.0), ast.BooleanExpression(context, True))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.BooleanExpression(context, True), ast.FloatExpression(context, 4.0))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.BooleanExpression(context, True), ast.StringExpression(context, 'b'))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.StringExpression(context, 'b'), ast.BooleanExpression(context, True))
 
 class BitwiseExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.BitwiseExpression

@@ -55,6 +55,10 @@ def _assert_is_numeric(*values):
 	if not all(map(is_numeric, values)):
 		raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
+def _assert_is_string(*values):
+	if not all(map(isinstance, values, [str])):
+		raise errors.EvaluationError('data type mismatch (not a string value)')
+
 def _is_reduced(*values):
 	"""
 	Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of it's
@@ -377,13 +381,27 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 		_assert_is_numeric(right_value)
 		return op(left_value, right_value)
 
-	_op_add  = functools.partialmethod(__op_arithmetic, operator.add)
 	_op_sub  = functools.partialmethod(__op_arithmetic, operator.sub)
 	_op_fdiv = functools.partialmethod(__op_arithmetic, operator.floordiv)
 	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)
 	_op_mod  = functools.partialmethod(__op_arithmetic, operator.mod)
 	_op_mul  = functools.partialmethod(__op_arithmetic, operator.mul)
 	_op_pow  = functools.partialmethod(__op_arithmetic, operator.pow)
+
+class AddExpression(LeftOperatorRightExpressionBase):
+	"""A class for representing arithmetic expressions from the grammar text such as addition and subtraction."""
+	compatible_types = (DataType.FLOAT,DataType.STRING)
+	result_type =  DataType.STRING
+	def __op_add(self, op, thing):
+		left_value = self.left.evaluate(thing)
+		right_value = self.right.evaluate(thing)
+		if isinstance(left_value,str) or isinstance(right_value, str):
+			_assert_is_string(left_value)
+			_assert_is_string(right_value)
+		return op(left_value, right_value)
+
+	_op_add  = functools.partialmethod(__op_add, operator.add)
+
 
 class BitwiseExpression(LeftOperatorRightExpressionBase):
 	"""

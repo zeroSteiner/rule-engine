@@ -148,11 +148,11 @@ class AstTests(unittest.TestCase):
 		self.assertEqual(statement.evaluate(None), 3)
 
 		statement = parser_.parse('one + 2', self.context)
-		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), 3)
 
 		statement = parser_.parse('1 + two', self.context)
-		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), 3)
 
 	def test_ast_reduces_array_literals(self):
@@ -189,7 +189,6 @@ class AstTests(unittest.TestCase):
 		cases = (
 			# type,             type_is,             type_is_not
 			('symbol << 1',     ast.DataType.FLOAT,  ast.DataType.STRING),
-			('symbol + 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol[1]',       ast.DataType.STRING, ast.DataType.FLOAT),
 			('symbol[1]',       ast.DataType.ARRAY,  ast.DataType.FLOAT),
 			('symbol =~ "foo"', ast.DataType.STRING, ast.DataType.FLOAT),

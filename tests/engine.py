@@ -133,8 +133,7 @@ class EngineTests(unittest.TestCase):
 		context = engine.Context()
 		context.builtins = builtins
 		engine.Rule('$name =~ ""')
-		with self.assertRaises(errors.EvaluationError):
-			engine.Rule('$name + 1', context=context)
+
 
 	def test_engine_builtins_re_groups(self):
 		context = engine.Context()

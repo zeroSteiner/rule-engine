@@ -391,13 +391,23 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 class AddExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing arithmetic expressions from the grammar text such as addition and subtraction."""
 	compatible_types = (DataType.FLOAT,DataType.STRING)
-	result_type =  DataType.STRING
+	result_type =  DataType.UNDEFINED
+
+	def __init__(self, *args, **kwargs):
+		super(AddExpression, self).__init__(*args, **kwargs)
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
+			if self.left.result_type != self.right.result_type:
+				raise errors.EvaluationError('data type mismatch')
+
 	def __op_add(self, op, thing):
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
 		if isinstance(left_value,str) or isinstance(right_value, str):
 			_assert_is_string(left_value)
 			_assert_is_string(right_value)
+		else:
+			_assert_is_numeric(left_value)
+			_assert_is_numeric(right_value)
 		return op(left_value, right_value)
 
 	_op_add  = functools.partialmethod(__op_add, operator.add)

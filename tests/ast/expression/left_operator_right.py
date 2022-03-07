@@ -80,7 +80,6 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	left_value = two = ast.FloatExpression(context, 2.0)
 	right_value = four = ast.FloatExpression(context, 4.0)
 	def test_ast_expression_left_operator_right_arithmetic(self):
-		self.assertExpressionTests('add', equals_value=6.0)
 		self.assertExpressionTests('sub', equals_value=-2.0)
 		self.assertExpressionTests('fdiv', equals_value=0.0)
 		self.assertExpressionTests('tdiv', equals_value=0.5)
@@ -89,7 +88,7 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('pow', equals_value=16.0)
 
 	def test_ast_expression_left_operator_right_arithmetic_type_errors(self):
-		for operation in ('add', 'sub', 'fdiv', 'tdiv', 'mod', 'mul', 'pow'):
+		for operation in ('sub', 'fdiv', 'tdiv', 'mod', 'mul', 'pow'):
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, ast.FloatExpression(context, 2.0), ast.StringExpression(context, '4.0'))
 			with self.assertRaises(errors.EvaluationError):

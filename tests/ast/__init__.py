@@ -189,6 +189,7 @@ class AstTests(unittest.TestCase):
 		cases = (
 			# type,             type_is,             type_is_not
 			('symbol << 1',     ast.DataType.FLOAT,  ast.DataType.STRING),
+			('symbol + 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol[1]',       ast.DataType.STRING, ast.DataType.FLOAT),
 			('symbol[1]',       ast.DataType.ARRAY,  ast.DataType.FLOAT),
 			('symbol =~ "foo"', ast.DataType.STRING, ast.DataType.FLOAT),

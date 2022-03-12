@@ -321,7 +321,6 @@ class Parser(ParserBase):
 	def p_expression_add(self, p):
 		"""
 		expression : expression ADD    expression
-
 		"""
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]

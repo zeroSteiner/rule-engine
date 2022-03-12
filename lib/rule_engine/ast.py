@@ -370,8 +370,29 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		digraph.edge(str(id(self)), str(id(self.left)), label='left')
 		digraph.edge(str(id(self)), str(id(self.right)), label='right')
 
+class AddExpression(LeftOperatorRightExpressionBase):
+	"""A class for representing addition expressions from the grammar text."""
+	compatible_types = (DataType.FLOAT,DataType.STRING)
+	result_type = DataType.UNDEFINED
+
+	def __init__(self, *args, **kwargs):
+		super(AddExpression, self).__init__(*args, **kwargs)
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
+			if self.left.result_type != self.right.result_type:
+				raise errors.EvaluationError('data type mismatch')
+			self.result_type = self.left.result_type
+
+	def _op_add(self, thing):
+		left_value = self.left.evaluate(thing)
+		right_value = self.right.evaluate(thing)
+		if isinstance(left_value, str) or isinstance(right_value, str):
+			_assert_is_string(left_value, right_value)
+		else:
+			_assert_is_numeric(left_value, right_value)
+		return operator.add(left_value, right_value)
+
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
-	"""A class for representing arithmetic expressions from the grammar text such as addition and subtraction."""
+	"""A class for representing arithmetic expressions from the grammar text such as subtraction and division."""
 	compatible_types = (DataType.FLOAT,)
 	result_type = DataType.FLOAT
 	def __op_arithmetic(self, op, thing):
@@ -387,31 +408,6 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 	_op_mod  = functools.partialmethod(__op_arithmetic, operator.mod)
 	_op_mul  = functools.partialmethod(__op_arithmetic, operator.mul)
 	_op_pow  = functools.partialmethod(__op_arithmetic, operator.pow)
-
-class AddExpression(LeftOperatorRightExpressionBase):
-	"""A class for representing arithmetic expressions from the grammar text such as addition and subtraction."""
-	compatible_types = (DataType.FLOAT,DataType.STRING)
-	result_type =  DataType.UNDEFINED
-
-	def __init__(self, *args, **kwargs):
-		super(AddExpression, self).__init__(*args, **kwargs)
-		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
-			if self.left.result_type != self.right.result_type:
-				raise errors.EvaluationError('data type mismatch')
-
-	def __op_add(self, op, thing):
-		left_value = self.left.evaluate(thing)
-		right_value = self.right.evaluate(thing)
-		if isinstance(left_value,str) or isinstance(right_value, str):
-			_assert_is_string(left_value)
-			_assert_is_string(right_value)
-		else:
-			_assert_is_numeric(left_value)
-			_assert_is_numeric(right_value)
-		return op(left_value, right_value)
-
-	_op_add  = functools.partialmethod(__op_add, operator.add)
-
 
 class BitwiseExpression(LeftOperatorRightExpressionBase):
 	"""

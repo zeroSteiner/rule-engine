@@ -307,8 +307,7 @@ class Parser(ParserBase):
 
 	def p_expression_arithmetic(self, p):
 		"""
-		expression : expression ADD    expression
-				   | expression SUB    expression
+		expression : expression SUB    expression
 				   | expression MOD    expression
 				   | expression MUL    expression
 				   | expression FDIV   expression
@@ -318,6 +317,14 @@ class Parser(ParserBase):
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
 		p[0] = _DeferredAstNode(ast.ArithmeticExpression, args=(self.context, op_name, left, right))
+
+	def p_expression_add(self, p):
+		"""
+		expression : expression ADD    expression
+		"""
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = _DeferredAstNode(ast.AddExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_bitwise(self, p):
 		"""

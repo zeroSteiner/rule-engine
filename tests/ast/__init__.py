@@ -140,7 +140,7 @@ class AstTests(unittest.TestCase):
 		with self.assertRaises(errors.EvaluationError):
 			parser_.parse('"string" =~ true', self.context)
 
-	def test_ast_reduces_arithmetic(self):
+	def test_ast_reduces_add_float(self):
 		thing = {'one': 1, 'two': 2}
 		parser_ = parser.Parser()
 		statement = parser_.parse('1 + 2', self.context)
@@ -148,12 +148,42 @@ class AstTests(unittest.TestCase):
 		self.assertEqual(statement.evaluate(None), 3)
 
 		statement = parser_.parse('one + 2', self.context)
-		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), 3)
 
 		statement = parser_.parse('1 + two', self.context)
-		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), 3)
+
+	def test_ast_reduces_add_string(self):
+		thing = {'first': 'Luke', 'last': 'Skywalker'}
+		parser_ = parser.Parser()
+		statement = parser_.parse('"Luke" + "Skywalker"', self.context)
+		self.assertIsInstance(statement.expression, ast.StringExpression)
+		self.assertEqual(statement.evaluate(None), 'LukeSkywalker')
+
+		statement = parser_.parse('first + "Skywalker"', self.context)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
+		self.assertEqual(statement.evaluate(thing), 'LukeSkywalker')
+
+		statement = parser_.parse('"Luke" + last', self.context)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
+		self.assertEqual(statement.evaluate(thing), 'LukeSkywalker')
+
+	def test_ast_reduces_arithmetic(self):
+		thing = {'two': 2, 'four': 4}
+		parser_ = parser.Parser()
+		statement = parser_.parse('2 * 4', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
+		self.assertEqual(statement.evaluate(None), 8)
+
+		statement = parser_.parse('two * 4', self.context)
+		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
+		self.assertEqual(statement.evaluate(thing), 8)
+
+		statement = parser_.parse('2 * four', self.context)
+		self.assertIsInstance(statement.expression, ast.ArithmeticExpression)
+		self.assertEqual(statement.evaluate(thing), 8)
 
 	def test_ast_reduces_array_literals(self):
 		parser_ = parser.Parser()

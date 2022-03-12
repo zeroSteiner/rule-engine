@@ -55,6 +55,10 @@ def _assert_is_numeric(*values):
 	if not all(map(is_numeric, values)):
 		raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
+def _assert_is_string(*values):
+	if not all(map(isinstance, values, [str])):
+		raise errors.EvaluationError('data type mismatch (not a string value)')
+
 def _is_reduced(*values):
 	"""
 	Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of it's
@@ -366,8 +370,29 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 		digraph.edge(str(id(self)), str(id(self.left)), label='left')
 		digraph.edge(str(id(self)), str(id(self.right)), label='right')
 
+class AddExpression(LeftOperatorRightExpressionBase):
+	"""A class for representing addition expressions from the grammar text."""
+	compatible_types = (DataType.FLOAT,DataType.STRING)
+	result_type = DataType.UNDEFINED
+
+	def __init__(self, *args, **kwargs):
+		super(AddExpression, self).__init__(*args, **kwargs)
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
+			if self.left.result_type != self.right.result_type:
+				raise errors.EvaluationError('data type mismatch')
+			self.result_type = self.left.result_type
+
+	def _op_add(self, thing):
+		left_value = self.left.evaluate(thing)
+		right_value = self.right.evaluate(thing)
+		if isinstance(left_value, str) or isinstance(right_value, str):
+			_assert_is_string(left_value, right_value)
+		else:
+			_assert_is_numeric(left_value, right_value)
+		return operator.add(left_value, right_value)
+
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
-	"""A class for representing arithmetic expressions from the grammar text such as addition and subtraction."""
+	"""A class for representing arithmetic expressions from the grammar text such as subtraction and division."""
 	compatible_types = (DataType.FLOAT,)
 	result_type = DataType.FLOAT
 	def __op_arithmetic(self, op, thing):
@@ -377,7 +402,6 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 		_assert_is_numeric(right_value)
 		return op(left_value, right_value)
 
-	_op_add  = functools.partialmethod(__op_arithmetic, operator.add)
 	_op_sub  = functools.partialmethod(__op_arithmetic, operator.sub)
 	_op_fdiv = functools.partialmethod(__op_arithmetic, operator.floordiv)
 	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)

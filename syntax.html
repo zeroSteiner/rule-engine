@@ -1,78 +1,38 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Rule Syntax &mdash; Rule Engine 3.3.2 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Rule Syntax &mdash; Rule Engine 3.4.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Data Types" href="types.html" />
     <link rel="prev" title="Getting Started" href="getting_started.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> Rule Engine
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                3.3.2
+                3.4.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,18 +40,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
@@ -122,85 +71,44 @@
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Rule Engine</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Rule Syntax</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/syntax.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="rule-syntax">
-<h1>Rule Syntax<a class="headerlink" href="#rule-syntax" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="rule-syntax">
+<h1>Rule Syntax<a class="headerlink" href="#rule-syntax" title="Permalink to this headline"></a></h1>
 <p>The syntax for creating rules is based off of logical expressions evaluating to either True (matching) or False (non-
 matching). Rules support a small set of data types which can be defined as literals or resolved using the Python object
 on which the rule is being applied. See the <a class="reference internal" href="types.html#id1"><span class="std std-ref">Data Types</span></a> table for a comprehensive list of the
 supported types.</p>
 <p>Not all supported operations work with all data types as noted in the table below. Rules follow a standard <a class="reference external" href="https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages">order of
 operations</a>.</p>
-<div class="section" id="grammar">
-<h2>Grammar<a class="headerlink" href="#grammar" title="Permalink to this headline">¶</a></h2>
+<section id="grammar">
+<h2>Grammar<a class="headerlink" href="#grammar" title="Permalink to this headline"></a></h2>
 <p>The expression grammar supports a number of operations including basic arithmetic for numerical data and regular
 expressions for strings. Operations are type aware and will raise an exception when an incompatible type is used.</p>
-<div class="section" id="supported-operations">
-<span id="data-type-operations"></span><h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this headline">¶</a></h3>
+<section id="supported-operations">
+<span id="data-type-operations"></span><h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this headline"></a></h3>
 <p>The following table outlines all operators that can be used in Rule Engine expressions.</p>
 <table class="docutils align-default">
 <colgroup>
@@ -374,8 +282,8 @@ the same as the data type of the right. For example, a <code class="xref py py-a
 based sequence comparison <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html#comparing-sequences-and-other-types">technique used by Python</a>.</p>
 <p><sup>3</sup> When using regular expression operations, the expression on the left is the string to compare and the
 expression on the right is the regular expression to use for either the match or search operation.</p>
-<div class="section" id="accessor-operators">
-<h4>Accessor Operators<a class="headerlink" href="#accessor-operators" title="Permalink to this headline">¶</a></h4>
+<section id="accessor-operators">
+<h4>Accessor Operators<a class="headerlink" href="#accessor-operators" title="Permalink to this headline"></a></h4>
 <p>Some data types support accessor operators to obtain sub-values and attributes. One example is the
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code> which supports both attribute and item lookup operations. For example, “length” is a valid
 attribute and can be accessed by appending <code class="docutils literal notranslate"><span class="pre">.length</span></code> to either a string literal or symbol. Alternatively, a specific
@@ -387,13 +295,13 @@ the bit-wise and operator which leverages the same symbol). The safe operator ve
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code> instead of raising an exception when the container value on which the operation is applied is
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code>. Additionally, the safe version of item lookup operations will evaluate to
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code> instead of raising a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.LookupError" title="rule_engine.errors.LookupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookupError</span></code></a> exception when the item is
-not held within the container. This is analogous the Python’s <a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#dict.get" title="(in Python v3.9)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.get()</span></code></a> method.</p>
+not held within the container. This is analogous the Python’s <a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict.get" title="(in Python v3.10)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.get()</span></code></a> method.</p>
 <p>The item lookup operation can also evaluate to an array when a stop boundary is provided. For example to reference the
 first four elements of a string by appending <code class="docutils literal notranslate"><span class="pre">[0:4]</span></code> to the end of the value. Alternatively, only the ending index
 may be specified using <code class="docutils literal notranslate"><span class="pre">[:4]</span></code>. Finally, just as in Python, negative values can be used to reference the last elements.</p>
-</div>
-<div class="section" id="array-comprehension">
-<h4>Array Comprehension<a class="headerlink" href="#array-comprehension" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="array-comprehension">
+<h4>Array Comprehension<a class="headerlink" href="#array-comprehension" title="Permalink to this headline"></a></h4>
 <p>An operation may be able to be applied to each member of an iterable value to generate a new <code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code>
 composed of the resulting expressions. This could for example be used to determine how many values within an array
 match an arbitrary condition. The syntax is very similar to the list comprehension within Python and is composed of
@@ -410,17 +318,17 @@ Building on the previous example, if only the squares of each odd number was nee
 <p>One limitation to the array comprehension syntax when compared to Python’s list comprehension is that the variable
 assignment may not contain more than one value. There is currently no support for unpacking multiple values like Python
 does, (e.g. <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">v</span> <span class="pre">for</span> <span class="pre">k,v</span> <span class="pre">in</span> <span class="pre">my_dict.items()</span> <span class="pre">if</span> <span class="pre">test(k)</span> <span class="pre">]</span></code>.</p>
-</div>
-<div class="section" id="ternary-operators">
-<h4>Ternary Operators<a class="headerlink" href="#ternary-operators" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="ternary-operators">
+<h4>Ternary Operators<a class="headerlink" href="#ternary-operators" title="Permalink to this headline"></a></h4>
 <p>The ternary operator can be used in place of a traditional “if-then-else” statement. Like other languages the question
 mark and colon are used as the expression delimiters. A ternary expression is a combination of a condition followed by
 an expression used when the condition is true and ending with an expression used when the condition is false.</p>
 <p>For example: <code class="docutils literal notranslate"><span class="pre">condition</span> <span class="pre">?</span> <span class="pre">true_case</span> <span class="pre">:</span> <span class="pre">false_case</span></code></p>
-</div>
-</div>
-<div class="section" id="reserved-keywords">
-<h3>Reserved Keywords<a class="headerlink" href="#reserved-keywords" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="reserved-keywords">
+<h3>Reserved Keywords<a class="headerlink" href="#reserved-keywords" title="Permalink to this headline"></a></h3>
 <p>The following keywords are reserved and can not be used as the names of symbols.</p>
 <table class="docutils align-default">
 <colgroup>
@@ -487,9 +395,9 @@ an expression used when the condition is true and ending with an expression used
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="literal-values">
-<span id="id1"></span><h3>Literal Values<a class="headerlink" href="#literal-values" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="literal-values">
+<span id="id1"></span><h3>Literal Values<a class="headerlink" href="#literal-values" title="Permalink to this headline"></a></h3>
 <p><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code> and <code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code> literal values are specified in a very similar manner by
 defining the value as a string of characters enclosed in either single or double quotes. The difference comes in an
 optional leading character before the opening quote. Either no leading character or a single <code class="docutils literal notranslate"><span class="pre">s</span></code> will specify a
@@ -520,22 +428,22 @@ include a decimal place component.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">1e0</span> <span class="pre">==</span> <span class="pre">1</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">1.0e0</span> <span class="pre">==</span> <span class="pre">1</span></code></p></li>
 </ul>
-</div>
-</div>
-<div class="section" id="builtin-symbols">
-<span id="id2"></span><h2>Builtin Symbols<a class="headerlink" href="#builtin-symbols" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="builtin-symbols">
+<span id="id2"></span><h2>Builtin Symbols<a class="headerlink" href="#builtin-symbols" title="Permalink to this headline"></a></h2>
 <p>The following symbols are provided by default using the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Builtins.from_defaults" title="rule_engine.engine.Builtins.from_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_defaults()</span></code></a> method. These symbols
 can be accessed through the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix, e.g. <code class="docutils literal notranslate"><span class="pre">$pi</span></code>. The default values can be overridden by defining a custom
 subclass of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> and setting the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.builtins" title="rule_engine.engine.Context.builtins"><code class="xref py py-attr docutils literal notranslate"><span class="pre">builtins</span></code></a> attribute.</p>
-<div class="section" id="math-related">
-<h3>Math Related<a class="headerlink" href="#math-related" title="Permalink to this headline">¶</a></h3>
+<section id="math-related">
+<h3>Math Related<a class="headerlink" href="#math-related" title="Permalink to this headline"></a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">e</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) – The mathematical constant <em>e</em> (2.71828…).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pi</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) – The mathematical constant <em>pi</em> (3.14159…).</p></li>
 </ul>
-</div>
-<div class="section" id="regular-expression-related">
-<h3>Regular Expression Related<a class="headerlink" href="#regular-expression-related" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="regular-expression-related">
+<h3>Regular Expression Related<a class="headerlink" href="#regular-expression-related" title="Permalink to this headline"></a></h3>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">re_groups</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code>) – An array of strings from the last regular expression match as
 defined by the regular expression itself. See documentation on <a class="reference external" href="https://docs.python.org/3/howto/regex.html#grouping">grouping</a> for more information. If no match has taken
@@ -548,65 +456,48 @@ be unavailable if the default builtins are replaced.</p>
 </div>
 </li>
 </ul>
-</div>
-<div class="section" id="timestamp-related">
-<h3>Timestamp Related<a class="headerlink" href="#timestamp-related" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="timestamp-related">
+<h3>Timestamp Related<a class="headerlink" href="#timestamp-related" title="Permalink to this headline"></a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">now</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code>) – The current timestamp (including time) using the default timezone
 from <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone" title="rule_engine.engine.Context.default_timezone"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timezone</span></code></a>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">today</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code>) – The current timestamp, (excluding time, normalized to midnight
 00:00:00) using the default timezone from <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone" title="rule_engine.engine.Context.default_timezone"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timezone</span></code></a>.</p></li>
 </ul>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="types.html" class="btn btn-neutral float-right" title="Data Types" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="types.html" class="btn btn-neutral float-right" title="Data Types" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Spencer McIntyre.
-
-    </p>
+    <p>&#169; Copyright 2022, Spencer McIntyre.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

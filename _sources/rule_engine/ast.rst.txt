@@ -54,6 +54,12 @@ Base Classes
 Left-Operator-Right Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. autoclass:: AddExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = UNDEFINED
+
 .. autoclass:: ArithmeticExpression
    :show-inheritance:
 

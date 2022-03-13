@@ -1,78 +1,38 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>ast &mdash; Rule Engine 3.3.2 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>ast &mdash; Rule Engine 3.4.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="engine" href="engine.html" />
     <link rel="prev" title="rule_engine" href="index.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> Rule Engine
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                3.3.2
+                3.4.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,18 +40,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
@@ -120,75 +69,33 @@
 <li class="toctree-l1"><a class="reference internal" href="../change_log.html">Change Log</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">Rule Engine</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a> &raquo;</li>
-        
       <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/rule_engine/ast.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="module-rule_engine.ast">
-<span id="ast"></span><h1><a class="reference external" href="https://docs.python.org/3.9/library/ast.html#module-ast" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a><a class="headerlink" href="#module-rule_engine.ast" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="module-rule_engine.ast">
+<span id="ast"></span><h1><a class="reference external" href="https://docs.python.org/3.10/library/ast.html#module-ast" title="(in Python v3.10)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a><a class="headerlink" href="#module-rule_engine.ast" title="Permalink to this headline"></a></h1>
 <p>This module contains the nodes which comprise the abstract syntax tree generated from parsed grammar text.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -198,20 +105,20 @@
 accessing and using any object or function within this module should be done with care. Breaking API changes within this
 module may not always cause a major version bump. The reason for this is that it is often necessary to update the AST in
 an API breaking way in order to add new features.</p>
-<div class="section" id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.Assignment">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">Assignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Assignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.Assignment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.9/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Assignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Assignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.Assignment" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.10/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An internal assignment where by a symbol is populated with a value of the specified type.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.ast.Assignment.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Assignment.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.Assignment.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Assignment.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.Assignment.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The symbol name that the assignment is defining.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The symbol name that the assignment is defining.</p></li>
 <li><p><strong>value</strong> – The value of the assignment.</p></li>
 <li><p><strong>value_type</strong> (<a class="reference internal" href="types.html#rule_engine.types.DataType" title="rule_engine.types.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>) – The data type of the assignment.</p></li>
 </ul>
@@ -221,37 +128,37 @@ an API breaking way in order to add new features.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.Assignment.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#rule_engine.ast.Assignment.name" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#rule_engine.ast.Assignment.name" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.Assignment.value">
-<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#rule_engine.ast.Assignment.value" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#rule_engine.ast.Assignment.value" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.Assignment.value_type">
-<span class="sig-name descname"><span class="pre">value_type</span></span><a class="headerlink" href="#rule_engine.ast.Assignment.value_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">value_type</span></span><a class="headerlink" href="#rule_engine.ast.Assignment.value_type" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.Statement">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">Statement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expression</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Statement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.Statement" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Statement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expression</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Statement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.Statement" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ASTNodeBase</span></code></p>
 <p>A class representing the top level statement of the grammar text.</p>
 </dd></dl>
 
-<div class="section" id="base-classes">
-<h3>Base Classes<a class="headerlink" href="#base-classes" title="Permalink to this headline">¶</a></h3>
+<section id="base-classes">
+<h3>Base Classes<a class="headerlink" href="#base-classes" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ExpressionBase">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ExpressionBase</span></span><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ExpressionBase</span></span><a class="reference internal" href="../_modules/rule_engine/ast.html#ExpressionBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ExpressionBase" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ASTNodeBase</span></code></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ExpressionBase.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.ExpressionBase.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.ExpressionBase.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -259,13 +166,13 @@ an API breaking way in order to add new features.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.LeftOperatorRightExpressionBase">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">LeftOperatorRightExpressionBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LeftOperatorRightExpressionBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A base class for representing complex expressions composed of a left side and a right side, separated by an
 operator.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types">
-<span class="sig-name descname"><span class="pre">compatible_types</span></span><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compatible_types</span></span><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.compatible_types" title="Permalink to this definition"></a></dt>
 <dd><p>A tuple containing the compatible data types that the left and right expressions must return. This can for example
 be used to indicate that arithmetic operations are compatible with <a class="reference internal" href="types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a> but not
 <a class="reference internal" href="types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> values.</p>
@@ -273,12 +180,12 @@ be used to indicate that arithmetic operations are compatible with <a class="ref
 
 <dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.ast.LeftOperatorRightExpressionBase.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LeftOperatorRightExpressionBase.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</p></li>
-<li><p><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.9/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – The grammar type of operator at the center of the expression. Subclasses must define operator
+<li><p><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The grammar type of operator at the center of the expression. Subclasses must define operator
 methods to handle evaluation based on this value.</p></li>
 <li><p><strong>left</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the left of the operator.</p></li>
 <li><p><strong>right</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the right of the operator.</p></li>
@@ -291,12 +198,12 @@ methods to handle evaluation based on this value.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.LiteralExpressionBase">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">LiteralExpressionBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LiteralExpressionBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A base class for representing literal values from the grammar text.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.ast.LiteralExpressionBase.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LiteralExpressionBase.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LiteralExpressionBase.__init__" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -309,17 +216,30 @@ methods to handle evaluation based on this value.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="left-operator-right-expressions">
-<h3>Left-Operator-Right Expressions<a class="headerlink" href="#left-operator-right-expressions" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="left-operator-right-expressions">
+<h3>Left-Operator-Right Expressions<a class="headerlink" href="#left-operator-right-expressions" title="Permalink to this headline"></a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="rule_engine.ast.AddExpression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AddExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#AddExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.AddExpression" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
+<p>A class for representing addition expressions from the grammar text.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rule_engine.ast.AddExpression.result_type">
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.AddExpression.result_type" title="Permalink to this definition"></a></dt>
+<dd><p>The data type of the result of successful evaluation.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ArithmeticExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ArithmeticExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ArithmeticExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
-<p>A class for representing arithmetic expressions from the grammar text such as addition and subtraction.</p>
+<p>A class for representing arithmetic expressions from the grammar text such as subtraction and division.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ArithmeticExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">FLOAT</span></em><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">FLOAT</span></em><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -327,13 +247,13 @@ methods to handle evaluation based on this value.</p></li>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ArithmeticComparisonExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ArithmeticComparisonExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticComparisonExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ArithmeticComparisonExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArithmeticComparisonExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ComparisonExpression" title="rule_engine.ast.ComparisonExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ComparisonExpression</span></code></a></p>
 <p>A class for representing arithmetic comparison expressions from the grammar text such as less-than-or-equal-to and
 greater-than.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ArithmeticComparisonExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.ArithmeticComparisonExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -341,12 +261,12 @@ greater-than.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.BitwiseExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">BitwiseExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BitwiseExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BitwiseExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BitwiseExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BitwiseExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BitwiseExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing bitwise arithmetic expressions from the grammar text such as XOR and shifting operations.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.BitwiseExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.BitwiseExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.BitwiseExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -354,11 +274,11 @@ greater-than.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.BitwiseShiftExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">BitwiseShiftExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BitwiseShiftExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BitwiseShiftExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BitwiseShiftExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BitwiseShiftExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BitwiseShiftExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.BitwiseExpression" title="rule_engine.ast.BitwiseExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.BitwiseExpression</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.BitwiseShiftExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">FLOAT</span></em><a class="headerlink" href="#rule_engine.ast.BitwiseShiftExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">FLOAT</span></em><a class="headerlink" href="#rule_engine.ast.BitwiseShiftExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -366,12 +286,12 @@ greater-than.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ComparisonExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ComparisonExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ComparisonExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ComparisonExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ComparisonExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ComparisonExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing comparison expressions from the grammar text such as equality checks.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ComparisonExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.ComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.ComparisonExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -379,12 +299,12 @@ greater-than.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.LogicExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">LogicExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LogicExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LogicExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LogicExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#LogicExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LogicExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="rule_engine.ast.LeftOperatorRightExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LeftOperatorRightExpressionBase</span></code></a></p>
 <p>A class for representing logical expressions from the grammar text such as “and” and “or”.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.LogicExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.LogicExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.LogicExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -392,29 +312,29 @@ greater-than.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.FuzzyComparisonExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">FuzzyComparisonExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FuzzyComparisonExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FuzzyComparisonExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FuzzyComparisonExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ComparisonExpression" title="rule_engine.ast.ComparisonExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ComparisonExpression</span></code></a></p>
 <p>A class for representing regular expression comparison expressions from the grammar text such as search and does not
 match.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.FuzzyComparisonExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.FuzzyComparisonExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="literal-expressions">
-<h3>Literal Expressions<a class="headerlink" href="#literal-expressions" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="literal-expressions">
+<h3>Literal Expressions<a class="headerlink" href="#literal-expressions" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ArrayExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ArrayExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArrayExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ArrayExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ArrayExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ArrayExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ArrayExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast._CollectionMixin</span></code>, <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal array expressions containing 0 or more sub-expressions.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ArrayExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ARRAY</span></em><a class="headerlink" href="#rule_engine.ast.ArrayExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">ARRAY</span></em><a class="headerlink" href="#rule_engine.ast.ArrayExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -422,12 +342,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.BooleanExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">BooleanExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BooleanExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BooleanExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BooleanExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BooleanExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BooleanExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal boolean expressions representing True or False.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.BooleanExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.BooleanExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.BooleanExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -435,12 +355,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.DatetimeExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">DatetimeExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DatetimeExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.DatetimeExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DatetimeExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DatetimeExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.DatetimeExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal datetime expressions representing a specific point in time. This expression type always evaluates to true.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.DatetimeExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">DATETIME</span></em><a class="headerlink" href="#rule_engine.ast.DatetimeExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">DATETIME</span></em><a class="headerlink" href="#rule_engine.ast.DatetimeExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -448,12 +368,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.FloatExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">FloatExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FloatExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.FloatExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FloatExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FloatExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.FloatExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal float expressions representing numerical values.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.FloatExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">FLOAT</span></em><a class="headerlink" href="#rule_engine.ast.FloatExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">FLOAT</span></em><a class="headerlink" href="#rule_engine.ast.FloatExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -461,12 +381,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.MappingExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">MappingExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#MappingExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.MappingExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MappingExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#MappingExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.MappingExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal mapping expression representing a set of associations between keys and values.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.MappingExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">MAPPING</span></em><a class="headerlink" href="#rule_engine.ast.MappingExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">MAPPING</span></em><a class="headerlink" href="#rule_engine.ast.MappingExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -474,12 +394,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.NullExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">NullExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#NullExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.NullExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NullExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#NullExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.NullExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal null expressions representing null values. This expression type always evaluates to false.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.NullExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">NULL</span></em><a class="headerlink" href="#rule_engine.ast.NullExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">NULL</span></em><a class="headerlink" href="#rule_engine.ast.NullExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -487,12 +407,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.SetExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">SetExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#SetExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.SetExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SetExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#SetExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.SetExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast._CollectionMixin</span></code>, <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal set expressions containing 0 or more sub-expressions.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.SetExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">SET</span></em><a class="headerlink" href="#rule_engine.ast.SetExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">SET</span></em><a class="headerlink" href="#rule_engine.ast.SetExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -500,27 +420,27 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.StringExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">StringExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#StringExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.StringExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StringExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#StringExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.StringExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.LiteralExpressionBase</span></code></a></p>
 <p>Literal string expressions representing an array of characters.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.StringExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">STRING</span></em><a class="headerlink" href="#rule_engine.ast.StringExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">STRING</span></em><a class="headerlink" href="#rule_engine.ast.StringExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="miscellaneous-expressions">
-<h3>Miscellaneous Expressions<a class="headerlink" href="#miscellaneous-expressions" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="miscellaneous-expressions">
+<h3>Miscellaneous Expressions<a class="headerlink" href="#miscellaneous-expressions" title="Permalink to this headline"></a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ComprehensionExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ComprehensionExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ComprehensionExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ComprehensionExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ComprehensionExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ComprehensionExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ComprehensionExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ComprehensionExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">ARRAY</span></em><a class="headerlink" href="#rule_engine.ast.ComprehensionExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">ARRAY</span></em><a class="headerlink" href="#rule_engine.ast.ComprehensionExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -528,12 +448,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ContainsExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">ContainsExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">member</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ContainsExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ContainsExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ContainsExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">member</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#ContainsExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ContainsExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>An expression used to test whether an item exists within a container.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ContainsExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.ContainsExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">BOOLEAN</span></em><a class="headerlink" href="#rule_engine.ast.ContainsExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -541,12 +461,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.GetAttributeExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">GetAttributeExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#GetAttributeExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.GetAttributeExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GetAttributeExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">object_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#GetAttributeExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.GetAttributeExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class representing an expression in which <em>name</em> is retrieved as an attribute of <em>object</em>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.GetAttributeExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.GetAttributeExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.GetAttributeExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -554,12 +474,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.GetItemExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">GetItemExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#GetItemExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.GetItemExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GetItemExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#GetItemExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.GetItemExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class representing an expression in which an <em>item</em> is retrieved from a container <em>object</em>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.GetItemExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.GetItemExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.GetItemExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -567,12 +487,12 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.GetSliceExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">GetSliceExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#GetSliceExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.GetSliceExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GetSliceExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#GetSliceExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.GetSliceExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class representing an expression in which a range of items is retrieved from a container <em>object</em>.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.GetSliceExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.GetSliceExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.GetSliceExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -580,13 +500,13 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.SymbolExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">SymbolExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#SymbolExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.SymbolExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SymbolExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#SymbolExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.SymbolExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class representing a symbol name to be resolved at evaluation time with the help of a
 <a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> object.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.SymbolExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><a class="headerlink" href="#rule_engine.ast.SymbolExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.SymbolExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -594,13 +514,13 @@ match.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.TernaryExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">TernaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">case_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">case_false</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#TernaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.TernaryExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TernaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">case_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">case_false</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#TernaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.TernaryExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class for representing ternary expressions from the grammar text. These involve evaluating <code class="xref py py-attr docutils literal notranslate"><span class="pre">condition</span></code>
 before evaluating either <code class="xref py py-attr docutils literal notranslate"><span class="pre">case_true</span></code> or <code class="xref py py-attr docutils literal notranslate"><span class="pre">case_false</span></code> based on the results.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.TernaryExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.TernaryExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.TernaryExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
@@ -608,67 +528,50 @@ before evaluating either <code class="xref py py-attr docutils literal notransla
 
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.UnaryExpression">
-<em class="property"><span class="pre">class</span> </em><span class="sig-name descname"><span class="pre">UnaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#UnaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.UnaryExpression" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnaryExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#UnaryExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.UnaryExpression" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.ast.ExpressionBase</span></code></a></p>
 <p>A class for representing unary expressions from the grammar text. These involve a single operator on the left side.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.UnaryExpression.result_type">
-<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"> <span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.UnaryExpression.result_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.ast.UnaryExpression.result_type" title="Permalink to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="engine.html" class="btn btn-neutral float-right" title="engine" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="rule_engine" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="engine.html" class="btn btn-neutral float-right" title="engine" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Spencer McIntyre.
-
-    </p>
+    <p>&#169; Copyright 2022, Spencer McIntyre.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

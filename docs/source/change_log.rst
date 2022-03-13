@@ -7,6 +7,13 @@ this list is curated by the development team for note worthy changes.
 Version 3.x.x
 -------------
 
+Version 3.4.0
+^^^^^^^^^^^^^
+
+*In progress*
+
+* Add support for string concatenation via the ``+`` operator
+
 Version 3.3.0
 ^^^^^^^^^^^^^
 
@@ -85,7 +92,7 @@ Version 2.1.0
 Released :release:`2.1.0` on August 3rd, 2020
 
 * Added coverage reporting to Travis-CI
-* Changed :py:class:`~rule_engine.types.DataType. from an enum to a custom class
+* Changed :py:class:`~rule_engine.types.DataType`. from an enum to a custom class
 * Improvements for the :py:class:`~rule_engine.types.DataType.ARRAY` data type
 
     * Added ``get[item]`` support for arrays, allowing items to be retrieved by index

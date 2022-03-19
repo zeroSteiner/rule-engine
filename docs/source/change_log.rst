@@ -10,7 +10,7 @@ Version 3.x.x
 Version 3.4.0
 ^^^^^^^^^^^^^
 
-*In progress*
+Released :release:`3.4.0` on March 19th, 2022
 
 * Add support for string concatenation via the ``+`` operator
 

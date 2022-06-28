@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import unittest
 
 from .expression import *
@@ -169,6 +170,21 @@ class AstTests(unittest.TestCase):
 		statement = parser_.parse('"Luke" + last', self.context)
 		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), 'LukeSkywalker')
+
+	def test_ast_reduces_add_timedelta(self):
+		thing = {'first': datetime.timedelta(seconds=5), 'last': datetime.timedelta(minutes=1)}
+		parser_ = parser.Parser()
+		statement = parser_.parse('PT5S + PT1M', self.context)
+		self.assertIsInstance(statement.expression, ast.TimedeltaExpression)
+		self.assertEqual(statement.evaluate(None), datetime.timedelta(minutes=1, seconds=5))
+
+		statement = parser_.parse('first + PT1M', self.context)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
+		self.assertEqual(statement.evaluate(thing), datetime.timedelta(minutes=1, seconds=5))
+
+		statement = parser_.parse('PT5S + last', self.context)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
+		self.assertEqual(statement.evaluate(thing), datetime.timedelta(minutes=1, seconds=5))
 
 	def test_ast_reduces_arithmetic(self):
 		thing = {'two': 2, 'four': 4}

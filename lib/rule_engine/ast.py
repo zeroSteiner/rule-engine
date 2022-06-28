@@ -386,20 +386,35 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 
 class AddExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing addition expressions from the grammar text."""
-	compatible_types = (DataType.FLOAT,DataType.STRING)
+	compatible_types = (DataType.FLOAT, DataType.STRING, DataType.DATETIME, DataType.TIMEDELTA)
 	result_type = DataType.UNDEFINED
 
 	def __init__(self, *args, **kwargs):
 		super(AddExpression, self).__init__(*args, **kwargs)
 		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
-			if self.left.result_type != self.right.result_type:
+			if self.left.result_type == DataType.DATETIME:
+				if self.right.result_type != DataType.TIMEDELTA:
+					raise errors.EvaluationError('data type mismatch')
+				self.result_type = self.left.result_type
+			elif self.left.result_type == DataType.TIMEDELTA:
+				if self.right.result_type not in (DataType.DATETIME, DataType.TIMEDELTA):
+					raise errors.EvaluationError('data type mismatch')
+				self.result_type = self.right.result_type
+			elif self.left.result_type != self.right.result_type:
 				raise errors.EvaluationError('data type mismatch')
-			self.result_type = self.left.result_type
+			else:
+				self.result_type = self.left.result_type
 
 	def _op_add(self, thing):
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
-		if isinstance(left_value, str) or isinstance(right_value, str):
+		if isinstance(left_value, datetime.datetime):
+			if not isinstance(right_value, datetime.timedelta):
+				raise errors.EvaluationError('data type mismatch (not a timedelta value)')
+		elif isinstance(left_value, datetime.timedelta):
+			if not isinstance(right_value, (datetime.timedelta, datetime.datetime)):
+				raise errors.EvaluationError('data type mismatch (not a datetime or timedelta value)')
+		elif isinstance(left_value, str) or isinstance(right_value, str):
 			_assert_is_string(left_value, right_value)
 		else:
 			_assert_is_numeric(left_value, right_value)

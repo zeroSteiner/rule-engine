@@ -42,6 +42,7 @@ import rule_engine.errors as errors
 __all__ = (
 	'ArithmeticExpressionTests',
 	'AddExpressionTests',
+	'AddDatetimeExpressionTests',
 	'BitwiseExpressionTests',
 	'BitwiseExpressionSetTests',
 	'BitwiseShiftExpressionTests',
@@ -120,6 +121,76 @@ class AddExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			self.assertExpressionTests('add', ast.BooleanExpression(context, True), ast.StringExpression(context, 'b'))
 		with self.assertRaises(errors.EvaluationError):
 			self.assertExpressionTests('add', ast.StringExpression(context, 'b'), ast.BooleanExpression(context, True))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.DatetimeExpression(context, datetime.datetime.now()), ast.StringExpression(context, 'abc'))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.DatetimeExpression(context, datetime.datetime.now()), ast.FloatExpression(context, 6.0))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.DatetimeExpression(context, datetime.datetime.now()), ast.BooleanExpression(context, False))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.DatetimeExpression(context, datetime.datetime.now()), ast.DatetimeExpression(context, datetime.datetime.now()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.StringExpression(context, 'abc'), ast.DatetimeExpression(context, datetime.datetime.now()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.FloatExpression(context, 6.0), ast.DatetimeExpression(context, datetime.datetime.now()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.BooleanExpression(context, False), ast.DatetimeExpression(context, datetime.datetime.now()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.TimedeltaExpression(context, datetime.timedelta()), ast.StringExpression(context, 'abc'))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.TimedeltaExpression(context, datetime.timedelta()), ast.FloatExpression(context, 6.0))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.TimedeltaExpression(context, datetime.timedelta()), ast.BooleanExpression(context, False))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.StringExpression(context, 'abc'), ast.TimedeltaExpression(context, datetime.timedelta()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.FloatExpression(context, 6.0), ast.TimedeltaExpression(context, datetime.timedelta()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('add', ast.BooleanExpression(context, False), ast.TimedeltaExpression(context, datetime.timedelta()))
+
+class AddDatetimeExpressionTests(LeftOperatorRightExpresisonTestsBase):
+	ExpressionClass = ast.AddExpression
+	def test_add_datetime_to_timedelta(self):
+		start_datetime = datetime.datetime(year=2022, month=6, day=28, hour=1, minute=2, second=3)
+		start_datetime_expr = ast.DatetimeExpression(context, start_datetime)
+		assert_func = functools.partial(self.assertExpressionTests, 'add')
+		td_expr_func = functools.partial(ast.TimedeltaExpression, context)
+
+		assert_func(
+			left_value=start_datetime_expr,
+			right_value=td_expr_func(datetime.timedelta(hours=3, minutes=2, seconds=1)),
+			equals_value=start_datetime.replace(hour=4, minute=4, second=4),
+		)
+		assert_func(
+			left_value=td_expr_func(datetime.timedelta(days=1, minutes=30, seconds=5)),
+			right_value=start_datetime_expr,
+			equals_value=start_datetime.replace(day=29, minute=32, second=8),
+		)
+		assert_func(
+			left_value=start_datetime_expr,
+			right_value=ast.TimedeltaExpression(context, datetime.timedelta()),
+			equals_value=start_datetime,
+		)
+
+	def test_add_timedeltas(self):
+		assert_func = functools.partial(self.assertExpressionTests, 'add')
+		td_expr_func = functools.partial(ast.TimedeltaExpression, context)
+
+		assert_func(
+			left_value=td_expr_func(datetime.timedelta(weeks=6, days=5, hours=4, minutes=3, seconds=2)),
+			right_value=td_expr_func(datetime.timedelta(seconds=4)),
+			equals_value=datetime.timedelta(weeks=6, days=5, hours=4, minutes=3, seconds=6),
+		)
+		assert_func(
+			left_value=td_expr_func(datetime.timedelta()),
+			right_value=td_expr_func(datetime.timedelta(days=6, minutes=25, seconds=42)),
+			equals_value=datetime.timedelta(days=6, minutes=25, seconds=42),
+		)
+		assert_func(
+			left_value=td_expr_func(datetime.timedelta(hours=4)),
+			right_value=td_expr_func(datetime.timedelta(days=1, seconds=54)),
+			equals_value=datetime.timedelta(days=1, hours=4, seconds=54),
+		)
 
 class BitwiseExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.BitwiseExpression

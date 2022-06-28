@@ -247,6 +247,14 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('le', past_date, now, True)
 		self.assertExpressionTests('lt', past_date, now, True)
 
+	def test_ast_expression_left_operator_right_arithmeticcomparison_timedelta(self):
+		smaller_period = ast.TimedeltaExpression(context, datetime.timedelta(seconds=1))
+		larger_period = ast.TimedeltaExpression(context, datetime.timedelta(minutes=1))
+		self.assertExpressionTests('ge', smaller_period, larger_period, False)
+		self.assertExpressionTests('gt', smaller_period, larger_period, False)
+		self.assertExpressionTests('le', smaller_period, larger_period, True)
+		self.assertExpressionTests('lt', smaller_period, larger_period, True)
+
 	def test_ast_expression_left_operator_right_arithmeticcomparison_float(self):
 		neg_one = ast.FloatExpression(context, -1.0)
 		zero = ast.FloatExpression(context, 0.0)

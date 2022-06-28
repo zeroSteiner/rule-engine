@@ -48,6 +48,7 @@ context.builtins = engine.Builtins.from_defaults(
 falseish = (
 	ast.ArrayExpression(context, tuple()),
 	ast.BooleanExpression(context, False),
+	ast.TimedeltaExpression(context, datetime.timedelta()),
 	ast.FloatExpression(context, 0.0),
 	ast.NullExpression(context),
 	ast.StringExpression(context, '')
@@ -58,6 +59,7 @@ trueish = (
 	ast.ArrayExpression(context, tuple((ast.FloatExpression(context, 1.0),))),
 	ast.BooleanExpression(context, True),
 	ast.DatetimeExpression(context, datetime.datetime.now()),
+	ast.TimedeltaExpression(context, datetime.timedelta(seconds=1)),
 	ast.FloatExpression(context, float('-inf')),
 	ast.FloatExpression(context, -1.0),
 	ast.FloatExpression(context, 1.0),
@@ -87,6 +89,7 @@ class LiteralExpressionTests(unittest.TestCase):
 			(ast.ArrayExpression, ()),
 			(ast.BooleanExpression, False),
 			(ast.DatetimeExpression, datetime.datetime(2020, 1, 1)),
+			(ast.TimedeltaExpression, datetime.timedelta(seconds=42)),
 			(ast.FloatExpression, 0),
 			(ast.MappingExpression, {}),
 			(ast.SetExpression, set()),

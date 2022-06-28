@@ -40,6 +40,7 @@ import re
 from . import errors
 from .suggestions import suggest_symbol
 from .types import *
+from .utils import parse_timedelta
 
 import dateutil.parser
 
@@ -237,6 +238,19 @@ class DatetimeExpression(LiteralExpressionBase):
 			dt = dt.replace(tzinfo=context.default_timezone)
 		return cls(context, dt)
 
+class TimedeltaExpression(LiteralExpressionBase):
+	"""
+	Literal timedelta expressions representing an offset from a specific point in time. This expression type always evaluates to true.
+	"""
+	result_type = DataType.TIMEDELTA
+	@classmethod
+	def from_string(cls, context, string):
+		try:
+			dt = parse_timedelta(string)
+		except ValueError:
+			raise errors.TimedeltaSyntaxError('invalid timedelta', string)
+		return cls(context, dt)
+
 class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
@@ -312,7 +326,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A base class for representing complex expressions composed of a left side and a right side, separated by an
 	operator.
 	"""
-	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.SET, DataType.STRING)
+	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.SET, DataType.STRING)
 	"""
 	A tuple containing the compatible data types that the left and right expressions must return. This can for example
 	be used to indicate that arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but not
@@ -496,7 +510,7 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 	A class for representing arithmetic comparison expressions from the grammar text such as less-than-or-equal-to and
 	greater-than.
 	"""
-	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
+	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.NULL, DataType.STRING)
 	def __init__(self, *args, **kwargs):
 		super(ArithmeticComparisonExpression, self).__init__(*args, **kwargs)
 		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:

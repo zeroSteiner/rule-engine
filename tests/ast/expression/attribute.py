@@ -111,6 +111,20 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
 
+	def test_ast_expression_timedelta_attributes(self):
+		timedelta = datetime.timedelta(weeks=7, days=6, hours=5, minutes=4, seconds=3, milliseconds=2, microseconds=1)
+		symbol = ast.TimedeltaExpression(context, timedelta)
+
+		attributes = {
+			'days': 55,
+			'seconds': 18243,
+			'microseconds': 2001,
+			'total_seconds': decimal.Decimal('4770243.002001'),
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
+
 	def test_ast_expression_float_attributes(self):
 		flt = decimal.Decimal('3.14159')
 		symbol = ast.SymbolExpression(context, 'flt')

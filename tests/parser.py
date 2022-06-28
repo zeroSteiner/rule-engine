@@ -302,6 +302,18 @@ class ParserLiteralTests(ParserTestsBase):
 		else:
 			self.fail('DatetimeSyntaxError was not raised')
 
+	def test_parse_timedelta(self):
+		self.assertLiteralStatementEqual('P1W', ast.TimedeltaExpression, datetime.timedelta(weeks=1))
+		self.assertLiteralStatementEqual('P7W6DT5H4M3S', ast.TimedeltaExpression, datetime.timedelta(weeks=7, days=6, hours=5, minutes=4, seconds=3))
+		self.assertLiteralStatementEqual('PT3H2S', ast.TimedeltaExpression, datetime.timedelta(hours=3, seconds=2))
+		self.assertLiteralStatementEqual('PT', ast.TimedeltaExpression, datetime.timedelta())
+
+	def test_parse_timedelta_attributes(self):
+		self.assertLiteralStatementEvalEqual('P7W6DT5H4M3S.days', decimal.Decimal('55'))
+		self.assertLiteralStatementEvalEqual('P7W6DT5H4M3S.seconds', decimal.Decimal('18243'))
+		self.assertLiteralStatementEvalEqual('P7W6DT5H4M3S.microseconds', decimal.Decimal('0'))
+		self.assertLiteralStatementEvalEqual('P7W6DT5H4M3S.total_seconds', decimal.Decimal('4770243'))
+
 	def test_parse_float(self):
 		self.assertLiteralStatementEqual('3.14', ast.FloatExpression, decimal.Decimal('3.14'))
 		self.assertLiteralStatementEqual('3.140', ast.FloatExpression, decimal.Decimal('3.140'))

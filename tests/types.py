@@ -68,6 +68,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(DataType.from_name('ARRAY'), DataType.ARRAY)
 		self.assertIs(DataType.from_name('BOOLEAN'), DataType.BOOLEAN)
 		self.assertIs(DataType.from_name('DATETIME'), DataType.DATETIME)
+		self.assertIs(DataType.from_name('TIMEDELTA'), DataType.TIMEDELTA)
 		self.assertIs(DataType.from_name('FLOAT'), DataType.FLOAT)
 		self.assertIs(DataType.from_name('MAPPING'), DataType.MAPPING)
 		self.assertIs(DataType.from_name('NULL'), DataType.NULL)
@@ -86,6 +87,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(DataType.from_type(bool), DataType.BOOLEAN)
 		self.assertIs(DataType.from_type(datetime.date), DataType.DATETIME)
 		self.assertIs(DataType.from_type(datetime.datetime), DataType.DATETIME)
+		self.assertIs(DataType.from_type(datetime.timedelta), DataType.TIMEDELTA)
 		self.assertIs(DataType.from_type(float), DataType.FLOAT)
 		self.assertIs(DataType.from_type(int), DataType.FLOAT)
 		self.assertIs(DataType.from_type(dict), DataType.MAPPING)
@@ -138,6 +140,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertEqual(DataType.from_value(False), DataType.BOOLEAN)
 		self.assertEqual(DataType.from_value(datetime.date.today()), DataType.DATETIME)
 		self.assertEqual(DataType.from_value(datetime.datetime.now()), DataType.DATETIME)
+		self.assertEqual(DataType.from_value(datetime.timedelta()), DataType.TIMEDELTA)
 		self.assertEqual(DataType.from_value(0), DataType.FLOAT)
 		self.assertEqual(DataType.from_value(0.0), DataType.FLOAT)
 		self.assertEqual(DataType.from_value(None), DataType.NULL)
@@ -148,7 +151,7 @@ class DataTypeTests(unittest.TestCase):
 			DataType.from_value(self._UnsupportedType())
 
 	def test_data_type_definitions_describe_themselves(self):
-		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'FLOAT', 'MAPPING', 'NULL', 'SET', 'STRING', 'UNDEFINED'):
+		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'TIMEDELTA', 'FLOAT', 'MAPPING', 'NULL', 'SET', 'STRING', 'UNDEFINED'):
 			data_type = getattr(DataType, name)
 			self.assertRegex(repr(data_type), 'name=' + name)
 

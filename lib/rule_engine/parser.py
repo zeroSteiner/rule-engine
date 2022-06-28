@@ -37,6 +37,7 @@ import types as pytypes
 
 from . import ast
 from . import errors
+from .utils import timedelta_regex
 
 import ply.lex as lex
 import ply.yacc as yacc
@@ -153,7 +154,7 @@ class Parser(ParserBase):
 		'if': 'IF'
 	}
 	tokens = (
-		'DATETIME', 'FLOAT', 'STRING', 'SYMBOL',
+		'DATETIME', 'TIMEDELTA', 'FLOAT', 'STRING', 'SYMBOL',
 		'LPAREN', 'RPAREN', 'QMARK', 'COLON', 'COMMA',
 		'LBRACKET', 'RBRACKET', 'LBRACE', 'RBRACE'
 	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
@@ -255,6 +256,10 @@ class Parser(ParserBase):
 		r'd(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 		t.value = t.value[1:]
 		return t
+
+	def t_TIMEDELTA(self, t):
+		return t
+	t_TIMEDELTA.__doc__ = timedelta_regex
 
 	def t_STRING(self, t):
 		r's?(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
@@ -431,6 +436,10 @@ class Parser(ParserBase):
 	def p_expression_datetime(self, p):
 		'object : DATETIME'
 		p[0] = _DeferredAstNode(ast.DatetimeExpression, args=(self.context, literal_eval(p[1])), method='from_string')
+
+	def p_expression_timedelta(self, p):
+		'object : TIMEDELTA'
+		p[0] = _DeferredAstNode(ast.TimedeltaExpression, args=(self.context, p[1]), method='from_string')
 
 	def p_expression_float(self, p):
 		'expression : FLOAT'

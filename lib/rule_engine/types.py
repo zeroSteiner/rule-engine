@@ -363,6 +363,7 @@ class DataType(metaclass=DataTypeMeta):
 	"""
 	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
 	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
+	TIMEDELTA = _DataTypeDef('TIMEDELTA', datetime.timedelta)
 	FLOAT = _DataTypeDef('FLOAT', decimal.Decimal)
 	MAPPING = _MappingDataTypeDef('MAPPING', dict)
 	"""
@@ -421,6 +422,8 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.BOOLEAN
 		elif python_type is datetime.date or python_type is datetime.datetime:
 			return cls.DATETIME
+		elif python_type is datetime.timedelta:
+			return cls.TIMEDELTA
 		elif python_type in (decimal.Decimal, float, int):
 			return cls.FLOAT
 		elif python_type is dict:
@@ -447,6 +450,8 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.BOOLEAN
 		elif isinstance(python_value, (datetime.date, datetime.datetime)):
 			return cls.DATETIME
+		elif isinstance(python_value, datetime.timedelta):
+			return cls.TIMEDELTA
 		elif isinstance(python_value, (decimal.Decimal, float, int)):
 			return cls.FLOAT
 		elif python_value is None:

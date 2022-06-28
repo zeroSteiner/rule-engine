@@ -182,7 +182,6 @@ class ParserLeftOperatorRightTests(ParserTestsBase):
 
 	def test_parser_arithmetic_expressions(self):
 		expressions = (
-			'left - right',
 			'left / right',
 			'left // right',
 			'left % right',
@@ -198,6 +197,13 @@ class ParserLeftOperatorRightTests(ParserTestsBase):
 		)
 		for expression in expressions:
 			self.assertStatementType(expression, ast.AddExpression)
+
+	def test_parser_subtract_expressions(self):
+		expressions = (
+			'left - right',
+		)
+		for expression in expressions:
+			self.assertStatementType(expression, ast.SubtractExpression)
 
 	def test_parser_bitwise_expressions(self):
 		expressions = (

@@ -245,7 +245,7 @@ class EngineDatetimeRuleTests(unittest.TestCase):
 		rule = engine.Rule("P4DT2H31S + P1WT45M17S == P1W4DT2H45M48S")
 		self.assertTrue(rule.evaluate({}))
 
-	def test_empty_timedelta(self):
+	def test_add_empty_timedelta(self):
 		rule = engine.Rule("P1DT3S + PT == P1DT3S")
 		self.assertTrue(rule.evaluate({}))
 
@@ -262,6 +262,28 @@ class EngineDatetimeRuleTests(unittest.TestCase):
 			"start": datetime.datetime(year=2022, month=2, day=28, hour=23, minute=32, second=56),
 			"end": datetime.datetime(year=2022, month=3, day=1, hour=0, minute=32, second=56),
 		}))
+
+	def test_subtract_empty_timedelta(self):
+		rule = engine.Rule("P1DT3S - PT == P1DT3S")
+		self.assertTrue(rule.evaluate({}))
+
+	def test_subtract_from_today(self):
+		rule = engine.Rule("$today - PT == $today")
+		self.assertTrue(rule.evaluate({}))
+
+	def test_subtract_datetime_from_datetime(self):
+		rule = engine.Rule("d'2022-05-23 14:12' - d'2022-05-23 12:15' == PT1H57M")
+		self.assertTrue(rule.evaluate({}))
+
+		rule = engine.Rule("end - PT1H == start")
+		self.assertTrue(rule.evaluate({
+			"start": datetime.datetime(year=2022, month=2, day=28, hour=23, minute=32, second=56),
+			"end": datetime.datetime(year=2022, month=3, day=1, hour=0, minute=32, second=56),
+		}))
+
+	def test_subtract_timedelta_from_datetime(self):
+		rule = engine.Rule("d'2022-06-12' - P1D == d'2022-06-11'")
+		self.assertTrue(rule.evaluate({}))
 
 if __name__ == '__main__':
 	unittest.main()

@@ -60,6 +60,12 @@ Left-Operator-Right Expressions
    .. autoattribute:: result_type
       :annotation: = UNDEFINED
 
+.. autoclass:: SubtractExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = UNDEFINED
+
 .. autoclass:: ArithmeticExpression
    :show-inheritance:
 

@@ -186,6 +186,36 @@ class AstTests(unittest.TestCase):
 		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), datetime.timedelta(minutes=1, seconds=5))
 
+	def test_ast_reduces_subtract_float(self):
+		thing = {'one': 1, 'two': 2}
+		parser_ = parser.Parser()
+		statement = parser_.parse('2 - 1', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
+		self.assertEqual(statement.evaluate(None), 1)
+
+		statement = parser_.parse('two - 1', self.context)
+		self.assertIsInstance(statement.expression, ast.SubtractExpression)
+		self.assertEqual(statement.evaluate(thing), 1)
+
+		statement = parser_.parse('1 - two', self.context)
+		self.assertIsInstance(statement.expression, ast.SubtractExpression)
+		self.assertEqual(statement.evaluate(thing), -1)
+
+	def test_ast_reduces_subtract_timedelta(self):
+		thing = {'first': datetime.timedelta(seconds=5), 'last': datetime.timedelta(minutes=1)}
+		parser_ = parser.Parser()
+		statement = parser_.parse('PT1M - PT5S', self.context)
+		self.assertIsInstance(statement.expression, ast.TimedeltaExpression)
+		self.assertEqual(statement.evaluate(None), datetime.timedelta(seconds=55))
+
+		statement = parser_.parse('first - PT1M', self.context)
+		self.assertIsInstance(statement.expression, ast.SubtractExpression)
+		self.assertEqual(statement.evaluate(thing), -datetime.timedelta(seconds=55))
+
+		statement = parser_.parse('PT5S - last', self.context)
+		self.assertIsInstance(statement.expression, ast.SubtractExpression)
+		self.assertEqual(statement.evaluate(thing), -datetime.timedelta(seconds=55))
+
 	def test_ast_reduces_arithmetic(self):
 		thing = {'two': 2, 'four': 4}
 		parser_ = parser.Parser()
@@ -236,6 +266,7 @@ class AstTests(unittest.TestCase):
 			# type,             type_is,             type_is_not
 			('symbol << 1',     ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol + 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
+			('symbol - 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol[1]',       ast.DataType.STRING, ast.DataType.FLOAT),
 			('symbol[1]',       ast.DataType.ARRAY,  ast.DataType.FLOAT),
 			('symbol =~ "foo"', ast.DataType.STRING, ast.DataType.FLOAT),

@@ -420,8 +420,44 @@ class AddExpression(LeftOperatorRightExpressionBase):
 			_assert_is_numeric(left_value, right_value)
 		return operator.add(left_value, right_value)
 
+class SubtractExpression(LeftOperatorRightExpressionBase):
+	compatible_types = (DataType.FLOAT, DataType.DATETIME, DataType.TIMEDELTA)
+	result_type = DataType.UNDEFINED
+
+	def __init__(self, *args, **kwargs):
+		super(SubtractExpression, self).__init__(*args, **kwargs)
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
+			if self.left.result_type == DataType.DATETIME:
+				if self.right.result_type == DataType.DATETIME:
+					self.result_type = DataType.TIMEDELTA
+				elif self.right.result_type == DataType.TIMEDELTA:
+					self.result_type = DataType.DATETIME
+				else:
+					raise errors.EvaluationError('data type mismatch')
+			elif self.left.result_type == DataType.TIMEDELTA:
+				if self.right.result_type != DataType.TIMEDELTA:
+					raise errors.EvaluationError('data type mismatch')
+				self.result_type = self.left.result_type
+			elif self.left.result_type != self.right.result_type:
+				raise errors.EvaluationError('data type mismatch')
+			else:
+				self.result_type = self.left.result_type
+
+	def _op_sub(self, thing):
+		left_value = self.left.evaluate(thing)
+		right_value = self.right.evaluate(thing)
+		if isinstance(left_value, datetime.datetime):
+			if not isinstance(right_value, (datetime.datetime, datetime.timedelta)):
+				raise errors.EvaluationError('data type mismatch (not a datetime or timedelta value)')
+		elif isinstance(left_value, datetime.timedelta):
+			if not isinstance(right_value, datetime.timedelta):
+				raise errors.EvaluationError('data type mismatch (not a timedelta value)')
+		else:
+			_assert_is_numeric(left_value, right_value)
+		return operator.sub(left_value, right_value)
+
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
-	"""A class for representing arithmetic expressions from the grammar text such as subtraction and division."""
+	"""A class for representing arithmetic expressions from the grammar text such as multiplication and division."""
 	compatible_types = (DataType.FLOAT,)
 	result_type = DataType.FLOAT
 	def __op_arithmetic(self, op, thing):
@@ -431,7 +467,6 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 		_assert_is_numeric(right_value)
 		return op(left_value, right_value)
 
-	_op_sub  = functools.partialmethod(__op_arithmetic, operator.sub)
 	_op_fdiv = functools.partialmethod(__op_arithmetic, operator.floordiv)
 	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)
 	_op_mod  = functools.partialmethod(__op_arithmetic, operator.mod)

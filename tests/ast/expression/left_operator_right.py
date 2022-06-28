@@ -43,6 +43,7 @@ __all__ = (
 	'ArithmeticExpressionTests',
 	'AddExpressionTests',
 	'AddDatetimeExpressionTests',
+	'SubtractExpressionTests',
 	'BitwiseExpressionTests',
 	'BitwiseExpressionSetTests',
 	'BitwiseShiftExpressionTests',
@@ -81,7 +82,6 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	left_value = two = ast.FloatExpression(context, 2.0)
 	right_value = four = ast.FloatExpression(context, 4.0)
 	def test_ast_expression_left_operator_right_arithmetic(self):
-		self.assertExpressionTests('sub', equals_value=-2.0)
 		self.assertExpressionTests('fdiv', equals_value=0.0)
 		self.assertExpressionTests('tdiv', equals_value=0.5)
 		self.assertExpressionTests('mod', equals_value=2.0)
@@ -89,7 +89,7 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('pow', equals_value=16.0)
 
 	def test_ast_expression_left_operator_right_arithmetic_type_errors(self):
-		for operation in ('sub', 'fdiv', 'tdiv', 'mod', 'mul', 'pow'):
+		for operation in ('fdiv', 'tdiv', 'mod', 'mul', 'pow'):
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, ast.FloatExpression(context, 2.0), ast.StringExpression(context, '4.0'))
 			with self.assertRaises(errors.EvaluationError):
@@ -190,6 +190,101 @@ class AddDatetimeExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			left_value=td_expr_func(datetime.timedelta(hours=4)),
 			right_value=td_expr_func(datetime.timedelta(days=1, seconds=54)),
 			equals_value=datetime.timedelta(days=1, hours=4, seconds=54),
+		)
+
+class SubtractExpressionTests(LeftOperatorRightExpresisonTestsBase):
+	ExpressionClass = ast.SubtractExpression
+	false_value = 0.0
+	left_value = ten = ast.FloatExpression(context, 10.0)
+	right_value = five = ast.FloatExpression(context, 5.0)
+	def test_ast_expression_left_operator_right_subtract(self):
+		self.assertExpressionTests('sub', equals_value=5.0)
+		self.assertExpressionTests('sub', left_value=self.right_value, right_value=self.left_value, equals_value=-5.0)
+
+	def test_ast_expression_left_operator_right_subtract_type_errors(self):
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.FloatExpression(context, 12.0), ast.StringExpression(context, "abc"))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.StringExpression(context, "def"), ast.FloatExpression(context, 4.0))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.FloatExpression(context, 14.5), ast.BooleanExpression(context, True))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.BooleanExpression(context, False), ast.FloatExpression(context, 9.9))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.DatetimeExpression(context, datetime.datetime.now()), ast.StringExpression(context, "ghi"))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.DatetimeExpression(context, datetime.datetime.now()), ast.FloatExpression(context, 8.4))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.DatetimeExpression(context, datetime.datetime.now()), ast.BooleanExpression(context, True))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.StringExpression(context, "jkl"), ast.DatetimeExpression(context, datetime.datetime.now()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.FloatExpression(context, 7.7), ast.DatetimeExpression(context, datetime.datetime.now()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.BooleanExpression(context, False), ast.DatetimeExpression(context, datetime.datetime.now()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.TimedeltaExpression(context, datetime.timedelta()), ast.DatetimeExpression(context, datetime.datetime.now()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.TimedeltaExpression(context, datetime.timedelta()), ast.StringExpression(context, "ghi"))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.TimedeltaExpression(context, datetime.timedelta()), ast.FloatExpression(context, 8.4))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.TimedeltaExpression(context, datetime.timedelta()), ast.BooleanExpression(context, True))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.StringExpression(context, "jkl"), ast.TimedeltaExpression(context, datetime.timedelta()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.FloatExpression(context, 7.7), ast.TimedeltaExpression(context, datetime.timedelta()))
+		with self.assertRaises(errors.EvaluationError):
+			self.assertExpressionTests('sub', ast.BooleanExpression(context, False), ast.TimedeltaExpression(context, datetime.timedelta()))
+
+class SubtractDatetimeExpressionTests(LeftOperatorRightExpresisonTestsBase):
+	ExpressionClass = ast.SubtractExpression
+	def test_subtract_datetime_from_datetime(self):
+		dt_expr_func = functools.partial(ast.DatetimeExpression, context)
+		start_datetime_expr = dt_expr_func(datetime.datetime(year=2022, month=3, day=15, hour=13, minute=6, second=12))
+		assert_func = functools.partial(self.assertExpressionTests, 'sub')
+
+		assert_func(
+			left_value=start_datetime_expr,
+			right_value=dt_expr_func(datetime.datetime(year=2022, month=3, day=12, hour=9, minute=34, second=11)),
+			equals_value=datetime.timedelta(days=3, seconds=12721),
+		)
+		assert_func(
+			left_value=start_datetime_expr,
+			right_value=dt_expr_func(datetime.datetime(year=2022, month=4, day=2, hour=3, minute=56, second=22)),
+			equals_value=datetime.timedelta(days=-18, seconds=32990),
+		)
+
+	def test_subtract_timedelta_from_datetime(self):
+		start_datetime = datetime.datetime(year=2022, month=1, day=24, hour=16, minute=19, second=44)
+		start_datetime_expr = ast.DatetimeExpression(context, start_datetime)
+		assert_func = functools.partial(self.assertExpressionTests, 'sub')
+		td_expr_func = functools.partial(ast.TimedeltaExpression, context)
+
+		assert_func(
+			left_value=start_datetime_expr,
+			right_value=td_expr_func(datetime.timedelta(days=21, hours=2)),
+			equals_value=start_datetime.replace(day=3, hour=14),
+		)
+		assert_func(
+			left_value=start_datetime_expr,
+			right_value=td_expr_func(-datetime.timedelta(hours=10, minutes=39, seconds=20)),
+			equals_value=start_datetime.replace(day=25, hour=2, minute=59, second=4),
+		)
+
+	def test_subtract_timedelta_from_timedelta(self):
+		assert_func = functools.partial(self.assertExpressionTests, 'sub')
+		td_expr_func = functools.partial(ast.TimedeltaExpression, context)
+
+		assert_func(
+			left_value=td_expr_func(datetime.timedelta(days=8, minutes=44, seconds=12)),
+			right_value=td_expr_func(datetime.timedelta(seconds=23)),
+			equals_value=datetime.timedelta(days=8, seconds=2629),
+		)
+		assert_func(
+			left_value=td_expr_func(datetime.timedelta(hours=15, minutes=35)),
+			right_value=td_expr_func(datetime.timedelta(minutes=41, seconds=45)),
+			equals_value=datetime.timedelta(seconds=53595),
 		)
 
 class BitwiseExpressionTests(LeftOperatorRightExpresisonTestsBase):

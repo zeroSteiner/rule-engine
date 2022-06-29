@@ -359,14 +359,14 @@ class UnaryExpressionTests(unittest.TestCase):
 
 	def test_ast_expression_unary_uminus(self):
 		for value in trueish:
-			if not isinstance(value, ast.FloatExpression):
+			if not isinstance(value, (ast.FloatExpression, ast.TimedeltaExpression)):
 				continue
 			unary = ast.UnaryExpression(context, 'uminus', value)
 			result = unary.evaluate(None)
 			self.assertTrue(result)
 			self.assertNotEqual(result, value.value)
 		for value in falseish:
-			if not isinstance(value, ast.FloatExpression):
+			if not isinstance(value, (ast.FloatExpression, ast.TimedeltaExpression)):
 				continue
 			unary = ast.UnaryExpression(context, 'uminus', value)
 			result = unary.evaluate(None)
@@ -375,7 +375,7 @@ class UnaryExpressionTests(unittest.TestCase):
 
 	def test_ast_expresison_unary_minus_type_errors(self):
 		for value in trueish + falseish:
-			if isinstance(value, ast.FloatExpression):
+			if isinstance(value, (ast.FloatExpression, ast.TimedeltaExpression)):
 				continue
 			unary = ast.UnaryExpression(context, 'uminus', value)
 			with self.assertRaises(errors.EvaluationError):

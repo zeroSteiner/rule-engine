@@ -263,6 +263,13 @@ class EngineDatetimeRuleTests(unittest.TestCase):
 			"end": datetime.datetime(year=2022, month=3, day=1, hour=0, minute=32, second=56),
 		}))
 
+	def test_subtract_timedeltas(self):
+		rule = engine.Rule("P4DT2H31S - P1DT45S == P3DT1H59M46S")
+		self.assertTrue(rule.evaluate({}))
+
+		rule = engine.Rule("P4DT2H31S - P1WT45M17S == -P2DT22H44M46S")
+		self.assertTrue(rule.evaluate({}))
+
 	def test_subtract_empty_timedelta(self):
 		rule = engine.Rule("P1DT3S - PT == P1DT3S")
 		self.assertTrue(rule.evaluate({}))

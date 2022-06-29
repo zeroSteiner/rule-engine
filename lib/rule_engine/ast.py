@@ -1106,10 +1106,13 @@ class UnaryExpression(ExpressionBase):
 		type_ = type_.lower()
 		self.type = type_
 		self._evaluator = getattr(self, '_op_' + type_)
-		self.result_type = {
-			'not':    DataType.BOOLEAN,
-			'uminus': DataType.FLOAT
-		}[type_]
+		if type_ == 'not':
+			self.result_type = DataType.BOOLEAN
+		elif type_ == 'uminus':
+			self.result_type = right.result_type
+		else:
+			raise errors.EvaluationError('unknown unary expression type')
+
 		self.right = right
 
 	@classmethod
@@ -1129,7 +1132,8 @@ class UnaryExpression(ExpressionBase):
 
 	def __op_arithmetic(self, op, thing):
 		right = self.right.evaluate(thing)
-		_assert_is_numeric(right)
+		if not is_numeric(right) and not isinstance(right, datetime.timedelta):
+			raise errors.EvaluationError('data type mismatch (not a numeric or timedelta value)')
 		return op(right)
 
 	_op_uminus = functools.partialmethod(__op_arithmetic, operator.neg)
@@ -1141,9 +1145,11 @@ class UnaryExpression(ExpressionBase):
 		if type_ == 'not':
 			return BooleanExpression(self.context, self.evaluate(None))
 		elif type_ == 'uminus':
-			if not isinstance(self.right, (FloatExpression,)):
-				raise errors.EvaluationError('data type mismatch (not a float expression)')
-			return FloatExpression(self.context, self.evaluate(None))
+			if isinstance(self.right, FloatExpression):
+				return FloatExpression(self.context, self.evaluate(None))
+			elif isinstance(self.right, TimedeltaExpression):
+				return TimedeltaExpression(self.context, self.evaluate(None))
+			raise errors.EvaluationError('data type mismatch (not a float or timedelta expression)')
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type.lower()))

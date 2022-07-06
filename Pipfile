@@ -12,8 +12,8 @@ sphinx = "*"
 sphinx-rtd-theme = "*"
 graphviz = "*"
 coverage = "*"
+ipython = "*"
 
 [scripts]
 tests = 'sh -c "PYTHONPATH=$(pwd)/lib python -m unittest -v tests"'
 tests-coverage = 'sh -c "PYTHONPATH=$(pwd)/lib coverage run -m unittest -v tests && coverage report --include=\"*/rule_engine/*\""'
-

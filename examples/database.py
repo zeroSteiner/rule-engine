@@ -64,8 +64,8 @@ class Database(object):
 		data = self.data
 		if from_ is not None:
 			data = rule_engine.Rule(from_, context=self._rule_context).evaluate(data)
-			if isinstance(data, collections.abc.Mapping):
-				data = data.values()
+		if isinstance(data, collections.abc.Mapping):
+			data = data.values()
 		if not isiterable(data):
 			raise ValueError('data source is not iterable')
 		rule = rule_engine.Rule(where, context=self._rule_context)

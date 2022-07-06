@@ -15,6 +15,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -82,12 +83,12 @@
            <div itemprop="articleBody">
              
   <section id="debug-repl">
-<span id="id1"></span><h1>Debug REPL<a class="headerlink" href="#debug-repl" title="Permalink to this headline"></a></h1>
+<span id="id1"></span><h1>Debug REPL<a class="headerlink" href="#debug-repl" title="Permalink to this heading"></a></h1>
 <p>Since version <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.4.0">v2.4.0</a>, the Rule Engine package includes a module which provides a Read Eval Print Loop (REPL)
 for debugging and testing purposes. This module can be executed using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">rule_engine.debug_repl</span></code>. Once
 started, the REPL loop can be used to evaluate rule expressions and view the results.</p>
 <section id="cli-arguments">
-<h2>CLI Arguments<a class="headerlink" href="#cli-arguments" title="Permalink to this headline"></a></h2>
+<h2>CLI Arguments<a class="headerlink" href="#cli-arguments" title="Permalink to this heading"></a></h2>
 <p>The module when executed from the command line has the following options available.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-debug_repl-edit-console">
@@ -103,13 +104,13 @@ started, the REPL loop can be used to evaluate rule expressions and view the res
 
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline"></a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
 <p>When configured through either the <code class="docutils literal notranslate"><span class="pre">--edit-console</span></code> or <code class="docutils literal notranslate"><span class="pre">--edit-file</span></code> options, the <code class="docutils literal notranslate"><span class="pre">context</span></code> symbol may be
 customized using a user-defined <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance. Additionally, the object to evaluate
 can be configured through the <code class="docutils literal notranslate"><span class="pre">thing</span></code> symbol.</p>
 </section>
 <section id="example-usage">
-<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline"></a></h2>
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h2>
 <p>The following example demonstrates using the Debug REPL with a <em>thing</em> (in this case a comic book) defined through the
 interactive console.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>python -m rule_engine.debug_repl --edit-console

@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -90,10 +91,10 @@
            <div itemprop="articleBody">
              
   <section id="module-rule_engine.engine">
-<span id="engine"></span><h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">engine</span></code><a class="headerlink" href="#module-rule_engine.engine" title="Permalink to this headline"></a></h1>
+<span id="engine"></span><h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">engine</span></code><a class="headerlink" href="#module-rule_engine.engine" title="Permalink to this heading"></a></h1>
 <p>This module contains the primary externally facing API for the package.</p>
 <section id="functions">
-<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline"></a></h2>
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="rule_engine.engine.resolve_attribute">
 <span class="sig-name descname"><span class="pre">resolve_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#resolve_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.resolve_attribute" title="Permalink to this definition"></a></dt>
@@ -160,11 +161,11 @@ interface) from which to create the callback function.</p>
 
 </section>
 <section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h2>
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.engine.Builtins">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Builtins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Builtins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.Builtins" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.10/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Mapping</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.10/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a></p>
 <p>A class to define and provide variables to within the builtin context of rules. These can be accessed by specifying
 a symbol name with the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix.</p>
 <dl class="py method">

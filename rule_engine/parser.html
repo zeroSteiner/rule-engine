@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -89,15 +90,15 @@
            <div itemprop="articleBody">
              
   <section id="module-rule_engine.parser">
-<span id="parser"></span><h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code><a class="headerlink" href="#module-rule_engine.parser" title="Permalink to this headline"></a></h1>
+<span id="parser"></span><h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code><a class="headerlink" href="#module-rule_engine.parser" title="Permalink to this heading"></a></h1>
 <p>This module contains the parsing logic for taking rule text in the specified grammar and converting it to an abstract
 syntax tree that can later be evaluated.</p>
 <section id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline"></a></h2>
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.parser.Parser">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/parser.html#Parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.parser.Parser" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#rule_engine.parser.ParserBase" title="rule_engine.parser.ParserBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">rule_engine.parser.ParserBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.parser.ParserBase" title="rule_engine.parser.ParserBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ParserBase</span></code></a></p>
 <p>The parser class for the rule grammar. This class contains many ply specific
 members to define the various components of the grammar allowing it to be
 parsed and reduced into an abstract syntax tree (AST). Once the AST has been

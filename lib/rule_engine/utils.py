@@ -5,15 +5,15 @@ import re
 _sub_regex = r'[0-9]+([,.][0-9]+)?'
 timedelta_regex = (
     r'P(?!\b)'
-    f'(?P<weeks>{_sub_regex}W)?'
-    f'(?P<days>{_sub_regex}D)?'
+    r'(?P<weeks>' + _sub_regex + r'W)?'
+    r'(?P<days>' + _sub_regex + r'D)?'
     r'(T'
-    f'(?P<hours>{_sub_regex}H)?'
-    f'(?P<minutes>{_sub_regex}M)?'
-    f'(?P<seconds>{_sub_regex}S)?'
+    r'(?P<hours>' + _sub_regex + r'H)?'
+    r'(?P<minutes>' + _sub_regex + r'M)?'
+    r'(?P<seconds>' + _sub_regex + r'S)?'
     r')?'
 )
-timedelta_re = re.compile(f"^{timedelta_regex}$")
+timedelta_re = re.compile("^" + timedelta_regex + "$")
 
 def parse_timedelta(periodstring):
     if periodstring == "P":

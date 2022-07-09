@@ -94,7 +94,7 @@ class AstTests(unittest.TestCase):
 
 	def test_ast_evaluates_unary_uminus_timedelta(self):
 		parser_ = parser.Parser()
-		statement = parser_.parse('-(PT1H + PT6M)', self.context)
+		statement = parser_.parse('-(t"PT1H" + t"PT6M")', self.context)
 		self.assertEqual(statement.evaluate(None), datetime.timedelta(days=-1, seconds=82440))
 
 	def test_ast_raises_type_mismatch_arithmetic_comparisons(self):
@@ -179,15 +179,16 @@ class AstTests(unittest.TestCase):
 	def test_ast_reduces_add_timedelta(self):
 		thing = {'first': datetime.timedelta(seconds=5), 'last': datetime.timedelta(minutes=1)}
 		parser_ = parser.Parser()
-		statement = parser_.parse('PT5S + PT1M', self.context)
+
+		statement = parser_.parse('t"PT5S" + t"PT1M"', self.context)
 		self.assertIsInstance(statement.expression, ast.TimedeltaExpression)
 		self.assertEqual(statement.evaluate(None), datetime.timedelta(minutes=1, seconds=5))
 
-		statement = parser_.parse('first + PT1M', self.context)
+		statement = parser_.parse('first + t"PT1M"', self.context)
 		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), datetime.timedelta(minutes=1, seconds=5))
 
-		statement = parser_.parse('PT5S + last', self.context)
+		statement = parser_.parse('t"PT5S" + last', self.context)
 		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), datetime.timedelta(minutes=1, seconds=5))
 
@@ -209,15 +210,16 @@ class AstTests(unittest.TestCase):
 	def test_ast_reduces_subtract_timedelta(self):
 		thing = {'first': datetime.timedelta(seconds=5), 'last': datetime.timedelta(minutes=1)}
 		parser_ = parser.Parser()
-		statement = parser_.parse('PT1M - PT5S', self.context)
+
+		statement = parser_.parse('t"PT1M" - t"PT5S"', self.context)
 		self.assertIsInstance(statement.expression, ast.TimedeltaExpression)
 		self.assertEqual(statement.evaluate(None), datetime.timedelta(seconds=55))
 
-		statement = parser_.parse('first - PT1M', self.context)
+		statement = parser_.parse('first - t"PT1M"', self.context)
 		self.assertIsInstance(statement.expression, ast.SubtractExpression)
 		self.assertEqual(statement.evaluate(thing), -datetime.timedelta(seconds=55))
 
-		statement = parser_.parse('PT5S - last', self.context)
+		statement = parser_.parse('t"PT5S" - last', self.context)
 		self.assertIsInstance(statement.expression, ast.SubtractExpression)
 		self.assertEqual(statement.evaluate(thing), -datetime.timedelta(seconds=55))
 
@@ -279,7 +281,7 @@ class AstTests(unittest.TestCase):
 	def test_ast_reduces_unary_uminus_timedelta(self):
 		parser_ = parser.Parser()
 
-		statement = parser_.parse('-P1D', self.context)
+		statement = parser_.parse('-t"P1D"', self.context)
 		self.assertIsInstance(statement.expression, ast.TimedeltaExpression)
 		self.assertEqual(statement.evaluate(None), datetime.timedelta(days=-1))
 

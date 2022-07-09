@@ -258,8 +258,9 @@ class Parser(ParserBase):
 		return t
 
 	def t_TIMEDELTA(self, t):
+		t.value = t.value[2:-1]
 		return t
-	t_TIMEDELTA.__doc__ = timedelta_regex
+	t_TIMEDELTA.__doc__ = r't(?P<quote>["\'])' + timedelta_regex + r'(?P=quote)'
 
 	def t_STRING(self, t):
 		r's?(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'

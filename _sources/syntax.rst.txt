@@ -27,8 +27,10 @@ The following table outlines all operators that can be used in Rule Engine expre
 | **Arithmetic Operators**                                                                                      |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``+``        | Addition                     | :py:attr:`~.DataType.FLOAT`, :py:attr:`~.DataType.STRING`       |
+|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.TIMEDELTA` |
 +--------------+------------------------------+-----------------------------------------------------------------+
-| ``-``        | Subtraction                  | :py:attr:`~.DataType.FLOAT`                                     |
+| ``-``        | Subtraction                  | :py:attr:`~.DataType.FLOAT`, :py:attr:`~.DataType.DATETIME`,    |
+|              |                              | :py:attr:`~.DataType.TIMEDELTA`                                 |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``*``        | Multiplication               | :py:attr:`~.DataType.FLOAT`                                     |
 +--------------+------------------------------+-----------------------------------------------------------------+
@@ -61,23 +63,27 @@ The following table outlines all operators that can be used in Rule Engine expre
 | **Arithmetic-Comparison Operators**                                                                           |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``>``        | Greater than                 | :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.BOOLEAN`,     |
-|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.FLOAT`,    |
-|              |                              | :py:attr:`~.DataType.NULL`, :py:attr:`~.DataType.STRING`        |
+|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.TIMEDELTA`,|
+|              |                              | :py:attr:`~.DataType.FLOAT`, :py:attr:`~.DataType.NULL`,        |
+|              |                              | :py:attr:`~.DataType.STRING`                                    |
 |              |                              | :sup:`2`                                                        |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``>=``       | Greater than or equal to     | :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.BOOLEAN`,     |
-|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.FLOAT`,    |
-|              |                              | :py:attr:`~.DataType.NULL`, :py:attr:`~.DataType.STRING`        |
+|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.TIMEDELTA`,|
+|              |                              | :py:attr:`~.DataType.FLOAT`, :py:attr:`~.DataType.NULL`,        |
+|              |                              | :py:attr:`~.DataType.STRING`                                    |
 |              |                              | :sup:`2`                                                        |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``<``        | Less than                    | :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.BOOLEAN`,     |
-|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.FLOAT`,    |
-|              |                              | :py:attr:`~.DataType.NULL`, :py:attr:`~.DataType.STRING`        |
+|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.TIMEDELTA`,|
+|              |                              | :py:attr:`~.DataType.FLOAT`, :py:attr:`~.DataType.NULL`,        |
+|              |                              | :py:attr:`~.DataType.STRING`                                    |
 |              |                              | :sup:`2`                                                        |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``<=``       | Less than or equal to        | :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.BOOLEAN`,     |
-|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.FLOAT`,    |
-|              |                              | :py:attr:`~.DataType.NULL`, :py:attr:`~.DataType.STRING`        |
+|              |                              | :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.TIMEDELTA`,|
+|              |                              | :py:attr:`~.DataType.FLOAT`, :py:attr:`~.DataType.NULL`,        |
+|              |                              | :py:attr:`~.DataType.STRING`                                    |
 |              |                              | :sup:`2`                                                        |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | **Fuzzy-Comparison Operators**                                                                                |
@@ -103,11 +109,12 @@ The following table outlines all operators that can be used in Rule Engine expre
 | **Accessor Operators**                                                                                        |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``.``        | Attribute access             | :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.DATETIME`,    |
-|              |                              | :py:attr:`~.DataType.MAPPING`, :py:attr:`~.DataType.STRING`     |
+|              |                              | :py:attr:`~.DataType.TIMEDELTA`, :py:attr:`~.DataType.MAPPING`, |
+|              |                              | :py:attr:`~.DataType.STRING`                                    |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``&.``       | Safe attribute access        | :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.DATETIME`,    |
-|              |                              | :py:attr:`~.DataType.MAPPING`, :py:attr:`~.DataType.NULL`,      |
-|              |                              | :py:attr:`~.DataType.STRING`                                    |
+|              |                              | :py:attr:`~.DataType.TIMEDELTA`, :py:attr:`~.DataType.MAPPING`, |
+|              |                              | :py:attr:`~.DataType.NULL`, :py:attr:`~.DataType.STRING`        |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``[``        | Item lookup                  | :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.MAPPING`,     |
 |              |                              | :py:attr:`~.DataType.STRING`                                    |
@@ -238,10 +245,15 @@ standard :py:attr:`~.DataType.STRING` value, while a single ``d`` will specify a
 by :py:meth:`dateutil.parser.isoparse`. :py:attr:`~.DataType.DATETIME` values with no time specified (e.g.
 ``d"2019-09-23"``) will evaluate to a :py:attr:`~.DataType.DATETIME` of the specified day at exactly midnight.
 
+:py:attr:`~.DataType.TIMEDELTA` literals must be specified in a subset of the ISO-8601 format for durations. Everything
+except years and months are supported in `~.DataType.TIMEDELTA` values, to match the underlying representation provided
+by the Python standard library.
+
 Example rules showing equivalent literal expressions:
 
 * ``"foobar" == s"foobar"``
 * ``d"2019-09-23" == d"2019-09-23 00:00:00"``
+* ``t"P1D" == t"PT24H"``
 
 :py:attr:`~.DataType.FLOAT` literals may be expressed in either binary, octal, decimal, or hexadecimal formats. The
 binary, octal and hexadecimal formats use the ``0b``, ``0o``, and ``0x`` prefixes respectively. Values in the decimal

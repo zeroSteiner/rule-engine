@@ -440,6 +440,7 @@
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">BOOLEAN</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;BOOLEAN&#39;</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
 	<span class="n">DATETIME</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;DATETIME&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+	<span class="n">TIMEDELTA</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;TIMEDELTA&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">)</span>
 	<span class="n">FLOAT</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">)</span>
 	<span class="n">MAPPING</span> <span class="o">=</span> <span class="n">_MappingDataTypeDef</span><span class="p">(</span><span class="s1">&#39;MAPPING&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -498,6 +499,8 @@
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
 		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span> <span class="ow">or</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">:</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATETIME</span>
+		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">:</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">TIMEDELTA</span>
 		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
 		<span class="k">elif</span> <span class="n">python_type</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
@@ -524,6 +527,8 @@
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">BOOLEAN</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">DATETIME</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">TIMEDELTA</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_value</span><span class="p">,</span> <span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
 			<span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FLOAT</span>
 		<span class="k">elif</span> <span class="n">python_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

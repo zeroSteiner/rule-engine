@@ -54,3 +54,6 @@ Classes
 
    .. autoattribute:: STRING
       :annotation:
+
+   .. autoattribute:: TIMEDELTA
+      :annotation:

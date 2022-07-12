@@ -159,6 +159,13 @@ Literal Expressions
    .. autoattribute:: result_type
       :annotation: = STRING
 
+.. autoclass:: TimedeltaExpression
+   :show-inheritance:
+
+
+   .. autoattribute:: result_type
+      :annotation: = TIMEDELTA
+
 Miscellaneous Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

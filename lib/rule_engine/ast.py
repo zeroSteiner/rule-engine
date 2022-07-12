@@ -241,6 +241,8 @@ class DatetimeExpression(LiteralExpressionBase):
 class TimedeltaExpression(LiteralExpressionBase):
 	"""
 	Literal timedelta expressions representing an offset from a specific point in time.
+
+	.. versionadded:: 3.5.0
 	"""
 	result_type = DataType.TIMEDELTA
 	@classmethod
@@ -421,6 +423,11 @@ class AddExpression(LeftOperatorRightExpressionBase):
 		return operator.add(left_value, right_value)
 
 class SubtractExpression(LeftOperatorRightExpressionBase):
+	"""
+	A class for representing subtraction expressions from the grammar text.
+
+	.. versionadded:: 3.5.0
+	"""
 	compatible_types = (DataType.FLOAT, DataType.DATETIME, DataType.TIMEDELTA)
 	result_type = DataType.UNDEFINED
 

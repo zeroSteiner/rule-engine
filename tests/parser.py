@@ -182,7 +182,6 @@ class ParserLeftOperatorRightTests(ParserTestsBase):
 
 	def test_parser_arithmetic_expressions(self):
 		expressions = (
-			'left - right',
 			'left / right',
 			'left // right',
 			'left % right',
@@ -198,6 +197,13 @@ class ParserLeftOperatorRightTests(ParserTestsBase):
 		)
 		for expression in expressions:
 			self.assertStatementType(expression, ast.AddExpression)
+
+	def test_parser_subtract_expressions(self):
+		expressions = (
+			'left - right',
+		)
+		for expression in expressions:
+			self.assertStatementType(expression, ast.SubtractExpression)
 
 	def test_parser_bitwise_expressions(self):
 		expressions = (
@@ -301,6 +307,18 @@ class ParserLiteralTests(ParserTestsBase):
 			self.assertEqual(error.value, 'this is wrong')
 		else:
 			self.fail('DatetimeSyntaxError was not raised')
+
+	def test_parse_timedelta(self):
+		self.assertLiteralStatementEqual('t"P1W"', ast.TimedeltaExpression, datetime.timedelta(weeks=1))
+		self.assertLiteralStatementEqual('t"P7W6DT5H4M3S"', ast.TimedeltaExpression, datetime.timedelta(weeks=7, days=6, hours=5, minutes=4, seconds=3))
+		self.assertLiteralStatementEqual('t"PT3H2S"', ast.TimedeltaExpression, datetime.timedelta(hours=3, seconds=2))
+		self.assertLiteralStatementEqual('t"PT"', ast.TimedeltaExpression, datetime.timedelta())
+
+	def test_parse_timedelta_attributes(self):
+		self.assertLiteralStatementEvalEqual('t"P7W6DT5H4M3S".days', decimal.Decimal('55'))
+		self.assertLiteralStatementEvalEqual('t"P7W6DT5H4M3S".seconds', decimal.Decimal('18243'))
+		self.assertLiteralStatementEvalEqual('t"P7W6DT5H4M3S".microseconds', decimal.Decimal('0'))
+		self.assertLiteralStatementEvalEqual('t"P7W6DT5H4M3S".total_seconds', decimal.Decimal('4770243'))
 
 	def test_parse_float(self):
 		self.assertLiteralStatementEqual('3.14', ast.FloatExpression, decimal.Decimal('3.14'))

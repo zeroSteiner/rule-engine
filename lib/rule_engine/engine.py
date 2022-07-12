@@ -217,6 +217,22 @@ class _AttributeResolver(object):
 	def datetime_zone_name(self, value):
 		return value.tzname()
 
+	@attribute('days', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	def timedelta_days(self, value):
+		return value.days
+
+	@attribute('seconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	def timedelta_seconds(self, value):
+		return value.seconds
+
+	@attribute('microseconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	def timedelta_microseconds(self, value):
+		return value.microseconds
+
+	@attribute('total_seconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	def timedelta_total_seconds(self, value):
+		return value.total_seconds()
+
 	@attribute('ceiling', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
 	def float_ceiling(self, value):
 		return _float_op(value, math.ceil)

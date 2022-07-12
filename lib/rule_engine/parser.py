@@ -37,6 +37,7 @@ import types as pytypes
 
 from . import ast
 from . import errors
+from ._utils import timedelta_regex
 
 import ply.lex as lex
 import ply.yacc as yacc
@@ -153,7 +154,7 @@ class Parser(ParserBase):
 		'if': 'IF'
 	}
 	tokens = (
-		'DATETIME', 'FLOAT', 'STRING', 'SYMBOL',
+		'DATETIME', 'TIMEDELTA', 'FLOAT', 'STRING', 'SYMBOL',
 		'LPAREN', 'RPAREN', 'QMARK', 'COLON', 'COMMA',
 		'LBRACKET', 'RBRACKET', 'LBRACE', 'RBRACE'
 	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
@@ -256,6 +257,11 @@ class Parser(ParserBase):
 		t.value = t.value[1:]
 		return t
 
+	def t_TIMEDELTA(self, t):
+		t.value = t.value[2:-1]
+		return t
+	t_TIMEDELTA.__doc__ = r't(?P<quote>["\'])' + timedelta_regex + r'(?P=quote)'
+
 	def t_STRING(self, t):
 		r's?(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 		if t.value[0] == 's':
@@ -307,8 +313,7 @@ class Parser(ParserBase):
 
 	def p_expression_arithmetic(self, p):
 		"""
-		expression : expression SUB    expression
-				   | expression MOD    expression
+		expression : expression MOD    expression
 				   | expression MUL    expression
 				   | expression FDIV   expression
 				   | expression TDIV   expression
@@ -325,6 +330,14 @@ class Parser(ParserBase):
 		left, op, right = p[1:4]
 		op_name = self.op_names[op]
 		p[0] = _DeferredAstNode(ast.AddExpression, args=(self.context, op_name, left, right))
+
+	def p_expression_sub(self, p):
+		"""
+		expression : expression SUB    expression
+		"""
+		left, op, right = p[1:4]
+		op_name = self.op_names[op]
+		p[0] = _DeferredAstNode(ast.SubtractExpression, args=(self.context, op_name, left, right))
 
 	def p_expression_bitwise(self, p):
 		"""
@@ -431,6 +444,10 @@ class Parser(ParserBase):
 	def p_expression_datetime(self, p):
 		'object : DATETIME'
 		p[0] = _DeferredAstNode(ast.DatetimeExpression, args=(self.context, literal_eval(p[1])), method='from_string')
+
+	def p_expression_timedelta(self, p):
+		'object : TIMEDELTA'
+		p[0] = _DeferredAstNode(ast.TimedeltaExpression, args=(self.context, p[1]), method='from_string')
 
 	def p_expression_float(self, p):
 		'expression : FLOAT'

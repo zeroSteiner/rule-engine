@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import datetime
 import unittest
 
 from .expression import *
@@ -86,10 +87,15 @@ class AstTests(unittest.TestCase):
 		statement = parser_.parse('false and not true', self.context)
 		self.assertFalse(statement.evaluate(None))
 
-	def test_ast_evaluates_unary_uminus(self):
+	def test_ast_evaluates_unary_uminus_float(self):
 		parser_ = parser.Parser()
 		statement = parser_.parse('-(2 * 5)', self.context)
 		self.assertEqual(statement.evaluate(None), -10)
+
+	def test_ast_evaluates_unary_uminus_timedelta(self):
+		parser_ = parser.Parser()
+		statement = parser_.parse('-(t"PT1H" + t"PT6M")', self.context)
+		self.assertEqual(statement.evaluate(None), datetime.timedelta(days=-1, seconds=82440))
 
 	def test_ast_raises_type_mismatch_arithmetic_comparisons(self):
 		parser_ = parser.Parser()
@@ -170,6 +176,53 @@ class AstTests(unittest.TestCase):
 		self.assertIsInstance(statement.expression, ast.AddExpression)
 		self.assertEqual(statement.evaluate(thing), 'LukeSkywalker')
 
+	def test_ast_reduces_add_timedelta(self):
+		thing = {'first': datetime.timedelta(seconds=5), 'last': datetime.timedelta(minutes=1)}
+		parser_ = parser.Parser()
+
+		statement = parser_.parse('t"PT5S" + t"PT1M"', self.context)
+		self.assertIsInstance(statement.expression, ast.TimedeltaExpression)
+		self.assertEqual(statement.evaluate(None), datetime.timedelta(minutes=1, seconds=5))
+
+		statement = parser_.parse('first + t"PT1M"', self.context)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
+		self.assertEqual(statement.evaluate(thing), datetime.timedelta(minutes=1, seconds=5))
+
+		statement = parser_.parse('t"PT5S" + last', self.context)
+		self.assertIsInstance(statement.expression, ast.AddExpression)
+		self.assertEqual(statement.evaluate(thing), datetime.timedelta(minutes=1, seconds=5))
+
+	def test_ast_reduces_subtract_float(self):
+		thing = {'one': 1, 'two': 2}
+		parser_ = parser.Parser()
+		statement = parser_.parse('2 - 1', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
+		self.assertEqual(statement.evaluate(None), 1)
+
+		statement = parser_.parse('two - 1', self.context)
+		self.assertIsInstance(statement.expression, ast.SubtractExpression)
+		self.assertEqual(statement.evaluate(thing), 1)
+
+		statement = parser_.parse('1 - two', self.context)
+		self.assertIsInstance(statement.expression, ast.SubtractExpression)
+		self.assertEqual(statement.evaluate(thing), -1)
+
+	def test_ast_reduces_subtract_timedelta(self):
+		thing = {'first': datetime.timedelta(seconds=5), 'last': datetime.timedelta(minutes=1)}
+		parser_ = parser.Parser()
+
+		statement = parser_.parse('t"PT1M" - t"PT5S"', self.context)
+		self.assertIsInstance(statement.expression, ast.TimedeltaExpression)
+		self.assertEqual(statement.evaluate(None), datetime.timedelta(seconds=55))
+
+		statement = parser_.parse('first - t"PT1M"', self.context)
+		self.assertIsInstance(statement.expression, ast.SubtractExpression)
+		self.assertEqual(statement.evaluate(thing), -datetime.timedelta(seconds=55))
+
+		statement = parser_.parse('t"PT5S" - last', self.context)
+		self.assertIsInstance(statement.expression, ast.SubtractExpression)
+		self.assertEqual(statement.evaluate(thing), -datetime.timedelta(seconds=55))
+
 	def test_ast_reduces_arithmetic(self):
 		thing = {'two': 2, 'four': 4}
 		parser_ = parser.Parser()
@@ -214,12 +267,35 @@ class AstTests(unittest.TestCase):
 		self.assertIsInstance(statement.expression, ast.FloatExpression)
 		self.assertEqual(statement.evaluate(None), 1)
 
+	def test_ast_reduces_unary_uminus_float(self):
+		parser_ = parser.Parser()
+
+		statement = parser_.parse('-1.0', self.context)
+		self.assertIsInstance(statement.expression, ast.FloatExpression)
+		self.assertEqual(statement.evaluate(None), -1)
+
+		statement = parser_.parse('-one', self.context)
+		self.assertIsInstance(statement.expression, ast.UnaryExpression)
+		self.assertEqual(statement.evaluate({'one': 1}), -1)
+
+	def test_ast_reduces_unary_uminus_timedelta(self):
+		parser_ = parser.Parser()
+
+		statement = parser_.parse('-t"P1D"', self.context)
+		self.assertIsInstance(statement.expression, ast.TimedeltaExpression)
+		self.assertEqual(statement.evaluate(None), datetime.timedelta(days=-1))
+
+		statement = parser_.parse('-day', self.context)
+		self.assertIsInstance(statement.expression, ast.UnaryExpression)
+		self.assertEqual(statement.evaluate({'day': datetime.timedelta(days=1)}), datetime.timedelta(days=-1))
+
 	def test_ast_type_hints(self):
 		parser_ = parser.Parser()
 		cases = (
 			# type,             type_is,             type_is_not
 			('symbol << 1',     ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol + 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
+			('symbol - 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
 			('symbol[1]',       ast.DataType.STRING, ast.DataType.FLOAT),
 			('symbol[1]',       ast.DataType.ARRAY,  ast.DataType.FLOAT),
 			('symbol =~ "foo"', ast.DataType.STRING, ast.DataType.FLOAT),

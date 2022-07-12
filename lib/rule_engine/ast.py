@@ -38,6 +38,7 @@ import operator
 import re
 
 from . import errors
+from ._utils import parse_timedelta
 from .suggestions import suggest_symbol
 from .types import *
 
@@ -237,6 +238,21 @@ class DatetimeExpression(LiteralExpressionBase):
 			dt = dt.replace(tzinfo=context.default_timezone)
 		return cls(context, dt)
 
+class TimedeltaExpression(LiteralExpressionBase):
+	"""
+	Literal timedelta expressions representing an offset from a specific point in time.
+
+	.. versionadded:: 3.5.0
+	"""
+	result_type = DataType.TIMEDELTA
+	@classmethod
+	def from_string(cls, context, string):
+		try:
+			dt = parse_timedelta(string)
+		except ValueError:
+			raise errors.TimedeltaSyntaxError('invalid timedelta', string)
+		return cls(context, dt)
+
 class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
 	result_type = DataType.FLOAT
@@ -312,7 +328,7 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 	A base class for representing complex expressions composed of a left side and a right side, separated by an
 	operator.
 	"""
-	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.SET, DataType.STRING)
+	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.SET, DataType.STRING)
 	"""
 	A tuple containing the compatible data types that the left and right expressions must return. This can for example
 	be used to indicate that arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but not
@@ -372,27 +388,83 @@ class LeftOperatorRightExpressionBase(ExpressionBase):
 
 class AddExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing addition expressions from the grammar text."""
-	compatible_types = (DataType.FLOAT,DataType.STRING)
+	compatible_types = (DataType.FLOAT, DataType.STRING, DataType.DATETIME, DataType.TIMEDELTA)
 	result_type = DataType.UNDEFINED
 
 	def __init__(self, *args, **kwargs):
 		super(AddExpression, self).__init__(*args, **kwargs)
 		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
-			if self.left.result_type != self.right.result_type:
+			if self.left.result_type == DataType.DATETIME:
+				if self.right.result_type != DataType.TIMEDELTA:
+					raise errors.EvaluationError('data type mismatch')
+				self.result_type = self.left.result_type
+			elif self.left.result_type == DataType.TIMEDELTA:
+				if self.right.result_type not in (DataType.DATETIME, DataType.TIMEDELTA):
+					raise errors.EvaluationError('data type mismatch')
+				self.result_type = self.right.result_type
+			elif self.left.result_type != self.right.result_type:
 				raise errors.EvaluationError('data type mismatch')
-			self.result_type = self.left.result_type
+			else:
+				self.result_type = self.left.result_type
 
 	def _op_add(self, thing):
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
-		if isinstance(left_value, str) or isinstance(right_value, str):
+		if isinstance(left_value, datetime.datetime):
+			if not isinstance(right_value, datetime.timedelta):
+				raise errors.EvaluationError('data type mismatch (not a timedelta value)')
+		elif isinstance(left_value, datetime.timedelta):
+			if not isinstance(right_value, (datetime.timedelta, datetime.datetime)):
+				raise errors.EvaluationError('data type mismatch (not a datetime or timedelta value)')
+		elif isinstance(left_value, str) or isinstance(right_value, str):
 			_assert_is_string(left_value, right_value)
 		else:
 			_assert_is_numeric(left_value, right_value)
 		return operator.add(left_value, right_value)
 
+class SubtractExpression(LeftOperatorRightExpressionBase):
+	"""
+	A class for representing subtraction expressions from the grammar text.
+
+	.. versionadded:: 3.5.0
+	"""
+	compatible_types = (DataType.FLOAT, DataType.DATETIME, DataType.TIMEDELTA)
+	result_type = DataType.UNDEFINED
+
+	def __init__(self, *args, **kwargs):
+		super(SubtractExpression, self).__init__(*args, **kwargs)
+		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
+			if self.left.result_type == DataType.DATETIME:
+				if self.right.result_type == DataType.DATETIME:
+					self.result_type = DataType.TIMEDELTA
+				elif self.right.result_type == DataType.TIMEDELTA:
+					self.result_type = DataType.DATETIME
+				else:
+					raise errors.EvaluationError('data type mismatch')
+			elif self.left.result_type == DataType.TIMEDELTA:
+				if self.right.result_type != DataType.TIMEDELTA:
+					raise errors.EvaluationError('data type mismatch')
+				self.result_type = self.left.result_type
+			elif self.left.result_type != self.right.result_type:
+				raise errors.EvaluationError('data type mismatch')
+			else:
+				self.result_type = self.left.result_type
+
+	def _op_sub(self, thing):
+		left_value = self.left.evaluate(thing)
+		right_value = self.right.evaluate(thing)
+		if isinstance(left_value, datetime.datetime):
+			if not isinstance(right_value, (datetime.datetime, datetime.timedelta)):
+				raise errors.EvaluationError('data type mismatch (not a datetime or timedelta value)')
+		elif isinstance(left_value, datetime.timedelta):
+			if not isinstance(right_value, datetime.timedelta):
+				raise errors.EvaluationError('data type mismatch (not a timedelta value)')
+		else:
+			_assert_is_numeric(left_value, right_value)
+		return operator.sub(left_value, right_value)
+
 class ArithmeticExpression(LeftOperatorRightExpressionBase):
-	"""A class for representing arithmetic expressions from the grammar text such as subtraction and division."""
+	"""A class for representing arithmetic expressions from the grammar text such as multiplication and division."""
 	compatible_types = (DataType.FLOAT,)
 	result_type = DataType.FLOAT
 	def __op_arithmetic(self, op, thing):
@@ -402,7 +474,6 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 		_assert_is_numeric(right_value)
 		return op(left_value, right_value)
 
-	_op_sub  = functools.partialmethod(__op_arithmetic, operator.sub)
 	_op_fdiv = functools.partialmethod(__op_arithmetic, operator.floordiv)
 	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)
 	_op_mod  = functools.partialmethod(__op_arithmetic, operator.mod)
@@ -496,7 +567,7 @@ class ArithmeticComparisonExpression(ComparisonExpression):
 	A class for representing arithmetic comparison expressions from the grammar text such as less-than-or-equal-to and
 	greater-than.
 	"""
-	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.FLOAT, DataType.NULL, DataType.STRING)
+	compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.NULL, DataType.STRING)
 	def __init__(self, *args, **kwargs):
 		super(ArithmeticComparisonExpression, self).__init__(*args, **kwargs)
 		if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
@@ -1042,10 +1113,13 @@ class UnaryExpression(ExpressionBase):
 		type_ = type_.lower()
 		self.type = type_
 		self._evaluator = getattr(self, '_op_' + type_)
-		self.result_type = {
-			'not':    DataType.BOOLEAN,
-			'uminus': DataType.FLOAT
-		}[type_]
+		if type_ == 'not':
+			self.result_type = DataType.BOOLEAN
+		elif type_ == 'uminus':
+			self.result_type = right.result_type
+		else:
+			raise errors.EvaluationError('unknown unary expression type')
+
 		self.right = right
 
 	@classmethod
@@ -1065,7 +1139,8 @@ class UnaryExpression(ExpressionBase):
 
 	def __op_arithmetic(self, op, thing):
 		right = self.right.evaluate(thing)
-		_assert_is_numeric(right)
+		if not is_numeric(right) and not isinstance(right, datetime.timedelta):
+			raise errors.EvaluationError('data type mismatch (not a numeric or timedelta value)')
 		return op(right)
 
 	_op_uminus = functools.partialmethod(__op_arithmetic, operator.neg)
@@ -1077,9 +1152,11 @@ class UnaryExpression(ExpressionBase):
 		if type_ == 'not':
 			return BooleanExpression(self.context, self.evaluate(None))
 		elif type_ == 'uminus':
-			if not isinstance(self.right, (FloatExpression,)):
-				raise errors.EvaluationError('data type mismatch (not a float expression)')
-			return FloatExpression(self.context, self.evaluate(None))
+			if isinstance(self.right, FloatExpression):
+				return FloatExpression(self.context, self.evaluate(None))
+			elif isinstance(self.right, TimedeltaExpression):
+				return TimedeltaExpression(self.context, self.evaluate(None))
+			raise errors.EvaluationError('data type mismatch (not a float or timedelta expression)')
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type.lower()))

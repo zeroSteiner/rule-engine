@@ -77,6 +77,17 @@ class DatetimeSyntaxError(SyntaxError):
 		self.value = value
 		"""The datetime value which contains the syntax error which caused this exception to be raised."""
 
+class TimedeltaSyntaxError(SyntaxError):
+	"""An error raised for issues regarding the use of improperly formatted timedelta expressions."""
+	def __init__(self, message, value):
+		"""
+		:param str message: A text description of what error occurred.
+		:param str value: The timedelta value which contains the syntax error which caused this exception to be raised.
+		"""
+		super(TimedeltaSyntaxError, self).__init__(message)
+		self.value = value
+		"""The timedelta value which contains the syntax error which caused this exception to be raised."""
+
 class RegexSyntaxError(SyntaxError):
 	"""An error raised for issues regarding the use of improper regular expression syntax."""
 	def __init__(self, message, error, value):

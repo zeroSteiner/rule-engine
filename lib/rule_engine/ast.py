@@ -38,9 +38,9 @@ import operator
 import re
 
 from . import errors
+from ._utils import parse_timedelta
 from .suggestions import suggest_symbol
 from .types import *
-from .utils import parse_timedelta
 
 import dateutil.parser
 

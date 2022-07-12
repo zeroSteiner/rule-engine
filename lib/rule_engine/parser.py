@@ -37,7 +37,7 @@ import types as pytypes
 
 from . import ast
 from . import errors
-from .utils import timedelta_regex
+from ._utils import timedelta_regex
 
 import ply.lex as lex
 import ply.yacc as yacc

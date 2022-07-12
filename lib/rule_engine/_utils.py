@@ -13,13 +13,12 @@ timedelta_regex = (
     r'(?P<seconds>' + _sub_regex + r'S)?'
     r')?'
 )
-timedelta_re = re.compile("^" + timedelta_regex + "$")
 
 def parse_timedelta(periodstring):
     if periodstring == "P":
         raise ValueError('empty timedelta string')
 
-    match = timedelta_re.match(periodstring)
+    match = re.match("^" + timedelta_regex + "$", periodstring)
     if not match:
         raise ValueError('invalid timedelta string')
 

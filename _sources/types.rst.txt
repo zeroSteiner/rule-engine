@@ -1,3 +1,5 @@
+.. py:currentmodule:: rule_engine.types
+
 Data Types
 ==========
 The following table describes the data types supported by the Rule Engine and the Python data types that each is
@@ -16,7 +18,7 @@ compatible with. For a information regarding supported operations, see the
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.DATETIME` | :py:class:`datetime.date`,    |
 |                               | :py:class:`datetime.datetime` |
-+-------------------------------+-------------------------------|
++-------------------------------+-------------------------------+
 | :py:attr:`~DataType.TIMEDELTA`| :py:class:`datetime.timedelta`|
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.FLOAT`    | :py:class:`int`,              |
@@ -71,10 +73,10 @@ data types with a mix of Python :py:class:`float` and :py:class:`~decimal.Decima
 
 DATETIME and TIMEDELTA
 ----------------------
-Version :release:`3.5.0` introduced the ``TIMEDELTA`` datatype, backed by Python's :py:class:`~datetime.timedelta` class.
-This also comes with the ability to perform arithmetic with both `TIMEDELTA` *and* `DATETIME` values. This allows you to
-create rules for things such as "has it been 30 days since this thing happened?" or "how much time passed between two
-events?".
+Version :release:`3.5.0` introduced the :py:attr:`~DataType.TIMEDELTA` datatype, backed by Python's
+:py:class:`~datetime.timedelta` class. This also comes with the ability to perform arithmetic with both
+:py:attr:`~DataType.TIMEDELTA` *and* :py:attr:`~DataType.DATETIME` values. This allows you to create rules for things
+such as "has it been 30 days since this thing happened?" or "how much time passed between two events?".
 
 The following mathematical operations are supported:
 

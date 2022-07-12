@@ -7,6 +7,13 @@ this list is curated by the development team for note worthy changes.
 Version 3.x.x
 -------------
 
+Version 3.5.0
+^^^^^^^^^^^^^
+
+*In progress*
+
+* Added the new :py:class:`~rule_engine.types.DataType.TIMEDELTA` data type
+
 Version 3.4.0
 ^^^^^^^^^^^^^
 

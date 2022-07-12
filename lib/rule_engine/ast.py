@@ -240,7 +240,7 @@ class DatetimeExpression(LiteralExpressionBase):
 
 class TimedeltaExpression(LiteralExpressionBase):
 	"""
-	Literal timedelta expressions representing an offset from a specific point in time. This expression type always evaluates to true.
+	Literal timedelta expressions representing an offset from a specific point in time.
 	"""
 	result_type = DataType.TIMEDELTA
 	@classmethod

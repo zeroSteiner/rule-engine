@@ -10,7 +10,7 @@ Version 3.x.x
 Version 3.5.0
 ^^^^^^^^^^^^^
 
-*In progress*
+Released :release:`3.5.0` on July 16th, 2022
 
 * Added the new :py:class:`~rule_engine.types.DataType.TIMEDELTA` data type
 

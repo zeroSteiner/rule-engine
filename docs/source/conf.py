@@ -158,9 +158,9 @@ texinfo_documents = [
 
 # -- Extension configuration -------------------------------------------------
 extlinks = {
-    'issue':   ("https://github.com/{0}/issues/%s".format(GITHUB_REPO), '#'),
-    'release': ("https://github.com/{0}/releases/tag/v%s".format(GITHUB_REPO), 'v'),
-    'wiki':    ("https://github.com/{0}/wiki/%s".format(GITHUB_REPO), ''),
+    'issue':   ("https://github.com/{0}/issues/%s".format(GITHUB_REPO), '#%s'),
+    'release': ("https://github.com/{0}/releases/tag/v%s".format(GITHUB_REPO), 'v%s'),
+    'wiki':    ("https://github.com/{0}/wiki/%s".format(GITHUB_REPO), '%s'),
 }
 
 intersphinx_mapping = {

@@ -10,8 +10,19 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        python-version: [3.4, 3.5, 3.6, 3.7, 3.8, 3.9]
-
+        include:
+          - pipenv-version: '2018.11.26'
+            python-version: '3.4'
+          - pipenv-version: '2018.11.26'
+            python-version: '3.5'
+          - pipenv-version: '2022.4.8'
+            python-version: '3.6'
+          - pipenv-version: '2022.4.8'
+            python-version: '3.7'
+          - pipenv-version: '2022.4.8'
+            python-version: '3.8'
+          - pipenv-version: '2022.4.8'
+            python-version: '3.9'
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
@@ -28,7 +39,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pipenv==2018.11.26
+          pip install pipenv==${{ matrix.pipenv-version }}
           pipenv install --dev
 
       - run: pipenv run tests

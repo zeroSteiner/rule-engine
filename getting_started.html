@@ -1,39 +1,78 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Getting Started &mdash; Rule Engine 3.5.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-    <script src="_static/js/theme.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Rule Syntax" href="syntax.html" />
     <link rel="prev" title="Rule Engine Documentation" href="index.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="index.html" class="icon icon-home"> Rule Engine
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 3.5.1
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -41,7 +80,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
@@ -74,39 +124,80 @@
 <li class="toctree-l1"><a class="reference internal" href="change_log.html">Change Log</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">Rule Engine</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Getting Started</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a></h1>
 <p>The Rule Engine is meant to allow developers to filter arbitrary Python objects with a “rule” specified either by them
 or by an end user. The “rules” that the Rule Engine uses are Python string expressions in a custom language. The syntax
 that Rule Engine uses is similar to Python but borrows some features from Ruby. The rules are a custom language and no
 Python <code class="docutils literal notranslate"><span class="pre">exec</span></code> or <code class="docutils literal notranslate"><span class="pre">eval</span></code> operations are used, allowing developers to safely and securely evaluate rule expressions
 provided by potentially untrusted sources.</p>
 <section id="basic-usage">
-<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading"></a></h2>
+<h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading">¶</a></h2>
 <ol class="arabic">
 <li><p>The developer needs to identify data that they would like to be filtered. This would be some kind of object with a
 set of variable attributes. The rest of the usage example will assume that these objects are comic books.</p>
@@ -114,11 +205,6 @@ set of variable attributes. The rest of the usage example will assume that these
 <li><p>Comic books have various attributes that could be useful for filtering including:</p>
 <blockquote>
 <div><table class="docutils align-default">
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 33%" />
-<col style="width: 51%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p>Attribute</p></td>
 <td><p>Python Type</p></td>
@@ -251,7 +337,7 @@ the rule matches.</p></li>
 </li>
 </ol>
 <section id="attribute-backed-objects">
-<h3>Attribute-Backed Objects<a class="headerlink" href="#attribute-backed-objects" title="Permalink to this heading"></a></h3>
+<h3>Attribute-Backed Objects<a class="headerlink" href="#attribute-backed-objects" title="Permalink to this heading">¶</a></h3>
 <p>In the previous example, the target objects were Python dictionaries. The keys in the dictionary were used as symbols
 and while this is the default behavior it can be modified to use object attributes instead. This would be necessary if
 the target objects had variable attributes (like a Python class object) instead of variable items (like a Python
@@ -302,11 +388,11 @@ artists).</p>
 </section>
 </section>
 <section id="advanced-usage">
-<h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this heading"></a></h2>
+<h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this heading">¶</a></h2>
 <p>The Rule Engine has a number of advanced features that contribute to its flexibility. In most use cases they are
 unnecessary.</p>
 <section id="setting-a-default-value">
-<h3>Setting A Default Value<a class="headerlink" href="#setting-a-default-value" title="Permalink to this heading"></a></h3>
+<h3>Setting A Default Value<a class="headerlink" href="#setting-a-default-value" title="Permalink to this heading">¶</a></h3>
 <p>By default, <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">engine.Rule</span></code></a> will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> for invalid symbols. In some
 cases, it may be desirable to change the way in which the language behaves to instead treat unknown symbols with a
 default value (most often <code class="docutils literal notranslate"><span class="pre">None</span></code> / <code class="xref py py-attr docutils literal notranslate"><span class="pre">ast.DataType.NULL</span></code> is used for this purpose, but any value of a supported
@@ -328,7 +414,7 @@ type can be used). To change this behavior, set the <em>default_value</em> param
 </div>
 </section>
 <section id="custom-resolvers">
-<h3>Custom Resolvers<a class="headerlink" href="#custom-resolvers" title="Permalink to this heading"></a></h3>
+<h3>Custom Resolvers<a class="headerlink" href="#custom-resolvers" title="Permalink to this heading">¶</a></h3>
 <p>Rule Engine includes resolvers for accessing attributes <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_item" title="rule_engine.engine.resolve_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">keys</span></code></a> on objects (such as
 dictionaries) and one for resolving symbols <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.resolve_attribute" title="rule_engine.engine.resolve_attribute"><code class="xref py py-func docutils literal notranslate"><span class="pre">as</span> <span class="pre">attributes</span></code></a> on objects. If for some
 reason, neither of those are suitable for the target object then a custom one can be defined and used.</p>
@@ -337,7 +423,7 @@ rule is being applied to and <em>name</em> is the symbol name as a Python string
 the resolver function fails for any reason, it should raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a>, forwarding
 <em>thing</em> in a keyword argument. This ensures consistency in how exceptions are raised and handled by the engine.</p>
 <section id="suggestions">
-<h4>Suggestions<a class="headerlink" href="#suggestions" title="Permalink to this heading"></a></h4>
+<h4>Suggestions<a class="headerlink" href="#suggestions" title="Permalink to this heading">¶</a></h4>
 <p>When raising a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a>, a custom resolver can optionally make a suggestion for a valid
 symbol name. In this case, the resolver may use the <a class="reference internal" href="rule_engine/suggestions.html#rule_engine.suggestions.suggest_symbol" title="rule_engine.suggestions.suggest_symbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">suggest_symbol</span></code></a> function, passing it the
 invalid name and a list of valid names. The result may then be passed as the <em>suggestion</em> keyword. This suggestion may
@@ -345,7 +431,7 @@ then assist rule authors in correcting mistakes.</p>
 </section>
 </section>
 <section id="type-hinting">
-<h3>Type Hinting<a class="headerlink" href="#type-hinting" title="Permalink to this heading"></a></h3>
+<h3>Type Hinting<a class="headerlink" href="#type-hinting" title="Permalink to this heading">¶</a></h3>
 <p>Symbol type information can be provided to the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> through the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance
 and will be used for compatibility testing. With type information, the engine will raise an
 <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> when an incompatible operation is detected such as a regex match (<code class="docutils literal notranslate"><span class="pre">=~</span></code>) using an
@@ -393,7 +479,7 @@ that reference it.</p>
 </pre></div>
 </div>
 <section id="compound-data-types">
-<span id="getting-started-compound-data-types"></span><h4>Compound Data Types<a class="headerlink" href="#compound-data-types" title="Permalink to this heading"></a></h4>
+<span id="getting-started-compound-data-types"></span><h4>Compound Data Types<a class="headerlink" href="#compound-data-types" title="Permalink to this heading">¶</a></h4>
 <p>Compound data types such as the <code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">MAPPING</span></code> types can
 optionally specify member type information by calling their respective type. For example, an array of strings would be
 defined as <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code> while a mapping with string keys and float values would be defined as
@@ -407,10 +493,10 @@ that the member value can be either the specified type or <code class="xref py p
 set to <code class="xref py py-class docutils literal notranslate"><span class="pre">UNDEFINED</span></code> which is the default value.</p>
 </section>
 <section id="defining-types-from-a-dictionary">
-<h4>Defining Types From A Dictionary<a class="headerlink" href="#defining-types-from-a-dictionary" title="Permalink to this heading"></a></h4>
+<h4>Defining Types From A Dictionary<a class="headerlink" href="#defining-types-from-a-dictionary" title="Permalink to this heading">¶</a></h4>
 <p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be used to generate a <em>type_resolver</em>
 function from a dictionary mapping symbol names to their respective <code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code>. Starting with version
-<a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.1.0">v2.1.0</a> if a <a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> is passed as the <em>type_resolver</em>, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a>
+<a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.1.0">v2.1.0</a> if a <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> is passed as the <em>type_resolver</em>, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a>
 function will be used automatically.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
     <span class="n">type_resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">type_resolver_from_dict</span><span class="p">({</span>
@@ -426,7 +512,7 @@ function will be used automatically.</p>
 </section>
 </section>
 <section id="changing-builtin-symbols">
-<h3>Changing Builtin Symbols<a class="headerlink" href="#changing-builtin-symbols" title="Permalink to this heading"></a></h3>
+<h3>Changing Builtin Symbols<a class="headerlink" href="#changing-builtin-symbols" title="Permalink to this heading">¶</a></h3>
 <p>To remove the default <a class="reference internal" href="syntax.html#builtin-symbols"><span class="std std-ref">builtin symbols</span></a> that are provided, simply initialize a
 <code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code> instance with a <em>values</em> of an empty dictionary. This will remove all builtin values, and the
 dictionary can optionally be populated with alternative values.</p>
@@ -449,7 +535,7 @@ addition to the default builtin symbols.</p>
 </section>
 </section>
 <section id="rule-inspection">
-<h2>Rule Inspection<a class="headerlink" href="#rule-inspection" title="Permalink to this heading"></a></h2>
+<h2>Rule Inspection<a class="headerlink" href="#rule-inspection" title="Permalink to this heading">¶</a></h2>
 <p>There are a few techniques that can be used to inspect a rule object.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.is_valid" title="rule_engine.engine.Rule.is_valid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_valid()</span></code></a> – This class method can be used to determine if a rule expression is valid. It will
@@ -465,33 +551,50 @@ Python <code class="docutils literal notranslate"><span class="pre">graphviz</sp
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Rule Engine Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="syntax.html" class="btn btn-neutral float-right" title="Rule Syntax" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Rule Engine Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Spencer McIntyre.</p>
-  </div>
+    <p>
+        &#169; Copyright 2023, Spencer McIntyre.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

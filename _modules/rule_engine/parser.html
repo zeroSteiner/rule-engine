@@ -1,36 +1,75 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>rule_engine.parser &mdash; Rule Engine 3.5.1 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../index.html" class="icon icon-home"> Rule Engine
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 3.5.1
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -38,7 +77,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
@@ -50,30 +100,69 @@
 <li class="toctree-l1"><a class="reference internal" href="../../change_log.html">Change Log</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Rule Engine</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
+        
       <li>rule_engine.parser</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for rule_engine.parser</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
@@ -136,21 +225,21 @@
 		<span class="k">return</span> <span class="n">constructor</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ParserBase"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase">[docs]</a><span class="k">class</span> <span class="nc">ParserBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A base class for parser objects to inherit from. This does not provide any</span>
 <span class="sd">	grammar related definitions.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">precedence</span> <span class="o">=</span> <span class="p">()</span>
-	<span class="sd">&quot;&quot;&quot;The precedence for operators.&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;The precedence for operators.&quot;&quot;&quot;</span>
 	<span class="n">tokens</span> <span class="o">=</span> <span class="p">()</span>
 	<span class="n">reserved_words</span> <span class="o">=</span> <span class="p">{}</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A mapping of literal words which are reserved to their corresponding grammar</span>
 <span class="sd">	names.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">__mutex</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
 <div class="viewcode-block" id="ParserBase.__init__"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param bool debug: Whether or not to enable debugging features when</span>
 <span class="sd">			using the ply API.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -161,7 +250,7 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">_parser</span> <span class="o">=</span> <span class="n">yacc</span><span class="o">.</span><span class="n">yacc</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">write_tables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ParserBase.parse"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase.parse">[docs]</a>	<span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Parse the specified text in an abstract syntax tree of nodes that can later be evaluated. This is done in two</span>
 <span class="sd">		phases. First, the syntax is parsed and a tree of deferred / uninitialized AST nodes are constructed. Next each</span>
 <span class="sd">		node is built recursively using it&#39;s respective :py:meth:`rule_engine.ast.ASTNodeBase.build`.</span>
@@ -182,7 +271,7 @@
 		<span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">build</span><span class="p">()</span></div></div>
 
 <div class="viewcode-block" id="Parser"><a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.Parser">[docs]</a><span class="k">class</span> <span class="nc">Parser</span><span class="p">(</span><span class="n">ParserBase</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	The parser class for the rule grammar. This class contains many ply specific</span>
 <span class="sd">	members to define the various components of the grammar allowing it to be</span>
 <span class="sd">	parsed and reduced into an abstract syntax tree (AST). Once the AST has been</span>
@@ -282,7 +371,7 @@
 
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">get_token_regex</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">token_name</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Return the regex that is used by the specified token.</span>
 
 <span class="sd">		:param str token_name: The token for which to return the regex.</span>
@@ -368,7 +457,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">Statement</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : object ATTR SYMBOL</span>
 <span class="sd">		       | object ATTR_SAFE SYMBOL</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -376,20 +465,20 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">GetAttributeExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;safe&#39;</span><span class="p">:</span> <span class="n">op_name</span> <span class="o">==</span> <span class="s1">&#39;ATTR_SAFE&#39;</span><span class="p">})</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : object</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_ternary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression QMARK expression COLON expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">condition</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">case_false</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">TernaryExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">case_false</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression MOD    expression</span>
 <span class="sd">				   | expression MUL    expression</span>
 <span class="sd">				   | expression FDIV   expression</span>
@@ -401,7 +490,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression ADD    expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
@@ -409,7 +498,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">AddExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_sub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression SUB    expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">left</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
@@ -417,7 +506,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">SubtractExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_bitwise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression BWAND  expression</span>
 <span class="sd">				   | expression BWOR   expression</span>
 <span class="sd">				   | expression BWXOR  expression</span>
@@ -427,7 +516,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">BitwiseExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_bitwise_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression BWLSH  expression</span>
 <span class="sd">				   | expression BWRSH  expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -436,7 +525,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">BitwiseShiftExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression IN     expression</span>
 <span class="sd">				   | expression NOT IN expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -449,7 +538,7 @@
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression EQ     expression</span>
 <span class="sd">				   | expression NE     expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -458,7 +547,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ComparisonExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_arithmetic_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression GT     expression</span>
 <span class="sd">				   | expression GE     expression</span>
 <span class="sd">				   | expression LT     expression</span>
@@ -469,7 +558,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticComparisonExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_fuzzy_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression EQ_FZM expression</span>
 <span class="sd">				   | expression EQ_FZS expression</span>
 <span class="sd">				   | expression NE_FZM expression</span>
@@ -480,7 +569,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FuzzyComparisonExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression AND    expression</span>
 <span class="sd">				   | expression OR     expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -512,7 +601,7 @@
 
 	<span class="c1"># Literal expressions</span>
 	<span class="k">def</span> <span class="nf">p_expression_boolean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : TRUE</span>
 <span class="sd">				   | FALSE</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -544,7 +633,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">NullExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : LBRACE ary_members RBRACE</span>
 <span class="sd">			   | LBRACE ary_members COMMA RBRACE</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -555,7 +644,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">StringExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : LBRACKET RBRACKET</span>
 <span class="sd">			   | LBRACKET ary_members RBRACKET</span>
 <span class="sd">			   | LBRACKET ary_members COMMA RBRACKET</span>
@@ -566,7 +655,7 @@
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ArrayExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_array_comprehension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : LBRACKET expression FOR SYMBOL IN expression RBRACKET</span>
 <span class="sd">			   | LBRACKET expression FOR SYMBOL IN expression IF expression RBRACKET</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -576,7 +665,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ComprehensionExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">6</span><span class="p">]),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;condition&#39;</span><span class="p">:</span> <span class="n">condition</span><span class="p">})</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_array_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		ary_members : expression</span>
 <span class="sd">					| ary_members COMMA expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -589,7 +678,7 @@
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : LBRACE RBRACE</span>
 <span class="sd">			   | LBRACE map_members RBRACE</span>
 <span class="sd">			   | LBRACE map_members COMMA RBRACE</span>
@@ -600,27 +689,27 @@
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">MappingExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_mapping_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		map_member : expression COLON expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_mapping_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		map_members : map_member</span>
 <span class="sd">					| map_members COMMA map_member</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_expression_array_members</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : object LBRACKET expression RBRACKET</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">container</span><span class="p">,</span> <span class="n">lbracket</span><span class="p">,</span> <span class="n">item</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">GetItemExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">item</span><span class="p">),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;safe&#39;</span><span class="p">:</span> <span class="n">lbracket</span> <span class="o">==</span> <span class="s1">&#39;&amp;[&#39;</span><span class="p">})</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_getslice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : object LBRACKET COLON RBRACKET</span>
 <span class="sd">		       | object LBRACKET COLON expression RBRACKET</span>
 <span class="sd">		       | object LBRACKET expression COLON RBRACKET</span>
@@ -643,30 +732,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Spencer McIntyre.</p>
-  </div>
+    <p>
+        &#169; Copyright 2023, Spencer McIntyre.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

@@ -1,36 +1,75 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>rule_engine.types &mdash; Rule Engine 3.5.1 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="../../index.html" class="icon icon-home"> Rule Engine
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 3.5.1
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -38,7 +77,18 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
@@ -50,30 +100,69 @@
 <li class="toctree-l1"><a class="reference internal" href="../../change_log.html">Change Log</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Rule Engine</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="../index.html">Module code</a> &raquo;</li>
+        
       <li>rule_engine.types</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <h1>Source code for rule_engine.types</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
@@ -134,7 +223,7 @@
 	<span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
 <div class="viewcode-block" id="coerce_value"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.coerce_value">[docs]</a><span class="k">def</span> <span class="nf">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Take a native Python *value* and convert it to a value of a data type which can be represented by a Rule Engine</span>
 <span class="sd">	:py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as</span>
 <span class="sd">	when resolving a symbol from an object external to the engine.</span>
@@ -164,7 +253,7 @@
 	<span class="k">return</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="is_integer_number"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.is_integer_number">[docs]</a><span class="k">def</span> <span class="nf">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check whether *value* is an integer number (i.e. a whole, number). This can, for example, be used to check if a</span>
 <span class="sd">	floating point number such as ``3.0`` can safely be converted to an integer without loss of information.</span>
 
@@ -181,7 +270,7 @@
 	<span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="is_natural_number"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.is_natural_number">[docs]</a><span class="k">def</span> <span class="nf">is_natural_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check whether *value* is a natural number (i.e. a whole, non-negative number). This can, for example, be used to</span>
 <span class="sd">	check if a floating point number such as ``3.0`` can safely be converted to an integer without loss of information.</span>
 
@@ -196,7 +285,7 @@
 	<span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="is_real_number"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.is_real_number">[docs]</a><span class="k">def</span> <span class="nf">is_real_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check whether *value* is a real number (i.e. capable of being represented as a floating point value without loss of</span>
 <span class="sd">	information as well as being finite). Despite being able to be represented as a float, ``NaN`` is not considered a</span>
 <span class="sd">	real number for the purposes of this function.</span>
@@ -212,7 +301,7 @@
 	<span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="is_numeric"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.is_numeric">[docs]</a><span class="k">def</span> <span class="nf">is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Check whether *value* is a numeric value (i.e. capable of being represented as a floating point value without loss</span>
 <span class="sd">	of information).</span>
 
@@ -227,7 +316,7 @@
 	<span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="iterable_member_value_type"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.iterable_member_value_type">[docs]</a><span class="k">def</span> <span class="nf">iterable_member_value_type</span><span class="p">(</span><span class="n">python_value</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Take a native *python_value* and return the corresponding data type of each of its members if the types are either</span>
 <span class="sd">	the same or NULL. NULL is considered a special case to allow nullable-values. This by extension means that an</span>
 <span class="sd">	iterable may not be defined as only capable of containing NULL values.</span>
@@ -403,7 +492,7 @@
 		<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_member_map_</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DataType"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType">[docs]</a><span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">DataTypeMeta</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A collection of constants representing the different supported data types. There are three ways to compare data</span>
 <span class="sd">	types. All three are effectively the same when dealing with scalars.</span>
 
@@ -432,7 +521,7 @@
 <span class="sd">	  this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">ARRAY</span> <span class="o">=</span> <span class="n">_ArrayDataTypeDef</span><span class="p">(</span><span class="s1">&#39;ARRAY&#39;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	.. py:function:: __call__(value_type, value_type_nullable=True)</span>
 <span class="sd">	</span>
 <span class="sd">	:param value_type: The type of the array members.</span>
@@ -443,7 +532,7 @@
 	<span class="n">TIMEDELTA</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;TIMEDELTA&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">)</span>
 	<span class="n">FLOAT</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">)</span>
 	<span class="n">MAPPING</span> <span class="o">=</span> <span class="n">_MappingDataTypeDef</span><span class="p">(</span><span class="s1">&#39;MAPPING&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	.. py:function:: __call__(key_type, value_type, value_type_nullable=True)</span>
 <span class="sd">	</span>
 <span class="sd">	:param key_type: The type of the mapping keys.</span>
@@ -452,7 +541,7 @@
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">NULL</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;NULL&#39;</span><span class="p">,</span> <span class="n">NoneType</span><span class="p">)</span>
 	<span class="n">SET</span> <span class="o">=</span> <span class="n">_SetDataTypeDef</span><span class="p">(</span><span class="s1">&#39;SET&#39;</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	.. py:function:: __call__(value_type, value_type_nullable=True)</span>
 
 <span class="sd">	:param value_type: The type of the set members.</span>
@@ -460,13 +549,13 @@
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">STRING</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;STRING&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 	<span class="n">UNDEFINED</span> <span class="o">=</span> <span class="n">_DATA_TYPE_UNDEFINED</span>
-	<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Undefined values. This constant can be used to indicate that a particular symbol is valid, but it&#39;s data type is</span>
 <span class="sd">	currently unknown.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="DataType.from_name"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.from_name">[docs]</a>	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">from_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Get the data type from its name.</span>
 
 <span class="sd">		.. versionadded:: 2.0.0</span>
@@ -483,7 +572,7 @@
 
 <div class="viewcode-block" id="DataType.from_type"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.from_type">[docs]</a>	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">from_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">python_type</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Get the supported data type constant for the specified Python type. If the type can not be mapped to a supported</span>
 <span class="sd">		data type, then a :py:exc:`ValueError` exception will be raised. This function will not return</span>
 <span class="sd">		:py:attr:`.UNDEFINED`.</span>
@@ -515,7 +604,7 @@
 
 <div class="viewcode-block" id="DataType.from_value"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.from_value">[docs]</a>	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">from_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">python_value</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Get the supported data type constant for the specified Python value. If the value can not be mapped to a</span>
 <span class="sd">		supported data type, then a :py:exc:`TypeError` exception will be raised. This function will not return</span>
 <span class="sd">		:py:attr:`.UNDEFINED`.</span>
@@ -548,7 +637,7 @@
 
 <div class="viewcode-block" id="DataType.is_compatible"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.is_compatible">[docs]</a>	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">is_compatible</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dt1</span><span class="p">,</span> <span class="n">dt2</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Check if two data type definitions are compatible without any kind of conversion. This evaluates to ``True``</span>
 <span class="sd">		when one or both are :py:attr:`.UNDEFINED` or both types are the same. In the case of compound data types (such</span>
 <span class="sd">		as :py:attr:`.ARRAY`) the member types are checked recursively in the same manner.</span>
@@ -581,7 +670,7 @@
 
 <div class="viewcode-block" id="DataType.is_definition"><a class="viewcode-back" href="../../rule_engine/types.html#rule_engine.types.DataType.is_definition">[docs]</a>	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">is_definition</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Check if *value* is a data type definition.</span>
 
 <span class="sd">		.. versionadded:: 2.1.0</span>
@@ -594,30 +683,46 @@
 </pre></div>
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2022, Spencer McIntyre.</p>
-  </div>
+    <p>
+        &#169; Copyright 2023, Spencer McIntyre.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

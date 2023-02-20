@@ -112,6 +112,7 @@
 
 <span class="kn">import</span> <span class="nn">ast</span> <span class="k">as</span> <span class="nn">pyast</span>
 <span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">types</span> <span class="k">as</span> <span class="nn">pytypes</span>
 
@@ -531,7 +532,14 @@
 
 	<span class="k">def</span> <span class="nf">p_expression_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : FLOAT&#39;</span>
-		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FloatExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]))))</span>
+		<span class="n">str_val</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+		<span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[0-9]&#39;</span><span class="p">,</span> <span class="n">str_val</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal: &#39;</span> <span class="o">+</span> <span class="n">str_val</span> <span class="o">+</span> <span class="s1">&#39; (leading zeros in decimal literals are not permitted)&#39;</span><span class="p">)</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">val</span> <span class="o">=</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">str_val</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">SyntaxError</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal: &#39;</span> <span class="o">+</span> <span class="n">str_val</span><span class="p">)</span>
+		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FloatExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)))</span>
 
 	<span class="k">def</span> <span class="nf">p_expression_float_nan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : FLOAT_NAN&#39;</span>

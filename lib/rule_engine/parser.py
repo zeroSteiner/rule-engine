@@ -32,6 +32,7 @@
 
 import ast as pyast
 import collections
+import re
 import threading
 import types as pytypes
 
@@ -451,7 +452,14 @@ class Parser(ParserBase):
 
 	def p_expression_float(self, p):
 		'expression : FLOAT'
-		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, float(literal_eval(p[1]))))
+		str_val = p[1]
+		if re.match('^0[0-9]', str_val):
+			raise errors.RuleSyntaxError('invalid floating point literal: ' + str_val + ' (leading zeros in decimal literals are not permitted)')
+		try:
+			val = literal_eval(str_val)
+		except SyntaxError:
+			raise errors.RuleSyntaxError('invalid floating point literal: ' + str_val)
+		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, float(val)))
 
 	def p_expression_float_nan(self, p):
 		'expression : FLOAT_NAN'

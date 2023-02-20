@@ -74,7 +74,7 @@ License
 The Rule Engine library is released under the BSD 3-Clause license. It is able to be used for both commercial and
 private purposes. For more information, see the `LICENSE`_ file.
 
-.. |badge-build| image:: https://img.shields.io/github/workflow/status/zeroSteiner/rule-engine/Continuous%20Integration/master?style=flat-square
+.. |badge-build| image:: https://img.shields.io/github/actions/workflow/status/zeroSteiner/rule-engine/ci.yml?branch=master&style=flat-square
    :alt: GitHub Workflow Status (branch)
    :target: https://github.com/zeroSteiner/rule-engine/actions/workflows/ci.yml
 

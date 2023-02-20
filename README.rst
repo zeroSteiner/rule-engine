@@ -6,6 +6,10 @@ A lightweight, optionally typed expression language with a custom grammar for ma
 
 Documentation is available at https://zeroSteiner.github.io/rule-engine/.
 
+:Warning:
+  The next minor version (3.6) will be the last to support Python versions 3.4 and 3.5. There is currently no timeline
+  for its release. The following version, either 3.7 or 4.0, will not suport Python versions 3.4 or 3.5.
+
 Rule Engine expressions are written in their own language, defined as strings in Python. The syntax is most similar to
 Python with some inspiration from Ruby. Some features of this language includes:
 

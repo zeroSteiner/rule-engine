@@ -35,6 +35,7 @@ import random
 import unittest
 
 import rule_engine.engine as engine
+import rule_engine.errors as errors
 import rule_engine.types as types
 
 class GitHubIssueTests(unittest.TestCase):
@@ -85,3 +86,12 @@ class GitHubIssueTests(unittest.TestCase):
 			self.assertFalse(rule.evaluate({
 				'object': {'timestamp': datetime.datetime(2021, 8, 19)}
 			}))
+
+	def test_number_54(self):
+		rules = (
+			'count == 01',
+			"test=='NOTTEST' and count==01 and other=='other'"
+		)
+		for rule in rules:
+			with self.assertRaises(errors.RuleSyntaxError):
+				engine.Rule(rule)

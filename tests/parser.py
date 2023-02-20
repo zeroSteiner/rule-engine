@@ -343,7 +343,7 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual('0o77', ast.FloatExpression, decimal.Decimal('63'))
 
 	def test_parse_float_base_10(self):
-		self.assertLiteralStatementEqual('00', ast.FloatExpression, decimal.Decimal('0'))
+		self.assertLiteralStatementEqual('0', ast.FloatExpression, decimal.Decimal('0'))
 		self.assertLiteralStatementEqual('99', ast.FloatExpression, decimal.Decimal('99'))
 
 	def test_parse_float_base_16(self):

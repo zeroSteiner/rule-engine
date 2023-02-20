@@ -1,5 +1,6 @@
 *.ipynb
 *.py[cod]
+*.swp
 
 .coverage
 .github/workflows/*.jnj

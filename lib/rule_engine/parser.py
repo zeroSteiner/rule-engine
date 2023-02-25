@@ -157,7 +157,7 @@ class Parser(ParserBase):
 	tokens = (
 		'DATETIME', 'TIMEDELTA', 'FLOAT', 'STRING', 'SYMBOL',
 		'LPAREN', 'RPAREN', 'QMARK', 'COLON', 'COMMA',
-		'LBRACKET', 'RBRACKET', 'LBRACE', 'RBRACE'
+		'LBRACKET', 'RBRACKET', 'LBRACE', 'RBRACE', 'COMMENT'
 	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
 
 	t_ignore = ' \t'
@@ -276,6 +276,10 @@ class Parser(ParserBase):
 		t.type = self.reserved_words.get(t.value, 'SYMBOL')
 		return t
 
+	def t_COMMENT(self, t):
+		r'\#.*$'
+		return t
+
 	def t_newline(self, t):
 		r'\n+'
 		t.lexer.lineno += t.value.count("\n")
@@ -288,8 +292,14 @@ class Parser(ParserBase):
 		raise errors.RuleSyntaxError('syntax error', token)
 
 	def p_statement_expr(self, p):
-		'statement : expression'
-		p[0] = _DeferredAstNode(ast.Statement, args=(self.context, p[1]))
+		"""
+		statement : expression
+		          | expression COMMENT
+		"""
+		kwargs = {}
+		if len(p) == 3:
+			kwargs['comment'] = ast.Comment(p[2][1:].strip())
+		p[0] = _DeferredAstNode(ast.Statement, args=(self.context, p[1]), kwargs=kwargs)
 
 	def p_expression_getattr(self, p):
 		"""

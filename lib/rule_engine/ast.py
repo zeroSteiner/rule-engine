@@ -120,6 +120,14 @@ class ASTNodeBase(object):
 		"""
 		return self
 
+class Comment(ASTNodeBase):
+	__slots__ = ('value',)
+	def __init__(self, value):
+		self.value = value
+
+	def __repr__(self):
+		return "<{0} {1!r}>".format(self.__class__.__name__, self.value)
+
 ################################################################################
 # Base Expression Classes
 ################################################################################
@@ -1025,8 +1033,8 @@ class SymbolExpression(ExpressionBase):
 
 class Statement(ASTNodeBase):
 	"""A class representing the top level statement of the grammar text."""
-	__slots__ = ('context', 'expression')
-	def __init__(self, context, expression):
+	__slots__ = ('context', 'expression', 'comment')
+	def __init__(self, context, expression, comment=None):
 		"""
 		:param context: The context to use for evaluating the statement.
 		:type context: :py:class:`~rule_engine.engine.Context`
@@ -1035,10 +1043,11 @@ class Statement(ASTNodeBase):
 		"""
 		self.context = context
 		self.expression = expression
+		self.comment = comment
 
 	@classmethod
-	def build(cls, context, expression):
-		return cls(context, expression.build()).reduce()
+	def build(cls, context, expression, **kwargs):
+		return cls(context, expression.build(), **kwargs).reduce()
 
 	def evaluate(self, thing):
 		return self.expression.evaluate(thing)

@@ -128,6 +128,9 @@ class Comment(ASTNodeBase):
 	def __repr__(self):
 		return "<{0} {1!r}>".format(self.__class__.__name__, self.value)
 
+	def to_graphviz(self, digraph, *args, **kwargs):
+		digraph.node(str(id(self)), "{}\n{!r}".format(self.__class__.__name__, self.value))
+
 ################################################################################
 # Base Expression Classes
 ################################################################################
@@ -1056,6 +1059,8 @@ class Statement(ASTNodeBase):
 		super(Statement, self).to_graphviz(digraph, *args, **kwargs)
 		self.expression.to_graphviz(digraph, *args, **kwargs)
 		digraph.edge(str(id(self)), str(id(self.expression)))
+		if self.comment:
+			self.comment.to_graphviz(digraph, *args, **kwargs)
 
 class TernaryExpression(ExpressionBase):
 	"""

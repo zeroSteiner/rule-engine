@@ -467,15 +467,15 @@ class DataType(metaclass=DataTypeMeta):
 	@classmethod
 	def from_type(cls, python_type):
 		"""
-		Get the supported data type constant for the specified Python type. If the type can not be mapped to a supported
-		data type, then a :py:exc:`ValueError` exception will be raised. This function will not return
-		:py:attr:`.UNDEFINED`.
+		Get the supported data type constant for the specified Python type/type hint. 
+		If the type or typehint can not be mapped to a supported data type, then a 
+		:py:exc:`ValueError` exception will be raised. This function will not return :py:attr:`.UNDEFINED`.
 
-		:param type python_type: The native Python type to retrieve the corresponding type constant for.
+		:param type python_type: The native Python type or type hint to retrieve the corresponding type constant for.
 		:return: One of the constants.
 		"""
-		if not isinstance(python_type, type):
-			raise TypeError('from_type argument 1 must be type, not ' + type(python_type).__name__)
+		if not (isinstance(python_type, type) or hasattr(python_type, '__origin__')):
+			raise TypeError('from_type argument 1 must be a type or a type hint, not ' + type(python_type).__name__)
 		if python_type in (list, range, tuple):
 			return cls.ARRAY
 		elif python_type is bool:
@@ -496,6 +496,19 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.STRING
 		elif python_type is _PYTHON_FUNCTION_TYPE:
 			return cls.FUNCTION
+		elif hasattr(python_type, "__origin__"):
+			origin_python_type = python_type.__origin__
+			maintype = cls.from_type(origin_python_type)
+			if origin_python_type in (list, tuple, set):
+				if hasattr(python_type, "__args__") and origin_python_type is not tuple:
+					valuetype = cls.from_type(python_type.__args__[0])
+					return maintype(valuetype)
+			if origin_python_type is dict:
+				if hasattr(python_type, "__args__"):
+					key_type = cls.from_type(python_type.__args__[0])
+					value_type = cls.from_type(python_type.__args__[1])
+					return maintype(key_type, value_type)
+			return maintype
 		raise ValueError("can not map python type {0!r} to a compatible data type".format(python_type.__name__))
 
 	@classmethod

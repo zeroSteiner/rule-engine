@@ -32,6 +32,8 @@
 
 import collections
 import datetime
+import sys
+import typing
 import unittest
 
 import rule_engine.types as types
@@ -113,8 +115,35 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(DataType.from_type(str), DataType.STRING)
 		self.assertIs(DataType.from_type(type(lambda: None)), DataType.FUNCTION)
 
+	def test_data_type_from_type_hint(self):
+		# simple compound tests
+		self.assertEqual(DataType.from_type(typing.List[str]), DataType.ARRAY(DataType.STRING))
+		self.assertEqual(DataType.from_type(typing.Tuple[str]), DataType.ARRAY(DataType.UNDEFINED))
+		self.assertEqual(DataType.from_type(typing.Set[int]), DataType.SET(DataType.FLOAT))
+		self.assertEqual(DataType.from_type(typing.Dict[str, str]), DataType.MAPPING(DataType.STRING, DataType.STRING))
+
+		# complex compound tests
+		self.assertEqual(DataType.from_type(typing.List[list]), DataType.ARRAY(DataType.ARRAY))
+		self.assertEqual(DataType.from_type(
+			typing.Dict[str, typing.Dict[str, datetime.datetime]]),
+			DataType.MAPPING(DataType.STRING, DataType.MAPPING(DataType.STRING, DataType.DATETIME)
+		))
+
+		if sys.version_info >= (3, 9):
+			self.assertEqual(DataType.from_type(list[str]), DataType.ARRAY(DataType.STRING))
+			self.assertEqual(DataType.from_type(tuple[str]), DataType.ARRAY(DataType.UNDEFINED))
+			self.assertEqual(DataType.from_type(set[int]), DataType.SET(DataType.FLOAT))
+			self.assertEqual(DataType.from_type(dict[str, str]), DataType.MAPPING(DataType.STRING, DataType.STRING))
+
+			self.assertEqual(DataType.from_type(list[list]), DataType.ARRAY(DataType.ARRAY))
+			self.assertEqual(DataType.from_type(
+				dict[str, dict[str, datetime.datetime]]),
+				DataType.MAPPING(DataType.STRING, DataType.MAPPING(DataType.STRING, DataType.DATETIME)
+			))
+
+
 	def test_data_type_from_type_error(self):
-		with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be type, not _UnsupportedType$'):
+		with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be a type or a type hint, not _UnsupportedType$'):
 			DataType.from_type(self._UnsupportedType())
 		with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
 			DataType.from_type(self._UnsupportedType)

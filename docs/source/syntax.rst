@@ -275,6 +275,14 @@ Example rules show equivalent literal expressions:
 * ``1e0 == 1``
 * ``1.0e0 == 1``
 
+Comments
+^^^^^^^^
+
+A single ``#`` symbol can be used to create a comment in the rule text. The everything after the first ``#`` occurrence
+will be ignored.
+
+Example rule containing a comment: ``size == 1 # this is a comment``
+
 .. py:currentmodule:: rule_engine
 
 .. _builtin-symbols:

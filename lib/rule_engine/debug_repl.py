@@ -111,6 +111,9 @@ def main():
 			print("{}: {}".format(error.__class__.__name__, error.message))
 			if isinstance(error, (errors.AttributeResolutionError, errors.SymbolResolutionError)) and error.suggestion:
 				print("Did you mean '{}'?".format(error.suggestion))
+			elif isinstance(error, errors.RegexSyntaxError):
+				print("  Regex:   {!r}".format(error.error.pattern))
+				print("  Details: {} at position {}".format(error.error.msg, error.error.pos))
 			if arguments.debug:
 				traceback.print_exc()
 		except Exception as error:

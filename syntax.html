@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rule Syntax &mdash; Rule Engine 3.5.1 documentation</title>
+  <title>Rule Syntax &mdash; Rule Engine 3.6.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
@@ -12,7 +12,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -35,7 +36,7 @@
             Rule Engine
           </a>
               <div class="version">
-                3.5.1
+                3.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -58,6 +59,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#reserved-keywords">Reserved Keywords</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#literal-values">Literal Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#comments">Comments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#builtin-symbols">Builtin Symbols</a><ul>
@@ -434,6 +436,12 @@ include a decimal place component.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">1e0</span> <span class="pre">==</span> <span class="pre">1</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">1.0e0</span> <span class="pre">==</span> <span class="pre">1</span></code></p></li>
 </ul>
+</section>
+<section id="comments">
+<h3>Comments<a class="headerlink" href="#comments" title="Permalink to this heading"></a></h3>
+<p>A single <code class="docutils literal notranslate"><span class="pre">#</span></code> symbol can be used to create a comment in the rule text. The everything after the first <code class="docutils literal notranslate"><span class="pre">#</span></code> occurrence
+will be ignored.</p>
+<p>Example rule containing a comment: <code class="docutils literal notranslate"><span class="pre">size</span> <span class="pre">==</span> <span class="pre">1</span> <span class="pre">#</span> <span class="pre">this</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">comment</span></code></p>
 </section>
 </section>
 <section id="builtin-symbols">

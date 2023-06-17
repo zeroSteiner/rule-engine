@@ -7,6 +7,12 @@ this list is curated by the development team for note worthy changes.
 Version 3.x.x
 -------------
 
+Released :release:`3.6.0` on June 16th, 2023
+
+* Removed testing for Python 3.4 and 3.5 on GitHub Actions
+* Add regex error details to the debug REPL
+* Add support for Python-style comments
+
 Version 3.5.0
 ^^^^^^^^^^^^^
 

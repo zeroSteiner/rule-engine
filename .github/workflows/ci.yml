@@ -7,14 +7,10 @@ on:
 jobs:
   unit-tests:
     name: Test on Python v${{ matrix.python-version }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         include:
-          - pipenv-version: '2018.11.26'
-            python-version: '3.4'
-          - pipenv-version: '2018.11.26'
-            python-version: '3.5'
           - pipenv-version: '2022.4.8'
             python-version: '3.6'
           - pipenv-version: '2022.4.8'

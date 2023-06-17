@@ -1044,6 +1044,14 @@ class FunctionCallExpression(ExpressionBase):
 	@classmethod
 	def build(cls, context, function, arguments):
 		return cls(context, function.build(), tuple(argument.build() for argument in arguments)).reduce()
+
+	def reduce(self):
+		if not _is_reduced(self.function):
+			return self
+		if not all(map(self.arguments, _is_reduced)):
+			return self
+		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+
 	def evaluate(self, thing):
 		function = self.function.evaluate(thing)
 		arguments = tuple(argument.evaluate(thing) for argument in self.arguments)

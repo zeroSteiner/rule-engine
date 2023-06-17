@@ -49,6 +49,7 @@ __all__ = (
 	'iterable_member_value_type'
 )
 
+_PYTHON_FUNCTION_TYPE = type(lambda: None)
 NoneType = type(None)
 
 def _to_decimal(value):
@@ -387,6 +388,7 @@ class DataType(metaclass=DataTypeMeta):
 	Undefined values. This constant can be used to indicate that a particular symbol is valid, but it's data type is
 	currently unknown.
 	"""
+	FUNCTION = _DataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE)
 	@classmethod
 	def from_name(cls, name):
 		"""
@@ -434,6 +436,8 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.SET
 		elif python_type is str:
 			return cls.STRING
+		elif python_type is _PYTHON_FUNCTION_TYPE:
+			return cls.FUNCTION
 		raise ValueError("can not map python type {0!r} to a compatible data type".format(python_type.__name__))
 
 	@classmethod
@@ -467,6 +471,8 @@ class DataType(metaclass=DataTypeMeta):
 			)
 		elif isinstance(python_value, collections.abc.Sequence):
 			return cls.ARRAY(value_type=iterable_member_value_type(python_value))
+		elif callable(python_value):
+			return cls.FUNCTION
 		raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
 	@classmethod

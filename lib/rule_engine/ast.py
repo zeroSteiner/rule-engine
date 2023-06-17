@@ -1034,6 +1034,21 @@ class SymbolExpression(ExpressionBase):
 	def to_graphviz(self, digraph, *args, **kwargs):
 		digraph.node(str(id(self)), "{}\nname={!r}".format(self.__class__.__name__, self.name))
 
+class FunctionCallExpression(ExpressionBase):
+	__slots__ = ('function', 'arguments',)
+	def __init__(self, context, function, arguments):
+		self.context = context
+		self.function = function
+		self.arguments = arguments
+
+	@classmethod
+	def build(cls, context, function, arguments):
+		return cls(context, function.build(), tuple(argument.build() for argument in arguments)).reduce()
+	def evaluate(self, thing):
+		function = self.function.evaluate(thing)
+		arguments = tuple(argument.evaluate(thing) for argument in self.arguments)
+		return function(*arguments)
+
 class Statement(ASTNodeBase):
 	"""A class representing the top level statement of the grammar text."""
 	__slots__ = ('context', 'expression', 'comment')

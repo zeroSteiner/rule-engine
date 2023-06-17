@@ -581,3 +581,17 @@ class Parser(ParserBase):
 		else:
 			raise errors.RuleSyntaxError('invalid get slice expression')
 		p[0] = _DeferredAstNode(ast.GetSliceExpression, args=(self.context, container, start, stop), kwargs={'safe': safe})
+
+	def p_expression_function_call(self, p):
+		"""
+		expression : expression LPAREN RPAREN
+		           | expression LPAREN ary_members RPAREN
+		"""
+		function = p[1]
+		if len(p) == 4:
+			arguments = collections.deque()
+		elif len(p) == 5:
+			arguments = p[3]
+		else:
+			raise errors.RuleSyntaxError('invalid function call expression')
+		p[0] = _DeferredAstNode(ast.FunctionCallExpression, args=(self.context, function, arguments))

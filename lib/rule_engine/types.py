@@ -304,6 +304,55 @@ class _MappingDataTypeDef(_DataTypeDef):
 	def __hash__(self):
 		return hash((self.python_type, self.is_scalar, hash((self.key_type, self.value_type, self.value_type_nullable))))
 
+class _FunctionDataTypeDef(_DataTypeDef):
+	__slots__ = ('value_name', 'return_type', 'argument_types', 'minimum_arguments')
+	def __init__(self, name, python_type, value_name=None, return_type=_DATA_TYPE_UNDEFINED, argument_types=_DATA_TYPE_UNDEFINED, minimum_arguments=None):
+		super(_FunctionDataTypeDef, self).__init__(name, python_type)
+		self.value_name = value_name
+		self.return_type = return_type
+		if argument_types is _DATA_TYPE_UNDEFINED:
+			if minimum_arguments is None:
+				minimum_arguments = _DATA_TYPE_UNDEFINED
+		else:
+			if not isinstance(argument_types, collections.abc.Sequence):
+				raise TypeError('argument_types must be a sequence (list or tuple)')
+			if minimum_arguments is None:
+				# if arguments are specified, assume that they're all required by default
+				minimum_arguments = len(argument_types)
+			if len(argument_types) < minimum_arguments:
+				raise ValueError('minimum_arguments can not be greater than the length of argument_types')
+		self.argument_types = argument_types
+		self.minimum_arguments = minimum_arguments
+
+	def __call__(self, name, return_type=_DATA_TYPE_UNDEFINED, argument_types=_DATA_TYPE_UNDEFINED, minimum_arguments=None):
+		return self.__class__(
+			self.name,
+			self.python_type,
+			value_name=name,
+			return_type=return_type,
+			argument_types=argument_types,
+			minimum_arguments=minimum_arguments
+		)
+	def __repr__(self):
+		return "<{} name={} python_type={} return_type={} >".format(
+			self.__class__.__name__,
+			self.name,
+			self.python_type.__name__,
+			self.return_type.name
+		)
+
+	def __eq__(self, other):
+		if not super().__eq__(other):
+			return False
+		return all((
+			self.return_type == other.return_type,
+			self.argument_types == other.argument_types,
+			self.minimum_arguments == other.minimum_arguments
+		))
+
+	def __hash__(self):
+		return hash((self.python_type, self.is_scalar, hash((self.return_type, self.argument_types, self.minimum_arguments))))
+
 class DataTypeMeta(type):
 	def __new__(metacls, cls, bases, classdict):
 		data_type = super().__new__(metacls, cls, bases, classdict)
@@ -388,7 +437,7 @@ class DataType(metaclass=DataTypeMeta):
 	Undefined values. This constant can be used to indicate that a particular symbol is valid, but it's data type is
 	currently unknown.
 	"""
-	FUNCTION = _DataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE)
+	FUNCTION = _FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE)
 	@classmethod
 	def from_name(cls, name):
 		"""
@@ -494,6 +543,18 @@ class DataType(metaclass=DataTypeMeta):
 		if dt1 is _DATA_TYPE_UNDEFINED or dt2 is _DATA_TYPE_UNDEFINED:
 			return True
 		if dt1.is_scalar and dt2.is_scalar:
+			if isinstance(dt1, DataType.FUNCTION.__class__) and isinstance(dt2, DataType.FUNCTION.__class__):
+				if not cls.is_compatible(dt1.return_type, dt2.return_type):
+					return False
+				if dt1.argument_types != _DATA_TYPE_UNDEFINED and dt2.argument_types != _DATA_TYPE_UNDEFINED:
+					if len(dt1.argument_types) != len(dt2.argument_types):
+						return False
+					if not all(cls.is_compatible(arg1_dt, arg2_dt) for (arg1_dt, arg2_dt) in zip(dt1.argument_types, dt2.argument_types)):
+						return False
+				if dt1.minimum_arguments != _DATA_TYPE_UNDEFINED and dt2.minimum_arguments != _DATA_TYPE_UNDEFINED:
+					if dt1.minimum_arguments != dt2.minimum_arguments:
+						return False
+				return True
 			return dt1 == dt2
 		elif dt1.is_compound and dt2.is_compound:
 			if isinstance(dt1, DataType.ARRAY.__class__) and isinstance(dt2, DataType.ARRAY.__class__):

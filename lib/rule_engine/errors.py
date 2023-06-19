@@ -248,3 +248,11 @@ class SymbolTypeError(EvaluationError):
 			expected_type.name
 		)
 		super(SymbolTypeError, self).__init__(message)
+
+class FunctionCallError(EvaluationError):
+	"""An error raised when there is an issue calling a function."""
+	def __init__(self, message, error=None, function_name=None):
+		super(FunctionCallError, self).__init__(message)
+		self.error = error
+		"""The exception from which this error was triggered."""
+		self.function_name = function_name

@@ -386,7 +386,7 @@ class Builtins(collections.abc.Mapping):
 			'pi': ast.DataType.FLOAT,
 			'now': ast.DataType.DATETIME,
 			'today': ast.DataType.DATETIME,
-			'sum': ast.DataType.FUNCTION
+			'sum': ast.DataType.FUNCTION('sum', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.ARRAY(ast.DataType.FLOAT),))
 		}
 		default_value_types.update(kwargs.pop('value_types', {}))
 		return cls(default_values, value_types=default_value_types, **kwargs)

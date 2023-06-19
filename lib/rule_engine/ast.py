@@ -1039,6 +1039,16 @@ class FunctionCallExpression(ExpressionBase):
 	def __init__(self, context, function, arguments):
 		self.context = context
 		self.function = function
+		if self.function.result_type != DataType.UNDEFINED:
+			function_type = self.function.result_type
+			if not isinstance(function_type, DataType.FUNCTION.__class__):
+				raise errors.EvaluationError('data type mismatch (not a callable value)')
+			if len(arguments) < function_type.minimum_arguments:
+				raise errors.FunctionCallError(
+					"missing {} required positional arguments".format(function_type.minimum_arguments - len(arguments)),
+					function_name=function_type.value_name
+				)
+			self.result_type = function_type.return_type
 		self.arguments = arguments
 
 	@classmethod
@@ -1054,8 +1064,29 @@ class FunctionCallExpression(ExpressionBase):
 
 	def evaluate(self, thing):
 		function = self.function.evaluate(thing)
+		if not callable(function):
+			raise errors.EvaluationError('data type mismatch (not a callable value)')
 		arguments = tuple(argument.evaluate(thing) for argument in self.arguments)
-		return function(*arguments)
+		function_name = function.__name__ + '?'
+		if self.function.result_type != DataType.UNDEFINED:
+			function_type = self.function.result_type
+			if len(arguments) < function_type.minimum_arguments:
+				raise errors.FunctionCallError(
+					"missing {} required positional arguments".format(function_type.minimum_arguments - len(arguments)),
+					function_name=function_type.value_name
+				)
+			for pos, (arg1, arg2_type) in enumerate(zip(arguments, function_type.argument_types), 1):
+				arg1_type = DataType.from_value(arg1)
+				if not DataType.is_compatible(arg1_type, arg2_type):
+					raise errors.FunctionCallError(
+						"data type mismatch (argument {})".format(pos),
+						function_name=function_type.value_name
+					)
+		try:
+			result = function(*arguments)
+		except Exception as error:
+			raise errors.FunctionCallError('function call failed', error=error, function_name=function_name) from None
+		return result
 
 class Statement(ASTNodeBase):
 	"""A class representing the top level statement of the grammar text."""

@@ -48,13 +48,24 @@ class DataTypeTests(unittest.TestCase):
 		with self.assertRaises(TypeError):
 			types._CollectionDataTypeDef('TEST', float)
 
-	def test_data_type_equality(self):
+
+	def test_data_type_equality_array(self):
 		dt1 = DataType.ARRAY(DataType.STRING)
 		self.assertIs(dt1.value_type, DataType.STRING)
 		self.assertEqual(dt1, DataType.ARRAY(DataType.STRING))
 		self.assertNotEqual(dt1, DataType.ARRAY)
 		self.assertNotEqual(dt1, DataType.ARRAY(DataType.STRING, value_type_nullable=False))
 
+	def test_data_type_equality_function(self):
+		dt1 = DataType.FUNCTION('test', return_type=DataType.FLOAT, argument_types=(), minimum_arguments=0)
+		self.assertEqual(dt1.value_name, 'test')
+		self.assertEqual(dt1, DataType.FUNCTION('otherTest', return_type=DataType.FLOAT, argument_types=(), minimum_arguments=0))
+		self.assertNotEqual(dt1, DataType.NULL)
+		self.assertNotEqual(dt1, DataType.FUNCTION('test', return_type=DataType.NULL, argument_types=(), minimum_arguments=0))
+		self.assertNotEqual(dt1, DataType.FUNCTION('test', return_type=DataType.FLOAT, argument_types=(DataType.FLOAT,), minimum_arguments=0))
+		self.assertNotEqual(dt1, DataType.FUNCTION('otherTest', return_type=DataType.FLOAT, minimum_arguments=1))
+
+	def test_data_type_equality_mapping(self):
 		dt1 = DataType.MAPPING(DataType.STRING)
 		self.assertIs(dt1.key_type, DataType.STRING)
 		self.assertEqual(dt1, DataType.MAPPING(DataType.STRING))
@@ -62,6 +73,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertNotEqual(dt1, DataType.MAPPING(DataType.STRING, value_type=DataType.STRING))
 		self.assertNotEqual(dt1, DataType.MAPPING(DataType.STRING, value_type_nullable=False))
 
+	def test_data_type_equality_set(self):
 		dt1 = DataType.SET(DataType.STRING)
 		self.assertIs(dt1.value_type, DataType.STRING)
 		self.assertEqual(dt1, DataType.SET(DataType.STRING))
@@ -78,6 +90,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(DataType.from_name('NULL'), DataType.NULL)
 		self.assertIs(DataType.from_name('SET'), DataType.SET)
 		self.assertIs(DataType.from_name('STRING'), DataType.STRING)
+		self.assertIs(DataType.from_name('FUNCTION'), DataType.FUNCTION)
 
 	def test_data_type_from_name_error(self):
 		with self.assertRaises(TypeError):
@@ -98,6 +111,7 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(DataType.from_type(type(None)), DataType.NULL)
 		self.assertIs(DataType.from_type(set), DataType.SET)
 		self.assertIs(DataType.from_type(str), DataType.STRING)
+		self.assertIs(DataType.from_type(type(lambda: None)), DataType.FUNCTION)
 
 	def test_data_type_from_type_error(self):
 		with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be type, not _UnsupportedType$'):
@@ -141,21 +155,30 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(value.iterable_type, DataType.STRING)
 
 	def test_data_type_from_value_scalar(self):
-		self.assertEqual(DataType.from_value(False), DataType.BOOLEAN)
-		self.assertEqual(DataType.from_value(datetime.date.today()), DataType.DATETIME)
-		self.assertEqual(DataType.from_value(datetime.datetime.now()), DataType.DATETIME)
-		self.assertEqual(DataType.from_value(datetime.timedelta()), DataType.TIMEDELTA)
-		self.assertEqual(DataType.from_value(0), DataType.FLOAT)
-		self.assertEqual(DataType.from_value(0.0), DataType.FLOAT)
-		self.assertEqual(DataType.from_value(None), DataType.NULL)
-		self.assertEqual(DataType.from_value(''), DataType.STRING)
+		self.assertIs(DataType.from_value(False), DataType.BOOLEAN)
+		self.assertIs(DataType.from_value(datetime.date.today()), DataType.DATETIME)
+		self.assertIs(DataType.from_value(datetime.datetime.now()), DataType.DATETIME)
+		self.assertIs(DataType.from_value(datetime.timedelta()), DataType.TIMEDELTA)
+		self.assertIs(DataType.from_value(0), DataType.FLOAT)
+		self.assertIs(DataType.from_value(0.0), DataType.FLOAT)
+		self.assertIs(DataType.from_value(None), DataType.NULL)
+		self.assertIs(DataType.from_value(''), DataType.STRING)
+		self.assertIs(DataType.from_value(lambda: None), DataType.FUNCTION)
+		self.assertIs(DataType.from_value(print), DataType.FUNCTION)
 
 	def test_data_type_from_value_error(self):
 		with self.assertRaisesRegex(TypeError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
 			DataType.from_value(self._UnsupportedType())
 
+	def test_data_type_function(self):
+		with self.assertRaises(TypeError, msg='argument_types should be a sequence'):
+			DataType.FUNCTION('test', argument_types=DataType.NULL)
+		with self.assertRaises(ValueError, msg='minimum_arguments should be less than or equal to the length of argument_types'):
+			DataType.FUNCTION('test', argument_types=(), minimum_arguments=1)
+
+
 	def test_data_type_definitions_describe_themselves(self):
-		for name in ('ARRAY', 'BOOLEAN', 'DATETIME', 'TIMEDELTA', 'FLOAT', 'MAPPING', 'NULL', 'SET', 'STRING', 'UNDEFINED'):
+		for name in DataType:
 			data_type = getattr(DataType, name)
 			self.assertRegex(repr(data_type), 'name=' + name)
 
@@ -202,6 +225,49 @@ class MetaDataTypeTests(unittest.TestCase):
 
 		with self.assertRaises(TypeError):
 			DataType.is_compatible(DataType.STRING, None)
+
+	def test_data_type_is_compatible_function(self):
+		def _is_compat(*args):
+			return self.assertTrue(DataType.is_compatible(*args))
+		def _is_not_compat(*args):
+			return self.assertFalse(DataType.is_compatible(*args))
+		# the function name doesn't matter, it's only for reporting
+		_is_compat(
+			DataType.FUNCTION('functionA'),
+			DataType.FUNCTION('functionB')
+		)
+		# return type is UNDEFINED by default which should be compatible
+		_is_compat(
+			DataType.FUNCTION('test', return_type=DataType.FLOAT),
+			DataType.FUNCTION('test')
+		)
+		# argument types are UNDEFINED by default which should be compatible
+		_is_compat(
+			DataType.FUNCTION('test', argument_types=(DataType.STRING,), minimum_arguments=1),
+			DataType.FUNCTION('test', minimum_arguments=1)
+		)
+		# minimum arguments defaults to the number of arguments
+		_is_compat(
+			DataType.FUNCTION('test', argument_types=(DataType.STRING,), minimum_arguments=1),
+			DataType.FUNCTION('test', argument_types=(DataType.STRING,))
+		)
+
+		_is_not_compat(
+			DataType.FUNCTION('test', return_type=DataType.FLOAT),
+			DataType.FUNCTION('test', return_type=DataType.STRING)
+		)
+		_is_not_compat(
+			DataType.FUNCTION('test', argument_types=(DataType.STRING,)),
+			DataType.FUNCTION('test', argument_types=())
+		)
+		_is_not_compat(
+			DataType.FUNCTION('test', argument_types=(DataType.FLOAT,)),
+			DataType.FUNCTION('test', argument_types=(DataType.STRING,))
+		)
+		_is_not_compat(
+			DataType.FUNCTION('test', minimum_arguments=0),
+			DataType.FUNCTION('test', minimum_arguments=1)
+		)
 
 	def test_data_type_is_definition(self):
 		self.assertTrue(DataType.is_definition(DataType.ARRAY))

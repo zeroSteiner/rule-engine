@@ -128,6 +128,23 @@ class ParserTests(ParserTestsBase):
 			self.assertIsInstance(expression.container, ast.SymbolExpression)
 			self.assertEqual(expression.container.name, 'container')
 
+	def test_parser_function_call_expressions(self):
+		expression = self.assertStatementType(
+			'function()',
+			ast.FunctionCallExpression
+		).expression
+		self.assertIsInstance(expression.function, ast.SymbolExpression)
+		self.assertEqual(expression.function.name, 'function')
+		self.assertEqual(len(expression.arguments), 0)
+
+		expression = self.assertStatementType(
+			'function(arg1)',
+			ast.FunctionCallExpression
+		).expression
+		self.assertEqual(len(expression.arguments), 1)
+		self.assertIsInstance(expression.arguments[0], ast.SymbolExpression)
+		self.assertEqual(expression.arguments[0].name, 'arg1')
+
 	def test_parser_order_of_operations(self):
 		cases = (
 			'100 * ( 2 + 12 ) / 14',

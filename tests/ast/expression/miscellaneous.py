@@ -46,6 +46,7 @@ import rule_engine.types as types
 import dateutil.tz
 
 __all__ = (
+	'CommentExpressionTests',
 	'ComprehensionExpressionTests',
 	'ContainsExpressionTests',
 	'GetItemExpressionTests',
@@ -55,6 +56,12 @@ __all__ = (
 	'TernaryExpressionTests',
 	'UnaryExpressionTests'
 )
+
+class CommentExpressionTests(unittest.TestCase):
+	def test_ast_expression_comment(self):
+		value = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+		comment = ast.Comment(value)
+		self.assertIn(value, repr(comment))
 
 class ComprehensionExpressionTests(unittest.TestCase):
 	def test_ast_conditional_comprehension(self):
@@ -349,6 +356,10 @@ class TernaryExpressionTests(unittest.TestCase):
 			self.assertEqual(ternary.evaluate(None), self.right_value.value)
 
 class UnaryExpressionTests(unittest.TestCase):
+	def test_ast_expression_unary(self):
+		with self.assertRaises(ValueError):
+			ast.UnaryExpression(context, 'type', ast.NullExpression(context))
+
 	def test_ast_expression_unary_not(self):
 		for value in trueish:
 			unary = ast.UnaryExpression(context, 'not', value)

@@ -44,6 +44,10 @@ class DataTypeTests(unittest.TestCase):
 	class _UnsupportedType(object):
 		pass
 
+	def test_data_type_collections(self):
+		with self.assertRaises(TypeError):
+			types._CollectionDataTypeDef('TEST', float)
+
 	def test_data_type_equality(self):
 		dt1 = DataType.ARRAY(DataType.STRING)
 		self.assertIs(dt1.value_type, DataType.STRING)

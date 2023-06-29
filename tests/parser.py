@@ -34,6 +34,8 @@ import datetime
 import decimal
 import itertools
 import math
+import random
+import string
 import unittest
 
 import rule_engine.ast as ast
@@ -58,6 +60,15 @@ class ParserTestsBase(unittest.TestCase):
 		return statement
 
 class ParserTests(ParserTestsBase):
+	def test_parser_comment_expressions(self):
+		expression = self.assertStatementType('null', ast.NullExpression)
+		self.assertIsNone(expression.comment)
+
+		comment = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+		expression = self.assertStatementType('null # ' + comment, ast.NullExpression)
+		self.assertIsInstance(expression.comment, ast.Comment)
+		self.assertEqual(expression.comment.value, comment)
+
 	def test_parser_comprehension_expressions(self):
 		expressions = []
 		# conditional

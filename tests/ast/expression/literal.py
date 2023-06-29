@@ -135,5 +135,9 @@ class LiteralExpressionTests(unittest.TestCase):
 	def test_ast_expression_literal_string(self):
 		self.assertLiteralTests(ast.StringExpression, '', 'non-empty')
 
+	def test_ast_expression_literal_timedelta(self):
+		with self.assertRaises(errors.TimedeltaSyntaxError):
+			ast.TimedeltaExpression.from_string(self.context, 'INVALID')
+
 if __name__ == '__main__':
 	unittest.main()

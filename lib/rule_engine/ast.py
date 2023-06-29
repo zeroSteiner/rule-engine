@@ -1084,6 +1084,7 @@ class TernaryExpression(ExpressionBase):
 			self.result_type = self.case_true.result_type
 		elif isinstance(self.case_true.result_type, DataType.ARRAY.__class__) and isinstance(self.case_false.result_type, DataType.ARRAY.__class__):
 			self.result_type = DataType.ARRAY
+		# todo: the other compound types should be checked here as well.
 
 	@classmethod
 	def build(cls, context, condition, case_true, case_false):
@@ -1126,14 +1127,13 @@ class UnaryExpression(ExpressionBase):
 		self.context = context
 		type_ = type_.lower()
 		self.type = type_
-		self._evaluator = getattr(self, '_op_' + type_)
 		if type_ == 'not':
 			self.result_type = DataType.BOOLEAN
 		elif type_ == 'uminus':
 			self.result_type = right.result_type
 		else:
-			raise errors.EvaluationError('unknown unary expression type')
-
+			raise ValueError('unknown unary expression type')
+		self._evaluator = getattr(self, '_op_' + type_)
 		self.right = right
 
 	@classmethod

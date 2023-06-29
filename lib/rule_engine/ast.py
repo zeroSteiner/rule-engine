@@ -62,7 +62,7 @@ def _assert_is_string(*values):
 
 def _is_reduced(*values):
 	"""
-	Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of it's
+	Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of its
 	members are reduced literals. A value that causes this to evaluate to True for is able to be evaluated without a
 	*thing*.
 	"""
@@ -75,7 +75,7 @@ def _iterable_member_value_type(value):
 	return iterable_member_value_type(value)
 
 class Assignment(object):
-	"""An internal assignment where by a symbol is populated with a value of the specified type."""
+	"""An internal assignment whereby a symbol is populated with a value of the specified type."""
 	__slots__ = ('name', 'value', 'value_type')
 	def __init__(self, name, *, value=errors.UNDEFINED, value_type=None):
 		"""
@@ -1055,12 +1055,7 @@ class FunctionCallExpression(ExpressionBase):
 	def build(cls, context, function, arguments):
 		return cls(context, function.build(), tuple(argument.build() for argument in arguments)).reduce()
 
-	def reduce(self):
-		if not _is_reduced(self.function):
-			return self
-		if not all(map(self.arguments, _is_reduced)):
-			return self
-		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+	# because there is no syntax for defining a function, they can't be reduced until symbols can be reduced
 
 	def evaluate(self, thing):
 		function = self.function.evaluate(thing)
@@ -1149,12 +1144,9 @@ class TernaryExpression(ExpressionBase):
 		return case.evaluate(thing)
 
 	def reduce(self):
-		if _is_reduced(self.condition):
-			reduced_condition = bool(self.condition.value)
-		else:
-			reduced_condition = self.condition.reduce()
-			if reduced_condition is self.condition:
-				return self
+		if not _is_reduced(self.condition):
+			return self
+		reduced_condition = bool(self.condition.value)
 		return self.case_true.reduce() if reduced_condition else self.case_false.reduce()
 
 	def to_graphviz(self, digraph, *args, **kwargs):

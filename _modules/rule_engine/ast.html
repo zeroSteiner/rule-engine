@@ -1165,6 +1165,7 @@
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">case_true</span><span class="o">.</span><span class="n">result_type</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">case_true</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">case_false</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span>
+		<span class="c1"># todo: the other compound types should be checked here as well.</span>
 
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">case_false</span><span class="p">):</span>
@@ -1207,14 +1208,13 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
 		<span class="n">type_</span> <span class="o">=</span> <span class="n">type_</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">type_</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">_evaluator</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_op_&#39;</span> <span class="o">+</span> <span class="n">type_</span><span class="p">)</span>
 		<span class="k">if</span> <span class="n">type_</span> <span class="o">==</span> <span class="s1">&#39;not&#39;</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span>
 		<span class="k">elif</span> <span class="n">type_</span> <span class="o">==</span> <span class="s1">&#39;uminus&#39;</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="n">result_type</span>
 		<span class="k">else</span><span class="p">:</span>
-			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;unknown unary expression type&#39;</span><span class="p">)</span>
-
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown unary expression type&#39;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_evaluator</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_op_&#39;</span> <span class="o">+</span> <span class="n">type_</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span>
 
 	<span class="nd">@classmethod</span>

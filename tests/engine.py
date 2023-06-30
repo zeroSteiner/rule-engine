@@ -58,9 +58,18 @@ class BuiltinsTests(unittest.TestCase):
 	def assertBuiltinFunction(self, name, expected_result, *arguments):
 		builtins = engine.Builtins.from_defaults()
 		function = builtins[name]
+		function_type = builtins.resolve_type(name)
+		self.assertIsNot(
+			function_type.minimum_arguments,
+			ast.DataType.UNDEFINED,
+			msg='builtin function should have a defined minimum number of arguments'
+		)
 		self.assertTrue(callable(function), msg='builtin functions should be callable')
 		result = function(*arguments)
 		self.assertEqual(result, expected_result, msg='builtin functions should return the expected result')
+		result_type = ast.DataType.from_value(result)
+		self.assertTrue(ast.DataType.is_compatible(result_type, function_type.return_type))
+		return result
 
 	def test_engine_builtins(self):
 		builtins = engine.Builtins.from_defaults({'test': {'one': 1.0, 'two': 2.0}})
@@ -115,6 +124,17 @@ class BuiltinsTests(unittest.TestCase):
 	def test_engine_buitins_function_filter(self):
 		self.assertBuiltinFunction('filter', (1, 3), lambda i: i % 2, [1, 2, 3])
 		self.assertBuiltinFunction('filter', ('A', 'B'), lambda c: len(c), ['', 'A', 'B'])
+
+	def test_engine_builtins_function_parse_datetime(self):
+		now = datetime.datetime.now()
+		self.assertBuiltinFunction('parse_datetime', now.replace(tzinfo=dateutil.tz.tzlocal()), now.isoformat())
+		with self.assertRaises(errors.DatetimeSyntaxError):
+			self.assertBuiltinFunction('parse_datetime', now, '')
+
+	def test_engine_builtins_function_parse_timedelta(self):
+		self.assertBuiltinFunction('parse_timedelta', datetime.timedelta(days=1), 'P1D')
+		with self.assertRaises(errors.TimedeltaSyntaxError):
+			self.assertBuiltinFunction('parse_timedelta', datetime.timedelta(), '')
 
 	def test_engine_builtins_re_groups(self):
 		context = engine.Context()

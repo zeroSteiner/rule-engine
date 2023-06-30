@@ -40,6 +40,7 @@ import math
 import re
 import threading
 
+from ._utils import parse_datetime, parse_timedelta
 from . import ast
 from . import errors
 from . import parser
@@ -90,6 +91,9 @@ def _builtin_filter(function, iterable):
 
 def _builtin_map(function, iterable):
 	return tuple(map(function, iterable))
+
+def _builtin_parse_datetime(builtins, string):
+	return parse_datetime(string, builtins.timezone)
 
 def _type_resolver(type_map, name):
 	if name not in type_map:
@@ -391,7 +395,9 @@ class Builtins(collections.abc.Mapping):
 			'all': all,
 			'sum': sum,
 			'map': _builtin_map,
-			'filter': _builtin_filter
+			'filter': _builtin_filter,
+			'parse_datetime': _BuiltinValueGenerator(lambda builtins: functools.partial(_builtin_parse_datetime, builtins)),
+			'parse_timedelta': parse_timedelta
 		}
 		default_values.update(values or {})
 		default_value_types = {
@@ -406,7 +412,9 @@ class Builtins(collections.abc.Mapping):
 			'any': ast.DataType.FUNCTION('any', return_type=ast.DataType.BOOLEAN, argument_types=(ast.DataType.ARRAY,)),
 			'sum': ast.DataType.FUNCTION('sum', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.ARRAY(ast.DataType.FLOAT),)),
 			'map': ast.DataType.FUNCTION('map', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
-			'filter': ast.DataType.FUNCTION('filter', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY))
+			'filter': ast.DataType.FUNCTION('filter', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
+			'parse_datetime': ast.DataType.FUNCTION('parse_datetime', return_type=ast.DataType.DATETIME, argument_types=(ast.DataType.STRING,)),
+			'parse_timedelta': ast.DataType.FUNCTION('parse_timedelta', return_type=ast.DataType.TIMEDELTA, argument_types=(ast.DataType.STRING,))
 		}
 		default_value_types.update(kwargs.pop('value_types', {}))
 		return cls(default_values, value_types=default_value_types, **kwargs)

@@ -2,6 +2,7 @@ import datetime
 import unittest
 
 import rule_engine._utils as utils
+import rule_engine.errors as errors
 
 class UtilityTests(unittest.TestCase):
     def test_parse_timedelta(self):
@@ -14,11 +15,11 @@ class UtilityTests(unittest.TestCase):
 
 
     def test_parse_timedelta_error(self):
-        with self.assertRaisesRegex(ValueError, 'empty timedelta string'):
+        with self.assertRaisesRegex(errors.TimedeltaSyntaxError, 'empty timedelta string'):
             utils.parse_timedelta('P')
-        with self.assertRaisesRegex(ValueError, 'invalid timedelta string'):
+        with self.assertRaisesRegex(errors.TimedeltaSyntaxError, 'invalid timedelta string'):
             utils.parse_timedelta('1W')
-        with self.assertRaisesRegex(ValueError, 'invalid timedelta string'):
+        with self.assertRaisesRegex(errors.TimedeltaSyntaxError, 'invalid timedelta string'):
             utils.parse_timedelta('p1w')
-        with self.assertRaisesRegex(ValueError, 'invalid timedelta string'):
+        with self.assertRaisesRegex(errors.TimedeltaSyntaxError, 'invalid timedelta string'):
             utils.parse_timedelta('PZ')

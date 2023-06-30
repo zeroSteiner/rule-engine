@@ -38,11 +38,9 @@ import operator
 import re
 
 from . import errors
-from ._utils import parse_timedelta
+from ._utils import parse_datetime, parse_timedelta
 from .suggestions import suggest_symbol
 from .types import *
-
-import dateutil.parser
 
 def _assert_is_integer_number(*values):
 	if not all(map(is_integer_number, values)):
@@ -241,12 +239,7 @@ class DatetimeExpression(LiteralExpressionBase):
 	result_type = DataType.DATETIME
 	@classmethod
 	def from_string(cls, context, string):
-		try:
-			dt = dateutil.parser.isoparse(string)
-		except ValueError:
-			raise errors.DatetimeSyntaxError('invalid datetime', string)
-		if dt.tzinfo is None:
-			dt = dt.replace(tzinfo=context.default_timezone)
+		dt = parse_datetime(string, default_timezone=context.default_timezone)
 		return cls(context, dt)
 
 class TimedeltaExpression(LiteralExpressionBase):
@@ -258,10 +251,7 @@ class TimedeltaExpression(LiteralExpressionBase):
 	result_type = DataType.TIMEDELTA
 	@classmethod
 	def from_string(cls, context, string):
-		try:
-			dt = parse_timedelta(string)
-		except ValueError:
-			raise errors.TimedeltaSyntaxError('invalid timedelta', string)
+		dt = parse_timedelta(string)
 		return cls(context, dt)
 
 class FloatExpression(LiteralExpressionBase):

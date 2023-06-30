@@ -33,6 +33,7 @@
 import unittest
 
 from .attribute import *
+from .function_call import *
 from .left_operator_right import *
 from .literal import *
 from .miscellaneous import *

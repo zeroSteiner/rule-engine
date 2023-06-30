@@ -49,7 +49,6 @@ __all__ = (
 	'CommentExpressionTests',
 	'ComprehensionExpressionTests',
 	'ContainsExpressionTests',
-	'FunctionCallExpressionTests',
 	'GetItemExpressionTests',
 	'GetSliceExpressionTests',
 	'SymbolExpressionTests',
@@ -135,61 +134,6 @@ class ContainsExpressionTests(unittest.TestCase):
 		container = ast.FloatExpression(context, 1.0)
 		with self.assertRaises(errors.EvaluationError):
 			ast.ContainsExpression(context, container, member).evaluate(None)
-
-class FunctionCallExpressionTests(unittest.TestCase):
-	def test_ast_expression_function_call(self):
-		def _function():
-			return True
-		symbol = ast.SymbolExpression(context, 'function')
-		function_call = ast.FunctionCallExpression(context, symbol, [])
-		self.assertTrue(function_call.evaluate({'function': _function}))
-
-	def test_ast_expression_function_call_error(self):
-		# function type mismatch
-		with self.assertRaises(errors.EvaluationError):
-			context = engine.Context(
-				type_resolver=engine.type_resolver_from_dict({
-					'function': ast.DataType.NULL
-				})
-			)
-			ast.FunctionCallExpression(
-				context,
-				ast.SymbolExpression(context, 'function'),
-				[]
-			)
-
-		context = engine.Context()
-		symbol = ast.SymbolExpression(context, 'function')
-		function_call = ast.FunctionCallExpression(context, symbol, [ast.FloatExpression(context, 1)])
-
-		# function is not callable
-		with self.assertRaises(errors.EvaluationError):
-			self.assertTrue(function_call.evaluate({'function': True}))
-
-		context = engine.Context(
-			type_resolver=engine.type_resolver_from_dict({
-				'function': ast.DataType.FUNCTION(
-					'function',
-					return_type=ast.DataType.FLOAT,
-					argument_types=(ast.DataType.FLOAT, ast.DataType.FLOAT,),
-					minimum_arguments=1
-				)
-			})
-		)
-		symbol = ast.SymbolExpression(context, 'function')
-		function_call = ast.FunctionCallExpression(context, symbol, [ast.FloatExpression(context, 1)])
-
-		# function is missing arguments
-		with self.assertRaises(errors.FunctionCallError):
-			function_call = ast.FunctionCallExpression(context, symbol, [])
-
-		# function raises an exception
-		class SomeException(Exception):
-			pass
-		def _function():
-			raise SomeException()
-		with self.assertRaises(errors.EvaluationError):
-			function_call.evaluate({'function': _function})
 
 class GetItemExpressionTests(unittest.TestCase):
 	containers = {

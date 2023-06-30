@@ -85,6 +85,12 @@ def resolve_item(thing, name):
 		raise errors.SymbolResolutionError(name, thing=thing, suggestion=suggest_symbol(name, thing.keys()))
 	return thing[name]
 
+def _builtin_filter(function, iterable):
+	return tuple(filter(function, iterable))
+
+def _builtin_map(function, iterable):
+	return tuple(map(function, iterable))
+
 def _type_resolver(type_map, name):
 	if name not in type_map:
 		raise errors.SymbolResolutionError(name, suggestion=suggest_symbol(name, type_map.keys()))
@@ -374,19 +380,33 @@ class Builtins(collections.abc.Mapping):
 		now = _BuiltinValueGenerator(lambda builtins: datetime.datetime.now(tz=builtins.timezone))
 		# there may be errors here if the decimal.Context precision exceeds what is provided by the math constants
 		default_values = {
+			# mathematical constants
 			'e': decimal.Decimal(repr(math.e)),
 			'pi': decimal.Decimal(repr(math.pi)),
+			# timestamps
 			'now': now,
 			'today': _BuiltinValueGenerator(lambda builtins: now(builtins).replace(hour=0, minute=0, second=0, microsecond=0)),
-			'sum': sum
+			# functions
+			'any': any,
+			'all': all,
+			'sum': sum,
+			'map': _builtin_map,
+			'filter': _builtin_filter
 		}
 		default_values.update(values or {})
 		default_value_types = {
+			# mathematical constants
 			'e': ast.DataType.FLOAT,
 			'pi': ast.DataType.FLOAT,
+			# timestamps
 			'now': ast.DataType.DATETIME,
 			'today': ast.DataType.DATETIME,
-			'sum': ast.DataType.FUNCTION('sum', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.ARRAY(ast.DataType.FLOAT),))
+			# functions
+			'all': ast.DataType.FUNCTION('all', return_type=ast.DataType.BOOLEAN, argument_types=(ast.DataType.ARRAY,)),
+			'any': ast.DataType.FUNCTION('any', return_type=ast.DataType.BOOLEAN, argument_types=(ast.DataType.ARRAY,)),
+			'sum': ast.DataType.FUNCTION('sum', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.ARRAY(ast.DataType.FLOAT),)),
+			'map': ast.DataType.FUNCTION('map', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
+			'filter': ast.DataType.FUNCTION('filter', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY))
 		}
 		default_value_types.update(kwargs.pop('value_types', {}))
 		return cls(default_values, value_types=default_value_types, **kwargs)

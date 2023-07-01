@@ -32,6 +32,7 @@
 
 from ._utils import *
 from .ast import *
+from .builtins import *
 from .engine import *
 from .errors import *
 from .issues import *

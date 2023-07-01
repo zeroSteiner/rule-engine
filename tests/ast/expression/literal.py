@@ -35,13 +35,14 @@ import decimal
 import unittest
 
 import rule_engine.ast as ast
+import rule_engine.builtins as builtins
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 
 __all__ = ('LiteralExpressionTests',)
 
 context = engine.Context()
-context.builtins = engine.Builtins.from_defaults(
+context.builtins = builtins.Builtins.from_defaults(
 	{'test': {'one': 1.0, 'two': 2.0}}
 )
 # literal expressions which should evaluate to false

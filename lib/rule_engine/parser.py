@@ -584,8 +584,8 @@ class Parser(ParserBase):
 
 	def p_expression_function_call(self, p):
 		"""
-		expression : expression LPAREN RPAREN
-		           | expression LPAREN ary_members RPAREN
+		object : expression LPAREN RPAREN
+		       | expression LPAREN ary_members RPAREN
 		"""
 		function = p[1]
 		if len(p) == 4:

@@ -109,6 +109,13 @@ class BuiltinsTests(unittest.TestCase):
 		self.assertBuiltinFunction('all', False, [None])
 		self.assertBuiltinFunction('all', True, [])
 
+	def test_engine_builtins_function_split(self):
+		self.assertBuiltinFunction('split', ('one', 'two'), 'one two')
+		self.assertBuiltinFunction('split', ('o', 'e two'), 'one two', 'n')
+		self.assertBuiltinFunction('split', ('one two',), 'one two', ' ', 0)
+		with self.assertRaises(errors.FunctionCallError):
+			self.assertBuiltinFunction('split', ('one', 'two'), 'one two', ' ', 1.5)
+
 	def test_engine_builtins_function_sum(self):
 		self.assertBuiltinFunction('sum', 10, [1, 2, 3, 4])
 

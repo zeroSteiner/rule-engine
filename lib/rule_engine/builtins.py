@@ -39,6 +39,8 @@ import math
 
 from ._utils import parse_datetime, parse_timedelta
 from . import ast
+from . import errors
+from . import types
 
 import dateutil.tz
 
@@ -50,6 +52,15 @@ def _builtin_map(function, iterable):
 
 def _builtin_parse_datetime(builtins, string):
 	return parse_datetime(string, builtins.timezone)
+
+def _builtins_split(string, sep=None, maxsplit=None):
+	if maxsplit is None:
+		maxsplit = -1
+	elif types.is_natural_number(maxsplit):
+		maxsplit = int(maxsplit)
+	else:
+		raise errors.FunctionCallError('argument #3 (maxsplit) must be a natural number')
+	return tuple(string.split(sep=sep, maxsplit=maxsplit))
 
 class BuiltinValueGenerator(object):
 	"""
@@ -140,7 +151,8 @@ class Builtins(collections.abc.Mapping):
 			'map': _builtin_map,
 			'filter': _builtin_filter,
 			'parse_datetime': BuiltinValueGenerator(lambda builtins: functools.partial(_builtin_parse_datetime, builtins)),
-			'parse_timedelta': parse_timedelta
+			'parse_timedelta': parse_timedelta,
+			'split': _builtins_split
 		}
 		default_values.update(values or {})
 		default_value_types = {
@@ -157,7 +169,13 @@ class Builtins(collections.abc.Mapping):
 			'map': ast.DataType.FUNCTION('map', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
 			'filter': ast.DataType.FUNCTION('filter', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
 			'parse_datetime': ast.DataType.FUNCTION('parse_datetime', return_type=ast.DataType.DATETIME, argument_types=(ast.DataType.STRING,)),
-			'parse_timedelta': ast.DataType.FUNCTION('parse_timedelta', return_type=ast.DataType.TIMEDELTA, argument_types=(ast.DataType.STRING,))
+			'parse_timedelta': ast.DataType.FUNCTION('parse_timedelta', return_type=ast.DataType.TIMEDELTA, argument_types=(ast.DataType.STRING,)),
+			'split': ast.DataType.FUNCTION(
+				'split',
+				return_type=ast.DataType.ARRAY(ast.DataType.STRING),
+				argument_types=(ast.DataType.STRING, ast.DataType.STRING, ast.DataType.FLOAT),
+				minimum_arguments=1
+			)
 		}
 		default_value_types.update(kwargs.pop('value_types', {}))
 		return cls(default_values, value_types=default_value_types, **kwargs)

@@ -1053,6 +1053,9 @@ class FunctionCallExpression(ExpressionBase):
 			self._validate_function(function_type, arguments)
 		try:
 			result = function(*arguments)
+		except errors.FunctionCallError as error:
+			error.function_name = function_name
+			raise error
 		except Exception as error:
 			raise errors.FunctionCallError('function call failed', error=error, function_name=function_name) from None
 		return result
@@ -1072,7 +1075,7 @@ class FunctionCallExpression(ExpressionBase):
 				arg1_type = DataType.from_value(arg1)
 			if not DataType.is_compatible(arg1_type, arg2_type):
 				raise errors.FunctionCallError(
-					"data type mismatch (argument {})".format(pos),
+					"data type mismatch (argument #{})".format(pos),
 					function_name=function_type.value_name
 				)
 

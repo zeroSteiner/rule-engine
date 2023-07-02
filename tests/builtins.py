@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import contextlib
 import datetime
 import random
 import string
@@ -49,6 +50,16 @@ except ImportError:
 else:
 	has_graphviz = True
 
+@contextlib.contextmanager
+def disable_random():
+	now = datetime.datetime.now()
+	state = random.getstate()
+	random.seed(now.timestamp())
+	try:
+		yield random.getstate()
+	finally:
+		random.setstate(state)
+
 class BuiltinsTests(unittest.TestCase):
 	def assertBuiltinFunction(self, name, expected_result, *arguments):
 		blts = builtins.Builtins.from_defaults()
@@ -65,6 +76,14 @@ class BuiltinsTests(unittest.TestCase):
 		result_type = ast.DataType.from_value(result)
 		self.assertTrue(ast.DataType.is_compatible(result_type, function_type.return_type))
 		return result
+
+	def test_engine_builtin_functions(self):
+		blts = builtins.Builtins.from_defaults()
+		for name in blts:
+			data_type = blts.resolve_type(name)
+			if not isinstance(data_type, ast.DataType.FUNCTION.__class__):
+				continue
+			self.assertEqual(name, data_type.value_name)
 
 	def test_engine_builtins(self):
 		blts = builtins.Builtins.from_defaults({'test': {'one': 1.0, 'two': 2.0}})
@@ -137,6 +156,18 @@ class BuiltinsTests(unittest.TestCase):
 		self.assertBuiltinFunction('parse_timedelta', datetime.timedelta(days=1), 'P1D')
 		with self.assertRaises(errors.TimedeltaSyntaxError):
 			self.assertBuiltinFunction('parse_timedelta', datetime.timedelta(), '')
+
+	def test_engine_builtins_function_random(self):
+		with disable_random() as state:
+			value = random.random()
+			random.setstate(state)
+			self.assertBuiltinFunction('random', value)
+		with disable_random() as state:
+			value = random.randint(0, 1_000_000)
+			random.setstate(state)
+			self.assertBuiltinFunction('random', value, 1_000_000)
+		with self.assertRaises(errors.FunctionCallError):
+			self.assertBuiltinFunction('random', 1, 1.5)
 
 	def test_engine_builtins_re_groups(self):
 		context = engine.Context()

@@ -36,6 +36,7 @@ import datetime
 import decimal
 import functools
 import math
+import random
 
 from ._utils import parse_datetime, parse_timedelta
 from . import ast
@@ -52,6 +53,13 @@ def _builtin_map(function, iterable):
 
 def _builtin_parse_datetime(builtins, string):
 	return parse_datetime(string, builtins.timezone)
+
+def _builtin_random(boundary=None):
+	if boundary:
+		if not types.is_natural_number(boundary):
+			raise errors.FunctionCallError('argument #1 (boundary) must be a natural number')
+		return decimal.Decimal(random.randint(0, int(boundary)))
+	return decimal.Decimal(random.random())
 
 def _builtins_split(string, sep=None, maxsplit=None):
 	if maxsplit is None:
@@ -152,6 +160,7 @@ class Builtins(collections.abc.Mapping):
 			'filter': _builtin_filter,
 			'parse_datetime': BuiltinValueGenerator(lambda builtins: functools.partial(_builtin_parse_datetime, builtins)),
 			'parse_timedelta': parse_timedelta,
+			'random': _builtin_random,
 			'split': _builtins_split
 		}
 		default_values.update(values or {})
@@ -170,6 +179,7 @@ class Builtins(collections.abc.Mapping):
 			'filter': ast.DataType.FUNCTION('filter', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
 			'parse_datetime': ast.DataType.FUNCTION('parse_datetime', return_type=ast.DataType.DATETIME, argument_types=(ast.DataType.STRING,)),
 			'parse_timedelta': ast.DataType.FUNCTION('parse_timedelta', return_type=ast.DataType.TIMEDELTA, argument_types=(ast.DataType.STRING,)),
+			'random': ast.DataType.FUNCTION('random', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.FLOAT,), minimum_arguments=0),
 			'split': ast.DataType.FUNCTION(
 				'split',
 				return_type=ast.DataType.ARRAY(ast.DataType.STRING),

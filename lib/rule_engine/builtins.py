@@ -58,8 +58,8 @@ def _builtin_random(boundary=None):
 	if boundary:
 		if not types.is_natural_number(boundary):
 			raise errors.FunctionCallError('argument #1 (boundary) must be a natural number')
-		return decimal.Decimal(random.randint(0, int(boundary)))
-	return decimal.Decimal(random.random())
+		return random.randint(0, int(boundary))
+	return random.random()
 
 def _builtins_split(string, sep=None, maxsplit=None):
 	if maxsplit is None:

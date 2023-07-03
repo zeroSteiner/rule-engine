@@ -1058,7 +1058,7 @@ class FunctionCallExpression(ExpressionBase):
 			raise error
 		except Exception as error:
 			raise errors.FunctionCallError('function call failed', error=error, function_name=function_name) from None
-		return result
+		return self._new_value(result)
 
 	def _validate_function(self, function_type, arguments):
 		if not isinstance(function_type, DataType.FUNCTION.__class__):

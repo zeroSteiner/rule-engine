@@ -1,4 +1,6 @@
+import ast as pyast
 import datetime
+import decimal
 import re
 
 from . import errors
@@ -25,6 +27,18 @@ def parse_datetime(string, default_timezone):
 	if dt.tzinfo is None:
 		dt = dt.replace(tzinfo=default_timezone)
 	return dt
+
+def parse_float(string):
+	if re.match('^0[0-9]', string):
+		raise errors.RuleSyntaxError('invalid floating point literal: ' + string + ' (leading zeros in decimal literals are not permitted)')
+	try:
+		if re.match('^0[box]', string):
+			val = decimal.Decimal(pyast.literal_eval(string))
+		else:
+			val = decimal.Decimal(string)
+	except Exception:
+		raise errors.RuleSyntaxError('invalid floating point literal: ' + string) from None
+	return val
 
 def parse_timedelta(periodstring):
 	if periodstring == "P":

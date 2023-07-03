@@ -38,7 +38,7 @@ import functools
 import math
 import random
 
-from ._utils import parse_datetime, parse_timedelta
+from ._utils import parse_datetime, parse_float, parse_timedelta
 from . import ast
 from . import errors
 from . import types
@@ -161,6 +161,7 @@ class Builtins(collections.abc.Mapping):
 			'min': min,
 			'filter': _builtin_filter,
 			'parse_datetime': BuiltinValueGenerator(lambda builtins: functools.partial(_builtin_parse_datetime, builtins)),
+			'parse_float': parse_float,
 			'parse_timedelta': parse_timedelta,
 			'random': _builtin_random,
 			'split': _builtins_split
@@ -182,6 +183,7 @@ class Builtins(collections.abc.Mapping):
 			'min': ast.DataType.FUNCTION('min', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.ARRAY(ast.DataType.FLOAT),)),
 			'filter': ast.DataType.FUNCTION('filter', argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
 			'parse_datetime': ast.DataType.FUNCTION('parse_datetime', return_type=ast.DataType.DATETIME, argument_types=(ast.DataType.STRING,)),
+			'parse_float': ast.DataType.FUNCTION('parse_float', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.STRING,)),
 			'parse_timedelta': ast.DataType.FUNCTION('parse_timedelta', return_type=ast.DataType.TIMEDELTA, argument_types=(ast.DataType.STRING,)),
 			'random': ast.DataType.FUNCTION('random', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.FLOAT,), minimum_arguments=0),
 			'split': ast.DataType.FUNCTION(

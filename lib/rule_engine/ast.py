@@ -38,7 +38,7 @@ import operator
 import re
 
 from . import errors
-from ._utils import parse_datetime, parse_timedelta
+from ._utils import parse_datetime, parse_float, parse_timedelta
 from .suggestions import suggest_symbol
 from .types import *
 
@@ -251,8 +251,7 @@ class TimedeltaExpression(LiteralExpressionBase):
 	result_type = DataType.TIMEDELTA
 	@classmethod
 	def from_string(cls, context, string):
-		dt = parse_timedelta(string)
-		return cls(context, dt)
+		return cls(context, parse_timedelta(string))
 
 class FloatExpression(LiteralExpressionBase):
 	"""Literal float expressions representing numerical values."""
@@ -260,6 +259,10 @@ class FloatExpression(LiteralExpressionBase):
 	def __init__(self, context, value, **kwargs):
 		value = coerce_value(value)
 		super(FloatExpression, self).__init__(context, value, **kwargs)
+
+	@classmethod
+	def from_string(cls, context, string):
+		return cls(context, parse_float(string))
 
 class MappingExpression(LiteralExpressionBase):
 	"""Literal mapping expression representing a set of associations between keys and values."""

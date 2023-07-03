@@ -32,7 +32,6 @@
 
 import ast as pyast
 import collections
-import re
 import threading
 import types as pytypes
 
@@ -461,23 +460,13 @@ class Parser(ParserBase):
 		p[0] = _DeferredAstNode(ast.TimedeltaExpression, args=(self.context, p[1]), method='from_string')
 
 	def p_expression_float(self, p):
-		'expression : FLOAT'
+		"""
+		expression : FLOAT
+				   | FLOAT_NAN
+				   | FLOAT_INF
+		"""
 		str_val = p[1]
-		if re.match('^0[0-9]', str_val):
-			raise errors.RuleSyntaxError('invalid floating point literal: ' + str_val + ' (leading zeros in decimal literals are not permitted)')
-		try:
-			val = literal_eval(str_val)
-		except SyntaxError:
-			raise errors.RuleSyntaxError('invalid floating point literal: ' + str_val)
-		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, float(val)))
-
-	def p_expression_float_nan(self, p):
-		'expression : FLOAT_NAN'
-		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, float('nan')))
-
-	def p_expression_float_inf(self, p):
-		'expression : FLOAT_INF'
-		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, float('inf')))
+		p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, str_val), method='from_string')
 
 	def p_expression_null(self, p):
 		'object : NULL'

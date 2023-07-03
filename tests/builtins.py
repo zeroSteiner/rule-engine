@@ -32,6 +32,7 @@
 
 import contextlib
 import datetime
+import decimal
 import random
 import string
 import unittest
@@ -157,6 +158,18 @@ class BuiltinsTests(unittest.TestCase):
 		self.assertBuiltinFunction('parse_datetime', now.replace(tzinfo=dateutil.tz.tzlocal()), now.isoformat())
 		with self.assertRaises(errors.DatetimeSyntaxError):
 			self.assertBuiltinFunction('parse_datetime', now, '')
+
+	def test_engine_builtins_function_parse_float(self):
+		self.assertBuiltinFunction('parse_float', 1, '1')
+		self.assertBuiltinFunction('parse_float', 0b10, '0b10')
+		self.assertBuiltinFunction('parse_float', 0o10, '0o10')
+		self.assertBuiltinFunction('parse_float', 0x10, '0x10')
+		self.assertBuiltinFunction('parse_float', decimal.Decimal('1.1'), '1.1')
+		self.assertBuiltinFunction('parse_float', 1e1, '1e1')
+		self.assertBuiltinFunction('parse_float', float('inf'), 'inf')
+		self.assertBuiltinFunction('parse_float', -1, '-1')
+		with self.assertRaises(errors.RuleSyntaxError):
+			self.assertBuiltinFunction('parse_float', 1, 'f00d')
 
 	def test_engine_builtins_function_parse_timedelta(self):
 		self.assertBuiltinFunction('parse_timedelta', datetime.timedelta(days=1), 'P1D')

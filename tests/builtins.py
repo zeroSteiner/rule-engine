@@ -142,6 +142,12 @@ class BuiltinsTests(unittest.TestCase):
 		self.assertBuiltinFunction('map', (2, 4, 6), lambda i: i * 2, [1, 2, 3])
 		self.assertBuiltinFunction('map', ('A', 'B'), lambda c: c.upper(), ['A', 'B'])
 
+	def test_engine_builtins_function_max(self):
+		self.assertBuiltinFunction('max', 10, [1, 10, -1, 1.5])
+
+	def test_engine_builtins_function_min(self):
+		self.assertBuiltinFunction('min', -1, [1, 10, -1, 1.5])
+
 	def test_engine_buitins_function_filter(self):
 		self.assertBuiltinFunction('filter', (1, 3), lambda i: i % 2, [1, 2, 3])
 		self.assertBuiltinFunction('filter', ('A', 'B'), lambda c: len(c), ['', 'A', 'B'])

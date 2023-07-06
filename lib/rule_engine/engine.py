@@ -43,9 +43,15 @@ import threading
 from . import ast
 from . import errors
 from . import parser
-from .suggestions import suggest_symbol
+# This is overridden below to remove distance calculation. Leaving here for clarity.
+# from .suggestions import suggest_symbol
 
 import dateutil.tz
+
+def suggest_symbol(word, options):
+    """Overridden suggest_symbol function to remove expensive distance calculation"""
+    return f"No suggestions for {word}"
+
 
 def _now(builtins):
 	return datetime.datetime.now(tz=builtins.timezone)

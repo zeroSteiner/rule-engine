@@ -78,7 +78,11 @@ class DatetimeSyntaxError(SyntaxError):
 		"""The datetime value which contains the syntax error which caused this exception to be raised."""
 
 class TimedeltaSyntaxError(SyntaxError):
-	"""An error raised for issues regarding the use of improperly formatted timedelta expressions."""
+	"""
+	An error raised for issues regarding the use of improperly formatted timedelta expressions.
+
+	.. versionadded:: 3.5.0
+	"""
 	def __init__(self, message, value):
 		"""
 		:param str message: A text description of what error occurred.
@@ -250,7 +254,11 @@ class SymbolTypeError(EvaluationError):
 		super(SymbolTypeError, self).__init__(message)
 
 class FunctionCallError(EvaluationError):
-	"""An error raised when there is an issue calling a function."""
+	"""
+	An error raised when there is an issue calling a function.
+
+	.. versionadded:: 4.0.0
+	"""
 	def __init__(self, message, error=None, function_name=None):
 		super(FunctionCallError, self).__init__(message)
 		self.error = error

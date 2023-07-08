@@ -413,8 +413,18 @@ class DataType(metaclass=DataTypeMeta):
 	"""
 	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
 	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
-	TIMEDELTA = _DataTypeDef('TIMEDELTA', datetime.timedelta)
 	FLOAT = _DataTypeDef('FLOAT', decimal.Decimal)
+	FUNCTION = _FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE)
+	"""
+	.. py:function:: __call__(name, return_type=_DATA_TYPE_UNDEFINED, argument_types=_DATA_TYPE_UNDEFINED, minimum_arguments=None)
+	
+	.. versionadded:: 4.0.0
+	
+	:param str name: The name of the function, e.g. "split".
+	:param return_type: The type of the functions return value.
+	:param tuple argument_types: The types of the functions arguments.
+	:param int minimum_arguments: The minimum number of arguments the function requires.
+	"""
 	MAPPING = _MappingDataTypeDef('MAPPING', dict)
 	"""
 	.. py:function:: __call__(key_type, value_type, value_type_nullable=True)
@@ -432,12 +442,12 @@ class DataType(metaclass=DataTypeMeta):
 	:param bool value_type_nullable: Whether or not set members are allowed to be :py:attr:`.NULL`.
 	"""
 	STRING = _DataTypeDef('STRING', str)
+	TIMEDELTA = _DataTypeDef('TIMEDELTA', datetime.timedelta)
 	UNDEFINED = _DATA_TYPE_UNDEFINED
 	"""
 	Undefined values. This constant can be used to indicate that a particular symbol is valid, but it's data type is
 	currently unknown.
 	"""
-	FUNCTION = _FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE)
 	@classmethod
 	def from_name(cls, name):
 		"""

@@ -28,7 +28,7 @@ Classes
 
 .. autoclass:: DataType
    :members:
-   :exclude-members: ARRAY, MAPPING, SET
+   :exclude-members: ARRAY, FUNCTION, MAPPING, SET
    :show-inheritance:
 
    .. autoattribute:: ARRAY
@@ -41,6 +41,9 @@ Classes
       :annotation:
 
    .. autoattribute:: FLOAT
+      :annotation:
+
+   .. autoattribute:: FUNCTION
       :annotation:
 
    .. autoattribute:: MAPPING

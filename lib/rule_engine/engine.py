@@ -403,6 +403,7 @@ class Context(object):
 	"""
 	def __init__(
 			self,
+			*,
 			regex_flags=0,
 			resolver=None,
 			type_resolver=None,

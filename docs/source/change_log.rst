@@ -14,6 +14,7 @@ Version 4.0.0
 
 * **Breaking:** Changed ``STRING.to_ary`` to return an array of characters instead of splitting the string
     * Use the new builtin ``$split`` function to split a string on whitespace into an array of words
+* **Breaking:** Changed :py:class:`~rule_engine.engine.Context` to use keyword-only arguments
 
 Version 3.x.x
 -------------

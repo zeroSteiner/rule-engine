@@ -275,7 +275,7 @@ class _AttributeResolver(object):
 
 	@attribute('to_ary', ast.DataType.STRING, result_type=ast.DataType.ARRAY(ast.DataType.STRING))
 	def string_to_ary(self, value):
-		return value.split()
+		return tuple(value)
 
 	@attribute('to_flt', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
 	def string_to_flt(self, value):

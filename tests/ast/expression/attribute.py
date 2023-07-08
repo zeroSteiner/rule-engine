@@ -181,7 +181,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		attributes = {
 			'as_lower': string.lower(),
 			'as_upper': string.upper(),
-			'to_ary': tuple(string.split()),
+			'to_ary': tuple(string),
 			'to_set': set(string),
 			'length': len(string),
 		}

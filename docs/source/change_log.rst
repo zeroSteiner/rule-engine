@@ -4,8 +4,22 @@ Change Log
 This document contains notes on the major changes for each version of the Rule Engine. In comparison to the git log,
 this list is curated by the development team for note worthy changes.
 
+Version 4.x.x
+-------------
+
+Version 4.0.0
+^^^^^^^^^^^^^
+
+*In Progress*
+
+* **Breaking:** Changed ``STRING.to_ary`` to return an array of characters instead of splitting the string
+    * Use the new builtin ``$split`` function to split a string on whitespace into an array of words
+
 Version 3.x.x
 -------------
+
+Version 3.6.0
+^^^^^^^^^^^^^
 
 Released :release:`3.6.0` on June 16th, 2023
 

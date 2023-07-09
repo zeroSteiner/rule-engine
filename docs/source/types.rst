@@ -71,8 +71,10 @@ have a length of 2 with two unique keys, the same value once converted into a Ru
 length of 1 with a single unique key. For this reason, developers using Rule Engine should take care to not use compound
 data types with a mix of Python :py:class:`float` and :py:class:`~decimal.Decimal` values.
 
-DATETIME and TIMEDELTA
-----------------------
+TIMEDELTA
+---------
+See :ref:`literal-timedelta-values` for syntax.
+
 Version :release:`3.5.0` introduced the :py:attr:`~DataType.TIMEDELTA` datatype, backed by Python's
 :py:class:`~datetime.timedelta` class. This also comes with the ability to perform arithmetic with both
 :py:attr:`~DataType.TIMEDELTA` *and* :py:attr:`~DataType.DATETIME` values. This allows you to create rules for things

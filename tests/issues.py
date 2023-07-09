@@ -93,5 +93,5 @@ class GitHubIssueTests(unittest.TestCase):
 			"test=='NOTTEST' and count==01 and other=='other'"
 		)
 		for rule in rules:
-			with self.assertRaises(errors.RuleSyntaxError):
+			with self.assertRaises(errors.FloatSyntaxError):
 				engine.Rule(rule)

@@ -30,14 +30,14 @@ def parse_datetime(string, default_timezone):
 
 def parse_float(string):
 	if re.match('^0[0-9]', string):
-		raise errors.RuleSyntaxError('invalid floating point literal: ' + string + ' (leading zeros in decimal literals are not permitted)')
+		raise errors.FloatSyntaxError('invalid floating point literal (leading zeros in decimal literals are not permitted)', string)
 	try:
 		if re.match('^0[box]', string):
 			val = decimal.Decimal(pyast.literal_eval(string))
 		else:
 			val = decimal.Decimal(string)
 	except Exception:
-		raise errors.RuleSyntaxError('invalid floating point literal: ' + string) from None
+		raise errors.FloatSyntaxError('invalid floating point literal', string) from None
 	return val
 
 def parse_timedelta(periodstring):

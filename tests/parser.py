@@ -373,7 +373,7 @@ class ParserLiteralTests(ParserTestsBase):
 	def test_parse_float_base_10(self):
 		self.assertLiteralStatementEqual('0', ast.FloatExpression, decimal.Decimal('0'))
 		self.assertLiteralStatementEqual('99', ast.FloatExpression, decimal.Decimal('99'))
-		with self.assertRaises(errors.RuleSyntaxError):
+		with self.assertRaises(errors.FloatSyntaxError):
 			self._parse('00', self.context)
 
 	def test_parse_float_base_16(self):

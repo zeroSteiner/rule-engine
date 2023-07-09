@@ -77,6 +77,21 @@ class DatetimeSyntaxError(SyntaxError):
 		self.value = value
 		"""The datetime value which contains the syntax error which caused this exception to be raised."""
 
+class FloatSyntaxError(SyntaxError):
+	"""
+	An error raised for issues regarding the use of improperly formatted float expressions.
+
+	.. versionadded:: 4.0.0
+	"""
+	def __init__(self, message, value):
+		"""
+		:param str message: A text description of what error occurred.
+		:param str value: The float value which contains the syntax error which caused this exception to be raised.
+		"""
+		super(FloatSyntaxError, self).__init__(message)
+		self.value = value
+		"""The float value which contains the syntax error which caused this exception to be raised."""
+
 class TimedeltaSyntaxError(SyntaxError):
 	"""
 	An error raised for issues regarding the use of improperly formatted timedelta expressions.

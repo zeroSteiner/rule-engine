@@ -168,7 +168,7 @@ class BuiltinsTests(unittest.TestCase):
 		self.assertBuiltinFunction('parse_float', 1e1, '1e1')
 		self.assertBuiltinFunction('parse_float', float('inf'), 'inf')
 		self.assertBuiltinFunction('parse_float', -1, '-1')
-		with self.assertRaises(errors.RuleSyntaxError):
+		with self.assertRaises(errors.FloatSyntaxError):
 			self.assertBuiltinFunction('parse_float', 1, 'f00d')
 
 	def test_engine_builtins_function_parse_timedelta(self):

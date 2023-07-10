@@ -192,8 +192,9 @@ more argument expressions to pass to the function. Functions support optional po
 function can take two arguments and one or both can specify a default value and then be omitted when called. Functions
 do not support keyword arguments.
 
-Using the builtin ``split`` function as an example, it can be called with up to 3 arguments. The first is required while
-the second two are optional. The ``split`` symbol requires the ``$`` prefix to access the builtin value.
+Using the :ref:`builtin  split<builtin-function-split>` function as an example, it can be called with up to 3 arguments.
+The first is required while the second two are optional. The ``split`` symbol requires the ``$`` prefix to access the
+builtin value.
 
 .. code-block::
 
@@ -340,6 +341,8 @@ The following symbols are provided by default using the :py:meth:`~builtins.Buil
 symbols can be accessed through the ``$`` prefix, e.g. ``$pi``. The default values can be overridden by defining a
 custom subclass of :py:class:`~engine.Context` and setting the :py:attr:`~engine.Context.builtins` attribute.
 
+.. _builtin-functions:
+
 Functions
 ^^^^^^^^^
 
@@ -426,6 +429,8 @@ fails to parse, a :py:exc:`~.errors.TimedeltaSyntaxError` is raised.
 Generate a random number. If *boundary* is not specified, the random number  returned will be between 0 and 1. If
 *boundary* is specified, it must be a natural number and the random number returned will be between 0 and *boundary*,
 including *boundary*.
+
+.. _builtin-function-split:
 
 ``ARRAY[STRING] split(STRING string, [STRING sep, FLOAT maxsplit])``
 

@@ -19,11 +19,11 @@ compatible with. For a information regarding supported operations, see the
 | :py:attr:`~DataType.DATETIME` | :py:class:`datetime.date`,    |
 |                               | :py:class:`datetime.datetime` |
 +-------------------------------+-------------------------------+
-| :py:attr:`~DataType.TIMEDELTA`| :py:class:`datetime.timedelta`|
-+-------------------------------+-------------------------------+
 | :py:attr:`~DataType.FLOAT`    | :py:class:`int`,              |
 |                               | :py:class:`float`             |
 |                               | :py:class:`decimal.Decimal`   |
++-------------------------------+-------------------------------+
+| :py:attr:`~DataType.FUNCTION` | *anything callable*           |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.MAPPING`  | :py:class:`dict`              |
 +-------------------------------+-------------------------------+
@@ -32,6 +32,8 @@ compatible with. For a information regarding supported operations, see the
 | :py:attr:`~DataType.SET`      | :py:class:`set`               |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.STRING`   | :py:class:`str`               |
++-------------------------------+-------------------------------+
+| :py:attr:`~DataType.TIMEDELTA`| :py:class:`datetime.timedelta`|
 +-------------------------------+-------------------------------+
 
 Compound Types
@@ -50,6 +52,8 @@ operations apply to the members of :py:attr:`~DataType.ARRAY` and :py:attr:`~Dat
 
 FLOAT
 -----
+See :ref:`literal-float-values` for syntax.
+
 Starting in :release:`3.0.0`, the ``FLOAT`` datatype is backed by Python's :py:class:`~decimal.Decimal` object. This
 makes the evaluation of arithmetic more intuitive for the audience of rule authors who are not assumed to be familiar
 with the nuances of binary floating point arithmetic. To take an example from the :py:mod:`decimal` documentation, rule
@@ -66,10 +70,18 @@ Since Python's :py:class:`~decimal.Decimal` values are not always equivalent to 
 ``0.1 != Decimal('0.1')``) it's important to know that Rule Engine will coerce and normalize these values. That means
 that while in Python ``0.1 in [ Decimal('0.1') ]`` will evaluate to ``False``, in a rule it will evaluate to ``True``
 (e.g. ``Rule('0.1 in numbers').evaluate({'numbers': [Decimal('0.1')]})``). This also affects Python dictionaries that
-are converted to Rule Engine ``MAPPING`` values. While in Python the value ``{0.1: 'a', Decimal('0.1'): 'a'}`` would
-have a length of 2 with two unique keys, the same value once converted into a Rule Engine ``MAPPING`` would have a
-length of 1 with a single unique key. For this reason, developers using Rule Engine should take care to not use compound
-data types with a mix of Python :py:class:`float` and :py:class:`~decimal.Decimal` values.
+are converted to Rule Engine :py:attr:`~DataType.MAPPING` values. While in Python the value
+``{0.1: 'a', Decimal('0.1'): 'a'}`` would have a length of 2 with two unique keys, the same value once converted into a
+Rule Engine :py:attr:`~DataType.MAPPING` would have a length of 1 with a single unique key. For this reason, developers
+using Rule Engine should take care to not use compound data types with a mix of Python :py:class:`float` and
+:py:class:`~decimal.Decimal` values.
+
+FUNCTION
+--------
+Version :release:`4.0.0` added the :py:attr:`~DataType.FUNCTION` datatype. This can be used to make functions available
+to rule authors. Rule Engine contains a few :ref:`builtin functions<builtin-functions>` that can be used by default.
+Additional functions can be either added them to the evaluated object or by extending the builtin symbols. It is only
+possible to call a function from within the rule text. Functions can not be defined as other data types can be.
 
 TIMEDELTA
 ---------
@@ -82,8 +94,8 @@ such as "has it been 30 days since this thing happened?" or "how much time passe
 
 The following mathematical operations are supported:
 
-* adding a timedelta to a datetime (result is a datetime)
-* adding a timedelta to another timedelta (result is a timedelta)
-* subtracting a timedelta from a datetime (result is a datetime)
-* subtracting a datetime from another datetime (result is a timedelta)
-* subtracting a timedelta from another timedelta (result is a timedelta)
+* Adding a timedelta to a datetime (result is a datetime)
+* Adding a timedelta to another timedelta (result is a timedelta)
+* Subtracting a timedelta from a datetime (result is a datetime)
+* Subtracting a datetime from another datetime (result is a timedelta)
+* Subtracting a timedelta from another timedelta (result is a timedelta)

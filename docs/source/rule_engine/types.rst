@@ -28,11 +28,10 @@ Classes
 
 .. autoclass:: DataType
    :members:
-   :exclude-members: ARRAY, FUNCTION, MAPPING, SET
+   :exclude-members: ARRAY, MAPPING, SET
    :show-inheritance:
 
-   .. autoattribute:: ARRAY
-      :annotation:
+   .. automethod:: ARRAY
 
    .. autoattribute:: BOOLEAN
       :annotation:
@@ -43,20 +42,19 @@ Classes
    .. autoattribute:: FLOAT
       :annotation:
 
-   .. autoattribute:: FUNCTION
-      :annotation:
+   .. automethod:: FUNCTION
 
-   .. autoattribute:: MAPPING
-      :annotation:
+   .. automethod:: MAPPING
 
    .. autoattribute:: NULL
       :annotation:
 
-   .. autoattribute:: SET
-      :annotation:
+   .. automethod:: SET
 
    .. autoattribute:: STRING
       :annotation:
 
    .. autoattribute:: TIMEDELTA
       :annotation:
+
+   .. autoattribute:: UNDEFINED

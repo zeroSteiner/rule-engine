@@ -179,6 +179,8 @@ class DataTypeTests(unittest.TestCase):
 
 	def test_data_type_definitions_describe_themselves(self):
 		for name in DataType:
+			if name == 'UNDEFINED':
+				continue
 			data_type = getattr(DataType, name)
 			self.assertRegex(repr(data_type), 'name=' + name)
 

@@ -182,6 +182,9 @@ class _DataTypeDef(object):
 		self.name = name
 		self.python_type = python_type
 		self.is_scalar = True
+		if '__call__' in dir(self) and self.__call__.__doc__:
+			# patch the call docs into the top-level class for Sphinx
+			self.__class__.__doc__ = self.__call__.__doc__
 
 	@property
 	def is_iterable(self):
@@ -202,7 +205,12 @@ class _DataTypeDef(object):
 	def is_compound(self):
 		return not self.is_scalar
 
-_DATA_TYPE_UNDEFINED = _DataTypeDef('UNDEFINED', errors.UNDEFINED)
+class _UndefinedDataTypeDef(_DataTypeDef):
+	def __repr__(self):
+		return 'UNDEFINED'
+
+_DATA_TYPE_UNDEFINED = _UndefinedDataTypeDef('UNDEFINED', errors.UNDEFINED)
+
 class _CollectionDataTypeDef(_DataTypeDef):
 	__slots__ = ('value_type', 'value_type_nullable')
 	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
@@ -223,6 +231,10 @@ class _CollectionDataTypeDef(_DataTypeDef):
 		return self.value_type
 
 	def __call__(self, value_type, value_type_nullable=True):
+		"""
+		:param value_type: The type of the members.
+		:param bool value_type_nullable: Whether or not members are allowed to be :py:attr:`.NULL`.
+		"""
 		return self.__class__(
 			self.name,
 			self.python_type,
@@ -275,6 +287,11 @@ class _MappingDataTypeDef(_DataTypeDef):
 		return self.key_type
 
 	def __call__(self, key_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
+		"""
+		:param key_type: The type of the mapping keys.
+		:param value_type: The type of the mapping values.
+		:param bool value_type_nullable: Whether or not mapping values are allowed to be :py:attr:`.NULL`.
+		"""
 		return self.__class__(
 			self.name,
 			self.python_type,
@@ -325,6 +342,17 @@ class _FunctionDataTypeDef(_DataTypeDef):
 		self.minimum_arguments = minimum_arguments
 
 	def __call__(self, name, return_type=_DATA_TYPE_UNDEFINED, argument_types=_DATA_TYPE_UNDEFINED, minimum_arguments=None):
+		"""
+		.. versionadded:: 4.0.0
+
+		:param str name: The name of the function, e.g. "split".
+		:param return_type: The data type of the functions return value.
+		:param tuple argument_types: The data types of the functions arguments.
+		:param int minimum_arguments: The minimum number of arguments the function requires.
+
+		If *argument_types* is specified and *minimum_arguments* is not, then *minimum_arguments* will default to the length
+		of *argument_types* effectively meaning that every defined argument is required. If
+		"""
 		return self.__class__(
 			self.name,
 			self.python_type,
@@ -404,43 +432,14 @@ class DataType(metaclass=DataTypeMeta):
 	  This checks that the types are compatible without any kind of conversion. When dealing with compound data types,
 	  this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.
 	"""
-	ARRAY = _ArrayDataTypeDef('ARRAY', tuple)
-	"""
-	.. py:function:: __call__(value_type, value_type_nullable=True)
-	
-	:param value_type: The type of the array members.
-	:param bool value_type_nullable: Whether or not array members are allowed to be :py:attr:`.NULL`.
-	"""
+	ARRAY = staticmethod(_ArrayDataTypeDef('ARRAY', tuple))
 	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
 	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
 	FLOAT = _DataTypeDef('FLOAT', decimal.Decimal)
-	FUNCTION = _FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE)
-	"""
-	.. py:function:: __call__(name, return_type=_DATA_TYPE_UNDEFINED, argument_types=_DATA_TYPE_UNDEFINED, minimum_arguments=None)
-	
-	.. versionadded:: 4.0.0
-	
-	:param str name: The name of the function, e.g. "split".
-	:param return_type: The type of the functions return value.
-	:param tuple argument_types: The types of the functions arguments.
-	:param int minimum_arguments: The minimum number of arguments the function requires.
-	"""
-	MAPPING = _MappingDataTypeDef('MAPPING', dict)
-	"""
-	.. py:function:: __call__(key_type, value_type, value_type_nullable=True)
-	
-	:param key_type: The type of the mapping keys.
-	:param value_type: The type of the mapping values.
-	:param bool value_type_nullable: Whether or not mapping values are allowed to be :py:attr:`.NULL`.
-	"""
+	FUNCTION = staticmethod(_FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE))
+	MAPPING = staticmethod(_MappingDataTypeDef('MAPPING', dict))
 	NULL = _DataTypeDef('NULL', NoneType)
-	SET = _SetDataTypeDef('SET', set)
-	"""
-	.. py:function:: __call__(value_type, value_type_nullable=True)
-
-	:param value_type: The type of the set members.
-	:param bool value_type_nullable: Whether or not set members are allowed to be :py:attr:`.NULL`.
-	"""
+	SET = staticmethod(_SetDataTypeDef('SET', set))
 	STRING = _DataTypeDef('STRING', str)
 	TIMEDELTA = _DataTypeDef('TIMEDELTA', datetime.timedelta)
 	UNDEFINED = _DATA_TYPE_UNDEFINED

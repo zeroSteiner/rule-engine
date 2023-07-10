@@ -18,13 +18,13 @@ Basic Usage
       +-----------+-----------------------+-----------------------------------+
       | Attribute | Python Type           | Rule Engine Type                  |
       +-----------+-----------------------+-----------------------------------+
-      | title     | ``str``               | :py:attr:`~ast.DataType.STRING`   |
+      | title     | ``str``               | :py:attr:`~.DataType.STRING`      |
       +-----------+-----------------------+-----------------------------------+
-      | publisher | ``str``               | :py:attr:`~ast.DataType.STRING`   |
+      | publisher | ``str``               | :py:attr:`~.DataType.STRING`      |
       +-----------+-----------------------+-----------------------------------+
-      | issue     | ``int``               | :py:attr:`~ast.DataType.FLOAT`    |
+      | issue     | ``int``               | :py:attr:`~.DataType.FLOAT`       |
       +-----------+-----------------------+-----------------------------------+
-      | released  | ``datetime.date``     | :py:attr:`~ast.DataType.DATETIME` |
+      | released  | ``datetime.date``     | :py:attr:`~.DataType.DATETIME`    |
       +-----------+-----------------------+-----------------------------------+
 
    * An example comic book collection might look like:
@@ -180,7 +180,7 @@ Setting A Default Value
 ^^^^^^^^^^^^^^^^^^^^^^^
 By default, :py:class:`engine.Rule` will raise a :py:class:`~errors.SymbolResolutionError` for invalid symbols. In some
 cases, it may be desirable to change the way in which the language behaves to instead treat unknown symbols with a
-default value (most often ``None`` / :py:attr:`ast.DataType.NULL` is used for this purpose, but any value of a supported
+default value (most often ``None`` / :py:attr:`~.DataType.NULL` is used for this purpose, but any value of a supported
 type can be used). To change this behavior, set the *default_value* parameter when initializing the
 :py:class:`~engine.Context` instance.
 
@@ -249,7 +249,7 @@ type needs to be resolved. The return type should be a member of the :py:class:`
 
    context = rule_engine.Context(type_resolver=type_resolver)
 
-:py:attr:`~ast.DataType.UNDEFINED` can be defined as the data type for a valid symbol without specifying explicit type
+:py:attr:`~.DataType.UNDEFINED` can be defined as the data type for a valid symbol without specifying explicit type
 information. In this case, the rule object will know that it is a valid symbol, but will not validate any operations
 that reference it.
 
@@ -275,18 +275,49 @@ In all cases, when a *type_resolver* is defined, the :py:class:`~engine.Rule` ob
 
 Compound Data Types
 """""""""""""""""""
-Compound data types such as the :py:class:`~ast.DataType.ARRAY` and :py:class:`~ast.DataType.MAPPING` types can
-optionally specify member type information by calling their respective type. For example, an array of strings would be
-defined as ``DataType.ARRAY(DataType.STRING)`` while a mapping with string keys and float values would be defined as
+Compound data types such as the :py:attr:`~.DataType.ARRAY` and :py:attr:`~.DataType.MAPPING` types can optionally
+specify member type information by calling their respective type. For example, an array of strings would be defined as
+``DataType.ARRAY(DataType.STRING)`` while a mapping with string keys and float values would be defined as
 ``DataType.MAPPING(DataType.STRING, DataType.FLOAT)``. For more information, see the documentation for the
-:py:meth:`~ast.DataType.ARRAY`, :py:meth:`~ast.DataType.MAPPING` functions.
+:py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.MAPPING` functions.
 
 Compound member types can only be a single data type. In some cases the data type can optionally be nullable which means
-that the member value can be either the specified type or :py:class:`~ast.DataType.NULL`. For example, a
-:py:class:`~ast.DataType.MAPPING` type whose values are all nullable strings may be defined, while a
-:py:class:`~ast.DataType.MAPPING` type with one value type of a :py:class:`~ast.DataType.STRING` and another of a
-:py:class:`~ast.DataType.BOOLEAN` may not be defined. In this case, the key type may be defined while the value type is
-set to :py:class:`~ast.DataType.UNDEFINED` which is the default value.
+that the member value can be either the specified type or :py:attr:`~.DataType.NULL`. For example, a
+:py:attr:`~.DataType.MAPPING` type whose values are all nullable strings may be defined, while a
+:py:attr:`~.DataType.MAPPING` type with one value type of a :py:attr:`~.DataType.STRING` and another of a
+:py:attr:`~.DataType.BOOLEAN` may not be defined. In this case, the key type may be defined while the value type is set
+to :py:attr:`~.DataType.UNDEFINED` which is the default value.
+
+Function Data Types
+"""""""""""""""""""
+Like compound types, functions can include type information by calling the respective type, in this case
+:py:attr:`~.DataType.FUNCTION`. Functions only support positional arguments and not keyword arguments but positional
+arguments can be defined as optional through the *minimum_arguments* option.
+
+For example, the :ref:`builtin  split<builtin-function-split>` can be called with as few as 1 arguments and as many as
+3 arguments. The first argument is always required, so *minimum_arguments* is set to 1. This means the remaining 2
+arguments are optional, however for the third argument to be defined in a function call, the second must also be
+defined. For the split function, the first argument is the string to split, followed by the seperator string to split on
+and finally the maximum number of times to split the string.
+
+.. code-block:: python
+
+   rule_engine.DataType.FUNCTION(
+       # the name of the function is provided for error messages
+       'split',
+       # the return data type, in this case an array of strings
+       return_type=ast.DataType.ARRAY(ast.DataType.STRING),
+       # the data type of each of the three arguments
+       argument_types=(
+          ast.DataType.STRING, # argument 1, the string to split
+          ast.DataType.STRING, # argument 2, the seperator to split on
+          ast.DataType.FLOAT   # argument 3, the maximum times to split the string
+       ),
+       # the minimum number of arguments, in this case the second two arguments are optional
+       minimum_arguments=1
+   )
+
+If the return type, or argument types are not specified, then no type checking is preformed.
 
 Defining Types From A Dictionary
 """"""""""""""""""""""""""""""""

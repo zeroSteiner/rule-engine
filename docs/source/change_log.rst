@@ -18,6 +18,7 @@ Version 4.0.0
 * **Breaking:** Dropped support for Python versions 3.4 and 3.5
 * **Breaking:** Invalid floating point literals now raise :py:exc:`~.errors.FloatSyntaxError` instead of
   :py:exc:`~.errors.RuleSyntaxError`
+* Added the new :py:class:`~rule_engine.types.DataType.FUNCTION` data type
 
 Version 3.x.x
 -------------

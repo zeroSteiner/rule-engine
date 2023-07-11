@@ -129,10 +129,10 @@ jobs:
         run: pipenv run python setup.py build sdist
 
       - name: Publish the distribution
-        uses: pypa/gh-action-pypi-publish@master
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
-          password: ${{ secrets.PYPI_PASSWORD }}
+          password: ${{ secrets.PYPI_TOKEN }}
 
       - name: Create the release
         id: create_release
@@ -142,4 +142,5 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
+
 

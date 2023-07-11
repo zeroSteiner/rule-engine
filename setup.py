@@ -51,7 +51,7 @@ except OSError:
 	long_description = None
 
 with open(os.path.join(base_directory, 'lib', 'rule_engine', '__init__.py')) as file_h:
-	match = re.search(r'^__version__\s*=\s*([\'"])(?P<version>\d+(\.\d)*)\1$', file_h.read(), flags=re.MULTILINE)
+	match = re.search(r'^__version__\s*=\s*([\'"])(?P<version>\d+(\.\d+)*)\1$', file_h.read(), flags=re.MULTILINE)
 if match is None:
 	raise RuntimeError('Unable to find the version information')
 version = match.group('version')
@@ -69,6 +69,7 @@ setup(
 	maintainer_email='zeroSteiner@gmail.com',
 	description=DESCRIPTION,
 	long_description=long_description,
+	long_description_content_type='text/x-rst',
 	url='https://github.com/zeroSteiner/rule-engine',
 	license='BSD',
 	# these are duplicated in requirements.txt
@@ -84,8 +85,8 @@ setup(
 		'Intended Audience :: Developers',
 		'License :: OSI Approved :: BSD License',
 		'Operating System :: OS Independent',
-		#'Programming Language :: Python :: 3.4',  # dropped in v3.6
-		#'Programming Language :: Python :: 3.5',  # dropped in v3.6
+		#'Programming Language :: Python :: 3.4',  # dropped in v4.0
+		#'Programming Language :: Python :: 3.5',  # dropped in v4.0
 		'Programming Language :: Python :: 3.6',
 		'Programming Language :: Python :: 3.7',
 		'Programming Language :: Python :: 3.8',

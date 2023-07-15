@@ -37,6 +37,7 @@ import os
 import pprint
 import re
 import sys
+import textwrap
 import traceback
 
 from . import __version__
@@ -122,6 +123,14 @@ def main():
 			elif isinstance(error, errors.RegexSyntaxError):
 				print("  Regex:   {!r}".format(error.error.pattern))
 				print("  Details: {} at position {}".format(error.error.msg, error.error.pos))
+			elif isinstance(error, errors.FunctionCallError):
+				if debugging:
+					inner_exception = ''.join(traceback.format_exception(
+						error.error,
+						error.error,
+						error.error.__traceback__
+					))
+					print(textwrap.indent(inner_exception, ' ' * 2))
 			if debugging:
 				traceback.print_exc()
 		except Exception as error:

@@ -1066,21 +1066,28 @@ class FunctionCallExpression(ExpressionBase):
 	def _validate_function(self, function_type, arguments):
 		if not isinstance(function_type, DataType.FUNCTION.__class__):
 			raise errors.EvaluationError('data type mismatch (not a callable value)')
-		if len(arguments) < function_type.minimum_arguments:
-			raise errors.FunctionCallError(
-				"missing {} required positional arguments".format(function_type.minimum_arguments - len(arguments)),
-				function_name=function_type.value_name
-			)
-		for pos, (arg1, arg2_type) in enumerate(zip(arguments, function_type.argument_types), 1):
-			if isinstance(arg1, LiteralExpressionBase):
-				arg1_type = arg1.result_type
-			else:
-				arg1_type = DataType.from_value(arg1)
-			if not DataType.is_compatible(arg1_type, arg2_type):
+		if function_type.minimum_arguments is not DataType.UNDEFINED:
+			if len(arguments) < function_type.minimum_arguments:
 				raise errors.FunctionCallError(
-					"data type mismatch (argument #{})".format(pos),
+					"expected at least {} positional arguments".format(function_type.minimum_arguments),
 					function_name=function_type.value_name
 				)
+		if function_type.argument_types is not DataType.UNDEFINED:
+			if len(arguments) > len(function_type.argument_types):
+				raise errors.FunctionCallError(
+					"expected at most {} positional arguments".format(len(function_type.argument_types)),
+					function_name=function_type.value_name
+				)
+			for pos, (arg1, arg2_type) in enumerate(zip(arguments, function_type.argument_types), 1):
+				if isinstance(arg1, LiteralExpressionBase):
+					arg1_type = arg1.result_type
+				else:
+					arg1_type = DataType.from_value(arg1)
+				if not DataType.is_compatible(arg1_type, arg2_type):
+					raise errors.FunctionCallError(
+						"data type mismatch (argument #{})".format(pos),
+						function_name=function_type.value_name
+					)
 
 class Statement(ASTNodeBase):
 	"""A class representing the top level statement of the grammar text."""

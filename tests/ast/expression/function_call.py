@@ -89,7 +89,7 @@ class FunctionCallExpressionTests(unittest.TestCase):
 		with self.assertRaises(errors.EvaluationError):
 			self.assertTrue(function_call.evaluate({'function': True}))
 
-	def test_ast_expression_function_call_error_on_missing_arguments(self):
+	def test_ast_expression_function_call_error_on_to_few_arguments(self):
 		context = engine.Context(
 			type_resolver=engine.type_resolver_from_dict({
 				'function': ast.DataType.FUNCTION(
@@ -101,11 +101,30 @@ class FunctionCallExpressionTests(unittest.TestCase):
 			})
 		)
 		symbol = ast.SymbolExpression(context, 'function')
-		function_call = ast.FunctionCallExpression(context, symbol, [ast.FloatExpression(context, 1)])
 
 		# function is missing arguments
 		with self.assertRaises(errors.FunctionCallError):
-			function_call = ast.FunctionCallExpression(context, symbol, [])
+			ast.FunctionCallExpression(context, symbol, [])
+
+	def test_ast_expression_function_call_error_on_to_many_arguments(self):
+		context = engine.Context(
+			type_resolver=engine.type_resolver_from_dict({
+				'function': ast.DataType.FUNCTION(
+					'function',
+					return_type=ast.DataType.FLOAT,
+					argument_types=(ast.DataType.FLOAT,),
+					minimum_arguments=1
+				)
+			})
+		)
+		symbol = ast.SymbolExpression(context, 'function')
+
+		# function is missing arguments
+		with self.assertRaises(errors.FunctionCallError):
+			ast.FunctionCallExpression(context, symbol, [
+				ast.FloatExpression(context, 1),
+				ast.FloatExpression(context, 1)
+			])
 
 	def test_ast_expression_function_call_error_on_exception(self):
 		symbol = ast.SymbolExpression(context, 'function')

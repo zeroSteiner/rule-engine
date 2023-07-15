@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Change Log &mdash; Rule Engine 4.0.0 documentation</title>
+  <title>Change Log &mdash; Rule Engine 4.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
@@ -35,7 +35,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.0.0
+                4.0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -118,13 +118,13 @@ this list is curated by the development team for note worthy changes.</p>
 <section id="version-4-0-0">
 <h3>Version 4.0.0<a class="headerlink" href="#version-4-0-0" title="Permalink to this heading"></a></h3>
 <p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v4.0.0">v4.0.0</a> on July 15th, 2023</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt><strong>Breaking:</strong> Changed <code class="docutils literal notranslate"><span class="pre">STRING.to_ary</span></code> to return an array of characters instead of splitting the string</dt><dd><ul>
+<ul>
+<li><p><strong>Breaking:</strong> Changed <code class="docutils literal notranslate"><span class="pre">STRING.to_ary</span></code> to return an array of characters instead of splitting the string</p>
+<blockquote>
+<div><ul class="simple">
 <li><p>Use the new builtin <code class="docutils literal notranslate"><span class="pre">$split</span></code> function to split a string on whitespace into an array of words</p></li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </li>
 <li><p><strong>Breaking:</strong> Changed <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> to use keyword-only arguments</p></li>
 <li><p><strong>Breaking:</strong> Dropped support for Python versions 3.4 and 3.5</p></li>

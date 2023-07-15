@@ -10,7 +10,7 @@ Version 4.x.x
 Version 4.0.0
 ^^^^^^^^^^^^^
 
-*In Progress*
+Released :release:`4.0.0` on July 15th, 2023
 
 * **Breaking:** Changed ``STRING.to_ary`` to return an array of characters instead of splitting the string
     * Use the new builtin ``$split`` function to split a string on whitespace into an array of words

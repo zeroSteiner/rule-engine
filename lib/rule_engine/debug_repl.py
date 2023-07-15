@@ -35,6 +35,7 @@ import code
 import io
 import os
 import pprint
+import re
 import sys
 import traceback
 
@@ -97,12 +98,19 @@ def main():
 			)
 		context = console.locals['context']
 		thing = console.locals['thing']
+	debugging = arguments.debug
 
 	while True:
 		try:
 			rule_text = input('rule > ')
 		except (EOFError, KeyboardInterrupt):
 			break
+
+		match = re.match(r'\s*#!\s*debug\s*=\s*(\w+)', rule_text)
+		if match:
+			debugging = match.group(1).lower() != 'false'
+			print('# debugging = ' + str(debugging).lower())
+			continue
 
 		try:
 			rule = engine.Rule(rule_text, context=context)
@@ -114,7 +122,7 @@ def main():
 			elif isinstance(error, errors.RegexSyntaxError):
 				print("  Regex:   {!r}".format(error.error.pattern))
 				print("  Details: {} at position {}".format(error.error.msg, error.error.pos))
-			if arguments.debug:
+			if debugging:
 				traceback.print_exc()
 		except Exception as error:
 			traceback.print_exc()

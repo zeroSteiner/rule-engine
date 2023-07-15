@@ -29,12 +29,22 @@ Exceptions
    :show-inheritance:
    :special-members: __init__
 
+.. autoexception:: FloatSyntaxError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: EngineError
    :members:
    :show-inheritance:
    :special-members: __init__
 
 .. autoexception:: EvaluationError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
+.. autoexception:: FunctionCallError
    :members:
    :show-inheritance:
    :special-members: __init__
@@ -69,6 +79,11 @@ Exceptions
    :show-inheritance:
    :special-members: __init__
 
+.. autoexception:: TimedeltaSyntaxError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 Exception Hierarchy
 -------------------
 
@@ -80,10 +95,13 @@ The class hierarchy for Rule Engine exceptions is:
     +-- EvaluationError
          +-- AttributeResolutionError
          +-- AttributeTypeError
+         +-- FunctionCallError
          +-- LookupError
          +-- SymbolResolutionError
          +-- SymbolTypeError
     +-- SyntaxError
          +-- DatetimeSyntaxError
+         +-- FloatSyntaxError
          +-- RegexSyntaxError
          +-- RuleSyntaxError
+         +-- TimedeltaSyntaxError

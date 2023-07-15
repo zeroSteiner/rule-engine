@@ -184,6 +184,34 @@ an expression used when the condition is true and ending with an expression used
 
 For example: ``condition ? true_case : false_case``
 
+Function Calls
+^^^^^^^^^^^^^^
+
+Function calls can be preformed on function symbols by placing parenthesis after them. The parenthesis contain zero or
+more argument expressions to pass to the function. Functions support optional positional arguments. For example, a
+function can take two arguments and one or both can specify a default value and then be omitted when called. Functions
+do not support keyword arguments.
+
+Using the :ref:`builtin  split<builtin-function-split>` function as an example, it can be called with up to 3 arguments.
+The first is required while the second two are optional. The ``split`` symbol requires the ``$`` prefix to access the
+builtin value.
+
+.. code-block::
+
+  # only the required argument performs an unlimited number of splits on spaces
+  $split("Star Wars")         # => ("Star", "Wars")
+
+  # the optional second argument specifies an alternative string to split on
+  $split("Star Wars", "r")    # => ('Sta', ' Wa', 's')
+
+  # the optional third argument specifies the maximum number of times to split the string
+  $split("Star Wars", "r", 1) # => ('Sta', ' Wars')
+
+  # raises FunctionCallError because the second argument must be a string, the third argument
+  # can not be specified without the second
+  $split("Star Wars", 1)      # => FunctionCallError: data type mismatch (argument #2)
+  $split("Star Wars", ' ', 1) # => ("Star", "Wars")
+
 Reserved Keywords
 ^^^^^^^^^^^^^^^^^
 The following keywords are reserved and can not be used as the names of symbols.
@@ -236,24 +264,30 @@ The following keywords are reserved and can not be used as the names of symbols.
 
 Literal Values
 ^^^^^^^^^^^^^^
-:py:attr:`~.DataType.DATETIME` and :py:attr:`~.DataType.STRING` literal values are specified in a very similar manner by
-defining the value as a string of characters enclosed in either single or double quotes. The difference comes in an
-optional leading character before the opening quote. Either no leading character or a single ``s`` will specify a
-standard :py:attr:`~.DataType.STRING` value, while a single ``d`` will specify a :py:attr:`~.DataType.DATETIME` value.
+:py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.STRING`, and :py:attr:`TIMEDELTA` literal values are specified in a
+very similar manner by defining the value as a string of characters enclosed in either single or double quotes. The
+difference comes in an optional leading character before the opening quote. Either no leading character or a single
+``s`` will specify a standard :py:attr:`~.DataType.STRING` value, while a single ``d`` will specify a
+:py:attr:`~.DataType.DATETIME` value, and a single ``t`` will specify a :py:attr:`~.DataType.TIMEDELTA` value.
+
+.. _literal-datetime-values:
+
+Literal DATETIME Values
+"""""""""""""""""""""""
 
 :py:attr:`~.DataType.DATETIME` literals must be specified in ISO-8601 format. The underlying parsing logic is provided
 by :py:meth:`dateutil.parser.isoparse`. :py:attr:`~.DataType.DATETIME` values with no time specified (e.g.
 ``d"2019-09-23"``) will evaluate to a :py:attr:`~.DataType.DATETIME` of the specified day at exactly midnight.
 
-:py:attr:`~.DataType.TIMEDELTA` literals must be specified in a subset of the ISO-8601 format for durations. Everything
-except years and months are supported in `~.DataType.TIMEDELTA` values, to match the underlying representation provided
-by the Python standard library.
-
 Example rules showing equivalent literal expressions:
 
-* ``"foobar" == s"foobar"``
-* ``d"2019-09-23" == d"2019-09-23 00:00:00"``
-* ``t"P1D" == t"PT24H"``
+* ``d"2019-09-23" == d"2019-09-23 00:00:00"`` (dates default to midnight unless a time is specified)
+* ``d"2019-09-23" == d"2019-09-23 00:00:00-04:00"`` (**only equivalent when the local timezone is EDT**)
+
+.. _literal-float-values:
+
+Literal FLOAT Values
+""""""""""""""""""""
 
 :py:attr:`~.DataType.FLOAT` literals may be expressed in either binary, octal, decimal, or hexadecimal formats. The
 binary, octal and hexadecimal formats use the ``0b``, ``0o``, and ``0x`` prefixes respectively. Values in the decimal
@@ -275,6 +309,20 @@ Example rules show equivalent literal expressions:
 * ``1e0 == 1``
 * ``1.0e0 == 1``
 
+.. _literal-timedelta-values:
+
+Literal TIMEDELTA Values
+""""""""""""""""""""""""
+
+:py:attr:`~.DataType.TIMEDELTA` literals must be specified in a subset of the ISO-8601 format for durations. Everything
+except years and months are supported in :py:attr:`~.DataType.TIMEDELTA` values, to match the underlying representation
+provided by the Python standard library.
+
+Example rules showing equivalent literal expressions:
+
+* ``t"P1D" == t"PT24H"`` (24 hours in a day)
+* ``t"P1D" == t"PT1440M"`` (1,440 minutes in a day)
+
 Comments
 ^^^^^^^^
 
@@ -289,9 +337,122 @@ Example rule containing a comment: ``size == 1 # this is a comment``
 
 Builtin Symbols
 ---------------
-The following symbols are provided by default using the :py:meth:`~engine.Builtins.from_defaults` method. These symbols
-can be accessed through the ``$`` prefix, e.g. ``$pi``. The default values can be overridden by defining a custom
-subclass of :py:class:`~engine.Context` and setting the :py:attr:`~engine.Context.builtins` attribute.
+The following symbols are provided by default using the :py:meth:`~builtins.Builtins.from_defaults` method. These
+symbols can be accessed through the ``$`` prefix, e.g. ``$pi``. The default values can be overridden by defining a
+custom subclass of :py:class:`~engine.Context` and setting the :py:attr:`~engine.Context.builtins` attribute.
+
+.. _builtin-functions:
+
+Functions
+^^^^^^^^^
+
+``BOOLEAN all(ARRAY[??] values)``
+
+:returns: :py:attr:`~ast.DataType.BOOLEAN`
+:values: (:py:attr:`~ast.DataType.ARRAY` of *anything*) An array of values to check.
+
+Returns true if every member of the array argument is truthy. If *values* is empty, the function returns true.
+
+``BOOLEAN any(ARRAY[??] values)``
+
+:returns: :py:attr:`~ast.DataType.BOOLEAN`
+:values: (:py:attr:`~ast.DataType.ARRAY` of *anything*) An array of values to check.
+
+Returns true if any member of the array argument is truthy. If *values* is empty, the function returns false.
+
+``FLOAT sum(ARRAY[FLOAT] values)``
+
+:returns: :py:attr:`~ast.DataType.FLOAT`
+:values: (:py:attr:`~ast.DataType.ARRAY` of :py:attr:`~ast.DataType.FLOAT`) An array of values to add.
+
+Returns the sum of an array of values. If *values* is empty, the function returns 0.
+
+``ARRAY[??] map(FUNCTION function, ARRAY[??] values)``
+
+:returns: :py:attr:`~ast.DataType.ARRAY` of *anything*
+:function: (:py:attr:`~ast.DataType.FUNCTION`) The function to call on each of the values.
+:values: (:py:attr:`~ast.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
+
+``FLOAT max(ARRAY[FLOAT] values)``
+
+:returns: :py:attr:`~ast.DataType.FLOAT`
+:values: (:py:attr:`~ast.DataType.ARRAY` of :py:attr:`~ast.DataType.FLOAT`) An array of values to check.
+
+Returns the largest value from the array of values. If *values* is empty, a :py:exc:`~.errors.FunctionCallError` is
+raised.
+
+``FLOAT min(ARRAY[FLOAT] values)``
+
+:returns: :py:attr:`~ast.DataType.FLOAT`
+:values: (:py:attr:`~ast.DataType.ARRAY` of :py:attr:`~ast.DataType.FLOAT`) An array of values to check.
+
+Returns the smallest value from the array of values. If *values* is empty, a :py:exc:`~.errors.FunctionCallError` is
+raised.
+
+``ARRAY[??] filter(FUNCTION function, ARRAY[??] values)``
+
+:returns: :py:attr:`~ast.DataType.ARRAY` of *anything*
+:function: (:py:attr:`~ast.DataType.FUNCTION`) The function to call on each of the values.
+:values: (:py:attr:`~ast.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
+
+Returns an array containing a subset of members from *values* where *function* returns true.
+
+``DATETIME parse_datetime(STRING value)``
+
+:returns: :py:attr:`~ast.DataType.DATETIME`
+:value: (:py:attr:`~ast.DataType.STRING`) The string value to parse into a timestamp.
+
+Parses the string value into a :py:attr:`~ast.DataType.DATETIME` value. The string must be in ISO-8601 format and if it
+fails to parse, a :py:exc:`~.errors.DatetimeSyntaxError` is raised.
+
+``FLOAT parse_float(STRING value)``
+
+:returns: :py:attr:`~ast.DataType.FLOAT`
+:value: (:py:attr:`~ast.DataType.STRING`) The string value to parse into a numeric.
+
+Parses the string value into a :py:attr:`~ast.DataType.FLOAT` value. The string must be properly formatted and if it
+fails to parse, a :py:exc:`~.errors.FloatSyntaxError` is raised.
+
+``FLOAT parse_timedelta(STRING value)``
+
+:returns: :py:attr:`~ast.DataType.TIMEDELTA`
+:value: (:py:attr:`~ast.DataType.STRING`) The string value to parse into a time period.
+
+Parses the string value into a :py:attr:`~ast.DataType.TIMEDELTA` value. The string must be properly formatted and if it
+fails to parse, a :py:exc:`~.errors.TimedeltaSyntaxError` is raised.
+
+``FLOAT random([FLOAT boundary])``
+
+:returns: :py:attr:`~ast.DataType.FLOAT`
+:boundary: (Optional :py:attr:`~ast.DataType.FLOAT`) The upper boundary to generate a random number for.
+
+Generate a random number. If *boundary* is not specified, the random number  returned will be between 0 and 1. If
+*boundary* is specified, it must be a natural number and the random number returned will be between 0 and *boundary*,
+including *boundary*.
+
+.. _builtin-function-split:
+
+``ARRAY[STRING] split(STRING string, [STRING sep, FLOAT maxsplit])``
+
+:returns: :py:attr:`~ast.DataType.ARRAY` of :py:attr:`~ast.DataType.STRING`
+:string: (:py:attr:`~ast.DataType.STRING`) The string value to split into substrings.
+:sep: (Optional :py:attr:`~ast.DataType.STRING`) The value to split *string* on.
+:maxsplit: (Optional :py:attr:`~ast.DataType.FLOAT`) The maximum number of times tp split *string*.
+
+Split a string value into sub strings. If *sep* is not specified, the *string* will be split by all whitespace. If *sep*
+is specified, *string* will be split by that value. This alters how consecutive spaces are handled. When *sep* is not
+specified, consecutive whitespace is handled as a single unit and reduced, where as if *sep* is a single space,
+consecutive spaces will result in empty strings being returned.
+
+For example:
+
+.. code-block::
+
+  $split("A    B")      # => ('A', 'B')
+  $split("A    B", ' ') # => ('A', '', '', '', 'B')
+
+If *maxsplit* is specified, it must be a natural number and will be used as the maximum number of times to split
+*string*. This will guarantee that the resulting array length is less than or equal to *maxsplit* + 1.
 
 Math Related
 ^^^^^^^^^^^^

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.errors &mdash; Rule Engine 3.6.1 documentation</title>
+  <title>rule_engine.errors &mdash; Rule Engine 4.0.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
@@ -33,7 +33,7 @@
             Rule Engine
           </a>
               <div class="version">
-                3.6.1
+                4.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -158,16 +158,35 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;The datetime value which contains the syntax error which caused this exception to be raised.&quot;&quot;&quot;</span></div></div>
 
-<span class="k">class</span> <span class="nc">TimedeltaSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;An error raised for issues regarding the use of improperly formatted timedelta expressions.&quot;&quot;&quot;</span>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="FloatSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.FloatSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">FloatSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised for issues regarding the use of improperly formatted float expressions.</span>
+
+<span class="sd">	.. versionadded:: 4.0.0</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FloatSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.FloatSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str message: A text description of what error occurred.</span>
+<span class="sd">		:param str value: The float value which contains the syntax error which caused this exception to be raised.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">FloatSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;The float value which contains the syntax error which caused this exception to be raised.&quot;&quot;&quot;</span></div></div>
+
+<div class="viewcode-block" id="TimedeltaSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.TimedeltaSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">TimedeltaSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised for issues regarding the use of improperly formatted timedelta expressions.</span>
+
+<span class="sd">	.. versionadded:: 3.5.0</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TimedeltaSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.TimedeltaSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param str message: A text description of what error occurred.</span>
 <span class="sd">		:param str value: The timedelta value which contains the syntax error which caused this exception to be raised.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">TimedeltaSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
-<span class="w">		</span><span class="sd">&quot;&quot;&quot;The timedelta value which contains the syntax error which caused this exception to be raised.&quot;&quot;&quot;</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;The timedelta value which contains the syntax error which caused this exception to be raised.&quot;&quot;&quot;</span></div></div>
 
 <div class="viewcode-block" id="RegexSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RegexSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RegexSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;An error raised for issues regarding the use of improper regular expression syntax.&quot;&quot;&quot;</span>
@@ -186,7 +205,7 @@
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;The regular expression value which contains the syntax error which caused this exception to be raised.&quot;&quot;&quot;</span></div></div>
 
 <div class="viewcode-block" id="RuleSyntaxError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RuleSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">RuleSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;An error raised for issues identified in while parsing the grammar of the rule text.&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;An error raised for issues identified while parsing the grammar of the rule text.&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="RuleSyntaxError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.RuleSyntaxError.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param str message: A text description of what error occurred.</span>
@@ -329,6 +348,18 @@
 			<span class="n">expected_type</span><span class="o">.</span><span class="n">name</span>
 		<span class="p">)</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">SymbolTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="FunctionCallError"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.FunctionCallError">[docs]</a><span class="k">class</span> <span class="nc">FunctionCallError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised when there is an issue calling a function.</span>
+
+<span class="sd">	.. versionadded:: 4.0.0</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FunctionCallError.__init__"><a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.FunctionCallError.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">function_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">FunctionCallError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="o">=</span> <span class="n">error</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;The exception from which this error was triggered.&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">function_name</span> <span class="o">=</span> <span class="n">function_name</span></div></div>
 </pre></div>
 
            </div>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>types &mdash; Rule Engine 3.6.1 documentation</title>
+  <title>types &mdash; Rule Engine 4.0.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
@@ -36,7 +36,7 @@
             Rule Engine
           </a>
               <div class="version">
-                3.6.1
+                4.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -54,6 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../attributes.html">Data Attributes</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="ast.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="builtins.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">builtins</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="engine.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">engine</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="errors.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">errors</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="parser.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">parser</span></code></a></li>
@@ -251,22 +252,17 @@ ignored.</p>
 </pre></div>
 </div>
 <p>This checks that the types are compatible without any kind of conversion. When dealing with compound data types,
-this ensures that the member types are either the same or <a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+this ensures that the member types are either the same or <a class="reference internal" href="#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
 </dd>
 </dl>
-<dl class="py attribute">
+<dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.types.DataType.ARRAY">
-<span class="sig-name descname"><span class="pre">ARRAY</span></span><a class="headerlink" href="#rule_engine.types.DataType.ARRAY" title="Permalink to this definition"></a></dt>
-<dd><dl class="py function">
-<dt class="sig sig-object py" id="rule_engine.types.DataType.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.types.DataType.__call__" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="field-list simple">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ARRAY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.types.DataType.ARRAY" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>value_type</strong> – The type of the array members.</p></li>
-<li><p><strong>value_type_nullable</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether or not array members are allowed to be <a class="reference internal" href="#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>.</p></li>
+<li><p><strong>value_type</strong> – The type of the members.</p></li>
+<li><p><strong>value_type_nullable</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether or not members are allowed to be <a class="reference internal" href="#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -287,15 +283,30 @@ this ensures that the member types are either the same or <a class="reference in
 <span class="sig-name descname"><span class="pre">FLOAT</span></span><a class="headerlink" href="#rule_engine.types.DataType.FLOAT" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="rule_engine.types.DataType.MAPPING">
-<span class="sig-name descname"><span class="pre">MAPPING</span></span><a class="headerlink" href="#rule_engine.types.DataType.MAPPING" title="Permalink to this definition"></a></dt>
-<dd><dl class="py function">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
+<dl class="py method">
+<dt class="sig sig-object py" id="rule_engine.types.DataType.FUNCTION">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FUNCTION</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argument_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_arguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.types.DataType.FUNCTION" title="Permalink to this definition"></a></dt>
+<dd><div class="versionadded">
+<p><span class="versionmodified added">New in version 4.0.0.</span></p>
+</div>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – The name of the function, e.g. “split”.</p></li>
+<li><p><strong>return_type</strong> – The data type of the functions return value.</p></li>
+<li><p><strong>argument_types</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#tuple" title="(in Python v3.11)"><em>tuple</em></a>) – The data types of the functions arguments.</p></li>
+<li><p><strong>minimum_arguments</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The minimum number of arguments the function requires.</p></li>
+</ul>
+</dd>
+</dl>
+<p>If <em>argument_types</em> is specified and <em>minimum_arguments</em> is not, then <em>minimum_arguments</em> will default to the length
+of <em>argument_types</em> effectively meaning that every defined argument is required. If</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rule_engine.types.DataType.MAPPING">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MAPPING</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.types.DataType.MAPPING" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>key_type</strong> – The type of the mapping keys.</p></li>
@@ -311,19 +322,14 @@ this ensures that the member types are either the same or <a class="reference in
 <span class="sig-name descname"><span class="pre">NULL</span></span><a class="headerlink" href="#rule_engine.types.DataType.NULL" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.types.DataType.SET">
-<span class="sig-name descname"><span class="pre">SET</span></span><a class="headerlink" href="#rule_engine.types.DataType.SET" title="Permalink to this definition"></a></dt>
-<dd><dl class="py function">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="field-list simple">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SET</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.types.DataType.SET" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>value_type</strong> – The type of the set members.</p></li>
-<li><p><strong>value_type_nullable</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether or not set members are allowed to be <a class="reference internal" href="#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>.</p></li>
+<li><p><strong>value_type</strong> – The type of the members.</p></li>
+<li><p><strong>value_type_nullable</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether or not members are allowed to be <a class="reference internal" href="#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -341,7 +347,14 @@ this ensures that the member types are either the same or <a class="reference in
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.types.DataType.UNDEFINED">
-<span class="sig-name descname"><span class="pre">UNDEFINED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_DataTypeDef</span> <span class="pre">name=UNDEFINED</span> <span class="pre">python_type=UNDEFINED</span> <span class="pre">&gt;</span></em><a class="headerlink" href="#rule_engine.types.DataType.UNDEFINED" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">UNDEFINED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">UNDEFINED</span></em><a class="headerlink" href="#rule_engine.types.DataType.UNDEFINED" title="Permalink to this definition"></a></dt>
+<dd><p>Undefined values. This constant can be used to indicate that a particular symbol is valid, but it’s data type is
+currently unknown.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">UNDEFINED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">UNDEFINED</span></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
 <dd><p>Undefined values. This constant can be used to indicate that a particular symbol is valid, but it’s data type is
 currently unknown.</p>
 </dd></dl>
@@ -368,7 +381,7 @@ currently unknown.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_type" title="Permalink to this definition"></a></dt>
 <dd><p>Get the supported data type constant for the specified Python type. If the type can not be mapped to a supported
 data type, then a <a class="reference external" href="https://docs.python.org/3.11/library/exceptions.html#ValueError" title="(in Python v3.11)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised. This function will not return
-<a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+<a class="reference internal" href="#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>python_type</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#type" title="(in Python v3.11)"><em>type</em></a>) – The native Python type to retrieve the corresponding type constant for.</p>
@@ -384,7 +397,7 @@ data type, then a <a class="reference external" href="https://docs.python.org/3.
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_value" title="Permalink to this definition"></a></dt>
 <dd><p>Get the supported data type constant for the specified Python value. If the value can not be mapped to a
 supported data type, then a <a class="reference external" href="https://docs.python.org/3.11/library/exceptions.html#TypeError" title="(in Python v3.11)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> exception will be raised. This function will not return
-<a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+<a class="reference internal" href="#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>python_value</strong> – The native Python value to retrieve the corresponding data type constant for.</p>
@@ -399,7 +412,7 @@ supported data type, then a <a class="reference external" href="https://docs.pyt
 <dt class="sig sig-object py" id="rule_engine.types.DataType.is_compatible">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_compatible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.is_compatible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.is_compatible" title="Permalink to this definition"></a></dt>
 <dd><p>Check if two data type definitions are compatible without any kind of conversion. This evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code>
-when one or both are <a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> or both types are the same. In the case of compound data types (such
+when one or both are <a class="reference internal" href="#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> or both types are the same. In the case of compound data types (such
 as <a class="reference internal" href="#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>) the member types are checked recursively in the same manner.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">New in version 2.1.0.</span></p>

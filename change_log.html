@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Change Log &mdash; Rule Engine 3.6.1 documentation</title>
+  <title>Change Log &mdash; Rule Engine 4.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
@@ -35,7 +35,7 @@
             Rule Engine
           </a>
               <div class="version">
-                3.6.1
+                4.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -54,7 +54,12 @@
 <li class="toctree-l1"><a class="reference internal" href="rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="debug_repl.html">Debug REPL</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-4-x-x">Version 4.x.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#version-4-0-0">Version 4.0.0</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#version-3-x-x">Version 3.x.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#version-3-6-0">Version 3.6.0</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version-3-5-0">Version 3.5.0</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version-3-4-0">Version 3.4.0</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version-3-3-0">Version 3.3.0</a></li>
@@ -108,14 +113,38 @@
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this heading"></a></h1>
 <p>This document contains notes on the major changes for each version of the Rule Engine. In comparison to the git log,
 this list is curated by the development team for note worthy changes.</p>
+<section id="version-4-x-x">
+<h2>Version 4.x.x<a class="headerlink" href="#version-4-x-x" title="Permalink to this heading"></a></h2>
+<section id="version-4-0-0">
+<h3>Version 4.0.0<a class="headerlink" href="#version-4-0-0" title="Permalink to this heading"></a></h3>
+<p><em>In Progress</em></p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>Breaking:</strong> Changed <code class="docutils literal notranslate"><span class="pre">STRING.to_ary</span></code> to return an array of characters instead of splitting the string</dt><dd><ul>
+<li><p>Use the new builtin <code class="docutils literal notranslate"><span class="pre">$split</span></code> function to split a string on whitespace into an array of words</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p><strong>Breaking:</strong> Changed <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> to use keyword-only arguments</p></li>
+<li><p><strong>Breaking:</strong> Dropped support for Python versions 3.4 and 3.5</p></li>
+<li><p><strong>Breaking:</strong> Invalid floating point literals now raise <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.FloatSyntaxError" title="rule_engine.errors.FloatSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FloatSyntaxError</span></code></a> instead of
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.RuleSyntaxError" title="rule_engine.errors.RuleSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuleSyntaxError</span></code></a></p></li>
+<li><p>Added the new <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-class docutils literal notranslate"><span class="pre">FUNCTION</span></code></a> data type</p></li>
+</ul>
+</section>
+</section>
 <section id="version-3-x-x">
 <h2>Version 3.x.x<a class="headerlink" href="#version-3-x-x" title="Permalink to this heading"></a></h2>
+<section id="version-3-6-0">
+<h3>Version 3.6.0<a class="headerlink" href="#version-3-6-0" title="Permalink to this heading"></a></h3>
 <p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.6.0">v3.6.0</a> on June 16th, 2023</p>
 <ul class="simple">
-<li><p>Removed testing for Python 3.4 and 3.5 on GitHub Actions</p></li>
+<li><p>Removed testing for Python versions 3.4 and 3.5 on GitHub Actions</p></li>
 <li><p>Add regex error details to the debug REPL</p></li>
 <li><p>Add support for Python-style comments</p></li>
 </ul>
+</section>
 <section id="version-3-5-0">
 <h3>Version 3.5.0<a class="headerlink" href="#version-3-5-0" title="Permalink to this heading"></a></h3>
 <p>Released <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.5.0">v3.5.0</a> on July 16th, 2022</p>

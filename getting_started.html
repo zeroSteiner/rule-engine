@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started &mdash; Rule Engine 3.6.1 documentation</title>
+  <title>Getting Started &mdash; Rule Engine 4.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
@@ -36,7 +36,7 @@
             Rule Engine
           </a>
               <div class="version">
-                3.6.1
+                4.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -61,6 +61,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#type-hinting">Type Hinting</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#compound-data-types">Compound Data Types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#function-data-types">Function Data Types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#defining-types-from-a-dictionary">Defining Types From A Dictionary</a></li>
 </ul>
 </li>
@@ -125,19 +126,19 @@ set of variable attributes. The rest of the usage example will assume that these
 </tr>
 <tr class="row-even"><td><p>title</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
-<td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>publisher</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">str</span></code></p></td>
-<td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p>issue</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">int</span></code></p></td>
-<td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p>released</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">datetime.date</span></code></p></td>
-<td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
 </tr>
 </tbody>
 </table>
@@ -308,7 +309,7 @@ unnecessary.</p>
 <h3>Setting A Default Value<a class="headerlink" href="#setting-a-default-value" title="Permalink to this heading"></a></h3>
 <p>By default, <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">engine.Rule</span></code></a> will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> for invalid symbols. In some
 cases, it may be desirable to change the way in which the language behaves to instead treat unknown symbols with a
-default value (most often <code class="docutils literal notranslate"><span class="pre">None</span></code> / <code class="xref py py-attr docutils literal notranslate"><span class="pre">ast.DataType.NULL</span></code> is used for this purpose, but any value of a supported
+default value (most often <code class="docutils literal notranslate"><span class="pre">None</span></code> / <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a> is used for this purpose, but any value of a supported
 type can be used). To change this behavior, set the <em>default_value</em> parameter when initializing the
 <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># this fails because title is not defined and there is no default_value</span>
@@ -372,7 +373,7 @@ type needs to be resolved. The return type should be a member of the <code class
 <span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">=</span><span class="n">type_resolver</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code> can be defined as the data type for a valid symbol without specifying explicit type
+<p><a class="reference internal" href="rule_engine/types.html#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> can be defined as the data type for a valid symbol without specifying explicit type
 information. In this case, the rule object will know that it is a valid symbol, but will not validate any operations
 that reference it.</p>
 <p>In all cases, when a <em>type_resolver</em> is defined, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> object will raise a
@@ -393,17 +394,45 @@ that reference it.</p>
 </div>
 <section id="compound-data-types">
 <span id="getting-started-compound-data-types"></span><h4>Compound Data Types<a class="headerlink" href="#compound-data-types" title="Permalink to this heading"></a></h4>
-<p>Compound data types such as the <code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">MAPPING</span></code> types can
-optionally specify member type information by calling their respective type. For example, an array of strings would be
-defined as <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code> while a mapping with string keys and float values would be defined as
+<p>Compound data types such as the <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> and <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> types can optionally
+specify member type information by calling their respective type. For example, an array of strings would be defined as
+<code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code> while a mapping with string keys and float values would be defined as
 <code class="docutils literal notranslate"><span class="pre">DataType.MAPPING(DataType.STRING,</span> <span class="pre">DataType.FLOAT)</span></code>. For more information, see the documentation for the
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">ARRAY()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">MAPPING()</span></code> functions.</p>
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>, <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> functions.</p>
 <p>Compound member types can only be a single data type. In some cases the data type can optionally be nullable which means
-that the member value can be either the specified type or <code class="xref py py-class docutils literal notranslate"><span class="pre">NULL</span></code>. For example, a
-<code class="xref py py-class docutils literal notranslate"><span class="pre">MAPPING</span></code> type whose values are all nullable strings may be defined, while a
-<code class="xref py py-class docutils literal notranslate"><span class="pre">MAPPING</span></code> type with one value type of a <code class="xref py py-class docutils literal notranslate"><span class="pre">STRING</span></code> and another of a
-<code class="xref py py-class docutils literal notranslate"><span class="pre">BOOLEAN</span></code> may not be defined. In this case, the key type may be defined while the value type is
-set to <code class="xref py py-class docutils literal notranslate"><span class="pre">UNDEFINED</span></code> which is the default value.</p>
+that the member value can be either the specified type or <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>. For example, a
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type whose values are all nullable strings may be defined, while a
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type with one value type of a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> and another of a
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a> may not be defined. In this case, the key type may be defined while the value type is set
+to <a class="reference internal" href="rule_engine/types.html#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> which is the default value.</p>
+</section>
+<section id="function-data-types">
+<h4>Function Data Types<a class="headerlink" href="#function-data-types" title="Permalink to this heading"></a></h4>
+<p>Like compound types, functions can include type information by calling the respective type, in this case
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a>. Functions only support positional arguments and not keyword arguments but positional
+arguments can be defined as optional through the <em>minimum_arguments</em> option.</p>
+<p>For example, the <a class="reference internal" href="syntax.html#builtin-function-split"><span class="std std-ref">builtin  split</span></a> can be called with as few as 1 arguments and as many as
+3 arguments. The first argument is always required, so <em>minimum_arguments</em> is set to 1. This means the remaining 2
+arguments are optional, however for the third argument to be defined in a function call, the second must also be
+defined. For the split function, the first argument is the string to split, followed by the seperator string to split on
+and finally the maximum number of times to split the string.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="p">(</span>
+    <span class="c1"># the name of the function is provided for error messages</span>
+    <span class="s1">&#39;split&#39;</span><span class="p">,</span>
+    <span class="c1"># the return data type, in this case an array of strings</span>
+    <span class="n">return_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">),</span>
+    <span class="c1"># the data type of each of the three arguments</span>
+    <span class="n">argument_types</span><span class="o">=</span><span class="p">(</span>
+       <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="c1"># argument 1, the string to split</span>
+       <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="c1"># argument 2, the seperator to split on</span>
+       <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>   <span class="c1"># argument 3, the maximum times to split the string</span>
+    <span class="p">),</span>
+    <span class="c1"># the minimum number of arguments, in this case the second two arguments are optional</span>
+    <span class="n">minimum_arguments</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>If the return type, or argument types are not specified, then no type checking is preformed.</p>
 </section>
 <section id="defining-types-from-a-dictionary">
 <h4>Defining Types From A Dictionary<a class="headerlink" href="#defining-types-from-a-dictionary" title="Permalink to this heading"></a></h4>
@@ -427,11 +456,11 @@ function will be used automatically.</p>
 <section id="changing-builtin-symbols">
 <h3>Changing Builtin Symbols<a class="headerlink" href="#changing-builtin-symbols" title="Permalink to this heading"></a></h3>
 <p>To remove the default <a class="reference internal" href="syntax.html#builtin-symbols"><span class="std std-ref">builtin symbols</span></a> that are provided, simply initialize a
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code> instance with a <em>values</em> of an empty dictionary. This will remove all builtin values, and the
-dictionary can optionally be populated with alternative values.</p>
-<p>To add additional values, use the <code class="xref py py-class docutils literal notranslate"><span class="pre">from_defaults</span></code> constructor, with a <em>values</em> dictionary. In this
-case, <em>values</em> will optionally override any of the default settings, and keys which do not overlap will be added in
-addition to the default builtin symbols.</p>
+<a class="reference internal" href="rule_engine/builtins.html#rule_engine.builtins.Builtins" title="rule_engine.builtins.Builtins"><code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code></a> instance with a <em>values</em> of an empty dictionary. This will remove all builtin
+values, and the dictionary can optionally be populated with alternative values.</p>
+<p>To add additional values, use the <a class="reference internal" href="rule_engine/builtins.html#rule_engine.builtins.Builtins.from_defaults" title="rule_engine.builtins.Builtins.from_defaults"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_defaults</span></code></a> constructor, with a <em>values</em>
+dictionary. In this case, <em>values</em> will optionally override any of the default settings, and keys which do not overlap
+will be added in addition to the default builtin symbols.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CustomBuiltinsContext</span><span class="p">(</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># call the parent class&#39;s __init__ method first to set the</span>

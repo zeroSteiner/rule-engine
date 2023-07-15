@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rule Syntax &mdash; Rule Engine 3.6.1 documentation</title>
+  <title>Rule Syntax &mdash; Rule Engine 4.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
@@ -36,7 +36,7 @@
             Rule Engine
           </a>
               <div class="version">
-                3.6.1
+                4.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -57,12 +57,19 @@
 <li class="toctree-l4"><a class="reference internal" href="#ternary-operators">Ternary Operators</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#function-calls">Function Calls</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#reserved-keywords">Reserved Keywords</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#literal-values">Literal Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#literal-values">Literal Values</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#literal-datetime-values">Literal DATETIME Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#literal-float-values">Literal FLOAT Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#literal-timedelta-values">Literal TIMEDELTA Values</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#comments">Comments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#builtin-symbols">Builtin Symbols</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#functions">Functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#math-related">Math Related</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#regular-expression-related">Regular Expression Related</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#timestamp-related">Timestamp Related</a></li>
@@ -335,6 +342,31 @@ an expression used when the condition is true and ending with an expression used
 <p>For example: <code class="docutils literal notranslate"><span class="pre">condition</span> <span class="pre">?</span> <span class="pre">true_case</span> <span class="pre">:</span> <span class="pre">false_case</span></code></p>
 </section>
 </section>
+<section id="function-calls">
+<h3>Function Calls<a class="headerlink" href="#function-calls" title="Permalink to this heading"></a></h3>
+<p>Function calls can be preformed on function symbols by placing parenthesis after them. The parenthesis contain zero or
+more argument expressions to pass to the function. Functions support optional positional arguments. For example, a
+function can take two arguments and one or both can specify a default value and then be omitted when called. Functions
+do not support keyword arguments.</p>
+<p>Using the <a class="reference internal" href="#builtin-function-split"><span class="std std-ref">builtin  split</span></a> function as an example, it can be called with up to 3 arguments.
+The first is required while the second two are optional. The <code class="docutils literal notranslate"><span class="pre">split</span></code> symbol requires the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix to access the
+builtin value.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># only the required argument performs an unlimited number of splits on spaces
+$split(&quot;Star Wars&quot;)         # =&gt; (&quot;Star&quot;, &quot;Wars&quot;)
+
+# the optional second argument specifies an alternative string to split on
+$split(&quot;Star Wars&quot;, &quot;r&quot;)    # =&gt; (&#39;Sta&#39;, &#39; Wa&#39;, &#39;s&#39;)
+
+# the optional third argument specifies the maximum number of times to split the string
+$split(&quot;Star Wars&quot;, &quot;r&quot;, 1) # =&gt; (&#39;Sta&#39;, &#39; Wars&#39;)
+
+# raises FunctionCallError because the second argument must be a string, the third argument
+# can not be specified without the second
+$split(&quot;Star Wars&quot;, 1)      # =&gt; FunctionCallError: data type mismatch (argument #2)
+$split(&quot;Star Wars&quot;, &#39; &#39;, 1) # =&gt; (&quot;Star&quot;, &quot;Wars&quot;)
+</pre></div>
+</div>
+</section>
 <section id="reserved-keywords">
 <h3>Reserved Keywords<a class="headerlink" href="#reserved-keywords" title="Permalink to this heading"></a></h3>
 <p>The following keywords are reserved and can not be used as the names of symbols.</p>
@@ -402,22 +434,24 @@ an expression used when the condition is true and ending with an expression used
 </section>
 <section id="literal-values">
 <span id="id1"></span><h3>Literal Values<a class="headerlink" href="#literal-values" title="Permalink to this heading"></a></h3>
-<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> and <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> literal values are specified in a very similar manner by
-defining the value as a string of characters enclosed in either single or double quotes. The difference comes in an
-optional leading character before the opening quote. Either no leading character or a single <code class="docutils literal notranslate"><span class="pre">s</span></code> will specify a
-standard <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> value, while a single <code class="docutils literal notranslate"><span class="pre">d</span></code> will specify a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> value.</p>
+<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>, <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>, and <code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code> literal values are specified in a
+very similar manner by defining the value as a string of characters enclosed in either single or double quotes. The
+difference comes in an optional leading character before the opening quote. Either no leading character or a single
+<code class="docutils literal notranslate"><span class="pre">s</span></code> will specify a standard <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> value, while a single <code class="docutils literal notranslate"><span class="pre">d</span></code> will specify a
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> value, and a single <code class="docutils literal notranslate"><span class="pre">t</span></code> will specify a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> value.</p>
+<section id="literal-datetime-values">
+<span id="id2"></span><h4>Literal DATETIME Values<a class="headerlink" href="#literal-datetime-values" title="Permalink to this heading"></a></h4>
 <p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> literals must be specified in ISO-8601 format. The underlying parsing logic is provided
 by <a class="reference external" href="https://dateutil.readthedocs.io/en/stable/parser.html#dateutil.parser.isoparse" title="(in dateutil v2.8.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dateutil.parser.isoparse()</span></code></a>. <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> values with no time specified (e.g.
 <code class="docutils literal notranslate"><span class="pre">d&quot;2019-09-23&quot;</span></code>) will evaluate to a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> of the specified day at exactly midnight.</p>
-<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> literals must be specified in a subset of the ISO-8601 format for durations. Everything
-except years and months are supported in <cite>~.DataType.TIMEDELTA</cite> values, to match the underlying representation provided
-by the Python standard library.</p>
 <p>Example rules showing equivalent literal expressions:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;foobar&quot;</span> <span class="pre">==</span> <span class="pre">s&quot;foobar&quot;</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">d&quot;2019-09-23&quot;</span> <span class="pre">==</span> <span class="pre">d&quot;2019-09-23</span> <span class="pre">00:00:00&quot;</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">t&quot;P1D&quot;</span> <span class="pre">==</span> <span class="pre">t&quot;PT24H&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d&quot;2019-09-23&quot;</span> <span class="pre">==</span> <span class="pre">d&quot;2019-09-23</span> <span class="pre">00:00:00&quot;</span></code> (dates default to midnight unless a time is specified)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d&quot;2019-09-23&quot;</span> <span class="pre">==</span> <span class="pre">d&quot;2019-09-23</span> <span class="pre">00:00:00-04:00&quot;</span></code> (<strong>only equivalent when the local timezone is EDT</strong>)</p></li>
 </ul>
+</section>
+<section id="literal-float-values">
+<span id="id3"></span><h4>Literal FLOAT Values<a class="headerlink" href="#literal-float-values" title="Permalink to this heading"></a></h4>
 <p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a> literals may be expressed in either binary, octal, decimal, or hexadecimal formats. The
 binary, octal and hexadecimal formats use the <code class="docutils literal notranslate"><span class="pre">0b</span></code>, <code class="docutils literal notranslate"><span class="pre">0o</span></code>, and <code class="docutils literal notranslate"><span class="pre">0x</span></code> prefixes respectively. Values in the decimal
 format require no prefix and is the default base in which values are represented. Only base-10, decimal values may
@@ -437,6 +471,18 @@ include a decimal place component.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">1.0e0</span> <span class="pre">==</span> <span class="pre">1</span></code></p></li>
 </ul>
 </section>
+<section id="literal-timedelta-values">
+<span id="id4"></span><h4>Literal TIMEDELTA Values<a class="headerlink" href="#literal-timedelta-values" title="Permalink to this heading"></a></h4>
+<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> literals must be specified in a subset of the ISO-8601 format for durations. Everything
+except years and months are supported in <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> values, to match the underlying representation
+provided by the Python standard library.</p>
+<p>Example rules showing equivalent literal expressions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">t&quot;P1D&quot;</span> <span class="pre">==</span> <span class="pre">t&quot;PT24H&quot;</span></code> (24 hours in a day)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t&quot;P1D&quot;</span> <span class="pre">==</span> <span class="pre">t&quot;PT1440M&quot;</span></code> (1,440 minutes in a day)</p></li>
+</ul>
+</section>
+</section>
 <section id="comments">
 <h3>Comments<a class="headerlink" href="#comments" title="Permalink to this heading"></a></h3>
 <p>A single <code class="docutils literal notranslate"><span class="pre">#</span></code> symbol can be used to create a comment in the rule text. The everything after the first <code class="docutils literal notranslate"><span class="pre">#</span></code> occurrence
@@ -445,10 +491,161 @@ will be ignored.</p>
 </section>
 </section>
 <section id="builtin-symbols">
-<span id="id2"></span><h2>Builtin Symbols<a class="headerlink" href="#builtin-symbols" title="Permalink to this heading"></a></h2>
-<p>The following symbols are provided by default using the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Builtins.from_defaults" title="rule_engine.engine.Builtins.from_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_defaults()</span></code></a> method. These symbols
-can be accessed through the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix, e.g. <code class="docutils literal notranslate"><span class="pre">$pi</span></code>. The default values can be overridden by defining a custom
-subclass of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> and setting the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.builtins" title="rule_engine.engine.Context.builtins"><code class="xref py py-attr docutils literal notranslate"><span class="pre">builtins</span></code></a> attribute.</p>
+<span id="id5"></span><h2>Builtin Symbols<a class="headerlink" href="#builtin-symbols" title="Permalink to this heading"></a></h2>
+<p>The following symbols are provided by default using the <a class="reference internal" href="rule_engine/builtins.html#rule_engine.builtins.Builtins.from_defaults" title="rule_engine.builtins.Builtins.from_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_defaults()</span></code></a> method. These
+symbols can be accessed through the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix, e.g. <code class="docutils literal notranslate"><span class="pre">$pi</span></code>. The default values can be overridden by defining a
+custom subclass of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> and setting the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.builtins" title="rule_engine.engine.Context.builtins"><code class="xref py py-attr docutils literal notranslate"><span class="pre">builtins</span></code></a> attribute.</p>
+<section id="functions">
+<span id="builtin-functions"></span><h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">BOOLEAN</span> <span class="pre">all(ARRAY[??]</span> <span class="pre">values)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></p>
+</dd>
+<dt class="field-even">values<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em>) An array of values to check.</p>
+</dd>
+</dl>
+<p>Returns true if every member of the array argument is truthy. If <em>values</em> is empty, the function returns true.</p>
+<p><code class="docutils literal notranslate"><span class="pre">BOOLEAN</span> <span class="pre">any(ARRAY[??]</span> <span class="pre">values)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></p>
+</dd>
+<dt class="field-even">values<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em>) An array of values to check.</p>
+</dd>
+</dl>
+<p>Returns true if any member of the array argument is truthy. If <em>values</em> is empty, the function returns false.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">sum(ARRAY[FLOAT]</span> <span class="pre">values)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+</dd>
+<dt class="field-even">values<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) An array of values to add.</p>
+</dd>
+</dl>
+<p>Returns the sum of an array of values. If <em>values</em> is empty, the function returns 0.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ARRAY[??]</span> <span class="pre">map(FUNCTION</span> <span class="pre">function,</span> <span class="pre">ARRAY[??]</span> <span class="pre">values)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em></p>
+</dd>
+<dt class="field-even">function<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code>) The function to call on each of the values.</p>
+</dd>
+<dt class="field-odd">values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em>) The array of values to apply <em>function</em> to.</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">max(ARRAY[FLOAT]</span> <span class="pre">values)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+</dd>
+<dt class="field-even">values<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) An array of values to check.</p>
+</dd>
+</dl>
+<p>Returns the largest value from the array of values. If <em>values</em> is empty, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.FunctionCallError" title="rule_engine.errors.FunctionCallError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FunctionCallError</span></code></a> is
+raised.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">min(ARRAY[FLOAT]</span> <span class="pre">values)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+</dd>
+<dt class="field-even">values<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) An array of values to check.</p>
+</dd>
+</dl>
+<p>Returns the smallest value from the array of values. If <em>values</em> is empty, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.FunctionCallError" title="rule_engine.errors.FunctionCallError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FunctionCallError</span></code></a> is
+raised.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ARRAY[??]</span> <span class="pre">filter(FUNCTION</span> <span class="pre">function,</span> <span class="pre">ARRAY[??]</span> <span class="pre">values)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em></p>
+</dd>
+<dt class="field-even">function<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code>) The function to call on each of the values.</p>
+</dd>
+<dt class="field-odd">values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em>) The array of values to apply <em>function</em> to.</p>
+</dd>
+</dl>
+<p>Returns an array containing a subset of members from <em>values</em> where <em>function</em> returns true.</p>
+<p><code class="docutils literal notranslate"><span class="pre">DATETIME</span> <span class="pre">parse_datetime(STRING</span> <span class="pre">value)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></p>
+</dd>
+<dt class="field-even">value<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The string value to parse into a timestamp.</p>
+</dd>
+</dl>
+<p>Parses the string value into a <code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code> value. The string must be in ISO-8601 format and if it
+fails to parse, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError" title="rule_engine.errors.DatetimeSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">DatetimeSyntaxError</span></code></a> is raised.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">parse_float(STRING</span> <span class="pre">value)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+</dd>
+<dt class="field-even">value<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The string value to parse into a numeric.</p>
+</dd>
+</dl>
+<p>Parses the string value into a <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code> value. The string must be properly formatted and if it
+fails to parse, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.FloatSyntaxError" title="rule_engine.errors.FloatSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FloatSyntaxError</span></code></a> is raised.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">parse_timedelta(STRING</span> <span class="pre">value)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></p>
+</dd>
+<dt class="field-even">value<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The string value to parse into a time period.</p>
+</dd>
+</dl>
+<p>Parses the string value into a <code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code> value. The string must be properly formatted and if it
+fails to parse, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.TimedeltaSyntaxError" title="rule_engine.errors.TimedeltaSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TimedeltaSyntaxError</span></code></a> is raised.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">random([FLOAT</span> <span class="pre">boundary])</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+</dd>
+<dt class="field-even">boundary<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Optional <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) The upper boundary to generate a random number for.</p>
+</dd>
+</dl>
+<p>Generate a random number. If <em>boundary</em> is not specified, the random number  returned will be between 0 and 1. If
+<em>boundary</em> is specified, it must be a natural number and the random number returned will be between 0 and <em>boundary</em>,
+including <em>boundary</em>.</p>
+<p id="builtin-function-split"><code class="docutils literal notranslate"><span class="pre">ARRAY[STRING]</span> <span class="pre">split(STRING</span> <span class="pre">string,</span> <span class="pre">[STRING</span> <span class="pre">sep,</span> <span class="pre">FLOAT</span> <span class="pre">maxsplit])</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></p>
+</dd>
+<dt class="field-even">string<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The string value to split into substrings.</p>
+</dd>
+<dt class="field-odd">sep<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(Optional <code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The value to split <em>string</em> on.</p>
+</dd>
+<dt class="field-even">maxsplit<span class="colon">:</span></dt>
+<dd class="field-even"><p>(Optional <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) The maximum number of times tp split <em>string</em>.</p>
+</dd>
+</dl>
+<p>Split a string value into sub strings. If <em>sep</em> is not specified, the <em>string</em> will be split by all whitespace. If <em>sep</em>
+is specified, <em>string</em> will be split by that value. This alters how consecutive spaces are handled. When <em>sep</em> is not
+specified, consecutive whitespace is handled as a single unit and reduced, where as if <em>sep</em> is a single space,
+consecutive spaces will result in empty strings being returned.</p>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$split(&quot;A    B&quot;)      # =&gt; (&#39;A&#39;, &#39;B&#39;)
+$split(&quot;A    B&quot;, &#39; &#39;) # =&gt; (&#39;A&#39;, &#39;&#39;, &#39;&#39;, &#39;&#39;, &#39;B&#39;)
+</pre></div>
+</div>
+<p>If <em>maxsplit</em> is specified, it must be a natural number and will be used as the maximum number of times to split
+<em>string</em>. This will guarantee that the resulting array length is less than or equal to <em>maxsplit</em> + 1.</p>
+</section>
 <section id="math-related">
 <h3>Math Related<a class="headerlink" href="#math-related" title="Permalink to this heading"></a></h3>
 <ul class="simple">
@@ -465,7 +662,7 @@ place, this value is <code class="xref py py-attr docutils literal notranslate">
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For technical reasons, this symbol is provided by the default <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Context</span></code></a> and is not included
-within the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Builtins.from_defaults" title="rule_engine.engine.Builtins.from_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_defaults()</span></code></a>. This means that unlike the other symbols listed here, it will
+within the <code class="xref py py-meth docutils literal notranslate"><span class="pre">from_defaults()</span></code>. This means that unlike the other symbols listed here, it will
 be unavailable if the default builtins are replaced.</p>
 </div>
 </li>

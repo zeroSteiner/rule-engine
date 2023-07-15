@@ -6,6 +6,7 @@
    :titlesonly:
 
    ast.rst
+   builtins.rst
    engine.rst
    errors.rst
    parser.rst

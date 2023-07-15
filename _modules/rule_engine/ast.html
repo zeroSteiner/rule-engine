@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.ast &mdash; Rule Engine 3.6.1 documentation</title>
+  <title>rule_engine.ast &mdash; Rule Engine 4.0.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
@@ -33,7 +33,7 @@
             Rule Engine
           </a>
               <div class="version">
-                3.6.1
+                4.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -119,11 +119,9 @@
 <span class="kn">import</span> <span class="nn">re</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">parse_timedelta</span>
+<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">parse_datetime</span><span class="p">,</span> <span class="n">parse_float</span><span class="p">,</span> <span class="n">parse_timedelta</span>
 <span class="kn">from</span> <span class="nn">.suggestions</span> <span class="kn">import</span> <span class="n">suggest_symbol</span>
 <span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="o">*</span>
-
-<span class="kn">import</span> <span class="nn">dateutil.parser</span>
 
 <span class="k">def</span> <span class="nf">_assert_is_integer_number</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_integer_number</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
@@ -143,7 +141,7 @@
 
 <span class="k">def</span> <span class="nf">_is_reduced</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of it&#39;s</span>
+<span class="sd">	Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of its</span>
 <span class="sd">	members are reduced literals. A value that causes this to evaluate to True for is able to be evaluated without a</span>
 <span class="sd">	*thing*.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -156,7 +154,7 @@
 	<span class="k">return</span> <span class="n">iterable_member_value_type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Assignment"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Assignment">[docs]</a><span class="k">class</span> <span class="nc">Assignment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;An internal assignment where by a symbol is populated with a value of the specified type.&quot;&quot;&quot;</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;An internal assignment whereby a symbol is populated with a value of the specified type.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;value_type&#39;</span><span class="p">)</span>
 <div class="viewcode-block" id="Assignment.__init__"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Assignment.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
@@ -322,12 +320,7 @@
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-		<span class="k">try</span><span class="p">:</span>
-			<span class="n">dt</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">isoparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
-		<span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-			<span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">default_timezone</span><span class="p">)</span>
+		<span class="n">dt</span> <span class="o">=</span> <span class="n">parse_datetime</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">default_timezone</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">default_timezone</span><span class="p">)</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TimedeltaExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.TimedeltaExpression">[docs]</a><span class="k">class</span> <span class="nc">TimedeltaExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
@@ -339,18 +332,18 @@
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span>
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-		<span class="k">try</span><span class="p">:</span>
-			<span class="n">dt</span> <span class="o">=</span> <span class="n">parse_timedelta</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-		<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">TimedeltaSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid timedelta&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
-		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span></div>
+		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">parse_timedelta</span><span class="p">(</span><span class="n">string</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="FloatExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FloatExpression">[docs]</a><span class="k">class</span> <span class="nc">FloatExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal float expressions representing numerical values.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="n">value</span> <span class="o">=</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-		<span class="nb">super</span><span class="p">(</span><span class="n">FloatExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+		<span class="nb">super</span><span class="p">(</span><span class="n">FloatExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="MappingExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.MappingExpression">[docs]</a><span class="k">class</span> <span class="nc">MappingExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal mapping expression representing a set of associations between keys and values.&quot;&quot;&quot;</span>
@@ -1115,6 +1108,68 @@
 	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">name=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
 
+<span class="k">class</span> <span class="nc">FunctionCallExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;arguments&#39;</span><span class="p">,)</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">arguments</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="n">function_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">result_type</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_validate_function</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">function_type</span><span class="o">.</span><span class="n">return_type</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="n">arguments</span>
+
+	<span class="nd">@classmethod</span>
+	<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">arguments</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">function</span><span class="o">.</span><span class="n">build</span><span class="p">(),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">argument</span><span class="o">.</span><span class="n">build</span><span class="p">()</span> <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">))</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+	<span class="c1"># because there is no syntax for defining a function, they can&#39;t be reduced until symbols can be reduced</span>
+
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+		<span class="n">function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a callable value)&#39;</span><span class="p">)</span>
+		<span class="n">arguments</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">argument</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span> <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+		<span class="n">function_name</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="n">function_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">result_type</span>
+			<span class="n">function_name</span> <span class="o">=</span> <span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">_validate_function</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">result</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">arguments</span><span class="p">)</span>
+		<span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+			<span class="n">error</span><span class="o">.</span><span class="n">function_name</span> <span class="o">=</span> <span class="n">function_name</span>
+			<span class="k">raise</span> <span class="n">error</span>
+		<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;function call failed&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span> <span class="n">function_name</span><span class="o">=</span><span class="n">function_name</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_value</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_validate_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_type</span><span class="p">,</span> <span class="n">arguments</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a callable value)&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">function_type</span><span class="o">.</span><span class="n">minimum_arguments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">function_type</span><span class="o">.</span><span class="n">minimum_arguments</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span>
+					<span class="s2">&quot;expected at least </span><span class="si">{}</span><span class="s2"> positional arguments&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">minimum_arguments</span><span class="p">),</span>
+					<span class="n">function_name</span><span class="o">=</span><span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+				<span class="p">)</span>
+		<span class="k">if</span> <span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span><span class="p">):</span>
+				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span>
+					<span class="s2">&quot;expected at most </span><span class="si">{}</span><span class="s2"> positional arguments&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span><span class="p">)),</span>
+					<span class="n">function_name</span><span class="o">=</span><span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+				<span class="p">)</span>
+			<span class="k">for</span> <span class="n">pos</span><span class="p">,</span> <span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2_type</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span><span class="p">),</span> <span class="mi">1</span><span class="p">):</span>
+				<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
+					<span class="n">arg1_type</span> <span class="o">=</span> <span class="n">arg1</span><span class="o">.</span><span class="n">result_type</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">arg1_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">arg1</span><span class="p">)</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">arg1_type</span><span class="p">,</span> <span class="n">arg2_type</span><span class="p">):</span>
+					<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span>
+						<span class="s2">&quot;data type mismatch (argument #</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pos</span><span class="p">),</span>
+						<span class="n">function_name</span><span class="o">=</span><span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+					<span class="p">)</span>
+
 <div class="viewcode-block" id="Statement"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Statement">[docs]</a><span class="k">class</span> <span class="nc">Statement</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class representing the top level statement of the grammar text.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;expression&#39;</span><span class="p">,</span> <span class="s1">&#39;comment&#39;</span><span class="p">)</span>
@@ -1176,12 +1231,9 @@
 		<span class="k">return</span> <span class="n">case</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="k">if</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">):</span>
-			<span class="n">reduced_condition</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
-		<span class="k">else</span><span class="p">:</span>
-			<span class="n">reduced_condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
-			<span class="k">if</span> <span class="n">reduced_condition</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">:</span>
-				<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span>
+		<span class="n">reduced_condition</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">case_true</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span> <span class="k">if</span> <span class="n">reduced_condition</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">case_false</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
 	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

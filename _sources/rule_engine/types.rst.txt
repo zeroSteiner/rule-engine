@@ -31,8 +31,7 @@ Classes
    :exclude-members: ARRAY, MAPPING, SET
    :show-inheritance:
 
-   .. autoattribute:: ARRAY
-      :annotation:
+   .. automethod:: ARRAY
 
    .. autoattribute:: BOOLEAN
       :annotation:
@@ -43,17 +42,19 @@ Classes
    .. autoattribute:: FLOAT
       :annotation:
 
-   .. autoattribute:: MAPPING
-      :annotation:
+   .. automethod:: FUNCTION
+
+   .. automethod:: MAPPING
 
    .. autoattribute:: NULL
       :annotation:
 
-   .. autoattribute:: SET
-      :annotation:
+   .. automethod:: SET
 
    .. autoattribute:: STRING
       :annotation:
 
    .. autoattribute:: TIMEDELTA
       :annotation:
+
+   .. autoattribute:: UNDEFINED

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; Rule Engine 3.6.1 documentation</title>
+  <title>Index &mdash; Rule Engine 4.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
@@ -33,7 +33,7 @@
             Rule Engine
           </a>
               <div class="version">
-                3.6.1
+                4.0.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -135,13 +135,17 @@
 </li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.AttributeTypeError.__init__">(AttributeTypeError method)</a>
 </li>
-        <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins.__init__">(Builtins method)</a>
+        <li><a href="rule_engine/builtins.html#rule_engine.builtins.Builtins.__init__">(Builtins method)</a>
 </li>
         <li><a href="rule_engine/engine.html#rule_engine.engine.Context.__init__">(Context method)</a>
 </li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError.__init__">(DatetimeSyntaxError method)</a>
 </li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.EngineError.__init__">(EngineError method)</a>
+</li>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.FloatSyntaxError.__init__">(FloatSyntaxError method)</a>
+</li>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.FunctionCallError.__init__">(FunctionCallError method)</a>
 </li>
         <li><a href="rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase.__init__">(LeftOperatorRightExpressionBase method)</a>
 </li>
@@ -163,6 +167,8 @@
 </li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError.__init__">(SymbolTypeError method)</a>
 </li>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.TimedeltaSyntaxError.__init__">(TimedeltaSyntaxError method)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -176,7 +182,7 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ArithmeticExpression">ArithmeticExpression (class in rule_engine.ast)</a>
 </li>
-      <li><a href="rule_engine/types.html#rule_engine.types.DataType.ARRAY">ARRAY (DataType attribute)</a>
+      <li><a href="rule_engine/types.html#rule_engine.types.DataType.ARRAY">ARRAY() (DataType static method)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.ArrayExpression">ArrayExpression (class in rule_engine.ast)</a>
 </li>
@@ -212,7 +218,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.BooleanExpression">BooleanExpression (class in rule_engine.ast)</a>
 </li>
-      <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins">Builtins (class in rule_engine.engine)</a>
+      <li><a href="rule_engine/builtins.html#rule_engine.builtins.Builtins">Builtins (class in rule_engine.builtins)</a>
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.builtins">builtins (Context attribute)</a>
 </li>
@@ -246,16 +252,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/types.html#rule_engine.types.DataType">DataType (class in rule_engine.types)</a>
 </li>
-      <li><a href="rule_engine/types.html#id0">DataType.__call__() (in module rule_engine.types)</a>, <a href="rule_engine/types.html#id1">[1]</a>, <a href="rule_engine/types.html#rule_engine.types.DataType.__call__">[2]</a>
-</li>
       <li><a href="rule_engine/types.html#rule_engine.types.DataType.DATETIME">DATETIME (DataType attribute)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.DatetimeExpression">DatetimeExpression (class in rule_engine.ast)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError">DatetimeSyntaxError</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     debug_repl command line option
 
@@ -265,6 +267,8 @@
         <li><a href="debug_repl.html#cmdoption-debug_repl-edit-file">--edit-file</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.decimal_context">decimal_context (Context attribute)</a>
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone">default_timezone (Context attribute)</a>
@@ -279,8 +283,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/errors.html#rule_engine.errors.EngineError">EngineError</a>
 </li>
-      <li><a href="rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.error">error (RegexSyntaxError attribute)</a>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.FunctionCallError.error">error (FunctionCallError attribute)</a>
+
+      <ul>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.error">(RegexSyntaxError attribute)</a>
 </li>
+      </ul></li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.evaluate">evaluate() (Rule method)</a>
 </li>
   </ul></td>
@@ -307,7 +315,9 @@
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.FloatExpression">FloatExpression (class in rule_engine.ast)</a>
 </li>
-      <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins.from_defaults">from_defaults() (Builtins class method)</a>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.FloatSyntaxError">FloatSyntaxError</a>
+</li>
+      <li><a href="rule_engine/builtins.html#rule_engine.builtins.Builtins.from_defaults">from_defaults() (Builtins class method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -316,6 +326,10 @@
       <li><a href="rule_engine/types.html#rule_engine.types.DataType.from_type">from_type() (DataType class method)</a>
 </li>
       <li><a href="rule_engine/types.html#rule_engine.types.DataType.from_value">from_value() (DataType class method)</a>
+</li>
+      <li><a href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION">FUNCTION() (DataType static method)</a>
+</li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.FunctionCallError">FunctionCallError</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.FuzzyComparisonExpression">FuzzyComparisonExpression (class in rule_engine.ast)</a>
 </li>
@@ -393,7 +407,7 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rule_engine/types.html#rule_engine.types.DataType.MAPPING">MAPPING (DataType attribute)</a>
+      <li><a href="rule_engine/types.html#rule_engine.types.DataType.MAPPING">MAPPING() (DataType static method)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.MappingExpression">MappingExpression (class in rule_engine.ast)</a>
 </li>
@@ -406,6 +420,8 @@
 
       <ul>
         <li><a href="rule_engine/ast.html#module-rule_engine.ast">rule_engine.ast</a>
+</li>
+        <li><a href="rule_engine/builtins.html#module-rule_engine.builtins">rule_engine.builtins</a>
 </li>
         <li><a href="rule_engine/engine.html#module-rule_engine.engine">rule_engine.engine</a>
 </li>
@@ -486,7 +502,7 @@
 </li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.resolve_item">resolve_item() (in module rule_engine.engine)</a>
 </li>
-      <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins.resolve_type">resolve_type() (Builtins method)</a>
+      <li><a href="rule_engine/builtins.html#rule_engine.builtins.Builtins.resolve_type">resolve_type() (Builtins method)</a>
 
       <ul>
         <li><a href="rule_engine/engine.html#rule_engine.engine.Context.resolve_type">(Context method)</a>
@@ -560,6 +576,13 @@
 </li>
       </ul></li>
       <li>
+    rule_engine.builtins
+
+      <ul>
+        <li><a href="rule_engine/builtins.html#module-rule_engine.builtins">module</a>
+</li>
+      </ul></li>
+      <li>
     rule_engine.engine
 
       <ul>
@@ -602,9 +625,9 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rule_engine/engine.html#rule_engine.engine.Builtins.scope_name">scope_name (Builtins attribute)</a>
+      <li><a href="rule_engine/builtins.html#rule_engine.builtins.Builtins.scope_name">scope_name (Builtins attribute)</a>
 </li>
-      <li><a href="rule_engine/types.html#rule_engine.types.DataType.SET">SET (DataType attribute)</a>
+      <li><a href="rule_engine/types.html#rule_engine.types.DataType.SET">SET() (DataType static method)</a>
 </li>
       <li><a href="rule_engine/ast.html#rule_engine.ast.SetExpression">SetExpression (class in rule_engine.ast)</a>
 </li>
@@ -664,6 +687,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rule_engine/ast.html#rule_engine.ast.TimedeltaExpression">TimedeltaExpression (class in rule_engine.ast)</a>
 </li>
+      <li><a href="rule_engine/errors.html#rule_engine.errors.TimedeltaSyntaxError">TimedeltaSyntaxError</a>
+</li>
       <li><a href="rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz">to_graphviz() (Rule method)</a>
 </li>
       <li><a href="rule_engine/errors.html#rule_engine.errors.RuleSyntaxError.token">token (RuleSyntaxError attribute)</a>
@@ -680,7 +705,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="rule_engine/types.html#rule_engine.types.DataType.UNDEFINED">UNDEFINED (DataType attribute)</a>
+      <li><a href="rule_engine/types.html#id0">UNDEFINED (DataType attribute)</a>, <a href="rule_engine/types.html#rule_engine.types.DataType.UNDEFINED">[1]</a>
 
       <ul>
         <li><a href="rule_engine/errors.html#rule_engine.errors.UNDEFINED">(in module rule_engine.errors)</a>
@@ -697,7 +722,11 @@
       <ul>
         <li><a href="rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError.value">(DatetimeSyntaxError attribute)</a>
 </li>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.FloatSyntaxError.value">(FloatSyntaxError attribute)</a>
+</li>
         <li><a href="rule_engine/errors.html#rule_engine.errors.RegexSyntaxError.value">(RegexSyntaxError attribute)</a>
+</li>
+        <li><a href="rule_engine/errors.html#rule_engine.errors.TimedeltaSyntaxError.value">(TimedeltaSyntaxError attribute)</a>
 </li>
       </ul></li>
   </ul></td>

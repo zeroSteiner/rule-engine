@@ -1083,6 +1083,8 @@ class FunctionCallExpression(ExpressionBase):
 			for pos, (arg1, arg2_type) in enumerate(zip(arguments, function_type.argument_types), 1):
 				if isinstance(arg1, LiteralExpressionBase):
 					arg1_type = arg1.result_type
+				elif isinstance(arg1, SymbolExpression):
+					arg1_type = arg1.result_type
 				else:
 					arg1_type = DataType.from_value(arg1)
 				if not DataType.is_compatible(arg1_type, arg2_type):

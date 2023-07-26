@@ -20,6 +20,7 @@ Released :release:`4.0.0` on July 15th, 2023
 * **Breaking:** Dropped support for Python versions 3.4 and 3.5
 * **Breaking:** Invalid floating point literals now raise :py:exc:`~.errors.FloatSyntaxError` instead of
   :py:exc:`~.errors.RuleSyntaxError`
+* **Breaking:** Moved ``rule_engine.engine.Builtins`` to :py:class:`rule_engine.builtins.Builtins`
 * Added the new :py:class:`~rule_engine.types.DataType.FUNCTION` data type
 
 Version 3.x.x

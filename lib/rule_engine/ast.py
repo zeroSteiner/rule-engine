@@ -1049,11 +1049,13 @@ class FunctionCallExpression(ExpressionBase):
 		if not callable(function):
 			raise errors.EvaluationError('data type mismatch (not a callable value)')
 		arguments = tuple(argument.evaluate(thing) for argument in self.arguments)
-		function_name = function.__name__ + '?'
+		function_name = '<unknown>'
 		if self.function.result_type != DataType.UNDEFINED:
 			function_type = self.function.result_type
 			function_name = function_type.value_name
 			self._validate_function(function_type, arguments)
+		elif hasattr(function, '__name__'):
+			function_name = function.__name__ + '?'
 		try:
 			result = function(*arguments)
 		except errors.FunctionCallError as error:

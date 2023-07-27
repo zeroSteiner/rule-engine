@@ -80,8 +80,8 @@ FUNCTION
 --------
 Version :release:`4.0.0` added the :py:attr:`~DataType.FUNCTION` datatype. This can be used to make functions available
 to rule authors. Rule Engine contains a few :ref:`builtin functions<builtin-functions>` that can be used by default.
-Additional functions can be either added them to the evaluated object or by extending the builtin symbols. It is only
-possible to call a function from within the rule text. Functions can not be defined as other data types can be.
+Additional functions can either be added to the evaluated object or by extending the builtin symbols. It is only possible
+to call a function from within the rule text. Functions can not be defined as other data types can be.
 
 TIMEDELTA
 ---------

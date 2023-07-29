@@ -1093,6 +1093,14 @@ class FunctionCallExpression(ExpressionBase):
 						function_name=function_type.value_name
 					)
 
+	def to_graphviz(self, digraph, *args, **kwargs):
+		super(FunctionCallExpression, self).to_graphviz(digraph, *args, **kwargs)
+		self.function.to_graphviz(digraph, *args, **kwargs)
+		digraph.edge(str(id(self)), str(id(self.function)), label='function')
+		for idx, argument in enumerate(self.arguments, 1):
+			argument.to_graphviz(digraph, *args, **kwargs)
+			digraph.edge(str(id(self)), str(id(argument)), label="argument #{}".format(idx))
+
 class Statement(ASTNodeBase):
 	"""A class representing the top level statement of the grammar text."""
 	__slots__ = ('context', 'expression', 'comment')

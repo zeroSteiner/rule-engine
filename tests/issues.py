@@ -38,6 +38,8 @@ import rule_engine.engine as engine
 import rule_engine.errors as errors
 import rule_engine.types as types
 
+import dateutil.tz
+
 class GitHubIssueTests(unittest.TestCase):
 	def test_number_10(self):
 		value = random.randint(1, 10000)
@@ -95,3 +97,19 @@ class GitHubIssueTests(unittest.TestCase):
 		for rule in rules:
 			with self.assertRaises(errors.FloatSyntaxError):
 				engine.Rule(rule)
+
+	def test_number_66(self):
+		rule = engine.Rule('$parse_datetime("2020-01-01")')
+		try:
+			result = rule.evaluate({})
+		except Exception:
+			self.fail('evaluation raised an exception')
+		self.assertEqual(result, datetime.datetime(2020, 1, 1, tzinfo=dateutil.tz.tzlocal()))
+
+	def test_number_68(self):
+		rule = engine.Rule('$min(items)')
+		try:
+			result = rule.evaluate({'items': [1, 2, 3, 4, 5, 6, 7, 8, 9]})
+		except Exception:
+			self.fail('evaluation raised an exception')
+		self.assertEqual(result, 1)

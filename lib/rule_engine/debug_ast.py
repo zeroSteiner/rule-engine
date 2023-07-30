@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  rule_engine/debug_repl.py
+#  rule_engine/debug_ast.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -53,8 +53,10 @@ def main():
 
 	rule = engine.Rule(rule_text)
 	digraph = rule.to_graphviz()
+
 	digraph.save(arguments.output + '.gv')
 	_print_written(arguments.output + '.gv')
+
 	digraph.render(arguments.output)
 	_print_written(arguments.output + '.pdf')
 

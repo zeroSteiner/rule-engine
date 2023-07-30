@@ -183,25 +183,31 @@ class Parser(ParserBase):
 	t_ATTR             = r'(?<=\S)\.(?=[a-zA-Z_][a-zA-Z0-9_]*)'
 	t_ATTR_SAFE        = r'(?<=\S)&\.(?=[a-zA-Z_][a-zA-Z0-9_]*)'
 
-	# tokens are listed from lowest to highest precedence, ones that appear
-	# later are effectively evaluated first
-	# see: https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages
-	precedence = (
-		('left',     'OR'),
-		('left',     'AND'),
-		('right',    'NOT'),
-		('left',     'BWOR'),
-		('left',     'BWXOR'),
-		('left',     'BWAND'),
-		('right',    'QMARK', 'COLON'),
-		('nonassoc', 'EQ', 'NE', 'EQ_FZM', 'EQ_FZS', 'NE_FZM', 'NE_FZS', 'GE', 'GT', 'LE', 'LT', 'IN'),  # Nonassociative operators
-		('left',     'ADD', 'SUB'),
-		('left',     'BWLSH', 'BWRSH'),
-		('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
-		('left',     'POW'),
-		('right',    'UMINUS'),
-		('left',     'ATTR', 'ATTR_SAFE'),
-	)
+	# Tokens are listed from highest to lowest precedence, ones that appear
+	# later are effectively evaluated last
+	# see:
+	#   * https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages
+	#   * https://docs.python.org/3/reference/expressions.html
+	precedence = tuple(
+		# reverse the order to lowest to highest for ply
+		reversed((
+			('nonassoc', 'LPAREN', 'RPAREN'),
+			('left',     'ATTR', 'ATTR_SAFE'),
+			('right',    'UMINUS'),
+			('left',     'POW'),
+			('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
+			('left',     'BWLSH', 'BWRSH'),
+			('left',     'ADD', 'SUB'),
+			('nonassoc', 'EQ', 'NE', 'EQ_FZM', 'EQ_FZS', 'NE_FZM', 'NE_FZS', 'GE', 'GT', 'LE', 'LT', 'IN'),  # Nonassociative operators
+			('right',    'QMARK', 'COLON'),
+			('left',     'BWAND'),
+			('left',     'BWXOR'),
+			('left',     'BWOR'),
+			('right',    'NOT'),
+			('left',     'AND'),
+			('left',     'OR'),
+		)
+	))
 
 	@classmethod
 	def get_token_regex(cls, token_name):

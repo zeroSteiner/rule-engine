@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rule Syntax &mdash; Rule Engine 4.0.2 documentation</title>
+  <title>Rule Syntax &mdash; Rule Engine 4.1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
@@ -36,7 +36,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.0.2
+                4.1.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -376,7 +376,7 @@ $split(&quot;Star Wars&quot;, &#39; &#39;, 1) # =&gt; (&quot;Star&quot;, &quot;W
 <td><p>Description</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">null</span></code></p></td>
-<td><p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">NullExpression</span></code> literal value</p></td>
+<td><p>The <a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.NullExpression" title="rule_engine.ast.NullExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">NullExpression</span></code></a> literal value</p></td>
 </tr>
 <tr class="row-odd"><td colspan="2"><p><strong>Array Comprehension</strong></p></td>
 </tr>
@@ -386,7 +386,7 @@ $split(&quot;Star Wars&quot;, &#39; &#39;, 1) # =&gt; (&quot;Star&quot;, &quot;W
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">if</span></code></p></td>
 <td><p>Array comprehension iterable and (optional) condition delimiter</p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p><strong>Booleans</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanExpression</span></code> Literals)</p></td>
+<tr class="row-even"><td colspan="2"><p><strong>Booleans</strong> (<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.BooleanExpression" title="rule_engine.ast.BooleanExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanExpression</span></code></a> Literals)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
 <td><p>The “True” boolean value</p></td>
@@ -394,7 +394,7 @@ $split(&quot;Star Wars&quot;, &#39; &#39;, 1) # =&gt; (&quot;Star&quot;, &quot;W
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
 <td><p>The “False” boolean value</p></td>
 </tr>
-<tr class="row-odd"><td colspan="2"><p><strong>Floats</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">FloatExpression</span></code> Literals)</p></td>
+<tr class="row-odd"><td colspan="2"><p><strong>Floats</strong> (<a class="reference internal" href="rule_engine/ast.html#rule_engine.ast.FloatExpression" title="rule_engine.ast.FloatExpression"><code class="xref py py-class docutils literal notranslate"><span class="pre">FloatExpression</span></code></a> Literals)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inf</span></code></p></td>
 <td><p>Floating point value for infinity</p></td>
@@ -497,55 +497,65 @@ symbols can be accessed through the <code class="docutils literal notranslate"><
 custom subclass of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> and setting the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.builtins" title="rule_engine.engine.Context.builtins"><code class="xref py py-attr docutils literal notranslate"><span class="pre">builtins</span></code></a> attribute.</p>
 <section id="functions">
 <span id="builtin-functions"></span><h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">abs(FLOAT</span> <span class="pre">value)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p>
+</dd>
+<dt class="field-even">value<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) The numeric to get the absolute value of.</p>
+</dd>
+</dl>
+<p>Returns the absolute value of <em>value</em>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">BOOLEAN</span> <span class="pre">all(ARRAY[??]</span> <span class="pre">values)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p>
 </dd>
 <dt class="field-even">values<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em>) An array of values to check.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <em>anything</em>) An array of values to check.</p>
 </dd>
 </dl>
 <p>Returns true if every member of the array argument is truthy. If <em>values</em> is empty, the function returns true.</p>
 <p><code class="docutils literal notranslate"><span class="pre">BOOLEAN</span> <span class="pre">any(ARRAY[??]</span> <span class="pre">values)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p>
 </dd>
 <dt class="field-even">values<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em>) An array of values to check.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <em>anything</em>) An array of values to check.</p>
 </dd>
 </dl>
 <p>Returns true if any member of the array argument is truthy. If <em>values</em> is empty, the function returns false.</p>
 <p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">sum(ARRAY[FLOAT]</span> <span class="pre">values)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p>
 </dd>
 <dt class="field-even">values<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) An array of values to add.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) An array of values to add.</p>
 </dd>
 </dl>
 <p>Returns the sum of an array of values. If <em>values</em> is empty, the function returns 0.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ARRAY[??]</span> <span class="pre">map(FUNCTION</span> <span class="pre">function,</span> <span class="pre">ARRAY[??]</span> <span class="pre">values)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <em>anything</em></p>
 </dd>
 <dt class="field-even">function<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code>) The function to call on each of the values.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a>) The function to call on each of the values.</p>
 </dd>
 <dt class="field-odd">values<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em>) The array of values to apply <em>function</em> to.</p>
+<dd class="field-odd"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <em>anything</em>) The array of values to apply <em>function</em> to.</p>
 </dd>
 </dl>
 <p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">max(ARRAY[FLOAT]</span> <span class="pre">values)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p>
 </dd>
 <dt class="field-even">values<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) An array of values to check.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) An array of values to check.</p>
 </dd>
 </dl>
 <p>Returns the largest value from the array of values. If <em>values</em> is empty, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.FunctionCallError" title="rule_engine.errors.FunctionCallError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FunctionCallError</span></code></a> is
@@ -553,10 +563,10 @@ raised.</p>
 <p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">min(ARRAY[FLOAT]</span> <span class="pre">values)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p>
 </dd>
 <dt class="field-even">values<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) An array of values to check.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) An array of values to check.</p>
 </dd>
 </dl>
 <p>Returns the smallest value from the array of values. If <em>values</em> is empty, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.FunctionCallError" title="rule_engine.errors.FunctionCallError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FunctionCallError</span></code></a> is
@@ -564,56 +574,56 @@ raised.</p>
 <p><code class="docutils literal notranslate"><span class="pre">ARRAY[??]</span> <span class="pre">filter(FUNCTION</span> <span class="pre">function,</span> <span class="pre">ARRAY[??]</span> <span class="pre">values)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <em>anything</em></p>
 </dd>
 <dt class="field-even">function<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code>) The function to call on each of the values.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a>) The function to call on each of the values.</p>
 </dd>
 <dt class="field-odd">values<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <em>anything</em>) The array of values to apply <em>function</em> to.</p>
+<dd class="field-odd"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <em>anything</em>) The array of values to apply <em>function</em> to.</p>
 </dd>
 </dl>
 <p>Returns an array containing a subset of members from <em>values</em> where <em>function</em> returns true.</p>
 <p><code class="docutils literal notranslate"><span class="pre">DATETIME</span> <span class="pre">parse_datetime(STRING</span> <span class="pre">value)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p>
 </dd>
 <dt class="field-even">value<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The string value to parse into a timestamp.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>) The string value to parse into a timestamp.</p>
 </dd>
 </dl>
-<p>Parses the string value into a <code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code> value. The string must be in ISO-8601 format and if it
+<p>Parses the string value into a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> value. The string must be in ISO-8601 format and if it
 fails to parse, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.DatetimeSyntaxError" title="rule_engine.errors.DatetimeSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">DatetimeSyntaxError</span></code></a> is raised.</p>
 <p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">parse_float(STRING</span> <span class="pre">value)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p>
 </dd>
 <dt class="field-even">value<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The string value to parse into a numeric.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>) The string value to parse into a numeric.</p>
 </dd>
 </dl>
-<p>Parses the string value into a <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code> value. The string must be properly formatted and if it
+<p>Parses the string value into a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a> value. The string must be properly formatted and if it
 fails to parse, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.FloatSyntaxError" title="rule_engine.errors.FloatSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FloatSyntaxError</span></code></a> is raised.</p>
 <p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">parse_timedelta(STRING</span> <span class="pre">value)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a></p>
 </dd>
 <dt class="field-even">value<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The string value to parse into a time period.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>) The string value to parse into a time period.</p>
 </dd>
 </dl>
-<p>Parses the string value into a <code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code> value. The string must be properly formatted and if it
+<p>Parses the string value into a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> value. The string must be properly formatted and if it
 fails to parse, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.TimedeltaSyntaxError" title="rule_engine.errors.TimedeltaSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TimedeltaSyntaxError</span></code></a> is raised.</p>
 <p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">random([FLOAT</span> <span class="pre">boundary])</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p>
 </dd>
 <dt class="field-even">boundary<span class="colon">:</span></dt>
-<dd class="field-even"><p>(Optional <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) The upper boundary to generate a random number for.</p>
+<dd class="field-even"><p>(Optional <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) The upper boundary to generate a random number for.</p>
 </dd>
 </dl>
 <p>Generate a random number. If <em>boundary</em> is not specified, the random number  returned will be between 0 and 1. If
@@ -622,16 +632,16 @@ including <em>boundary</em>.</p>
 <p id="builtin-function-split"><code class="docutils literal notranslate"><span class="pre">ARRAY[STRING]</span> <span class="pre">split(STRING</span> <span class="pre">string,</span> <span class="pre">[STRING</span> <span class="pre">sep,</span> <span class="pre">FLOAT</span> <span class="pre">maxsplit])</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code> of <code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> of <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p>
 </dd>
 <dt class="field-even">string<span class="colon">:</span></dt>
-<dd class="field-even"><p>(<code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The string value to split into substrings.</p>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>) The string value to split into substrings.</p>
 </dd>
 <dt class="field-odd">sep<span class="colon">:</span></dt>
-<dd class="field-odd"><p>(Optional <code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code>) The value to split <em>string</em> on.</p>
+<dd class="field-odd"><p>(Optional <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>) The value to split <em>string</em> on.</p>
 </dd>
 <dt class="field-even">maxsplit<span class="colon">:</span></dt>
-<dd class="field-even"><p>(Optional <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) The maximum number of times tp split <em>string</em>.</p>
+<dd class="field-even"><p>(Optional <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) The maximum number of times tp split <em>string</em>.</p>
 </dd>
 </dl>
 <p>Split a string value into sub strings. If <em>sep</em> is not specified, the <em>string</em> will be split by all whitespace. If <em>sep</em>
@@ -649,16 +659,16 @@ $split(&quot;A    B&quot;, &#39; &#39;) # =&gt; (&#39;A&#39;, &#39;&#39;, &#39;&
 <section id="math-related">
 <h3>Math Related<a class="headerlink" href="#math-related" title="Permalink to this heading"></a></h3>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">e</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) – The mathematical constant <em>e</em> (2.71828…).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pi</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code>) – The mathematical constant <em>pi</em> (3.14159…).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">e</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) – The mathematical constant <em>e</em> (2.71828…).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pi</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) – The mathematical constant <em>pi</em> (3.14159…).</p></li>
 </ul>
 </section>
 <section id="regular-expression-related">
 <h3>Regular Expression Related<a class="headerlink" href="#regular-expression-related" title="Permalink to this heading"></a></h3>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">re_groups</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code>) – An array of strings from the last regular expression match as
+<li><p><code class="docutils literal notranslate"><span class="pre">re_groups</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>) – An array of strings from the last regular expression match as
 defined by the regular expression itself. See documentation on <a class="reference external" href="https://docs.python.org/3/howto/regex.html#grouping">grouping</a> for more information. If no match has taken
-place, this value is <code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+place, this value is <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For technical reasons, this symbol is provided by the default <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Context</span></code></a> and is not included
@@ -671,9 +681,9 @@ be unavailable if the default builtins are replaced.</p>
 <section id="timestamp-related">
 <h3>Timestamp Related<a class="headerlink" href="#timestamp-related" title="Permalink to this heading"></a></h3>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">now</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code>) – The current timestamp (including time) using the default timezone
+<li><p><code class="docutils literal notranslate"><span class="pre">now</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>) – The current timestamp (including time) using the default timezone
 from <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone" title="rule_engine.engine.Context.default_timezone"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timezone</span></code></a>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">today</span></code> (type: <code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code>) – The current timestamp, (excluding time, normalized to midnight
+<li><p><code class="docutils literal notranslate"><span class="pre">today</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>) – The current timestamp, (excluding time, normalized to midnight
 00:00:00) using the default timezone from <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone" title="rule_engine.engine.Context.default_timezone"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timezone</span></code></a>.</p></li>
 </ul>
 </section>

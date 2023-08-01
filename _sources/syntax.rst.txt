@@ -219,7 +219,7 @@ The following keywords are reserved and can not be used as the names of symbols.
 +-----------+-----------------------------------------------------------------+
 | Keyword   | Description                                                     |
 +-----------+-----------------------------------------------------------------+
-| ``null``  | The :py:class:`NullExpression` literal value                    |
+| ``null``  | The :py:class:`~ast.NullExpression` literal value               |
 +-----------+-----------------------------------------------------------------+
 | **Array Comprehension**                                                     |
 +-----------+-----------------------------------------------------------------+
@@ -227,13 +227,13 @@ The following keywords are reserved and can not be used as the names of symbols.
 +-----------+-----------------------------------------------------------------+
 | ``if``    | Array comprehension iterable and (optional) condition delimiter |
 +-----------+-----------------------------------------------------------------+
-| **Booleans** (:py:class:`BooleanExpression` Literals)                       |
+| **Booleans** (:py:class:`~ast.BooleanExpression` Literals)                  |
 +-----------+-----------------------------------------------------------------+
 | ``true``  | The "True" boolean value                                        |
 +-----------+-----------------------------------------------------------------+
 | ``false`` | The "False" boolean value                                       |
 +-----------+-----------------------------------------------------------------+
-| **Floats** (:py:class:`FloatExpression` Literals)                           |
+| **Floats** (:py:class:`~ast.FloatExpression` Literals)                      |
 +-----------+-----------------------------------------------------------------+
 | ``inf``   | Floating point value for infinity                               |
 +-----------+-----------------------------------------------------------------+
@@ -346,85 +346,92 @@ custom subclass of :py:class:`~engine.Context` and setting the :py:attr:`~engine
 Functions
 ^^^^^^^^^
 
+``FLOAT abs(FLOAT value)``
+
+:returns: :py:attr:`~.DataType.FLOAT`
+:value: (:py:attr:`~.DataType.FLOAT`) The numeric to get the absolute value of.
+
+Returns the absolute value of *value*.
+
 ``BOOLEAN all(ARRAY[??] values)``
 
-:returns: :py:attr:`~ast.DataType.BOOLEAN`
-:values: (:py:attr:`~ast.DataType.ARRAY` of *anything*) An array of values to check.
+:returns: :py:attr:`~.DataType.BOOLEAN`
+:values: (:py:attr:`~.DataType.ARRAY` of *anything*) An array of values to check.
 
 Returns true if every member of the array argument is truthy. If *values* is empty, the function returns true.
 
 ``BOOLEAN any(ARRAY[??] values)``
 
-:returns: :py:attr:`~ast.DataType.BOOLEAN`
-:values: (:py:attr:`~ast.DataType.ARRAY` of *anything*) An array of values to check.
+:returns: :py:attr:`~.DataType.BOOLEAN`
+:values: (:py:attr:`~.DataType.ARRAY` of *anything*) An array of values to check.
 
 Returns true if any member of the array argument is truthy. If *values* is empty, the function returns false.
 
 ``FLOAT sum(ARRAY[FLOAT] values)``
 
-:returns: :py:attr:`~ast.DataType.FLOAT`
-:values: (:py:attr:`~ast.DataType.ARRAY` of :py:attr:`~ast.DataType.FLOAT`) An array of values to add.
+:returns: :py:attr:`~.DataType.FLOAT`
+:values: (:py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`) An array of values to add.
 
 Returns the sum of an array of values. If *values* is empty, the function returns 0.
 
 ``ARRAY[??] map(FUNCTION function, ARRAY[??] values)``
 
-:returns: :py:attr:`~ast.DataType.ARRAY` of *anything*
-:function: (:py:attr:`~ast.DataType.FUNCTION`) The function to call on each of the values.
-:values: (:py:attr:`~ast.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
+:returns: :py:attr:`~.DataType.ARRAY` of *anything*
+:function: (:py:attr:`~.DataType.FUNCTION`) The function to call on each of the values.
+:values: (:py:attr:`~.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
 
 ``FLOAT max(ARRAY[FLOAT] values)``
 
-:returns: :py:attr:`~ast.DataType.FLOAT`
-:values: (:py:attr:`~ast.DataType.ARRAY` of :py:attr:`~ast.DataType.FLOAT`) An array of values to check.
+:returns: :py:attr:`~.DataType.FLOAT`
+:values: (:py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`) An array of values to check.
 
 Returns the largest value from the array of values. If *values* is empty, a :py:exc:`~.errors.FunctionCallError` is
 raised.
 
 ``FLOAT min(ARRAY[FLOAT] values)``
 
-:returns: :py:attr:`~ast.DataType.FLOAT`
-:values: (:py:attr:`~ast.DataType.ARRAY` of :py:attr:`~ast.DataType.FLOAT`) An array of values to check.
+:returns: :py:attr:`~.DataType.FLOAT`
+:values: (:py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`) An array of values to check.
 
 Returns the smallest value from the array of values. If *values* is empty, a :py:exc:`~.errors.FunctionCallError` is
 raised.
 
 ``ARRAY[??] filter(FUNCTION function, ARRAY[??] values)``
 
-:returns: :py:attr:`~ast.DataType.ARRAY` of *anything*
-:function: (:py:attr:`~ast.DataType.FUNCTION`) The function to call on each of the values.
-:values: (:py:attr:`~ast.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
+:returns: :py:attr:`~.DataType.ARRAY` of *anything*
+:function: (:py:attr:`~.DataType.FUNCTION`) The function to call on each of the values.
+:values: (:py:attr:`~.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
 
 Returns an array containing a subset of members from *values* where *function* returns true.
 
 ``DATETIME parse_datetime(STRING value)``
 
-:returns: :py:attr:`~ast.DataType.DATETIME`
-:value: (:py:attr:`~ast.DataType.STRING`) The string value to parse into a timestamp.
+:returns: :py:attr:`~.DataType.DATETIME`
+:value: (:py:attr:`~.DataType.STRING`) The string value to parse into a timestamp.
 
-Parses the string value into a :py:attr:`~ast.DataType.DATETIME` value. The string must be in ISO-8601 format and if it
+Parses the string value into a :py:attr:`~.DataType.DATETIME` value. The string must be in ISO-8601 format and if it
 fails to parse, a :py:exc:`~.errors.DatetimeSyntaxError` is raised.
 
 ``FLOAT parse_float(STRING value)``
 
-:returns: :py:attr:`~ast.DataType.FLOAT`
-:value: (:py:attr:`~ast.DataType.STRING`) The string value to parse into a numeric.
+:returns: :py:attr:`~.DataType.FLOAT`
+:value: (:py:attr:`~.DataType.STRING`) The string value to parse into a numeric.
 
-Parses the string value into a :py:attr:`~ast.DataType.FLOAT` value. The string must be properly formatted and if it
+Parses the string value into a :py:attr:`~.DataType.FLOAT` value. The string must be properly formatted and if it
 fails to parse, a :py:exc:`~.errors.FloatSyntaxError` is raised.
 
 ``FLOAT parse_timedelta(STRING value)``
 
-:returns: :py:attr:`~ast.DataType.TIMEDELTA`
-:value: (:py:attr:`~ast.DataType.STRING`) The string value to parse into a time period.
+:returns: :py:attr:`~.DataType.TIMEDELTA`
+:value: (:py:attr:`~.DataType.STRING`) The string value to parse into a time period.
 
-Parses the string value into a :py:attr:`~ast.DataType.TIMEDELTA` value. The string must be properly formatted and if it
+Parses the string value into a :py:attr:`~.DataType.TIMEDELTA` value. The string must be properly formatted and if it
 fails to parse, a :py:exc:`~.errors.TimedeltaSyntaxError` is raised.
 
 ``FLOAT random([FLOAT boundary])``
 
-:returns: :py:attr:`~ast.DataType.FLOAT`
-:boundary: (Optional :py:attr:`~ast.DataType.FLOAT`) The upper boundary to generate a random number for.
+:returns: :py:attr:`~.DataType.FLOAT`
+:boundary: (Optional :py:attr:`~.DataType.FLOAT`) The upper boundary to generate a random number for.
 
 Generate a random number. If *boundary* is not specified, the random number  returned will be between 0 and 1. If
 *boundary* is specified, it must be a natural number and the random number returned will be between 0 and *boundary*,
@@ -434,10 +441,10 @@ including *boundary*.
 
 ``ARRAY[STRING] split(STRING string, [STRING sep, FLOAT maxsplit])``
 
-:returns: :py:attr:`~ast.DataType.ARRAY` of :py:attr:`~ast.DataType.STRING`
-:string: (:py:attr:`~ast.DataType.STRING`) The string value to split into substrings.
-:sep: (Optional :py:attr:`~ast.DataType.STRING`) The value to split *string* on.
-:maxsplit: (Optional :py:attr:`~ast.DataType.FLOAT`) The maximum number of times tp split *string*.
+:returns: :py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.STRING`
+:string: (:py:attr:`~.DataType.STRING`) The string value to split into substrings.
+:sep: (Optional :py:attr:`~.DataType.STRING`) The value to split *string* on.
+:maxsplit: (Optional :py:attr:`~.DataType.FLOAT`) The maximum number of times tp split *string*.
 
 Split a string value into sub strings. If *sep* is not specified, the *string* will be split by all whitespace. If *sep*
 is specified, *string* will be split by that value. This alters how consecutive spaces are handled. When *sep* is not
@@ -457,15 +464,15 @@ If *maxsplit* is specified, it must be a natural number and will be used as the 
 Math Related
 ^^^^^^^^^^^^
 
-* ``e`` (type: :py:attr:`~ast.DataType.FLOAT`) -- The mathematical constant *e* (2.71828...).
-* ``pi`` (type: :py:attr:`~ast.DataType.FLOAT`) -- The mathematical constant *pi* (3.14159...).
+* ``e`` (type: :py:attr:`~.DataType.FLOAT`) -- The mathematical constant *e* (2.71828...).
+* ``pi`` (type: :py:attr:`~.DataType.FLOAT`) -- The mathematical constant *pi* (3.14159...).
 
 Regular Expression Related
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ``re_groups`` (type: :py:attr:`~ast.DataType.ARRAY`) -- An array of strings from the last regular expression match as
+* ``re_groups`` (type: :py:attr:`~.DataType.ARRAY`) -- An array of strings from the last regular expression match as
   defined by the regular expression itself. See documentation on `grouping`_ for more information. If no match has taken
-  place, this value is :py:attr:`~ast.DataType.NULL`.
+  place, this value is :py:attr:`~.DataType.NULL`.
 
   .. note:: For technical reasons, this symbol is provided by the default :py:attr:`~engine.Context` and is not included
     within the :py:meth:`~engine.Builtins.from_defaults`. This means that unlike the other symbols listed here, it will
@@ -474,9 +481,9 @@ Regular Expression Related
 Timestamp Related
 ^^^^^^^^^^^^^^^^^
 
-* ``now`` (type: :py:attr:`~ast.DataType.DATETIME`) -- The current timestamp (including time) using the default timezone
+* ``now`` (type: :py:attr:`~.DataType.DATETIME`) -- The current timestamp (including time) using the default timezone
   from :py:attr:`~engine.Context.default_timezone`.
-* ``today`` (type: :py:attr:`~ast.DataType.DATETIME`) -- The current timestamp, (excluding time, normalized to midnight
+* ``today`` (type: :py:attr:`~.DataType.DATETIME`) -- The current timestamp, (excluding time, normalized to midnight
   00:00:00) using the default timezone from :py:attr:`~engine.Context.default_timezone`.
 
 .. _grouping: https://docs.python.org/3/howto/regex.html#grouping

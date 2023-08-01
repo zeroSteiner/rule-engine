@@ -121,7 +121,7 @@ class BuiltinsTests(unittest.TestCase):
 	def test_engine_builtins_function_abs(self):
 		self.assertBuiltinFunction('abs', 30, -30)
 		self.assertBuiltinFunction('abs', 30, 30)
-  
+
 	def test_engine_builtins_function_any(self):
 		self.assertBuiltinFunction('any', True, [0, 1, 2])
 		self.assertBuiltinFunction('any', False, [None])

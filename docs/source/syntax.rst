@@ -346,6 +346,13 @@ custom subclass of :py:class:`~engine.Context` and setting the :py:attr:`~engine
 Functions
 ^^^^^^^^^
 
+``FLOAT abs(FLOAT value)``
+
+:returns: :py:attr:`~ast.DataType.FLOAT`
+:value: (:py:attr:`~ast.DataType.FLOAT`) The numeric to get the absolute value of.
+
+Returns the absolute value of *value*.
+
 ``BOOLEAN all(ARRAY[??] values)``
 
 :returns: :py:attr:`~ast.DataType.BOOLEAN`

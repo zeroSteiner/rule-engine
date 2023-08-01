@@ -467,12 +467,15 @@ class DataType(metaclass=DataTypeMeta):
 	@classmethod
 	def from_type(cls, python_type):
 		"""
-		Get the supported data type constant for the specified Python type/type hint. 
-		If the type or typehint can not be mapped to a supported data type, then a 
-		:py:exc:`ValueError` exception will be raised. This function will not return :py:attr:`.UNDEFINED`.
+		Get the supported data type constant for the specified Python type/type hint. If the type or typehint can not be
+		mapped to a supported data type, then a :py:exc:`ValueError` exception will be raised. This function will not
+		return :py:attr:`.UNDEFINED`.
 
 		:param type python_type: The native Python type or type hint to retrieve the corresponding type constant for.
 		:return: One of the constants.
+
+		.. versionchanged:: 4.1.0
+			Added support for typehints.
 		"""
 		if not (isinstance(python_type, type) or hasattr(python_type, '__origin__')):
 			raise TypeError('from_type argument 1 must be a type or a type hint, not ' + type(python_type).__name__)

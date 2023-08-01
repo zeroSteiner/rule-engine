@@ -50,7 +50,6 @@ class DataTypeTests(unittest.TestCase):
 		with self.assertRaises(TypeError):
 			types._CollectionDataTypeDef('TEST', float)
 
-
 	def test_data_type_equality_array(self):
 		dt1 = DataType.ARRAY(DataType.STRING)
 		self.assertIs(dt1.value_type, DataType.STRING)
@@ -141,7 +140,6 @@ class DataTypeTests(unittest.TestCase):
 				DataType.MAPPING(DataType.STRING, DataType.MAPPING(DataType.STRING, DataType.DATETIME)
 			))
 
-
 	def test_data_type_from_type_error(self):
 		with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be a type or a type hint, not _UnsupportedType$'):
 			DataType.from_type(self._UnsupportedType())
@@ -204,7 +202,6 @@ class DataTypeTests(unittest.TestCase):
 			DataType.FUNCTION('test', argument_types=DataType.NULL)
 		with self.assertRaises(ValueError, msg='minimum_arguments should be less than or equal to the length of argument_types'):
 			DataType.FUNCTION('test', argument_types=(), minimum_arguments=1)
-
 
 	def test_data_type_definitions_describe_themselves(self):
 		for name in DataType:

@@ -379,17 +379,20 @@ currently unknown.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.types.DataType.from_type">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_type" title="Permalink to this definition"></a></dt>
-<dd><p>Get the supported data type constant for the specified Python type. If the type can not be mapped to a supported
-data type, then a <a class="reference external" href="https://docs.python.org/3.11/library/exceptions.html#ValueError" title="(in Python v3.11)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised. This function will not return
-<a class="reference internal" href="#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+<dd><p>Get the supported data type constant for the specified Python type/type hint. If the type or typehint can not be
+mapped to a supported data type, then a <a class="reference external" href="https://docs.python.org/3.11/library/exceptions.html#ValueError" title="(in Python v3.11)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised. This function will not
+return <a class="reference internal" href="#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>python_type</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#type" title="(in Python v3.11)"><em>type</em></a>) – The native Python type to retrieve the corresponding type constant for.</p>
+<dd class="field-odd"><p><strong>python_type</strong> (<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#type" title="(in Python v3.11)"><em>type</em></a>) – The native Python type or type hint to retrieve the corresponding type constant for.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>One of the constants.</p>
 </dd>
 </dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 4.1.0: </span>Added support for typehints.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">

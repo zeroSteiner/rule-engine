@@ -353,6 +353,8 @@ Functions
 
 Returns the absolute value of *value*.
 
+.. versionadded:: 4.1.0
+
 ``BOOLEAN all(ARRAY[??] values)``
 
 :returns: :py:attr:`~.DataType.BOOLEAN`

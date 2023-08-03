@@ -7,6 +7,14 @@ this list is curated by the development team for note worthy changes.
 Version 4.x.x
 -------------
 
+Version 4.1.0
+^^^^^^^^^^^^^
+
+Released :release:`4.1.0` on August 3rd, 2023
+
+* Added the ``$abs`` builtin function
+* Added support to :py:class:`~rule_engine.types.DataType.from_type` to handle Python's type hints
+
 Version 4.0.0
 ^^^^^^^^^^^^^
 

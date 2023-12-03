@@ -236,17 +236,15 @@ class _AttributeResolver(object):
 	def float_floor(self, value):
 		return _float_op(value, math.floor)
 
-	@attribute('to_str', ast.DataType.FLOAT, result_type=ast.DataType.STRING)
-	def float_to_str(self, value):
-		# keep the string representations consistent for nan, inf, -inf
-		if value.is_nan():
-			return 'nan'
-		elif value.is_infinite():
-			if value.is_signed():
-				return '-inf'
-			else:
-				return 'inf'
-		return str(value)
+	@attribute('to_flt', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
+	def float_to_flt(self, value):
+		return value
+
+	@attribute('to_int', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
+	def float_to_int(self, value):
+		if not ast.is_integer_number(value):
+			raise errors.EvaluationError('data type mismatch (not an integer number)')
+		return value
 
 	@attribute('keys', ast.DataType.MAPPING, result_type=ast.DataType.ARRAY)
 	def mapping_keys(self, value):
@@ -255,10 +253,6 @@ class _AttributeResolver(object):
 	@attribute('values', ast.DataType.MAPPING, result_type=ast.DataType.ARRAY)
 	def mapping_values(self, value):
 		return tuple(value.values())
-
-	@attribute('to_ary', ast.DataType.SET, result_type=ast.DataType.ARRAY)
-	def set_to_ary(self, value):
-		return tuple(value)
 
 	@attribute('as_lower', ast.DataType.STRING, result_type=ast.DataType.STRING)
 	def string_as_lower(self, value):
@@ -297,7 +291,25 @@ class _AttributeResolver(object):
 	def value_length(self, value):
 		return len(value)
 
-	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.STRING, result_type=ast.DataType.SET)
+	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.SET, result_type=ast.DataType.ARRAY)
+	def value_to_ary(self, value):
+		return tuple(value)
+
+	@attribute('to_str', ast.DataType.FLOAT, ast.DataType.STRING, result_type=ast.DataType.STRING)
+	def value_to_str(self, value):
+		if isinstance(value, str):
+			return value
+		# keep the string representations consistent for nan, inf, -inf
+		if value.is_nan():
+			return 'nan'
+		elif value.is_infinite():
+			if value.is_signed():
+				return '-inf'
+			else:
+				return 'inf'
+		return str(value)
+
+	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.SET, ast.DataType.STRING, result_type=ast.DataType.SET)
 	def value_to_set(self, value):
 		return set(value)
 

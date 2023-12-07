@@ -79,11 +79,12 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		self.assertIsNone(expression.evaluate(None))
 
 	def test_ast_expression_array_attributes(self):
-		ary = [1, 2, 3]
+		ary = (decimal.Decimal(1), decimal.Decimal(2), decimal.Decimal(3))
 		symbol = ast.SymbolExpression(context, 'ary')
 
 		attributes = {
 			'length': len(ary),
+			'to_ary': ary,
 			'to_set': set(ary)
 		}
 		for attribute_name, value in attributes.items():
@@ -132,6 +133,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		attributes = {
 			'ceiling': decimal.Decimal('4'),
 			'floor': decimal.Decimal('3'),
+			'to_flt': flt,
 			'to_str': '3.14159'
 		}
 		for attribute_name, value in attributes.items():
@@ -159,7 +161,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			'keys': tuple(mapping.keys()),
 			'is_empty': len(mapping) == 0,
 			'length': len(mapping),
-			'values': tuple(mapping.values()),
+			'values': tuple(mapping.values())
 		}
 		for attribute_name, value in attributes.items():
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
@@ -175,7 +177,8 @@ class GetAttributeExpressionTests(unittest.TestCase):
 
 		attributes = {
 			'length': len(set_),
-			'to_ary': tuple(set_)
+			'to_ary': tuple(set_),
+			'to_set': set_
 		}
 		for attribute_name, value in attributes.items():
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
@@ -190,7 +193,8 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			'as_upper': string.upper(),
 			'to_ary': tuple(string),
 			'to_set': set(string),
-			'length': len(string),
+			'to_str': string,
+			'length': len(string)
 		}
 		for attribute_name, value in attributes.items():
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)

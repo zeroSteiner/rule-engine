@@ -7,6 +7,13 @@ this list is curated by the development team for note worthy changes.
 Version 4.x.x
 -------------
 
+Version 4.2.0
+^^^^^^^^^^^^^
+
+*In Progress*
+
+* Added attributes for coercion of types to themselves, e.g. ``to_str`` for ``STRING`` values.
+
 Version 4.1.0
 ^^^^^^^^^^^^^
 

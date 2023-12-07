@@ -21,6 +21,8 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-------------------+-------------------------------------+
 | ``length``        | :py:attr:`~.DataType.FLOAT`         |
 +-------------------+-------------------------------------+
+| ``to_ary``        | :py:attr:`~.DataType.ARRAY`         |
++-------------------+-------------------------------------+
 | ``to_set``        | :py:attr:`~.DataType.SET`           |
 +-------------------+-------------------------------------+
 | :py:attr:`~.DataType.DATETIME` **Attributes**           |
@@ -65,6 +67,8 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-------------------+-------------------------------------+
 | ``floor``         | :py:attr:`~.DataType.FLOAT`         |
 +-------------------+-------------------------------------+
+| ``to_flt``        | :py:attr:`~.DataType.FLOAT`         |
++-------------------+-------------------------------------+
 | ``to_str``        | :py:attr:`~.DataType.STRING`        |
 +-------------------+-------------------------------------+
 | :py:attr:`~.DataType.MAPPING` **Attributes**            |
@@ -85,6 +89,8 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-------------------+-------------------------------------+
 | ``to_ary``        | :py:attr:`~.DataType.ARRAY`         |
 +-------------------+-------------------------------------+
+| ``to_set``        | :py:attr:`~.DataType.SET`           |
++-------------------+-------------------------------------+
 | :py:attr:`~.DataType.STRING` **Attributes**             |
 +-------------------+-------------------------------------+
 | ``as_lower``      | :py:attr:`~.DataType.STRING`        |
@@ -96,6 +102,8 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 | ``to_flt``        | :py:attr:`~.DataType.FLOAT`         |
 +-------------------+-------------------------------------+
 | ``to_set``        | :py:attr:`~.DataType.SET`           |
++-------------------+-------------------------------------+
+| ``to_str``        | :py:attr:`~.DataType.STRING`        |
 +-------------------+-------------------------------------+
 | ``to_int``        | :py:attr:`~.DataType.FLOAT`         |
 +-------------------+-------------------------------------+

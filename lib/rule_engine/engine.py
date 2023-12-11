@@ -45,6 +45,7 @@ from . import builtins
 from . import errors
 from . import parser
 from .suggestions import suggest_symbol
+from .types import DataType
 
 import dateutil.tz
 
@@ -111,7 +112,25 @@ def type_resolver_from_dict(dictionary):
 	type_map = {key: value if ast.DataType.is_definition(value) else ast.DataType.from_value(value) for key, value in dictionary.items()}
 	return functools.partial(_type_resolver, type_map)
 
-_AttributeResolverFunction = collections.namedtuple('_AttributeResolverFunction', ('function', 'result_type'))
+def _value_to_ary_result_type(object_type):
+	return ast.DataType.ARRAY(object_type.value_type)
+
+def _value_to_set_result_type(object_type):
+	if object_type == ast.DataType.STRING:
+		return ast.DataType.SET(ast.DataType.STRING)
+	return ast.DataType.SET(object_type.value_type)
+
+class _AttributeResolverFunction(object):
+	__slots__ = ('function', 'result_type')
+	def __init__(self, function, result_type):
+		self.function = function
+		self.result_type = result_type
+
+	def resolve_type(self, object_type):
+		if DataType.is_definition(self.result_type):
+			return self.result_type
+		return self.result_type(object_type)
+
 class _AttributeResolver(object):
 	class attribute(object):
 		__slots__ = ('types', 'name', 'result_type')
@@ -138,7 +157,7 @@ class _AttributeResolver(object):
 		if resolver.result_type == ast.DataType.UNDEFINED:
 			return value
 		value_type = ast.DataType.from_value(value)
-		if ast.DataType.is_compatible(resolver.result_type, value_type):
+		if ast.DataType.is_compatible(resolver.resolve_type(value_type), value_type):
 			return value
 		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=resolver.result_type)
 
@@ -161,7 +180,7 @@ class _AttributeResolver(object):
 		:param str name: The name of the attribute to retrieve the data type of.
 		:return: The data type of the specified attribute.
 		"""
-		return self._get_resolver(object_type, name).result_type
+		return self._get_resolver(object_type, name).resolve_type(object_type)
 
 	@attribute('to_epoch', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_to_epoch(self, value):
@@ -291,7 +310,7 @@ class _AttributeResolver(object):
 	def value_length(self, value):
 		return len(value)
 
-	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.SET, result_type=ast.DataType.ARRAY)
+	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.SET, result_type=_value_to_ary_result_type)
 	def value_to_ary(self, value):
 		return tuple(value)
 
@@ -309,7 +328,7 @@ class _AttributeResolver(object):
 				return 'inf'
 		return str(value)
 
-	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.SET, ast.DataType.STRING, result_type=ast.DataType.SET)
+	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.SET, ast.DataType.STRING, result_type=_value_to_set_result_type)
 	def value_to_set(self, value):
 		return set(value)
 

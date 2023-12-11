@@ -121,28 +121,39 @@ def _value_to_set_result_type(object_type):
 	return ast.DataType.SET(object_type.value_type)
 
 class _AttributeResolverFunction(object):
-	__slots__ = ('function', 'result_type')
-	def __init__(self, function, result_type):
+	__slots__ = ('function', 'type_resolver')
+	def __init__(self, function, *, result_type, type_resolver):
 		self.function = function
-		self.result_type = result_type
+		if result_type and result_type is not ast.DataType.UNDEFINED:
+			if not DataType.is_definition(result_type):
+				raise TypeError('result_type must be a DataType definition')
+			if type_resolver:
+				raise ValueError('both result_type and type_resolver can not be specified')
+			type_resolver = functools.partial(self._type_resolver, result_type)
+		elif not type_resolver:
+			type_resolver = functools.partial(self._type_resolver, ast.DataType.UNDEFINED)
+		self.type_resolver = type_resolver
+
+	@staticmethod
+	def _type_resolver(result_type, _object_type):
+		return result_type
 
 	def resolve_type(self, object_type):
-		if DataType.is_definition(self.result_type):
-			return self.result_type
-		return self.result_type(object_type)
+		return self.type_resolver(object_type)
 
 class _AttributeResolver(object):
 	class attribute(object):
-		__slots__ = ('types', 'name', 'result_type')
+		__slots__ = ('types', 'name', 'result_type', 'type_resolver')
 		type_map = collections.defaultdict(dict)
-		def __init__(self, name, *data_types, result_type=ast.DataType.UNDEFINED):
+		def __init__(self, name, *data_types, result_type=ast.DataType.UNDEFINED, type_resolver=errors.UNDEFINED):
 			self.types = data_types
 			self.name = name
 			self.result_type = result_type
+			self.type_resolver = type_resolver
 
 		def __call__(self, function):
 			for type_ in self.types:
-				self.type_map[type_][self.name] = _AttributeResolverFunction(function, self.result_type)
+				self.type_map[type_][self.name] = _AttributeResolverFunction(function, result_type=self.result_type, type_resolver=self.type_resolver)
 			return function
 
 	def __call__(self, thing, object_, name):
@@ -154,12 +165,11 @@ class _AttributeResolver(object):
 		resolver = self._get_resolver(object_type, name, thing=thing)
 		value = resolver.function(self, object_)
 		value = ast.coerce_value(value)
-		if resolver.result_type == ast.DataType.UNDEFINED:
-			return value
 		value_type = ast.DataType.from_value(value)
-		if ast.DataType.is_compatible(resolver.resolve_type(value_type), value_type):
+		expected_value_type = resolver.resolve_type(value_type)
+		if ast.DataType.is_compatible(expected_value_type, value_type):
 			return value
-		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=resolver.result_type)
+		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=expected_value_type)
 
 	def _get_resolver(self, object_type, name, thing=errors.UNDEFINED):
 		for data_type, attribute_resolvers in self.attribute.type_map.items():
@@ -310,7 +320,7 @@ class _AttributeResolver(object):
 	def value_length(self, value):
 		return len(value)
 
-	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.SET, result_type=_value_to_ary_result_type)
+	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.SET, type_resolver=_value_to_ary_result_type)
 	def value_to_ary(self, value):
 		return tuple(value)
 
@@ -328,7 +338,7 @@ class _AttributeResolver(object):
 				return 'inf'
 		return str(value)
 
-	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.SET, ast.DataType.STRING, result_type=_value_to_set_result_type)
+	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.SET, ast.DataType.STRING, type_resolver=_value_to_set_result_type)
 	def value_to_set(self, value):
 		return set(value)
 

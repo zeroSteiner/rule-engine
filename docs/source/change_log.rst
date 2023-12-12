@@ -10,7 +10,7 @@ Version 4.x.x
 Version 4.2.0
 ^^^^^^^^^^^^^
 
-*In Progress*
+Released :release:`4.2.0` on December 11th, 2023
 
 * Added attributes for coercion of types to themselves, e.g. ``to_str`` for ``STRING`` values.
 

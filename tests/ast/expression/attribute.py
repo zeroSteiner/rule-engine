@@ -39,6 +39,7 @@ from .literal import context
 import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
+import rule_engine.types as types
 
 import dateutil.tz
 
@@ -90,6 +91,16 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		for attribute_name, value in attributes.items():
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate({'ary': ary}), value, "attribute {} failed".format(attribute_name))
+
+		# test that compound type information is propagated through attributes
+		typed_context = engine.Context(
+			type_resolver=engine.type_resolver_from_dict({
+				symbol.name: types.DataType.ARRAY(types.DataType.FLOAT)
+			})
+		)
+		typed_symbol = ast.SymbolExpression(typed_context, symbol.name)
+		expression = ast.GetAttributeExpression(typed_context, typed_symbol, 'to_ary')
+		self.assertEqual(expression.result_type, typed_context.resolve_type(symbol.name))
 
 	def test_ast_expression_datetime_attributes(self):
 		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)
@@ -183,6 +194,16 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		for attribute_name, value in attributes.items():
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate({'set': set_}), value, "attribute {} failed".format(attribute_name))
+
+		# test that compound type information is propagated through attributes
+		typed_context = engine.Context(
+			type_resolver=engine.type_resolver_from_dict({
+				symbol.name: types.DataType.SET(types.DataType.FLOAT)
+			})
+		)
+		typed_symbol = ast.SymbolExpression(typed_context, symbol.name)
+		expression = ast.GetAttributeExpression(typed_context, typed_symbol, 'to_set')
+		self.assertEqual(expression.result_type, typed_context.resolve_type(symbol.name))
 
 	def test_ast_expression_string_attributes(self):
 		string = 'Rule Engine'

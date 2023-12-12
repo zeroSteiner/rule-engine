@@ -138,6 +138,13 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate({'flt': flt}), value, "attribute {} failed".format(attribute_name))
 
+		expression = ast.GetAttributeExpression(context, symbol, 'to_int')
+		self.assertEqual(
+			expression.evaluate({'flt': decimal.Decimal('3')}),
+			decimal.Decimal('3'),
+			'attribute to_int failed'
+		)
+
 		# check special values too
 		expression = ast.GetAttributeExpression(context, symbol, 'to_str')
 		for value in ('nan', 'inf', '-inf'):

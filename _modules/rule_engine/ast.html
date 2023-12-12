@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rule_engine.ast &mdash; Rule Engine 4.1.1 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e6a937a4"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -153,10 +155,14 @@
 	<span class="p">)</span>
 	<span class="k">return</span> <span class="n">iterable_member_value_type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Assignment"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Assignment">[docs]</a><span class="k">class</span> <span class="nc">Assignment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Assignment">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Assignment">[docs]</a>
+<span class="k">class</span> <span class="nc">Assignment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;An internal assignment whereby a symbol is populated with a value of the specified type.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;value_type&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="Assignment.__init__"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Assignment.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Assignment.__init__">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Assignment.__init__">[docs]</a>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">,</span> <span class="n">value_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param str name: The symbol name that the assignment is defining.</span>
 <span class="sd">		:param value: The value of the assignment.</span>
@@ -169,8 +175,10 @@
 			<span class="n">value_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">=</span> <span class="n">value_type</span></div>
 
+
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> name=</span><span class="si">{!r}</span><span class="s2"> value=</span><span class="si">{!r}</span><span class="s2"> value_type=</span><span class="si">{!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="p">)</span></div>
+
 
 <span class="k">class</span> <span class="nc">ASTNodeBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">):</span>
@@ -213,7 +221,9 @@
 <span class="c1">################################################################################</span>
 <span class="c1"># Base Expression Classes</span>
 <span class="c1">################################################################################</span>
-<div class="viewcode-block" id="ExpressionBase"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ExpressionBase">[docs]</a><span class="k">class</span> <span class="nc">ExpressionBase</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
+<div class="viewcode-block" id="ExpressionBase">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ExpressionBase">[docs]</a>
+<span class="k">class</span> <span class="nc">ExpressionBase</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">,)</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;The data type of the result of successful evaluation.&quot;&quot;&quot;</span>
@@ -227,11 +237,16 @@
 			<span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">default_timezone</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="LiteralExpressionBase"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase">[docs]</a><span class="k">class</span> <span class="nc">LiteralExpressionBase</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LiteralExpressionBase">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase">[docs]</a>
+<span class="k">class</span> <span class="nc">LiteralExpressionBase</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A base class for representing literal values from the grammar text.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,)</span>
 	<span class="n">is_reduced</span> <span class="o">=</span> <span class="kc">True</span>
-<div class="viewcode-block" id="LiteralExpressionBase.__init__"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="LiteralExpressionBase.__init__">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase.__init__">[docs]</a>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param context: The context to use for evaluating the expression.</span>
 <span class="sd">		:type context: :py:class:`~rule_engine.engine.Context`</span>
@@ -241,6 +256,7 @@
 		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">python_type</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;__init__ argument 2 must be </span><span class="si">{}</span><span class="s2">, not </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span></div>
+
 
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> value=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
@@ -281,6 +297,7 @@
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">value=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">))</span></div>
 
+
 <span class="c1">################################################################################</span>
 <span class="c1"># Literal Expressions</span>
 <span class="c1">################################################################################</span>
@@ -298,7 +315,9 @@
 			<span class="n">member</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 			<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">member</span><span class="p">)))</span>
 
-<div class="viewcode-block" id="ArrayExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ArrayExpression">[docs]</a><span class="k">class</span> <span class="nc">ArrayExpression</span><span class="p">(</span><span class="n">_CollectionMixin</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
+<div class="viewcode-block" id="ArrayExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ArrayExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">ArrayExpression</span><span class="p">(</span><span class="n">_CollectionMixin</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal array expressions containing 0 or more sub-expressions.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -309,11 +328,17 @@
 	<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="p">[</span><span class="n">member</span><span class="o">.</span><span class="n">build</span><span class="p">()</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">value</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="BooleanExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BooleanExpression">[docs]</a><span class="k">class</span> <span class="nc">BooleanExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BooleanExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BooleanExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">BooleanExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal boolean expressions representing True or False.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span></div>
 
-<div class="viewcode-block" id="DatetimeExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DatetimeExpression">[docs]</a><span class="k">class</span> <span class="nc">DatetimeExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DatetimeExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DatetimeExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">DatetimeExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Literal datetime expressions representing a specific point in time. This expression type always evaluates to true.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -323,7 +348,10 @@
 		<span class="n">dt</span> <span class="o">=</span> <span class="n">parse_datetime</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">default_timezone</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">default_timezone</span><span class="p">)</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TimedeltaExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.TimedeltaExpression">[docs]</a><span class="k">class</span> <span class="nc">TimedeltaExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TimedeltaExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.TimedeltaExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">TimedeltaExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Literal timedelta expressions representing an offset from a specific point in time.</span>
 
@@ -334,7 +362,10 @@
 	<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">parse_timedelta</span><span class="p">(</span><span class="n">string</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="FloatExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FloatExpression">[docs]</a><span class="k">class</span> <span class="nc">FloatExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FloatExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FloatExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">FloatExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal float expressions representing numerical values.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -345,7 +376,10 @@
 	<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="MappingExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.MappingExpression">[docs]</a><span class="k">class</span> <span class="nc">MappingExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MappingExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.MappingExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">MappingExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal mapping expression representing a set of associations between keys and values.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -380,7 +414,10 @@
 	<span class="k">def</span> <span class="nf">is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">_is_reduced</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="NullExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.NullExpression">[docs]</a><span class="k">class</span> <span class="nc">NullExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="NullExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.NullExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">NullExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal null expressions representing null values. This expression type always evaluates to false.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -389,7 +426,10 @@
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;value must be None&#39;</span><span class="p">)</span>
 		<span class="nb">super</span><span class="p">(</span><span class="n">NullExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SetExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.SetExpression">[docs]</a><span class="k">class</span> <span class="nc">SetExpression</span><span class="p">(</span><span class="n">_CollectionMixin</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SetExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.SetExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">SetExpression</span><span class="p">(</span><span class="n">_CollectionMixin</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal set expressions containing 0 or more sub-expressions.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -401,14 +441,20 @@
 		<span class="n">value</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">build</span><span class="p">()</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="StringExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.StringExpression">[docs]</a><span class="k">class</span> <span class="nc">StringExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StringExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.StringExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">StringExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal string expressions representing an array of characters.&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span></div>
+
 
 <span class="c1">################################################################################</span>
 <span class="c1"># Left-Operator-Right Expressions</span>
 <span class="c1">################################################################################</span>
-<div class="viewcode-block" id="LeftOperatorRightExpressionBase"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase">[docs]</a><span class="k">class</span> <span class="nc">LeftOperatorRightExpressionBase</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+<div class="viewcode-block" id="LeftOperatorRightExpressionBase">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase">[docs]</a>
+<span class="k">class</span> <span class="nc">LeftOperatorRightExpressionBase</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A base class for representing complex expressions composed of a left side and a right side, separated by an</span>
 <span class="sd">	operator.</span>
@@ -420,7 +466,9 @@
 <span class="sd">	:py:attr:`~.DataType.STRING` values.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span>
-<div class="viewcode-block" id="LeftOperatorRightExpressionBase.__init__"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
+<div class="viewcode-block" id="LeftOperatorRightExpressionBase.__init__">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LeftOperatorRightExpressionBase.__init__">[docs]</a>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param context: The context to use for evaluating the expression.</span>
 <span class="sd">		:type context: :py:class:`~rule_engine.engine.Context`</span>
@@ -441,6 +489,7 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">left</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">_assert_type_is_compatible</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">right</span></div>
+
 
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">type_</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
@@ -471,7 +520,10 @@
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AddExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.AddExpression">[docs]</a><span class="k">class</span> <span class="nc">AddExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="AddExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.AddExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">AddExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class for representing addition expressions from the grammar text.&quot;&quot;&quot;</span>
 	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">)</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
@@ -507,7 +559,10 @@
 			<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SubtractExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.SubtractExpression">[docs]</a><span class="k">class</span> <span class="nc">SubtractExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SubtractExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.SubtractExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">SubtractExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class for representing subtraction expressions from the grammar text.</span>
 
@@ -548,7 +603,10 @@
 			<span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ArithmeticExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ArithmeticExpression">[docs]</a><span class="k">class</span> <span class="nc">ArithmeticExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ArithmeticExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ArithmeticExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">ArithmeticExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class for representing arithmetic expressions from the grammar text such as multiplication and division.&quot;&quot;&quot;</span>
 	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,)</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
@@ -565,7 +623,10 @@
 	<span class="n">_op_mul</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">)</span>
 	<span class="n">_op_pow</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BitwiseExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BitwiseExpression">[docs]</a><span class="k">class</span> <span class="nc">BitwiseExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BitwiseExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BitwiseExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">BitwiseExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class for representing bitwise arithmetic expressions from the grammar text such as XOR and shifting operations.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -612,7 +673,10 @@
 	<span class="n">_op_bwor</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">)</span>
 	<span class="n">_op_bwxor</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BitwiseShiftExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BitwiseShiftExpression">[docs]</a><span class="k">class</span> <span class="nc">BitwiseShiftExpression</span><span class="p">(</span><span class="n">BitwiseExpression</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BitwiseShiftExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BitwiseShiftExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">BitwiseShiftExpression</span><span class="p">(</span><span class="n">BitwiseExpression</span><span class="p">):</span>
 	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,)</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
 	<span class="k">def</span> <span class="nf">_op_bitwise_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -620,7 +684,10 @@
 	<span class="n">_op_bwlsh</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise_shift</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">lshift</span><span class="p">)</span>
 	<span class="n">_op_bwrsh</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise_shift</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">rshift</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LogicExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LogicExpression">[docs]</a><span class="k">class</span> <span class="nc">LogicExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LogicExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.LogicExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">LogicExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class for representing logical expressions from the grammar text such as &quot;and&quot; and &quot;or&quot;.&quot;&quot;&quot;</span>
 	<span class="k">def</span> <span class="nf">_op_and</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span>
@@ -628,10 +695,13 @@
 	<span class="k">def</span> <span class="nf">_op_or</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span></div>
 
+
 <span class="c1">################################################################################</span>
 <span class="c1"># Left-Operator-Right Comparison Expressions</span>
 <span class="c1">################################################################################</span>
-<div class="viewcode-block" id="ComparisonExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ComparisonExpression">[docs]</a><span class="k">class</span> <span class="nc">ComparisonExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
+<div class="viewcode-block" id="ComparisonExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ComparisonExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">ComparisonExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class for representing comparison expressions from the grammar text such as equality checks.&quot;&quot;&quot;</span>
 	<span class="k">def</span> <span class="nf">_op_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">left_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
@@ -647,7 +717,10 @@
 			<span class="k">return</span> <span class="kc">True</span>
 		<span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ArithmeticComparisonExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ArithmeticComparisonExpression">[docs]</a><span class="k">class</span> <span class="nc">ArithmeticComparisonExpression</span><span class="p">(</span><span class="n">ComparisonExpression</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ArithmeticComparisonExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ArithmeticComparisonExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">ArithmeticComparisonExpression</span><span class="p">(</span><span class="n">ComparisonExpression</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class for representing arithmetic comparison expressions from the grammar text such as less-than-or-equal-to and</span>
 <span class="sd">	greater-than.</span>
@@ -686,7 +759,10 @@
 	<span class="n">_op_le</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">)</span>
 	<span class="n">_op_lt</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FuzzyComparisonExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FuzzyComparisonExpression">[docs]</a><span class="k">class</span> <span class="nc">FuzzyComparisonExpression</span><span class="p">(</span><span class="n">ComparisonExpression</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FuzzyComparisonExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FuzzyComparisonExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">FuzzyComparisonExpression</span><span class="p">(</span><span class="n">ComparisonExpression</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class for representing regular expression comparison expressions from the grammar text such as search and does not</span>
 <span class="sd">	match.</span>
@@ -728,10 +804,13 @@
 	<span class="n">_op_ne_fzm</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;match&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_</span><span class="p">)</span>
 	<span class="n">_op_ne_fzs</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_regex</span><span class="p">,</span> <span class="s1">&#39;search&#39;</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">is_</span><span class="p">)</span></div>
 
+
 <span class="c1">################################################################################</span>
 <span class="c1"># Miscellaneous Expressions</span>
 <span class="c1">################################################################################</span>
-<div class="viewcode-block" id="ComprehensionExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ComprehensionExpression">[docs]</a><span class="k">class</span> <span class="nc">ComprehensionExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+<div class="viewcode-block" id="ComprehensionExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ComprehensionExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">ComprehensionExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
@@ -778,7 +857,10 @@
 			<span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 			<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;condition&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ContainsExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ContainsExpression">[docs]</a><span class="k">class</span> <span class="nc">ContainsExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ContainsExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.ContainsExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">ContainsExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;An expression used to test whether an item exists within a container.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="s1">&#39;member&#39;</span><span class="p">)</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span>
@@ -819,7 +901,10 @@
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;container&#39;</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">member</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;member&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GetAttributeExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.GetAttributeExpression">[docs]</a><span class="k">class</span> <span class="nc">GetAttributeExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GetAttributeExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.GetAttributeExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">GetAttributeExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class representing an expression in which *name* is retrieved as an attribute of *object*.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;safe&#39;</span><span class="p">)</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -891,7 +976,10 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="p">)))</span></div>
 
-<div class="viewcode-block" id="GetItemExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.GetItemExpression">[docs]</a><span class="k">class</span> <span class="nc">GetItemExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GetItemExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.GetItemExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">GetItemExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class representing an expression in which an *item* is retrieved from a container *object*.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="s1">&#39;safe&#39;</span><span class="p">)</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -970,7 +1058,10 @@
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;container&#39;</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;item&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GetSliceExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.GetSliceExpression">[docs]</a><span class="k">class</span> <span class="nc">GetSliceExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="GetSliceExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.GetSliceExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">GetSliceExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class representing an expression in which a range of items is retrieved from a container *object*.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="s1">&#39;safe&#39;</span><span class="p">)</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1045,7 +1136,10 @@
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;start&#39;</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;stop&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SymbolExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.SymbolExpression">[docs]</a><span class="k">class</span> <span class="nc">SymbolExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SymbolExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.SymbolExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">SymbolExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class representing a symbol name to be resolved at evaluation time with the help of a</span>
 <span class="sd">	:py:class:`~rule_engine.engine.Context` object.</span>
@@ -1107,6 +1201,7 @@
 
 	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">name=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
+
 
 <span class="k">class</span> <span class="nc">FunctionCallExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;arguments&#39;</span><span class="p">,)</span>
@@ -1180,7 +1275,9 @@
 			<span class="n">argument</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 			<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">argument</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;argument #</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Statement"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Statement">[docs]</a><span class="k">class</span> <span class="nc">Statement</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
+<div class="viewcode-block" id="Statement">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.Statement">[docs]</a>
+<span class="k">class</span> <span class="nc">Statement</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class representing the top level statement of the grammar text.&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;expression&#39;</span><span class="p">,</span> <span class="s1">&#39;comment&#39;</span><span class="p">)</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1208,7 +1305,10 @@
 		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TernaryExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.TernaryExpression">[docs]</a><span class="k">class</span> <span class="nc">TernaryExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TernaryExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.TernaryExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">TernaryExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class for representing ternary expressions from the grammar text. These involve evaluating :py:attr:`.condition`</span>
 <span class="sd">	before evaluating either :py:attr:`.case_true` or :py:attr:`.case_false` based on the results.</span>
@@ -1255,7 +1355,10 @@
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">case_true</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;true case&#39;</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">case_false</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;false case&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="UnaryExpression"><a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.UnaryExpression">[docs]</a><span class="k">class</span> <span class="nc">UnaryExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UnaryExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.UnaryExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">UnaryExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class for representing unary expressions from the grammar text. These involve a single operator on the left side.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -1319,6 +1422,7 @@
 		<span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">type=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">)))</span></div>
+
 </pre></div>
 
            </div>

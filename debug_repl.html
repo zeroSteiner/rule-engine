@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Debug REPL &mdash; Rule Engine 4.1.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e6a937a4"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -87,34 +89,34 @@
            <div itemprop="articleBody">
              
   <section id="debug-repl">
-<span id="id1"></span><h1>Debug REPL<a class="headerlink" href="#debug-repl" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Debug REPL<a class="headerlink" href="#debug-repl" title="Link to this heading"></a></h1>
 <p>Since version <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.4.0">v2.4.0</a>, the Rule Engine package includes a module which provides a Read Eval Print Loop (REPL)
 for debugging and testing purposes. This module can be executed using <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">rule_engine.debug_repl</span></code>. Once
 started, the REPL loop can be used to evaluate rule expressions and view the results.</p>
 <section id="cli-arguments">
-<h2>CLI Arguments<a class="headerlink" href="#cli-arguments" title="Permalink to this heading"></a></h2>
+<h2>CLI Arguments<a class="headerlink" href="#cli-arguments" title="Link to this heading"></a></h2>
 <p>The module when executed from the command line has the following options available.</p>
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-debug_repl-edit-console">
-<span id="cmdoption-debug-repl-edit-console"></span><span class="sig-name descname"><span class="pre">--edit-console</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-debug_repl-edit-console" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">--edit-console</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-debug_repl-edit-console" title="Link to this definition"></a></dt>
 <dd><p>Start an interactive Python console that allows the user to setup the environment for the rule evaluation.</p>
 </dd></dl>
 
 <dl class="std option">
 <dt class="sig sig-object std" id="cmdoption-debug_repl-edit-file">
-<span id="cmdoption-debug-repl-edit-file"></span><span class="sig-name descname"><span class="pre">--edit-file</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;path&gt;</span></span><a class="headerlink" href="#cmdoption-debug_repl-edit-file" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">--edit-file</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;path&gt;</span></span><a class="headerlink" href="#cmdoption-debug_repl-edit-file" title="Link to this definition"></a></dt>
 <dd><p>Run the specified file containing Python source code, allowing it to setup the environment for the rule evaluation.</p>
 </dd></dl>
 
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
 <p>When configured through either the <code class="docutils literal notranslate"><span class="pre">--edit-console</span></code> or <code class="docutils literal notranslate"><span class="pre">--edit-file</span></code> options, the <code class="docutils literal notranslate"><span class="pre">context</span></code> symbol may be
 customized using a user-defined <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance. Additionally, the object to evaluate
 can be configured through the <code class="docutils literal notranslate"><span class="pre">thing</span></code> symbol.</p>
 </section>
 <section id="example-usage">
-<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this heading"></a></h2>
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading"></a></h2>
 <p>The following example demonstrates using the Debug REPL with a <em>thing</em> (in this case a comic book) defined through the
 interactive console.</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>python -m rule_engine.debug_repl --edit-console

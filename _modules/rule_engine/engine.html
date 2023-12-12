@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rule_engine.engine &mdash; Rule Engine 4.1.1 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e6a937a4"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -133,7 +135,9 @@
 	<span class="c1"># a function stub to be used with functools.partial for retrieving thread-local values</span>
 	<span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">thread_local</span><span class="o">.</span><span class="n">storage</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
-<div class="viewcode-block" id="resolve_attribute"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_attribute">[docs]</a><span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="resolve_attribute">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_attribute">[docs]</a>
+<span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A replacement resolver function for looking up symbols as members of *thing*. This is effectively the same as</span>
 <span class="sd">	``thing.name``. The *thing* object can be a :py:func:`~collections.namedtuple`, a custom Python class or any other</span>
@@ -151,7 +155,10 @@
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="n">suggest_symbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">dir</span><span class="p">(</span><span class="n">thing</span><span class="p">)))</span>
 	<span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="resolve_item"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_item">[docs]</a><span class="k">def</span> <span class="nf">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+
+<div class="viewcode-block" id="resolve_item">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.resolve_item">[docs]</a>
+<span class="k">def</span> <span class="nf">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A resolver function for looking up symbols as items from an object (*thing*) which supports the</span>
 <span class="sd">	:py:class:`~collections.abc.Mapping` interface, such as a dictionary. This is effectively the same as</span>
@@ -167,6 +174,7 @@
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="n">suggest_symbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
 	<span class="k">return</span> <span class="n">thing</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
 
+
 <span class="k">def</span> <span class="nf">_type_resolver</span><span class="p">(</span><span class="n">type_map</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 	<span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">type_map</span><span class="p">:</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="n">suggest_symbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">type_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
@@ -177,7 +185,9 @@
 		<span class="k">return</span> <span class="n">value</span>
 	<span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-<div class="viewcode-block" id="type_resolver_from_dict"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict">[docs]</a><span class="k">def</span> <span class="nf">type_resolver_from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
+<div class="viewcode-block" id="type_resolver_from_dict">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">type_resolver_from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a dictionary. If</span>
 <span class="sd">	any of the values within the dictionary are not of a compatible data type, a :py:exc:`TypeError` will be raised.</span>
@@ -191,6 +201,7 @@
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">if</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">is_definition</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">else</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 	<span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">type_map</span><span class="p">)</span></div>
+
 
 <span class="n">_AttributeResolverFunction</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;_AttributeResolverFunction&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;result_type&#39;</span><span class="p">))</span>
 <span class="k">class</span> <span class="nc">_AttributeResolver</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -397,12 +408,16 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">regex_groups</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Context"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context">[docs]</a><span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Context">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context">[docs]</a>
+<span class="k">class</span> <span class="nc">Context</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	An object defining the context for a rule&#39;s evaluation. This can be used to change the behavior of certain aspects</span>
 <span class="sd">	of the rule such as how symbols are resolved and what regex flags should be used.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Context.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<div class="viewcode-block" id="Context.__init__">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
 			<span class="bp">self</span><span class="p">,</span>
 			<span class="o">*</span><span class="p">,</span>
 			<span class="n">regex_flags</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -475,7 +490,10 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span> <span class="ow">or</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">resolver</span> <span class="ow">or</span> <span class="n">resolve_item</span></div>
 
-<div class="viewcode-block" id="Context.assignments"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.assignments">[docs]</a>	<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+
+<div class="viewcode-block" id="Context.assignments">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.assignments">[docs]</a>
+	<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
 	<span class="k">def</span> <span class="nf">assignments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">assignments</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Add the specified assignments to a thread-specific scope. This is used when an assignment originates from an</span>
@@ -490,13 +508,16 @@
 		<span class="k">finally</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
 
+
 	<span class="nd">@property</span>
 	<span class="k">def</span> <span class="nf">_tls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="p">,</span> <span class="s1">&#39;storage&#39;</span><span class="p">):</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">_ThreadLocalStorage</span><span class="p">()</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="o">.</span><span class="n">storage</span>
 
-<div class="viewcode-block" id="Context.resolve"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve">[docs]</a>	<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Context.resolve">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve">[docs]</a>
+	<span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		The method to use for resolving symbols names to values. This function must return a compatible value for the</span>
 <span class="sd">		specified symbol name. When a *scope* is defined, this function handles the resolution itself, however when the</span>
@@ -521,8 +542,11 @@
 			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">)</span></div>
 
+
 	<span class="n">__resolve_attribute</span> <span class="o">=</span> <span class="n">_AttributeResolver</span><span class="p">()</span>
-<div class="viewcode-block" id="Context.resolve_attribute"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_attribute">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<div class="viewcode-block" id="Context.resolve_attribute">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_attribute">[docs]</a>
+	<span class="k">def</span> <span class="nf">resolve_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		The method to use for resolving attributes from values. This function must return a compatible value for the</span>
 <span class="sd">		specified attribute name.</span>
@@ -536,9 +560,12 @@
 <span class="sd">		:return: The value for the corresponding attribute *name*.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
 	<span class="n">resolve_attribute_type</span> <span class="o">=</span> <span class="n">__resolve_attribute</span><span class="o">.</span><span class="n">resolve_type</span>
 
-<div class="viewcode-block" id="Context.resolve_type"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Context.resolve_type">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>
+	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		A method for providing type hints while the rule is being generated. This can be used to ensure that all symbol</span>
 <span class="sd">		names are valid and that the types are appropriate for the operations being performed. It must then return one</span>
@@ -554,9 +581,13 @@
 		<span class="k">for</span> <span class="n">assignments</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="p">:</span>
 			<span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">assignments</span><span class="p">:</span>
 				<span class="k">return</span> <span class="n">assignments</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">value_type</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div></div>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+</div>
 
-<div class="viewcode-block" id="Rule"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule">[docs]</a><span class="k">class</span> <span class="nc">Rule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Rule">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule">[docs]</a>
+<span class="k">class</span> <span class="nc">Rule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A rule which parses a string with a logical expression and can then evaluate an arbitrary object for whether or not</span>
 <span class="sd">	it matches based on the constraints of the expression.</span>
@@ -566,7 +597,9 @@
 <span class="sd">	The :py:class:`~rule_engine.parser.Parser` instance that will be used for parsing the rule text into a compatible</span>
 <span class="sd">	abstract syntax tree (AST) for evaluation.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="Rule.__init__"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.__init__">[docs]</a>	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Rule.__init__">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.__init__">[docs]</a>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param str text: The text of the logical expression.</span>
 <span class="sd">		:param context: The context to use for evaluating the expression on arbitrary objects. This can be used to</span>
@@ -579,13 +612,16 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">statement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
 
+
 	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> text=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span>
 
-<div class="viewcode-block" id="Rule.filter"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.filter">[docs]</a>	<span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">things</span><span class="p">):</span>
+<div class="viewcode-block" id="Rule.filter">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.filter">[docs]</a>
+	<span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">things</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		A convenience function for iterating over *things* and yielding each member that :py:meth:`.matches` return True</span>
 <span class="sd">		for.</span>
@@ -594,7 +630,10 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">yield from</span> <span class="p">(</span><span class="n">thing</span> <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="n">things</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Rule.is_valid"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.is_valid">[docs]</a>	<span class="nd">@classmethod</span>
+
+<div class="viewcode-block" id="Rule.is_valid">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.is_valid">[docs]</a>
+	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Test whether or not the rule is syntactically correct. This verifies the grammar is well structured and that</span>
@@ -613,7 +652,10 @@
 			<span class="k">return</span> <span class="kc">False</span>
 		<span class="k">return</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Rule.evaluate"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.evaluate">[docs]</a>	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Rule.evaluate">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.evaluate">[docs]</a>
+	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Evaluate the rule against the specified *thing* and return the value. This can be used to, for example, apply</span>
 <span class="sd">		the symbol resolver.</span>
@@ -626,7 +668,10 @@
 		<span class="k">with</span> <span class="n">decimal</span><span class="o">.</span><span class="n">localcontext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">decimal_context</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Rule.matches"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.matches">[docs]</a>	<span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Rule.matches">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.matches">[docs]</a>
+	<span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Evaluate the rule against the specified *thing*. This will either return whether *thing* matches, or an</span>
 <span class="sd">		exception will be raised.</span>
@@ -637,7 +682,10 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Rule.to_graphviz"><a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz">[docs]</a>	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Rule.to_graphviz">
+<a class="viewcode-back" href="../../rule_engine/engine.html#rule_engine.engine.Rule.to_graphviz">[docs]</a>
+	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Generate a diagram of the parsed rule&#39;s AST using GraphViz.</span>
 
@@ -647,7 +695,9 @@
 		<span class="kn">import</span> <span class="nn">graphviz</span>
 		<span class="n">digraph</span> <span class="o">=</span> <span class="n">graphviz</span><span class="o">.</span><span class="n">Digraph</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">statement</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">)</span>
-		<span class="k">return</span> <span class="n">digraph</span></div></div>
+		<span class="k">return</span> <span class="n">digraph</span></div>
+</div>
+
 
 <span class="k">class</span> <span class="nc">DebugRule</span><span class="p">(</span><span class="n">Rule</span><span class="p">):</span>
 	<span class="n">parser</span> <span class="o">=</span> <span class="kc">None</span>

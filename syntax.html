@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rule Syntax &mdash; Rule Engine 4.1.1 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e6a937a4"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -109,7 +111,7 @@
            <div itemprop="articleBody">
              
   <section id="rule-syntax">
-<h1>Rule Syntax<a class="headerlink" href="#rule-syntax" title="Permalink to this heading"></a></h1>
+<h1>Rule Syntax<a class="headerlink" href="#rule-syntax" title="Link to this heading"></a></h1>
 <p>The syntax for creating rules is based off of logical expressions evaluating to either True (matching) or False (non-
 matching). Rules support a small set of data types which can be defined as literals or resolved using the Python object
 on which the rule is being applied. See the <a class="reference internal" href="types.html#id1"><span class="std std-ref">Data Types</span></a> table for a comprehensive list of the
@@ -117,11 +119,11 @@ supported types.</p>
 <p>Not all supported operations work with all data types as noted in the table below. Rules follow a standard <a class="reference external" href="https://en.wikipedia.org/wiki/Order_of_operations#Programming_languages">order of
 operations</a>.</p>
 <section id="grammar">
-<h2>Grammar<a class="headerlink" href="#grammar" title="Permalink to this heading"></a></h2>
+<h2>Grammar<a class="headerlink" href="#grammar" title="Link to this heading"></a></h2>
 <p>The expression grammar supports a number of operations including basic arithmetic for numerical data and regular
 expressions for strings. Operations are type aware and will raise an exception when an incompatible type is used.</p>
 <section id="supported-operations">
-<span id="data-type-operations"></span><h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Permalink to this heading"></a></h3>
+<span id="data-type-operations"></span><h3>Supported Operations<a class="headerlink" href="#supported-operations" title="Link to this heading"></a></h3>
 <p>The following table outlines all operators that can be used in Rule Engine expressions.</p>
 <table class="docutils align-default">
 <tbody>
@@ -298,7 +300,7 @@ based sequence comparison <a class="reference external" href="https://docs.pytho
 <p><sup>3</sup> When using regular expression operations, the expression on the left is the string to compare and the
 expression on the right is the regular expression to use for either the match or search operation.</p>
 <section id="accessor-operators">
-<h4>Accessor Operators<a class="headerlink" href="#accessor-operators" title="Permalink to this heading"></a></h4>
+<h4>Accessor Operators<a class="headerlink" href="#accessor-operators" title="Link to this heading"></a></h4>
 <p>Some data types support accessor operators to obtain sub-values and attributes. One example is the
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> which supports both attribute and item lookup operations. For example, “length” is a valid
 attribute and can be accessed by appending <code class="docutils literal notranslate"><span class="pre">.length</span></code> to either a string literal or symbol. Alternatively, a specific
@@ -310,13 +312,13 @@ the bit-wise and operator which leverages the same symbol). The safe operator ve
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a> instead of raising an exception when the container value on which the operation is applied is
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>. Additionally, the safe version of item lookup operations will evaluate to
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a> instead of raising a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.LookupError" title="rule_engine.errors.LookupError"><code class="xref py py-class docutils literal notranslate"><span class="pre">LookupError</span></code></a> exception when the item is
-not held within the container. This is analogous the Python’s <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict.get" title="(in Python v3.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.get()</span></code></a> method.</p>
+not held within the container. This is analogous the Python’s <a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict.get" title="(in Python v3.12)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.get()</span></code></a> method.</p>
 <p>The item lookup operation can also evaluate to an array when a stop boundary is provided. For example to reference the
 first four elements of a string by appending <code class="docutils literal notranslate"><span class="pre">[0:4]</span></code> to the end of the value. Alternatively, only the ending index
 may be specified using <code class="docutils literal notranslate"><span class="pre">[:4]</span></code>. Finally, just as in Python, negative values can be used to reference the last elements.</p>
 </section>
 <section id="array-comprehension">
-<h4>Array Comprehension<a class="headerlink" href="#array-comprehension" title="Permalink to this heading"></a></h4>
+<h4>Array Comprehension<a class="headerlink" href="#array-comprehension" title="Link to this heading"></a></h4>
 <p>An operation may be able to be applied to each member of an iterable value to generate a new <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>
 composed of the resulting expressions. This could for example be used to determine how many values within an array
 match an arbitrary condition. The syntax is very similar to the list comprehension within Python and is composed of
@@ -335,7 +337,7 @@ assignment may not contain more than one value. There is currently no support fo
 does, (e.g. <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">v</span> <span class="pre">for</span> <span class="pre">k,v</span> <span class="pre">in</span> <span class="pre">my_dict.items()</span> <span class="pre">if</span> <span class="pre">test(k)</span> <span class="pre">]</span></code>.</p>
 </section>
 <section id="ternary-operators">
-<h4>Ternary Operators<a class="headerlink" href="#ternary-operators" title="Permalink to this heading"></a></h4>
+<h4>Ternary Operators<a class="headerlink" href="#ternary-operators" title="Link to this heading"></a></h4>
 <p>The ternary operator can be used in place of a traditional “if-then-else” statement. Like other languages the question
 mark and colon are used as the expression delimiters. A ternary expression is a combination of a condition followed by
 an expression used when the condition is true and ending with an expression used when the condition is false.</p>
@@ -343,7 +345,7 @@ an expression used when the condition is true and ending with an expression used
 </section>
 </section>
 <section id="function-calls">
-<h3>Function Calls<a class="headerlink" href="#function-calls" title="Permalink to this heading"></a></h3>
+<h3>Function Calls<a class="headerlink" href="#function-calls" title="Link to this heading"></a></h3>
 <p>Function calls can be preformed on function symbols by placing parenthesis after them. The parenthesis contain zero or
 more argument expressions to pass to the function. Functions support optional positional arguments. For example, a
 function can take two arguments and one or both can specify a default value and then be omitted when called. Functions
@@ -368,7 +370,7 @@ $split(&quot;Star Wars&quot;, &#39; &#39;, 1) # =&gt; (&quot;Star&quot;, &quot;W
 </div>
 </section>
 <section id="reserved-keywords">
-<h3>Reserved Keywords<a class="headerlink" href="#reserved-keywords" title="Permalink to this heading"></a></h3>
+<h3>Reserved Keywords<a class="headerlink" href="#reserved-keywords" title="Link to this heading"></a></h3>
 <p>The following keywords are reserved and can not be used as the names of symbols.</p>
 <table class="docutils align-default">
 <tbody>
@@ -433,14 +435,14 @@ $split(&quot;Star Wars&quot;, &#39; &#39;, 1) # =&gt; (&quot;Star&quot;, &quot;W
 </table>
 </section>
 <section id="literal-values">
-<span id="id1"></span><h3>Literal Values<a class="headerlink" href="#literal-values" title="Permalink to this heading"></a></h3>
+<span id="id1"></span><h3>Literal Values<a class="headerlink" href="#literal-values" title="Link to this heading"></a></h3>
 <p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>, <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>, and <code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code> literal values are specified in a
 very similar manner by defining the value as a string of characters enclosed in either single or double quotes. The
 difference comes in an optional leading character before the opening quote. Either no leading character or a single
 <code class="docutils literal notranslate"><span class="pre">s</span></code> will specify a standard <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> value, while a single <code class="docutils literal notranslate"><span class="pre">d</span></code> will specify a
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> value, and a single <code class="docutils literal notranslate"><span class="pre">t</span></code> will specify a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> value.</p>
 <section id="literal-datetime-values">
-<span id="id2"></span><h4>Literal DATETIME Values<a class="headerlink" href="#literal-datetime-values" title="Permalink to this heading"></a></h4>
+<span id="id2"></span><h4>Literal DATETIME Values<a class="headerlink" href="#literal-datetime-values" title="Link to this heading"></a></h4>
 <p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> literals must be specified in ISO-8601 format. The underlying parsing logic is provided
 by <a class="reference external" href="https://dateutil.readthedocs.io/en/stable/parser.html#dateutil.parser.isoparse" title="(in dateutil v2.8.2)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dateutil.parser.isoparse()</span></code></a>. <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> values with no time specified (e.g.
 <code class="docutils literal notranslate"><span class="pre">d&quot;2019-09-23&quot;</span></code>) will evaluate to a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> of the specified day at exactly midnight.</p>
@@ -451,7 +453,7 @@ by <a class="reference external" href="https://dateutil.readthedocs.io/en/stable
 </ul>
 </section>
 <section id="literal-float-values">
-<span id="id3"></span><h4>Literal FLOAT Values<a class="headerlink" href="#literal-float-values" title="Permalink to this heading"></a></h4>
+<span id="id3"></span><h4>Literal FLOAT Values<a class="headerlink" href="#literal-float-values" title="Link to this heading"></a></h4>
 <p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a> literals may be expressed in either binary, octal, decimal, or hexadecimal formats. The
 binary, octal and hexadecimal formats use the <code class="docutils literal notranslate"><span class="pre">0b</span></code>, <code class="docutils literal notranslate"><span class="pre">0o</span></code>, and <code class="docutils literal notranslate"><span class="pre">0x</span></code> prefixes respectively. Values in the decimal
 format require no prefix and is the default base in which values are represented. Only base-10, decimal values may
@@ -472,7 +474,7 @@ include a decimal place component.</p>
 </ul>
 </section>
 <section id="literal-timedelta-values">
-<span id="id4"></span><h4>Literal TIMEDELTA Values<a class="headerlink" href="#literal-timedelta-values" title="Permalink to this heading"></a></h4>
+<span id="id4"></span><h4>Literal TIMEDELTA Values<a class="headerlink" href="#literal-timedelta-values" title="Link to this heading"></a></h4>
 <p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> literals must be specified in a subset of the ISO-8601 format for durations. Everything
 except years and months are supported in <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> values, to match the underlying representation
 provided by the Python standard library.</p>
@@ -484,19 +486,19 @@ provided by the Python standard library.</p>
 </section>
 </section>
 <section id="comments">
-<h3>Comments<a class="headerlink" href="#comments" title="Permalink to this heading"></a></h3>
+<h3>Comments<a class="headerlink" href="#comments" title="Link to this heading"></a></h3>
 <p>A single <code class="docutils literal notranslate"><span class="pre">#</span></code> symbol can be used to create a comment in the rule text. The everything after the first <code class="docutils literal notranslate"><span class="pre">#</span></code> occurrence
 will be ignored.</p>
 <p>Example rule containing a comment: <code class="docutils literal notranslate"><span class="pre">size</span> <span class="pre">==</span> <span class="pre">1</span> <span class="pre">#</span> <span class="pre">this</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">comment</span></code></p>
 </section>
 </section>
 <section id="builtin-symbols">
-<span id="id5"></span><h2>Builtin Symbols<a class="headerlink" href="#builtin-symbols" title="Permalink to this heading"></a></h2>
+<span id="id5"></span><h2>Builtin Symbols<a class="headerlink" href="#builtin-symbols" title="Link to this heading"></a></h2>
 <p>The following symbols are provided by default using the <a class="reference internal" href="rule_engine/builtins.html#rule_engine.builtins.Builtins.from_defaults" title="rule_engine.builtins.Builtins.from_defaults"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_defaults()</span></code></a> method. These
 symbols can be accessed through the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix, e.g. <code class="docutils literal notranslate"><span class="pre">$pi</span></code>. The default values can be overridden by defining a
 custom subclass of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> and setting the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.builtins" title="rule_engine.engine.Context.builtins"><code class="xref py py-attr docutils literal notranslate"><span class="pre">builtins</span></code></a> attribute.</p>
 <section id="functions">
-<span id="builtin-functions"></span><h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading"></a></h3>
+<span id="builtin-functions"></span><h3>Functions<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">FLOAT</span> <span class="pre">abs(FLOAT</span> <span class="pre">value)</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">returns<span class="colon">:</span></dt>
@@ -660,14 +662,14 @@ $split(&quot;A    B&quot;, &#39; &#39;) # =&gt; (&#39;A&#39;, &#39;&#39;, &#39;&
 <em>string</em>. This will guarantee that the resulting array length is less than or equal to <em>maxsplit</em> + 1.</p>
 </section>
 <section id="math-related">
-<h3>Math Related<a class="headerlink" href="#math-related" title="Permalink to this heading"></a></h3>
+<h3>Math Related<a class="headerlink" href="#math-related" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">e</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) – The mathematical constant <em>e</em> (2.71828…).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pi</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>) – The mathematical constant <em>pi</em> (3.14159…).</p></li>
 </ul>
 </section>
 <section id="regular-expression-related">
-<h3>Regular Expression Related<a class="headerlink" href="#regular-expression-related" title="Permalink to this heading"></a></h3>
+<h3>Regular Expression Related<a class="headerlink" href="#regular-expression-related" title="Link to this heading"></a></h3>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">re_groups</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>) – An array of strings from the last regular expression match as
 defined by the regular expression itself. See documentation on <a class="reference external" href="https://docs.python.org/3/howto/regex.html#grouping">grouping</a> for more information. If no match has taken
@@ -682,7 +684,7 @@ be unavailable if the default builtins are replaced.</p>
 </ul>
 </section>
 <section id="timestamp-related">
-<h3>Timestamp Related<a class="headerlink" href="#timestamp-related" title="Permalink to this heading"></a></h3>
+<h3>Timestamp Related<a class="headerlink" href="#timestamp-related" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">now</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a>) – The current timestamp (including time) using the default timezone
 from <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context.default_timezone" title="rule_engine.engine.Context.default_timezone"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_timezone</span></code></a>.</p></li>

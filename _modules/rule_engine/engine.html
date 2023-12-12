@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.engine &mdash; Rule Engine 4.1.1 documentation</title>
+  <title>rule_engine.engine &mdash; Rule Engine 4.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=e6a937a4"></script>
+        <script src="../../_static/documentation_options.js?v=d0ae6d56"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -35,7 +35,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.1.1
+                4.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -128,6 +128,7 @@
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">parser</span>
 <span class="kn">from</span> <span class="nn">.suggestions</span> <span class="kn">import</span> <span class="n">suggest_symbol</span>
+<span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="n">DataType</span>
 
 <span class="kn">import</span> <span class="nn">dateutil.tz</span>
 
@@ -203,19 +204,48 @@
 	<span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">type_map</span><span class="p">)</span></div>
 
 
-<span class="n">_AttributeResolverFunction</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;_AttributeResolverFunction&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;result_type&#39;</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">_value_to_ary_result_type</span><span class="p">(</span><span class="n">object_type</span><span class="p">):</span>
+	<span class="k">return</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">object_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_value_to_set_result_type</span><span class="p">(</span><span class="n">object_type</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">object_type</span> <span class="o">==</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+		<span class="k">return</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">(</span><span class="n">object_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">_AttributeResolverFunction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;type_resolver&#39;</span><span class="p">)</span>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">result_type</span><span class="p">,</span> <span class="n">type_resolver</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
+		<span class="k">if</span> <span class="n">result_type</span> <span class="ow">and</span> <span class="n">result_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_definition</span><span class="p">(</span><span class="n">result_type</span><span class="p">):</span>
+				<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;result_type must be a DataType definition&#39;</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">type_resolver</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;both result_type and type_resolver can not be specified&#39;</span><span class="p">)</span>
+			<span class="n">type_resolver</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">result_type</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="ow">not</span> <span class="n">type_resolver</span><span class="p">:</span>
+			<span class="n">type_resolver</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span>
+
+	<span class="nd">@staticmethod</span>
+	<span class="k">def</span> <span class="nf">_type_resolver</span><span class="p">(</span><span class="n">result_type</span><span class="p">,</span> <span class="n">_object_type</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">result_type</span>
+
+	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_resolver</span><span class="p">(</span><span class="n">object_type</span><span class="p">)</span>
+
 <span class="k">class</span> <span class="nc">_AttributeResolver</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="k">class</span> <span class="nc">attribute</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-		<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;types&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;result_type&#39;</span><span class="p">)</span>
+		<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;types&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;result_type&#39;</span><span class="p">,</span> <span class="s1">&#39;type_resolver&#39;</span><span class="p">)</span>
 		<span class="n">type_map</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
-		<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">data_types</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">):</span>
+		<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">data_types</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">):</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">types</span> <span class="o">=</span> <span class="n">data_types</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">result_type</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span>
 
 		<span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
 			<span class="k">for</span> <span class="n">type_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
-				<span class="bp">self</span><span class="o">.</span><span class="n">type_map</span><span class="p">[</span><span class="n">type_</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_AttributeResolverFunction</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">type_map</span><span class="p">[</span><span class="n">type_</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_AttributeResolverFunction</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type_resolver</span><span class="p">)</span>
 			<span class="k">return</span> <span class="n">function</span>
 
 	<span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -227,12 +257,11 @@
 		<span class="n">resolver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_resolver</span><span class="p">(</span><span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">)</span>
 		<span class="n">value</span> <span class="o">=</span> <span class="n">resolver</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_</span><span class="p">)</span>
 		<span class="n">value</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-		<span class="k">if</span> <span class="n">resolver</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
-			<span class="k">return</span> <span class="n">value</span>
 		<span class="n">value_type</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-		<span class="k">if</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">resolver</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">value_type</span><span class="p">):</span>
+		<span class="n">expected_value_type</span> <span class="o">=</span> <span class="n">resolver</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">value_type</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">expected_value_type</span><span class="p">,</span> <span class="n">value_type</span><span class="p">):</span>
 			<span class="k">return</span> <span class="n">value</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">AttributeTypeError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="n">resolver</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">AttributeTypeError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="n">expected_value_type</span><span class="p">)</span>
 
 	<span class="k">def</span> <span class="nf">_get_resolver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">):</span>
 		<span class="k">for</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">attribute_resolvers</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute</span><span class="o">.</span><span class="n">type_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -253,7 +282,7 @@
 <span class="sd">		:param str name: The name of the attribute to retrieve the data type of.</span>
 <span class="sd">		:return: The data type of the specified attribute.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_resolver</span><span class="p">(</span><span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">result_type</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_resolver</span><span class="p">(</span><span class="n">object_type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">object_type</span><span class="p">)</span>
 
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_epoch&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">datetime_to_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -328,17 +357,15 @@
 	<span class="k">def</span> <span class="nf">float_floor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="n">_float_op</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">)</span>
 
-	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_str&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
-	<span class="k">def</span> <span class="nf">float_to_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-		<span class="c1"># keep the string representations consistent for nan, inf, -inf</span>
-		<span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_nan</span><span class="p">():</span>
-			<span class="k">return</span> <span class="s1">&#39;nan&#39;</span>
-		<span class="k">elif</span> <span class="n">value</span><span class="o">.</span><span class="n">is_infinite</span><span class="p">():</span>
-			<span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_signed</span><span class="p">():</span>
-				<span class="k">return</span> <span class="s1">&#39;-inf&#39;</span>
-			<span class="k">else</span><span class="p">:</span>
-				<span class="k">return</span> <span class="s1">&#39;inf&#39;</span>
-		<span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_flt&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">float_to_flt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="n">value</span>
+
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_int&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">float_to_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">ast</span><span class="o">.</span><span class="n">is_integer_number</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not an integer number)&#39;</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">value</span>
 
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;keys&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">mapping_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -347,10 +374,6 @@
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">mapping_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-
-	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_ary&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">)</span>
-	<span class="k">def</span> <span class="nf">set_to_ary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-		<span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;as_lower&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">string_as_lower</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -389,7 +412,25 @@
 	<span class="k">def</span> <span class="nf">value_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_set&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">)</span>
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_ary&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="n">_value_to_ary_result_type</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">value_to_ary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_str&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">result_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
+	<span class="k">def</span> <span class="nf">value_to_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+			<span class="k">return</span> <span class="n">value</span>
+		<span class="c1"># keep the string representations consistent for nan, inf, -inf</span>
+		<span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_nan</span><span class="p">():</span>
+			<span class="k">return</span> <span class="s1">&#39;nan&#39;</span>
+		<span class="k">elif</span> <span class="n">value</span><span class="o">.</span><span class="n">is_infinite</span><span class="p">():</span>
+			<span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">is_signed</span><span class="p">():</span>
+				<span class="k">return</span> <span class="s1">&#39;-inf&#39;</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">return</span> <span class="s1">&#39;inf&#39;</span>
+		<span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+	<span class="nd">@attribute</span><span class="p">(</span><span class="s1">&#39;to_set&#39;</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">type_resolver</span><span class="o">=</span><span class="n">_value_to_set_result_type</span><span class="p">)</span>
 	<span class="k">def</span> <span class="nf">value_to_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 

@@ -468,7 +468,7 @@ will be added in addition to the default builtin symbols.</p>
         <span class="c1"># call the parent class&#39;s __init__ method first to set the</span>
         <span class="c1"># default_timezone attribute</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CustomBuiltinsContext</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">builtins</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span>
             <span class="c1"># expose the $version symbol</span>
             <span class="p">{</span><span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">__version__</span><span class="p">},</span>
             <span class="c1"># use the specified default timezone</span>

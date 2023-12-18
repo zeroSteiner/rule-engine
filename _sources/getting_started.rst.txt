@@ -355,7 +355,7 @@ will be added in addition to the default builtin symbols.
            # call the parent class's __init__ method first to set the
            # default_timezone attribute
            super(CustomBuiltinsContext, self).__init__(*args, **kwargs)
-           self.builtins = rule_engine.engine.Builtins.from_defaults(
+           self.builtins = rule_engine.builtins.Builtins.from_defaults(
                # expose the $version symbol
                {'version': rule_engine.__version__},
                # use the specified default timezone

@@ -51,21 +51,13 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-------------------+-------------------------------------+
 | ``zone_name``     | :py:attr:`~.DataType.STRING`        |
 +-------------------+-------------------------------------+
-| :py:attr:`~.DataType.TIMEDELTA` **Attributes**          |
-+-------------------+-------------------------------------+
-| ``days``          | :py:attr:`~.DataType.FLOAT`         |
-+-------------------+-------------------------------------+
-| ``seconds``       | :py:attr:`~.DataType.FLOAT`         |
-+-------------------+-------------------------------------+
-| ``microseconds``  | :py:attr:`~.DataType.FLOAT`         |
-+-------------------+-------------------------------------+
-| ``total_seconds`` | :py:attr:`~.DataType.FLOAT`         |
-+-------------------+-------------------------------------+
 | :py:attr:`~.DataType.FLOAT`   **Attributes** :sup:`1`   |
 +-------------------+-------------------------------------+
 | ``ceiling``       | :py:attr:`~.DataType.FLOAT`         |
 +-------------------+-------------------------------------+
 | ``floor``         | :py:attr:`~.DataType.FLOAT`         |
++-------------------+-------------------------------------+
+| ``is_nan``        | :py:attr:`~.DataType.BOOLEAN`       |
 +-------------------+-------------------------------------+
 | ``to_flt``        | :py:attr:`~.DataType.FLOAT`         |
 +-------------------+-------------------------------------+
@@ -110,6 +102,16 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 | ``is_empty``      | :py:attr:`~.DataType.BOOLEAN`       |
 +-------------------+-------------------------------------+
 | ``length``        | :py:attr:`~.DataType.FLOAT`         |
++-------------------+-------------------------------------+
+| :py:attr:`~.DataType.TIMEDELTA` **Attributes**          |
++-------------------+-------------------------------------+
+| ``days``          | :py:attr:`~.DataType.FLOAT`         |
++-------------------+-------------------------------------+
+| ``seconds``       | :py:attr:`~.DataType.FLOAT`         |
++-------------------+-------------------------------------+
+| ``microseconds``  | :py:attr:`~.DataType.FLOAT`         |
++-------------------+-------------------------------------+
+| ``total_seconds`` | :py:attr:`~.DataType.FLOAT`         |
 +-------------------+-------------------------------------+
 
 FLOAT Attributes :sup:`1`

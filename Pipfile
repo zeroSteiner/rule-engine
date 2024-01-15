@@ -13,6 +13,7 @@ sphinx-rtd-theme = "*"
 graphviz = "*"
 coverage = "*"
 ipython = "*"
+setuptools = "*"
 
 [scripts]
 tests = 'sh -c "PYTHONPATH=$(pwd)/lib python -m unittest -v tests"'

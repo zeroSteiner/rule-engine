@@ -144,6 +144,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		attributes = {
 			'ceiling': decimal.Decimal('4'),
 			'floor': decimal.Decimal('3'),
+			'is_nan': False,
 			'to_flt': flt,
 			'to_str': '3.14159'
 		}

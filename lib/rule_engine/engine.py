@@ -241,22 +241,6 @@ class _AttributeResolver(object):
 	def datetime_zone_name(self, value):
 		return value.tzname()
 
-	@attribute('days', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
-	def timedelta_days(self, value):
-		return value.days
-
-	@attribute('seconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
-	def timedelta_seconds(self, value):
-		return value.seconds
-
-	@attribute('microseconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
-	def timedelta_microseconds(self, value):
-		return value.microseconds
-
-	@attribute('total_seconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
-	def timedelta_total_seconds(self, value):
-		return value.total_seconds()
-
 	@attribute('ceiling', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
 	def float_ceiling(self, value):
 		return _float_op(value, math.ceil)
@@ -264,6 +248,10 @@ class _AttributeResolver(object):
 	@attribute('floor', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
 	def float_floor(self, value):
 		return _float_op(value, math.floor)
+
+	@attribute('is_nan', ast.DataType.FLOAT, result_type=ast.DataType.BOOLEAN)
+	def float_is_nan(self, value):
+		return math.isnan(value)
 
 	@attribute('to_flt', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
 	def float_to_flt(self, value):
@@ -311,6 +299,22 @@ class _AttributeResolver(object):
 		if not ast.is_integer_number(value):
 			raise errors.EvaluationError('data type mismatch (not an integer number)')
 		return value
+
+	@attribute('days', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	def timedelta_days(self, value):
+		return value.days
+
+	@attribute('seconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	def timedelta_seconds(self, value):
+		return value.seconds
+
+	@attribute('microseconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	def timedelta_microseconds(self, value):
+		return value.microseconds
+
+	@attribute('total_seconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	def timedelta_total_seconds(self, value):
+		return value.total_seconds()
 
 	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.BOOLEAN)
 	def value_is_empty(self, value):

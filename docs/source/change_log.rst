@@ -7,6 +7,13 @@ this list is curated by the development team for note worthy changes.
 Version 4.x.x
 -------------
 
+Version 4.3.0
+^^^^^^^^^^^^^
+
+Released :release:`4.3.0` on January 15th, 2024
+
+* Added the ``is_nan`` attribute for ``FLOAT`` values
+
 Version 4.2.0
 ^^^^^^^^^^^^^
 

@@ -192,6 +192,20 @@ class BuiltinsTests(unittest.TestCase):
 		with self.assertRaises(errors.FunctionCallError):
 			self.assertBuiltinFunction('random', 1, 1.5)
 
+	def test_engine_builtins_function_range(self):
+		self.assertBuiltinFunction('range', True, 1, 5, 3)
+		self.assertBuiltinFunction('range', False, 1, 5, 3)
+		self.assertBuiltinFunction('range', True, 1.0, 5.0, 1.0)
+		self.assertBuiltinFunction('range', True, 1.0, 5.0, 3.0)
+		self.assertBuiltinFunction('range', True, 5, 3)
+		self.assertBuiltinFunction('range', False, 5, -5)
+		self.assertBuiltinFunction('range', True, 5, -2, -1, 3)
+		self.assertBuiltinFunction('range', True, 5, -2, -1, -1)
+		self.assertBuiltinFunction('range', False, -5, 3)
+		self.assertBuiltinFunction('range', False, -5, -1)
+		with self.assertRaises(errors.FunctionCallError):
+			self.assertBuiltinFunction('range', 1, 3.5)
+
 	def test_engine_builtins_re_groups(self):
 		context = engine.Context()
 		rule = engine.Rule('words =~ "(\\w+) (\\w+) (\\w+)" and $re_groups[0] == word0', context=context)

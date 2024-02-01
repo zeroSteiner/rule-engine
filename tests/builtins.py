@@ -194,7 +194,7 @@ class BuiltinsTests(unittest.TestCase):
 
 	def test_engine_builtins_function_range(self):
 		self.assertBuiltinFunction('range', True, 1, 5, 3)
-		self.assertBuiltinFunction('range', False, 1, 5, 3)
+		self.assertBuiltinFunction('range', False, 1, 5, -5)
 		self.assertBuiltinFunction('range', True, 1.0, 5.0, 1.0)
 		self.assertBuiltinFunction('range', True, 1.0, 5.0, 3.0)
 		self.assertBuiltinFunction('range', True, 5, 3)

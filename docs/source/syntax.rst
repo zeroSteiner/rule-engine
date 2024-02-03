@@ -439,6 +439,13 @@ Generate a random number. If *boundary* is not specified, the random number  ret
 *boundary* is specified, it must be a natural number and the random number returned will be between 0 and *boundary*,
 including *boundary*.
 
+``ARRAY[FLOAT] range(FLOAT start, [FLOAT stop, FLOAT step])``
+
+:returns: :py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`
+:start: (:py:attr:`~.DataType.FLOAT`) The value of the start parameter.
+:stop: (Optional :py:attr:`~.DataType.FLOAT`) The value of the stop parameter. If not supplied, start value will be used as stop instead.
+:step: (Optional :py:attr:`~.DataType.FLOAT`) The value of the step parameter (or 1 if the parameter was not supplied)
+
 .. _builtin-function-split:
 
 ``ARRAY[STRING] split(STRING string, [STRING sep, FLOAT maxsplit])``

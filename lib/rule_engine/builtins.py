@@ -202,7 +202,7 @@ class Builtins(collections.abc.Mapping):
 			'parse_float': ast.DataType.FUNCTION('parse_float', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.STRING,)),
 			'parse_timedelta': ast.DataType.FUNCTION('parse_timedelta', return_type=ast.DataType.TIMEDELTA, argument_types=(ast.DataType.STRING,)),
 			'random': ast.DataType.FUNCTION('random', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.FLOAT,), minimum_arguments=0),
-			'range': ast.DataType.FUNCTION('range', return_type=ast.DataType.ARRAY, argument_types=(ast.DataType.FLOAT, ast.DataType.FLOAT, ast.DataType.FLOAT,), minimum_arguments=1),
+			'range': ast.DataType.FUNCTION('range', return_type=ast.DataType.ARRAY(ast.DataType.FLOAT), argument_types=(ast.DataType.FLOAT, ast.DataType.FLOAT, ast.DataType.FLOAT,), minimum_arguments=1),
 			'split': ast.DataType.FUNCTION(
 				'split',
 				return_type=ast.DataType.ARRAY(ast.DataType.STRING),

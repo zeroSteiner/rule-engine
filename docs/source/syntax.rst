@@ -369,12 +369,13 @@ Returns true if every member of the array argument is truthy. If *values* is emp
 
 Returns true if any member of the array argument is truthy. If *values* is empty, the function returns false.
 
-``FLOAT sum(ARRAY[FLOAT] values)``
+``ARRAY[??] filter(FUNCTION function, ARRAY[??] values)``
 
-:returns: :py:attr:`~.DataType.FLOAT`
-:values: (:py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`) An array of values to add.
+:returns: :py:attr:`~.DataType.ARRAY` of *anything*
+:function: (:py:attr:`~.DataType.FUNCTION`) The function to call on each of the values.
+:values: (:py:attr:`~.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
 
-Returns the sum of an array of values. If *values* is empty, the function returns 0.
+Returns an array containing a subset of members from *values* where *function* returns true.
 
 ``ARRAY[??] map(FUNCTION function, ARRAY[??] values)``
 
@@ -397,14 +398,6 @@ raised.
 
 Returns the smallest value from the array of values. If *values* is empty, a :py:exc:`~.errors.FunctionCallError` is
 raised.
-
-``ARRAY[??] filter(FUNCTION function, ARRAY[??] values)``
-
-:returns: :py:attr:`~.DataType.ARRAY` of *anything*
-:function: (:py:attr:`~.DataType.FUNCTION`) The function to call on each of the values.
-:values: (:py:attr:`~.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
-
-Returns an array containing a subset of members from *values* where *function* returns true.
 
 ``DATETIME parse_datetime(STRING value)``
 
@@ -443,8 +436,11 @@ including *boundary*.
 
 :returns: :py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`
 :start: (:py:attr:`~.DataType.FLOAT`) The value of the start parameter.
-:stop: (Optional :py:attr:`~.DataType.FLOAT`) The value of the stop parameter. If not supplied, start value will be used as stop instead.
-:step: (Optional :py:attr:`~.DataType.FLOAT`) The value of the step parameter (or 1 if the parameter was not supplied)
+:stop: (Optional :py:attr:`~.DataType.FLOAT`) The value of the stop parameter. If not supplied, start value will be used
+    as stop instead.
+:step: (Optional :py:attr:`~.DataType.FLOAT`) The value of the step parameter (or 1 if the parameter was not supplied).
+
+Generate a sequence of :py:attr:`~.DataType.FLOAT`'s between *start* (inclusive) and *stop* (exclusive) by *step*.
 
 .. _builtin-function-split:
 
@@ -469,6 +465,13 @@ For example:
 
 If *maxsplit* is specified, it must be a natural number and will be used as the maximum number of times to split
 *string*. This will guarantee that the resulting array length is less than or equal to *maxsplit* + 1.
+
+``FLOAT sum(ARRAY[FLOAT] values)``
+
+:returns: :py:attr:`~.DataType.FLOAT`
+:values: (:py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`) An array of values to add.
+
+Returns the sum of an array of values. If *values* is empty, the function returns 0.
 
 Math Related
 ^^^^^^^^^^^^

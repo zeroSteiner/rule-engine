@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.builtins &mdash; Rule Engine 4.3.2 documentation</title>
+  <title>rule_engine.builtins &mdash; Rule Engine 4.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=32fb297c"></script>
+        <script src="../../_static/documentation_options.js?v=2f20d6c1"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -35,7 +35,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.3.2
+                4.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -143,6 +143,19 @@
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;argument #1 (boundary) must be a natural number&#39;</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">boundary</span><span class="p">))</span>
 	<span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">_builtin_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">is_integer_number</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;argument #1 (start) must be an integer number&#39;</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">stop</span><span class="p">:</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">is_integer_number</span><span class="p">(</span><span class="n">stop</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;argument #2 (stop) must be an integer number&#39;</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">step</span><span class="p">:</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">is_integer_number</span><span class="p">(</span><span class="n">step</span><span class="p">):</span>
+				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;argument #3 (step) must be an integer number&#39;</span><span class="p">)</span>
+			<span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">stop</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">step</span><span class="p">)))</span>
+		<span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">stop</span><span class="p">)))</span>
+	<span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)))</span>
 
 <span class="k">def</span> <span class="nf">_builtins_split</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 	<span class="k">if</span> <span class="n">maxsplit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -258,6 +271,7 @@
 			<span class="s1">&#39;parse_float&#39;</span><span class="p">:</span> <span class="n">parse_float</span><span class="p">,</span>
 			<span class="s1">&#39;parse_timedelta&#39;</span><span class="p">:</span> <span class="n">parse_timedelta</span><span class="p">,</span>
 			<span class="s1">&#39;random&#39;</span><span class="p">:</span> <span class="n">_builtin_random</span><span class="p">,</span>
+			<span class="s1">&#39;range&#39;</span><span class="p">:</span> <span class="n">_builtin_range</span><span class="p">,</span>
 			<span class="s1">&#39;split&#39;</span><span class="p">:</span> <span class="n">_builtins_split</span>
 		<span class="p">}</span>
 		<span class="n">default_values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span> <span class="ow">or</span> <span class="p">{})</span>
@@ -281,6 +295,7 @@
 			<span class="s1">&#39;parse_float&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="p">(</span><span class="s1">&#39;parse_float&#39;</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">argument_types</span><span class="o">=</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,)),</span>
 			<span class="s1">&#39;parse_timedelta&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="p">(</span><span class="s1">&#39;parse_timedelta&#39;</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">,</span> <span class="n">argument_types</span><span class="o">=</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,)),</span>
 			<span class="s1">&#39;random&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="p">(</span><span class="s1">&#39;random&#39;</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">argument_types</span><span class="o">=</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,),</span> <span class="n">minimum_arguments</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+			<span class="s1">&#39;range&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="p">(</span><span class="s1">&#39;range&#39;</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">),</span> <span class="n">argument_types</span><span class="o">=</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,),</span> <span class="n">minimum_arguments</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
 			<span class="s1">&#39;split&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="p">(</span>
 				<span class="s1">&#39;split&#39;</span><span class="p">,</span>
 				<span class="n">return_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">),</span>

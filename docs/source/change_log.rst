@@ -7,6 +7,13 @@ this list is curated by the development team for note worthy changes.
 Version 4.x.x
 -------------
 
+Version 4.4.0
+^^^^^^^^^^^^^
+
+*In Progress*
+
+* Added the ``$range`` builtin function
+
 Version 4.3.0
 ^^^^^^^^^^^^^
 

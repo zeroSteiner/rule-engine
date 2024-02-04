@@ -61,6 +61,19 @@ def _builtin_random(boundary=None):
 		return random.randint(0, int(boundary))
 	return random.random()
 
+def _builtin_range(start, stop=None, step=None):
+	if not types.is_integer_number(start):
+		raise errors.FunctionCallError('argument #1 (start) must be an integer number')
+	if stop:
+		if not types.is_integer_number(stop):
+			raise errors.FunctionCallError('argument #2 (stop) must be an integer number')
+		if step:
+			if not types.is_integer_number(step):
+				raise errors.FunctionCallError('argument #3 (step) must be an integer number')
+			return list(range(int(start), int(stop), int(step)))
+		return list(range(int(start), int(stop)))
+	return list(range(int(start)))
+
 def _builtins_split(string, sep=None, maxsplit=None):
 	if maxsplit is None:
 		maxsplit = -1
@@ -165,6 +178,7 @@ class Builtins(collections.abc.Mapping):
 			'parse_float': parse_float,
 			'parse_timedelta': parse_timedelta,
 			'random': _builtin_random,
+			'range': _builtin_range,
 			'split': _builtins_split
 		}
 		default_values.update(values or {})
@@ -188,6 +202,7 @@ class Builtins(collections.abc.Mapping):
 			'parse_float': ast.DataType.FUNCTION('parse_float', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.STRING,)),
 			'parse_timedelta': ast.DataType.FUNCTION('parse_timedelta', return_type=ast.DataType.TIMEDELTA, argument_types=(ast.DataType.STRING,)),
 			'random': ast.DataType.FUNCTION('random', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.FLOAT,), minimum_arguments=0),
+			'range': ast.DataType.FUNCTION('range', return_type=ast.DataType.ARRAY(ast.DataType.FLOAT), argument_types=(ast.DataType.FLOAT, ast.DataType.FLOAT, ast.DataType.FLOAT,), minimum_arguments=1),
 			'split': ast.DataType.FUNCTION(
 				'split',
 				return_type=ast.DataType.ARRAY(ast.DataType.STRING),

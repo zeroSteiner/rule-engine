@@ -37,6 +37,8 @@ import functools
 import operator
 import re
 
+import pandas as pd
+
 from . import errors
 from ._utils import parse_datetime, parse_float, parse_timedelta
 from .suggestions import suggest_symbol
@@ -542,9 +544,17 @@ class BitwiseShiftExpression(BitwiseExpression):
 class LogicExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing logical expressions from the grammar text such as "and" and "or"."""
 	def _op_and(self, thing):
+		left = self.left.evaluate(thing)
+		right = self.right.evaluate(thing)
+		if isinstance(left, pd.Series) and isinstance(right, pd.Series):
+			return left & right
 		return bool(self.left.evaluate(thing) and self.right.evaluate(thing))
 
 	def _op_or(self, thing):
+		left = self.left.evaluate(thing)
+		right = self.right.evaluate(thing)
+		if isinstance(left, pd.Series) and isinstance(right, pd.Series):
+			return left | right
 		return bool(self.left.evaluate(thing) or self.right.evaluate(thing))
 
 ################################################################################
@@ -555,14 +565,15 @@ class ComparisonExpression(LeftOperatorRightExpressionBase):
 	def _op_eq(self, thing):
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
-		if type(left_value) is not type(right_value):
+		if type(left_value) is not type(right_value) and type(left_value) is not pd.Series:
 			return False
+
 		return operator.eq(left_value, right_value)
 
 	def _op_ne(self, thing):
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
-		if type(left_value) is not type(right_value):
+		if type(left_value) is not type(right_value) and type(left_value) is not pd.Series:
 			return True
 		return operator.ne(left_value, right_value)
 

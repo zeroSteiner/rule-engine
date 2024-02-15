@@ -40,6 +40,8 @@ import math
 import re
 import threading
 
+import pandas as pd
+
 from . import ast
 from . import builtins
 from . import errors
@@ -81,7 +83,7 @@ def resolve_item(thing, name):
 	:param str name: The symbol name that is being resolved.
 	:return: The value for the corresponding attribute *name*.
 	"""
-	if not isinstance(thing, collections.abc.Mapping):
+	if not isinstance(thing, collections.abc.Mapping) and not isinstance(thing, pd.DataFrame):
 		raise errors.SymbolResolutionError(name, thing=thing)
 	if name not in thing:
 		raise errors.SymbolResolutionError(name, thing=thing, suggestion=suggest_symbol(name, thing.keys()))

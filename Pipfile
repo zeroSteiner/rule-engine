@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 ply = ">=3.9"
 python-dateutil = "~=2.7"
+pandas = ">=2.1"
 
 [dev-packages]
 sphinx = "*"

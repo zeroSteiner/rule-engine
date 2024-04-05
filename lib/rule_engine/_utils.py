@@ -20,6 +20,13 @@ timedelta_regex = (
 )
 
 def parse_datetime(string, default_timezone):
+	"""
+	Parse a timestamp string. If the timestamp does not specify a timezone, *default_timezone* is used.
+
+	:param str string: The string to parse.
+	:param datetime.tzinfo default_timezone: The default timezone to set.
+	:rtype: datetime.datetime
+	"""
 	try:
 		dt = dateutil.parser.isoparse(string)
 	except ValueError:
@@ -29,6 +36,12 @@ def parse_datetime(string, default_timezone):
 	return dt
 
 def parse_float(string):
+	"""
+	Parse a literal string representing a floating point value.
+
+	:param str string: The string to parse.
+	:rtype: decimal.Decimal
+	"""
 	if re.match('^0[0-9]', string):
 		raise errors.FloatSyntaxError('invalid floating point literal (leading zeros in decimal literals are not permitted)', string)
 	try:
@@ -40,13 +53,19 @@ def parse_float(string):
 		raise errors.FloatSyntaxError('invalid floating point literal', string) from None
 	return val
 
-def parse_timedelta(periodstring):
-	if periodstring == "P":
-		raise errors.TimedeltaSyntaxError('empty timedelta string', periodstring)
+def parse_timedelta(string):
+	"""
+	Parse a literal string representing a time period in the ISO-8601 duration format.
 
-	match = re.match("^" + timedelta_regex + "$", periodstring)
+	:param str string: The string to parse.
+	:rtype: datetime.timedelta
+	"""
+	if string == "P":
+		raise errors.TimedeltaSyntaxError('empty timedelta string', string)
+
+	match = re.match("^" + timedelta_regex + "$", string)
 	if not match:
-		raise errors.TimedeltaSyntaxError('invalid timedelta string', periodstring)
+		raise errors.TimedeltaSyntaxError('invalid timedelta string', string)
 
 	groups = match.groupdict()
 	for key, val in groups.items():

@@ -84,7 +84,7 @@
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1">#</span>
-<span class="c1">#  rule_engine/parser.py</span>
+<span class="c1">#  rule_engine/parser/__init__.py</span>
 <span class="c1">#</span>
 <span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
 <span class="c1">#  modification, are permitted provided that the following conditions are</span>
@@ -115,15 +115,12 @@
 
 <span class="kn">import</span> <span class="nn">ast</span> <span class="k">as</span> <span class="nn">pyast</span>
 <span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">types</span> <span class="k">as</span> <span class="nn">pytypes</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ast</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
-<span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">timedelta_regex</span>
-
-<span class="kn">import</span> <span class="nn">ply.lex</span> <span class="k">as</span> <span class="nn">lex</span>
-<span class="kn">import</span> <span class="nn">ply.yacc</span> <span class="k">as</span> <span class="nn">yacc</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">ast</span>
+<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">ParserBase</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">timedelta_regex</span>
 
 <span class="n">literal_eval</span> <span class="o">=</span> <span class="n">pyast</span><span class="o">.</span><span class="n">literal_eval</span>
 
@@ -140,61 +137,6 @@
 	<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="n">constructor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">constructor</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
-
-<div class="viewcode-block" id="ParserBase">
-<a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase">[docs]</a>
-<span class="k">class</span> <span class="nc">ParserBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	A base class for parser objects to inherit from. This does not provide any</span>
-<span class="sd">	grammar related definitions.</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">precedence</span> <span class="o">=</span> <span class="p">()</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;The precedence for operators.&quot;&quot;&quot;</span>
-	<span class="n">tokens</span> <span class="o">=</span> <span class="p">()</span>
-	<span class="n">reserved_words</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	A mapping of literal words which are reserved to their corresponding grammar</span>
-<span class="sd">	names.</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">__mutex</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
-<div class="viewcode-block" id="ParserBase.__init__">
-<a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase.__init__">[docs]</a>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		:param bool debug: Whether or not to enable debugging features when</span>
-<span class="sd">			using the ply API.</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">debug</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
-		<span class="c1"># Build the lexer and parser</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">_lexer</span> <span class="o">=</span> <span class="n">lex</span><span class="o">.</span><span class="n">lex</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">_parser</span> <span class="o">=</span> <span class="n">yacc</span><span class="o">.</span><span class="n">yacc</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span> <span class="n">write_tables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="ParserBase.parse">
-<a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.ParserBase.parse">[docs]</a>
-	<span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Parse the specified text in an abstract syntax tree of nodes that can later be evaluated. This is done in two</span>
-<span class="sd">		phases. First, the syntax is parsed and a tree of deferred / uninitialized AST nodes are constructed. Next each</span>
-<span class="sd">		node is built recursively using it&#39;s respective :py:meth:`rule_engine.ast.ASTNodeBase.build`.</span>
-
-<span class="sd">		:param str text: The grammar text to parse into an AST.</span>
-<span class="sd">		:param context: A context for specifying parsing and evaluation options.</span>
-<span class="sd">		:type context: :py:class:`~rule_engine.engine.Context`</span>
-<span class="sd">		:return: The parsed AST statement.</span>
-<span class="sd">		:rtype: :py:class:`~rule_engine.ast.Statement`</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		<span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;lexer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;lexer&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lexer</span><span class="p">)</span>
-		<span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mutex</span><span class="p">:</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
-			<span class="c1"># phase 1: parse the string into a tree of deferred nodes</span>
-			<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
-		<span class="c1"># phase 2: initialize each AST node recursively, providing them with an opportunity to define assignments</span>
-		<span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">build</span><span class="p">()</span></div>
-</div>
-
 
 <div class="viewcode-block" id="Parser">
 <a class="viewcode-back" href="../../rule_engine/parser.html#rule_engine.parser.Parser">[docs]</a>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  rule_engine/parser.py
+#  rule_engine/parser/__init__.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -32,15 +32,12 @@
 
 import ast as pyast
 import collections
-import threading
 import types as pytypes
 
-from . import ast
-from . import errors
-from ._utils import timedelta_regex
-
-import ply.lex as lex
-import ply.yacc as yacc
+from .. import ast
+from .. import errors
+from .base import ParserBase
+from .utilities import timedelta_regex
 
 literal_eval = pyast.literal_eval
 
@@ -57,52 +54,6 @@ class _DeferredAstNode(object):
 	def build(self):
 		constructor = getattr(self.cls, self.method)
 		return constructor(*self.args, **self.kwargs)
-
-class ParserBase(object):
-	"""
-	A base class for parser objects to inherit from. This does not provide any
-	grammar related definitions.
-	"""
-	precedence = ()
-	"""The precedence for operators."""
-	tokens = ()
-	reserved_words = {}
-	"""
-	A mapping of literal words which are reserved to their corresponding grammar
-	names.
-	"""
-	__mutex = threading.Lock()
-	def __init__(self, debug=False):
-		"""
-		:param bool debug: Whether or not to enable debugging features when
-			using the ply API.
-		"""
-		self.debug = debug
-		self.context = None
-		# Build the lexer and parser
-		self._lexer = lex.lex(module=self, debug=self.debug)
-		self._parser = yacc.yacc(module=self, debug=self.debug, write_tables=self.debug)
-
-	def parse(self, text, context, **kwargs):
-		"""
-		Parse the specified text in an abstract syntax tree of nodes that can later be evaluated. This is done in two
-		phases. First, the syntax is parsed and a tree of deferred / uninitialized AST nodes are constructed. Next each
-		node is built recursively using it's respective :py:meth:`rule_engine.ast.ASTNodeBase.build`.
-
-		:param str text: The grammar text to parse into an AST.
-		:param context: A context for specifying parsing and evaluation options.
-		:type context: :py:class:`~rule_engine.engine.Context`
-		:return: The parsed AST statement.
-		:rtype: :py:class:`~rule_engine.ast.Statement`
-		"""
-		kwargs['lexer'] = kwargs.pop('lexer', self._lexer)
-		with self.__mutex:
-			self.context = context
-			# phase 1: parse the string into a tree of deferred nodes
-			result = self._parser.parse(text, **kwargs)
-			self.context = None
-		# phase 2: initialize each AST node recursively, providing them with an opportunity to define assignments
-		return result.build()
 
 class Parser(ParserBase):
 	"""

@@ -38,10 +38,10 @@ import functools
 import math
 import random
 
-from ._utils import parse_datetime, parse_float, parse_timedelta
 from . import ast
 from . import errors
 from . import types
+from .parser.utilities import parse_datetime, parse_float, parse_timedelta
 
 import dateutil.tz
 

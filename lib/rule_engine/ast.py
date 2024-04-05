@@ -38,7 +38,7 @@ import operator
 import re
 
 from . import errors
-from ._utils import parse_datetime, parse_float, parse_timedelta
+from .parser.utilities import parse_datetime, parse_float, parse_timedelta
 from .suggestions import suggest_symbol
 from .types import *
 

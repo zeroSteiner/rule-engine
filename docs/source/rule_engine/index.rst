@@ -9,6 +9,6 @@
    builtins.rst
    engine.rst
    errors.rst
-   parser.rst
+   parser/index.rst
    suggestions.rst
    types.rst

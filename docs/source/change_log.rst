@@ -7,12 +7,18 @@ this list is curated by the development team for note worthy changes.
 Version 4.x.x
 -------------
 
-Version 4.4.0
+Version 4.4.1
 ^^^^^^^^^^^^^
 
 *In Progress*
 
+Version 4.4.0
+^^^^^^^^^^^^^
+
+Released :release:`4.4.0` on April 5th, 2024
+
 * Added the ``$range`` builtin function
+* Added the ``rule_engine.parser.utilities`` module with a few functions and documentation
 
 Version 4.3.0
 ^^^^^^^^^^^^^

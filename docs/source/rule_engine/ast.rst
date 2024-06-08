@@ -123,6 +123,12 @@ Literal Expressions
    .. autoattribute:: result_type
       :annotation: = BOOLEAN
 
+.. autoclass:: BytesExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = BYTES
+
 .. autoclass:: DatetimeExpression
    :show-inheritance:
 

@@ -38,7 +38,7 @@ import operator
 import re
 
 from . import errors
-from .parser.utilities import parse_datetime, parse_float, parse_timedelta
+from .parser.utilities import parse_bytes, parse_datetime, parse_float, parse_timedelta
 from .suggestions import suggest_symbol
 from .types import *
 
@@ -231,6 +231,15 @@ class ArrayExpression(_CollectionMixin, LiteralExpressionBase):
 class BooleanExpression(LiteralExpressionBase):
 	"""Literal boolean expressions representing True or False."""
 	result_type = DataType.BOOLEAN
+
+class BytesExpression(LiteralExpressionBase):
+	"""
+	Literal bytes expressions representing a binary string. This expression type always evaluates to true when not empty.
+	"""
+	result_type = DataType.BYTES
+	@classmethod
+	def from_string(cls, context, string):
+		return cls(context, parse_bytes(string))
 
 class DatetimeExpression(LiteralExpressionBase):
 	"""

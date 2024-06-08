@@ -433,6 +433,7 @@ class DataType(metaclass=DataTypeMeta):
 	  this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.
 	"""
 	ARRAY = staticmethod(_ArrayDataTypeDef('ARRAY', tuple))
+	BYTES = _DataTypeDef('BYTES', bytes)
 	BOOLEAN = _DataTypeDef('BOOLEAN', bool)
 	DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
 	FLOAT = _DataTypeDef('FLOAT', decimal.Decimal)
@@ -483,6 +484,8 @@ class DataType(metaclass=DataTypeMeta):
 			return cls.ARRAY
 		elif python_type is bool:
 			return cls.BOOLEAN
+		elif python_type is bytes:
+			return cls.BYTES
 		elif python_type is datetime.date or python_type is datetime.datetime:
 			return cls.DATETIME
 		elif python_type is datetime.timedelta:
@@ -526,6 +529,8 @@ class DataType(metaclass=DataTypeMeta):
 		"""
 		if isinstance(python_value, bool):
 			return cls.BOOLEAN
+		elif isinstance(python_value, bytes):
+			return cls.BYTES
 		elif isinstance(python_value, (datetime.date, datetime.datetime)):
 			return cls.DATETIME
 		elif isinstance(python_value, datetime.timedelta):

@@ -36,6 +36,9 @@ Classes
    .. autoattribute:: BOOLEAN
       :annotation:
 
+   .. autoattribute:: BYTES
+      :annotation:
+
    .. autoattribute:: DATETIME
       :annotation:
 

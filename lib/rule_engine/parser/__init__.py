@@ -105,7 +105,7 @@ class Parser(ParserBase):
 		'if': 'IF'
 	}
 	tokens = (
-		'DATETIME', 'TIMEDELTA', 'FLOAT', 'STRING', 'SYMBOL',
+		'BYTES', 'DATETIME', 'TIMEDELTA', 'FLOAT', 'STRING', 'SYMBOL',
 		'LPAREN', 'RPAREN', 'QMARK', 'COLON', 'COMMA',
 		'LBRACKET', 'RBRACKET', 'LBRACE', 'RBRACE', 'COMMENT'
 	) + tuple(set(list(reserved_words.values()) + list(op_names.values())))
@@ -209,9 +209,14 @@ class Parser(ParserBase):
 			t.type = 'NE_FZM'
 		return t
 
+	def t_BYTES(self, t):
+		r'b(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
+		t.value = t.value[2:-1]
+		return t
+
 	def t_DATETIME(self, t):
 		r'd(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
-		t.value = t.value[1:]
+		t.value = t.value[2:-1]
 		return t
 
 	def t_TIMEDELTA(self, t):
@@ -408,9 +413,13 @@ class Parser(ParserBase):
 		"""
 		p[0] = _DeferredAstNode(ast.BooleanExpression, args=(self.context, p[1] == 'true'))
 
+	def p_expression_bytes(self, p):
+		'object : BYTES'
+		p[0] = _DeferredAstNode(ast.BytesExpression, args=(self.context, p[1]), method='from_string')
+
 	def p_expression_datetime(self, p):
 		'object : DATETIME'
-		p[0] = _DeferredAstNode(ast.DatetimeExpression, args=(self.context, literal_eval(p[1])), method='from_string')
+		p[0] = _DeferredAstNode(ast.DatetimeExpression, args=(self.context, p[1]), method='from_string')
 
 	def p_expression_timedelta(self, p):
 		'object : TIMEDELTA'

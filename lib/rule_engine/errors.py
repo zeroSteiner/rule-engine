@@ -66,6 +66,21 @@ class EvaluationError(EngineError):
 class SyntaxError(EngineError):
 	"""A base error for syntax related issues."""
 
+class BytesSyntaxError(SyntaxError):
+	"""
+	An error raised for issues regarding the use of improperly formatted bytes expressions.
+
+	.. versionadded:: 4.5.0
+	"""
+	def __init__(self, message, value):
+		"""
+		:param str message: A text description of what error occurred.
+		:param str value: The bytes value which contains the syntax error which caused this exception to be raised.
+		"""
+		super(BytesSyntaxError, self).__init__(message)
+		self.value = value
+		"""The bytes value which contains the syntax error which caused this exception to be raised."""
+
 class DatetimeSyntaxError(SyntaxError):
 	"""An error raised for issues regarding the use of improperly formatted datetime expressions."""
 	def __init__(self, message, value):

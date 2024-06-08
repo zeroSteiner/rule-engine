@@ -7,7 +7,7 @@ this list is curated by the development team for note worthy changes.
 Version 4.x.x
 -------------
 
-Version 4.4.1
+Version 4.5.0
 ^^^^^^^^^^^^^
 
 *In Progress*

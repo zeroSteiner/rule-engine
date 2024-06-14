@@ -60,11 +60,11 @@ def parse_bytes(string):
 	:rtype: bytes
 	"""
 	if not string:
-		return bytes
+		return b''
 	elif re.match(r'^(\\x[A-Fa-f0-9]{2})+$', string):
 		string = re.sub(r'\\x', '', string)
 		return binascii.a2b_hex(string)
-	elif re.match(r'^([A-Fa-f0-9]{2}:)*[A-Fa-f0-9]{2}$', string):
+	elif re.match(r'^([A-Fa-f0-9]{2}:?)*[A-Fa-f0-9]{2}$', string):
 		string = string.replace(':', '')
 		return binascii.a2b_hex(string)
 	raise errors.BytesSyntaxError('invalid bytes literal', string)

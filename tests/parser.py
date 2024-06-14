@@ -311,6 +311,13 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual('true', ast.BooleanExpression, True)
 		self.assertLiteralStatementEqual('false', ast.BooleanExpression, False)
 
+	def test_parse_bytes(self):
+		self.assertLiteralStatementEqual('b""', ast.BytesExpression, b'')
+		self.assertLiteralStatementEqual('b"de:ad"', ast.BytesExpression, b'\xde\xad')
+		self.assertLiteralStatementEqual('b"DE:AD"', ast.BytesExpression, b'\xde\xad')
+		self.assertLiteralStatementEqual('b"\\xde\\xad"', ast.BytesExpression, b'\xde\xad')
+		self.assertLiteralStatementEqual('b"\\xDE\\xAD"', ast.BytesExpression, b'\xde\xad')
+
 	def test_parse_datetime(self):
 		self.assertLiteralStatementEqual('d"2016-10-15"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, tzinfo=dateutil.tz.tzlocal()))
 		self.assertLiteralStatementEqual('d"2016-10-15 12:30"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, 12, 30, tzinfo=dateutil.tz.tzlocal()))

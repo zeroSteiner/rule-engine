@@ -211,7 +211,7 @@ class Parser(ParserBase):
 
 	def t_BYTES(self, t):
 		r'b(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
-		t.value = t.value[2:-1]
+		t.value = t.value[1:]
 		return t
 
 	def t_DATETIME(self, t):
@@ -415,7 +415,11 @@ class Parser(ParserBase):
 
 	def p_expression_bytes(self, p):
 		'object : BYTES'
-		p[0] = _DeferredAstNode(ast.BytesExpression, args=(self.context, p[1]), method='from_string')
+		try:
+			value = literal_eval('b' + p[1])
+		except Exception:
+			raise errors.BytesSyntaxError('invalid bytes literal', p[1][1:-1]) from None
+		p[0] = _DeferredAstNode(ast.BytesExpression, args=(self.context, value))
 
 	def p_expression_datetime(self, p):
 		'object : DATETIME'
@@ -448,7 +452,11 @@ class Parser(ParserBase):
 
 	def p_expression_string(self, p):
 		'object : STRING'
-		p[0] = _DeferredAstNode(ast.StringExpression, args=(self.context, literal_eval(p[1])))
+		try:
+			value = literal_eval(p[1])
+		except Exception:
+			raise errors.StringSyntaxError('invalid string literal', p[1][1:-1]) from None
+		p[0] = _DeferredAstNode(ast.StringExpression, args=(self.context, value))
 
 	def p_expression_array(self, p):
 		"""

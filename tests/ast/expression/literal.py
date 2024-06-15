@@ -89,12 +89,13 @@ class LiteralExpressionTests(unittest.TestCase):
 		expressions = (
 			(ast.ArrayExpression, ()),
 			(ast.BooleanExpression, False),
+			(ast.BytesExpression, b''),
 			(ast.DatetimeExpression, datetime.datetime(2020, 1, 1)),
-			(ast.TimedeltaExpression, datetime.timedelta(seconds=42)),
 			(ast.FloatExpression, 0),
 			(ast.MappingExpression, {}),
 			(ast.SetExpression, set()),
 			(ast.StringExpression, ''),
+			(ast.TimedeltaExpression, datetime.timedelta(seconds=42)),
 		)
 		for expression_class, value in expressions:
 			expression = ast.LiteralExpressionBase.from_value(context, value)
@@ -108,6 +109,9 @@ class LiteralExpressionTests(unittest.TestCase):
 
 	def test_ast_expression_literal_boolean(self):
 		self.assertLiteralTests(ast.BooleanExpression, False, True)
+
+	def test_ast_expression_literal_bytes(self):
+		self.assertLiteralTests(ast.BytesExpression, b'', b'\x00')
 
 	def test_ast_expression_literal_float(self):
 		trueish_floats = (expression.value for expression in trueish if isinstance(expression, ast.FloatExpression))

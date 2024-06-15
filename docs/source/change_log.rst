@@ -10,7 +10,7 @@ Version 4.x.x
 Version 4.5.0
 ^^^^^^^^^^^^^
 
-*In Progress*
+* :py:class:`~rule_engine.errors.StringSyntaxError` is now raised for invalid string literals
 
 Version 4.4.0
 ^^^^^^^^^^^^^

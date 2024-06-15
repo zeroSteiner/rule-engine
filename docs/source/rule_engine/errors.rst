@@ -69,6 +69,11 @@ Exceptions
    :show-inheritance:
    :special-members: __init__
 
+.. autoexception:: StringSyntaxError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: SymbolResolutionError
    :members:
    :show-inheritance:
@@ -110,4 +115,5 @@ The class hierarchy for Rule Engine exceptions is:
          +-- FloatSyntaxError
          +-- RegexSyntaxError
          +-- RuleSyntaxError
+         +-- StringSyntaxError
          +-- TimedeltaSyntaxError

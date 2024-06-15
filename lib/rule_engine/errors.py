@@ -81,6 +81,21 @@ class BytesSyntaxError(SyntaxError):
 		self.value = value
 		"""The bytes value which contains the syntax error which caused this exception to be raised."""
 
+class StringSyntaxError(SyntaxError):
+	"""
+	An error raised for issues regarding the use of improperly formatted string expressions.
+
+	.. versionadded:: 4.5.0
+	"""
+	def __init__(self, message, value):
+		"""
+		:param str message: A text description of what error occurred.
+		:param str value: The string value which contains the syntax error which caused this exception to be raised.
+		"""
+		super(StringSyntaxError, self).__init__(message)
+		self.value = value
+		"""The string value which contains the syntax error which caused this exception to be raised."""
+
 class DatetimeSyntaxError(SyntaxError):
 	"""An error raised for issues regarding the use of improperly formatted datetime expressions."""
 	def __init__(self, message, value):

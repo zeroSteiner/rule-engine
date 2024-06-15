@@ -313,10 +313,11 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_bytes(self):
 		self.assertLiteralStatementEqual('b""', ast.BytesExpression, b'')
-		self.assertLiteralStatementEqual('b"de:ad"', ast.BytesExpression, b'\xde\xad')
-		self.assertLiteralStatementEqual('b"DE:AD"', ast.BytesExpression, b'\xde\xad')
+		self.assertLiteralStatementEqual('b"dead\x13\x37"', ast.BytesExpression, b'dead\x13\x37')
 		self.assertLiteralStatementEqual('b"\\xde\\xad"', ast.BytesExpression, b'\xde\xad')
 		self.assertLiteralStatementEqual('b"\\xDE\\xAD"', ast.BytesExpression, b'\xde\xad')
+		with self.assertRaises(errors.BytesSyntaxError):
+			self._parse('b"\\xyz"', self.context)
 
 	def test_parse_datetime(self):
 		self.assertLiteralStatementEqual('d"2016-10-15"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, tzinfo=dateutil.tz.tzlocal()))
@@ -426,6 +427,8 @@ class ParserLiteralTests(ParserTestsBase):
 	def test_parse_string_escapes(self):
 		self.assertLiteralStatementEqual("'Alice\\\'s'", ast.StringExpression, 'Alice\'s')
 		self.assertLiteralStatementEqual('"Alice\'s"', ast.StringExpression, 'Alice\'s')
+		with self.assertRaises(errors.StringSyntaxError):
+			self._parse('"\\xyz"', self.context)
 
 	def test_parse_xxx_edge_cases(self):
 		# test the safe getattr parsing for weird edge cases

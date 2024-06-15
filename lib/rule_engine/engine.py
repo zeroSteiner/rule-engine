@@ -206,7 +206,10 @@ class _AttributeResolver(object):
 			return binascii.b2a_hex(value).decode()
 		elif encoding == 'base64':
 			return binascii.b2a_base64(value).decode().strip()
-		return value.decode(encoding)
+		try:
+			return value.decode(encoding)
+		except LookupError as error:
+			raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='decode')
 
 	@attribute('to_epoch', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_to_epoch(self, value):
@@ -302,11 +305,17 @@ class _AttributeResolver(object):
 	@classmethod
 	def _string_encode(self, value, encoding):
 		encoding = encoding.lower()
-		if encoding == 'base16' or encoding == 'hex':
-			return binascii.a2b_hex(value.encode())
-		elif encoding == 'base64':
-			return binascii.a2b_base64(value.encode())
-		return value.encode(encoding)
+		try:
+			if encoding == 'base16' or encoding == 'hex':
+				return binascii.a2b_hex(value.encode())
+			elif encoding == 'base64':
+				return binascii.a2b_base64(value.encode())
+		except binascii.Error as error:
+			raise errors.FunctionCallError("error converting to {}".format(encoding), error=error, function_name='encode')
+		try:
+			return value.encode(encoding)
+		except LookupError as error:
+			raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='encode')
 
 	@attribute('to_ary', ast.DataType.STRING, result_type=ast.DataType.ARRAY(ast.DataType.STRING))
 	def string_to_ary(self, value):

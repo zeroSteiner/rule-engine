@@ -102,6 +102,35 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		expression = ast.GetAttributeExpression(typed_context, typed_symbol, 'to_ary')
 		self.assertEqual(expression.result_type, typed_context.resolve_type(symbol.name))
 
+	def test_ast_expression_bytes_attributes(self):
+		value = b'Rule Engine'
+		symbol = ast.BytesExpression(context, value)
+
+		attributes = {
+			'to_set': set(value),
+			'length': len(value),
+			'is_empty': False
+		}
+		for attribute_name, value in attributes.items():
+			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
+			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
+
+	def test_ast_expression_bytes_method_decode(self):
+		combos = [
+			('utf-8', 'Rule Engine'),
+			('hex', '52756c6520456e67696e65'),
+			('base16', '52756c6520456e67696e65'),
+			('base64', 'UnVsZSBFbmdpbmU=')
+		]
+		for encoding, string in combos:
+			bytes_expression = ast.BytesExpression(context, b'Rule Engine')
+			expression = ast.GetAttributeExpression(context, bytes_expression, 'decode')
+			method = expression.evaluate(None)
+			self.assertTrue(callable(method), "attribute decode failed (method not callable)")
+			self.assertEqual(method(encoding), string)
+		with self.assertRaises(errors.FunctionCallError):
+			method('invalid-encoding')
+
 	def test_ast_expression_datetime_attributes(self):
 		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)
 		symbol = ast.DatetimeExpression(context, timestamp)
@@ -216,11 +245,30 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			'to_ary': tuple(string),
 			'to_set': set(string),
 			'to_str': string,
-			'length': len(string)
+			'length': len(string),
+			'is_empty': False
 		}
 		for attribute_name, value in attributes.items():
 			expression = ast.GetAttributeExpression(context, symbol, attribute_name)
 			self.assertEqual(expression.evaluate(None), value, "attribute {} failed".format(attribute_name))
+
+	def test_ast_expression_string_method_encode(self):
+		combos = [
+			('utf-8', 'Rule Engine'),
+			('hex', '52756c6520456e67696e65'),
+			('base16', '52756c6520456e67696e65'),
+			('base64', 'UnVsZSBFbmdpbmU=')
+		]
+		for encoding, string in combos:
+			string_expression = ast.StringExpression(context, string)
+			expression = ast.GetAttributeExpression(context, string_expression, 'encode')
+			method = expression.evaluate(None)
+			self.assertTrue(callable(method), "attribute encode failed (method not callable)")
+			self.assertEqual(method(encoding), b'Rule Engine')
+		with self.assertRaises(errors.FunctionCallError):
+			method('invalid-encoding')
+		with self.assertRaises(errors.FunctionCallError):
+			method('base16') # last one is base64 so this should fail
 
 	def test_ast_expression_string_attributes_flt(self):
 		combos = (

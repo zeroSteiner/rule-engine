@@ -84,14 +84,15 @@ class DataTypeTests(unittest.TestCase):
 	def test_data_type_from_name(self):
 		self.assertIs(DataType.from_name('ARRAY'), DataType.ARRAY)
 		self.assertIs(DataType.from_name('BOOLEAN'), DataType.BOOLEAN)
+		self.assertIs(DataType.from_name('BYTES'), DataType.BYTES)
 		self.assertIs(DataType.from_name('DATETIME'), DataType.DATETIME)
-		self.assertIs(DataType.from_name('TIMEDELTA'), DataType.TIMEDELTA)
 		self.assertIs(DataType.from_name('FLOAT'), DataType.FLOAT)
+		self.assertIs(DataType.from_name('FUNCTION'), DataType.FUNCTION)
 		self.assertIs(DataType.from_name('MAPPING'), DataType.MAPPING)
 		self.assertIs(DataType.from_name('NULL'), DataType.NULL)
 		self.assertIs(DataType.from_name('SET'), DataType.SET)
 		self.assertIs(DataType.from_name('STRING'), DataType.STRING)
-		self.assertIs(DataType.from_name('FUNCTION'), DataType.FUNCTION)
+		self.assertIs(DataType.from_name('TIMEDELTA'), DataType.TIMEDELTA)
 
 	def test_data_type_from_name_error(self):
 		with self.assertRaises(TypeError):
@@ -103,16 +104,17 @@ class DataTypeTests(unittest.TestCase):
 		self.assertIs(DataType.from_type(list), DataType.ARRAY)
 		self.assertIs(DataType.from_type(tuple), DataType.ARRAY)
 		self.assertIs(DataType.from_type(bool), DataType.BOOLEAN)
+		self.assertIs(DataType.from_type(bytes), DataType.BYTES)
 		self.assertIs(DataType.from_type(datetime.date), DataType.DATETIME)
 		self.assertIs(DataType.from_type(datetime.datetime), DataType.DATETIME)
-		self.assertIs(DataType.from_type(datetime.timedelta), DataType.TIMEDELTA)
 		self.assertIs(DataType.from_type(float), DataType.FLOAT)
 		self.assertIs(DataType.from_type(int), DataType.FLOAT)
+		self.assertIs(DataType.from_type(type(lambda: None)), DataType.FUNCTION)
 		self.assertIs(DataType.from_type(dict), DataType.MAPPING)
 		self.assertIs(DataType.from_type(type(None)), DataType.NULL)
 		self.assertIs(DataType.from_type(set), DataType.SET)
 		self.assertIs(DataType.from_type(str), DataType.STRING)
-		self.assertIs(DataType.from_type(type(lambda: None)), DataType.FUNCTION)
+		self.assertIs(DataType.from_type(datetime.timedelta), DataType.TIMEDELTA)
 
 	def test_data_type_from_type_hint(self):
 		# simple compound tests
@@ -183,15 +185,16 @@ class DataTypeTests(unittest.TestCase):
 
 	def test_data_type_from_value_scalar(self):
 		self.assertIs(DataType.from_value(False), DataType.BOOLEAN)
+		self.assertIs(DataType.from_value(b''), DataType.BYTES)
 		self.assertIs(DataType.from_value(datetime.date.today()), DataType.DATETIME)
 		self.assertIs(DataType.from_value(datetime.datetime.now()), DataType.DATETIME)
-		self.assertIs(DataType.from_value(datetime.timedelta()), DataType.TIMEDELTA)
 		self.assertIs(DataType.from_value(0), DataType.FLOAT)
 		self.assertIs(DataType.from_value(0.0), DataType.FLOAT)
-		self.assertIs(DataType.from_value(None), DataType.NULL)
-		self.assertIs(DataType.from_value(''), DataType.STRING)
 		self.assertIs(DataType.from_value(lambda: None), DataType.FUNCTION)
 		self.assertIs(DataType.from_value(print), DataType.FUNCTION)
+		self.assertIs(DataType.from_value(None), DataType.NULL)
+		self.assertIs(DataType.from_value(''), DataType.STRING)
+		self.assertIs(DataType.from_value(datetime.timedelta()), DataType.TIMEDELTA)
 
 	def test_data_type_from_value_error(self):
 		with self.assertRaisesRegex(TypeError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):

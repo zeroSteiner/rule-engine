@@ -141,6 +141,12 @@ Literal Expressions
    .. autoattribute:: result_type
       :annotation: = FLOAT
 
+.. autoclass:: FunctionExpression
+   :show-inheritance:
+
+   .. autoattribute:: result_type
+      :annotation: = FUNCTION
+
 .. autoclass:: MappingExpression
    :show-inheritance:
 

@@ -161,7 +161,7 @@ class LiteralExpressionBase(ExpressionBase):
 		:param value: The native Python value.
 		"""
 		self.context = context
-		if not isinstance(value, self.result_type.python_type) and self.result_type.is_scalar:
+		if self.result_type.is_scalar and DataType.from_value(value) != self.result_type:
 			raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.python_type.__name__, type(value).__name__))
 		self.value = value
 
@@ -276,6 +276,12 @@ class FloatExpression(LiteralExpressionBase):
 	@classmethod
 	def from_string(cls, context, string):
 		return cls(context, parse_float(string))
+
+class FunctionExpression(LiteralExpressionBase):
+	"""Literal mapping expression representing a function."""
+	# there's no syntax for defining functions, but this is required by the parser when a method is referred to on a
+	# literal value, e.g. `b"41".decode('utf-8')`
+	result_type = DataType.FUNCTION
 
 class MappingExpression(LiteralExpressionBase):
 	"""Literal mapping expression representing a set of associations between keys and values."""
@@ -818,7 +824,10 @@ class GetAttributeExpression(ExpressionBase):
 	def reduce(self):
 		if not _is_reduced(self.object):
 			return self
-		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+		literal = LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+		if literal.result_type == DataType.FUNCTION and DataType.is_compatible(self.result_type, DataType.FUNCTION):
+			literal.result_type = self.result_type
+		return literal
 
 	def to_graphviz(self, digraph, *args, **kwargs):
 		digraph.node(str(id(self)), "{}\nname={!r}".format(self.__class__.__name__, self.name))
@@ -1063,7 +1072,10 @@ class FunctionCallExpression(ExpressionBase):
 	def build(cls, context, function, arguments):
 		return cls(context, function.build(), tuple(argument.build() for argument in arguments)).reduce()
 
-	# because there is no syntax for defining a function, they can't be reduced until symbols can be reduced
+	def reduce(self):
+		if not _is_reduced(self.function, *self.arguments):
+			return self
+		return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 
 	def evaluate(self, thing):
 		function = self.function.evaluate(thing)

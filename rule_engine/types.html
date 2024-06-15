@@ -17,7 +17,7 @@
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="../_static/documentation_options.js?v=8b5852d8"></script>
-        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -111,7 +111,7 @@
   <section id="module-rule_engine.types">
 <span id="types"></span><h1><a class="reference external" href="https://docs.python.org/3.12/library/types.html#module-types" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">types</span></code></a><a class="headerlink" href="#module-rule_engine.types" title="Link to this heading"></a></h1>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 3.2.0.</span></p>
+<p><span class="versionmodified added">Added in version 3.2.0.</span></p>
 </div>
 <p>This module contains the internal type definitions and utility functions for working with them.</p>
 <section id="functions">
@@ -123,7 +123,7 @@
 <a class="reference internal" href="#rule_engine.types.DataType" title="rule_engine.types.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>. This function is useful for converting native Python values at the engine boundaries such as
 when resolving a symbol from an object external to the engine.</p>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.0.0.</span></p>
+<p><span class="versionmodified added">Added in version 2.0.0.</span></p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -144,7 +144,7 @@ when resolving a symbol from an object external to the engine.</p>
 <dd><p>Check whether <em>value</em> is an integer number (i.e. a whole, number). This can, for example, be used to check if a
 floating point number such as <code class="docutils literal notranslate"><span class="pre">3.0</span></code> can safely be converted to an integer without loss of information.</p>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.1.0.</span></p>
+<p><span class="versionmodified added">Added in version 2.1.0.</span></p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -289,7 +289,7 @@ this ensures that the member types are either the same or <a class="reference in
 <dt class="sig sig-object py" id="rule_engine.types.DataType.FUNCTION">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FUNCTION</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argument_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_arguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rule_engine.types.DataType.FUNCTION" title="Link to this definition"></a></dt>
 <dd><div class="versionadded">
-<p><span class="versionmodified added">New in version 4.0.0.</span></p>
+<p><span class="versionmodified added">Added in version 4.0.0.</span></p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -366,7 +366,7 @@ currently unknown.</p>
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_name" title="Link to this definition"></a></dt>
 <dd><p>Get the data type from its name.</p>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.0.0.</span></p>
+<p><span class="versionmodified added">Added in version 2.0.0.</span></p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -420,7 +420,7 @@ supported data type, then a <a class="reference external" href="https://docs.pyt
 when one or both are <a class="reference internal" href="#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> or both types are the same. In the case of compound data types (such
 as <a class="reference internal" href="#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>) the member types are checked recursively in the same manner.</p>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.1.0.</span></p>
+<p><span class="versionmodified added">Added in version 2.1.0.</span></p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -443,7 +443,7 @@ as <a class="reference internal" href="#rule_engine.types.DataType.ARRAY" title=
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/types.html#DataType.is_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.is_definition" title="Link to this definition"></a></dt>
 <dd><p>Check if <em>value</em> is a data type definition.</p>
 <div class="versionadded">
-<p><span class="versionmodified added">New in version 2.1.0.</span></p>
+<p><span class="versionmodified added">Added in version 2.1.0.</span></p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

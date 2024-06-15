@@ -30,6 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import binascii
 import collections
 import collections.abc
 import contextlib
@@ -116,7 +117,9 @@ def _value_to_ary_result_type(object_type):
 	return ast.DataType.ARRAY(object_type.value_type)
 
 def _value_to_set_result_type(object_type):
-	if object_type == ast.DataType.STRING:
+	if object_type == ast.DataType.BYTES:
+		return ast.DataType.SET(ast.DataType.FLOAT)
+	elif object_type == ast.DataType.STRING:
 		return ast.DataType.SET(ast.DataType.STRING)
 	return ast.DataType.SET(object_type.value_type)
 
@@ -191,6 +194,19 @@ class _AttributeResolver(object):
 		:return: The data type of the specified attribute.
 		"""
 		return self._get_resolver(object_type, name).resolve_type(object_type)
+
+	@attribute('decode', ast.DataType.BYTES, result_type=ast.DataType.FUNCTION('decode', return_type=ast.DataType.STRING, argument_types=(ast.DataType.STRING,)))
+	def bytes_decode(self, value):
+		return functools.partial(self._bytes_decode, value)
+
+	@classmethod
+	def _bytes_decode(self, value, encoding):
+		encoding = encoding.lower()
+		if encoding == 'base16' or encoding == 'hex':
+			return binascii.b2a_hex(value).decode()
+		elif encoding == 'base64':
+			return binascii.b2a_base64(value).decode().strip()
+		return value.decode(encoding)
 
 	@attribute('to_epoch', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
 	def datetime_to_epoch(self, value):
@@ -279,6 +295,19 @@ class _AttributeResolver(object):
 	def string_as_upper(self, value):
 		return value.upper()
 
+	@attribute('encode', ast.DataType.STRING, result_type=ast.DataType.FUNCTION('encode', return_type=ast.DataType.BYTES, argument_types=(ast.DataType.STRING,)))
+	def string_encode(self, value):
+		return functools.partial(self._string_encode, value)
+
+	@classmethod
+	def _string_encode(self, value, encoding):
+		encoding = encoding.lower()
+		if encoding == 'base16' or encoding == 'hex':
+			return binascii.a2b_hex(value.encode())
+		elif encoding == 'base64':
+			return binascii.a2b_base64(value.encode())
+		return value.encode(encoding)
+
 	@attribute('to_ary', ast.DataType.STRING, result_type=ast.DataType.ARRAY(ast.DataType.STRING))
 	def string_to_ary(self, value):
 		return tuple(value)
@@ -316,11 +345,11 @@ class _AttributeResolver(object):
 	def timedelta_total_seconds(self, value):
 		return value.total_seconds()
 
-	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.BOOLEAN)
+	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.BOOLEAN)
 	def value_is_empty(self, value):
 		return len(value) == 0
 
-	@attribute('length', ast.DataType.ARRAY, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.FLOAT)
+	@attribute('length', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.FLOAT)
 	def value_length(self, value):
 		return len(value)
 
@@ -342,7 +371,7 @@ class _AttributeResolver(object):
 				return 'inf'
 		return str(value)
 
-	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.SET, ast.DataType.STRING, type_resolver=_value_to_set_result_type)
+	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.SET, ast.DataType.STRING, type_resolver=_value_to_set_result_type)
 	def value_to_set(self, value):
 		return set(value)
 

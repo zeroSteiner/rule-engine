@@ -52,23 +52,6 @@ timedelta_regex = (
 	r')?'
 )
 
-def parse_bytes(string):
-	"""
-	Parse a bytes string in ascii-hex format.
-
-	:param str string: The string to parse.
-	:rtype: bytes
-	"""
-	if not string:
-		return b''
-	elif re.match(r'^(\\x[A-Fa-f0-9]{2})+$', string):
-		string = re.sub(r'\\x', '', string)
-		return binascii.a2b_hex(string)
-	elif re.match(r'^([A-Fa-f0-9]{2}:?)*[A-Fa-f0-9]{2}$', string):
-		string = string.replace(':', '')
-		return binascii.a2b_hex(string)
-	raise errors.BytesSyntaxError('invalid bytes literal', string)
-
 def parse_datetime(string, default_timezone):
 	"""
 	Parse a timestamp string. If the timestamp does not specify a timezone, *default_timezone* is used.

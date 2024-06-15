@@ -349,6 +349,10 @@ class ParserLiteralTests(ParserTestsBase):
 		self.assertLiteralStatementEqual('t"P7W6DT5H4M3S"', ast.TimedeltaExpression, datetime.timedelta(weeks=7, days=6, hours=5, minutes=4, seconds=3))
 		self.assertLiteralStatementEqual('t"PT3H2S"', ast.TimedeltaExpression, datetime.timedelta(hours=3, seconds=2))
 		self.assertLiteralStatementEqual('t"PT"', ast.TimedeltaExpression, datetime.timedelta())
+		with self.assertRaises(errors.TimedeltaSyntaxError):
+			self._parse('t""', self.context)
+		with self.assertRaises(errors.TimedeltaSyntaxError):
+			self._parse('t"P"', self.context)
 
 	def test_parse_timedelta_attributes(self):
 		self.assertLiteralStatementEvalEqual('t"P7W6DT5H4M3S".days', decimal.Decimal('55'))

@@ -1096,7 +1096,10 @@ class FunctionCallExpression(ExpressionBase):
 			raise error
 		except Exception as error:
 			raise errors.FunctionCallError('function call failed', error=error, function_name=function_name) from None
-		return self._new_value(result)
+		result = self._new_value(result)
+		if not DataType.is_compatible(DataType.from_value(result), self.result_type):
+			raise errors.FunctionCallError('function call failed (data type mismatch on returned value)', function_name=function_name)
+		return result
 
 	def _validate_function(self, function_type, arguments):
 		if not isinstance(function_type, DataType.FUNCTION.__class__):

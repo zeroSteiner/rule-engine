@@ -11,6 +11,7 @@ Version 4.5.0
 ^^^^^^^^^^^^^
 
 * :py:class:`~rule_engine.errors.StringSyntaxError` is now raised for invalid string literals
+* :py:class:`~rule_engine.errors.FunctionCallError` is now raised when a typed function returns an incompatible value
 
 Version 4.4.0
 ^^^^^^^^^^^^^

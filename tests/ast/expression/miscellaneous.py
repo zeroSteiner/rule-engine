@@ -138,6 +138,7 @@ class ContainsExpressionTests(unittest.TestCase):
 class GetItemExpressionTests(unittest.TestCase):
 	containers = {
 		types.DataType.ARRAY:   ast.LiteralExpressionBase.from_value(context, ['one', 'two']),  # ARRAY
+		types.DataType.BYTES:   ast.LiteralExpressionBase.from_value(context, b'Rule Engine!'), # BYTES
 		types.DataType.MAPPING: ast.LiteralExpressionBase.from_value(context, {'foo': 'bar'}),  # MAPPING
 		types.DataType.STRING:  ast.LiteralExpressionBase.from_value(context, 'Rule Engine!')   # STRING
 	}
@@ -206,8 +207,9 @@ class GetSliceExpressionTests(unittest.TestCase):
 	def test_ast_expression_getslice(self):
 		ary_value = tuple(random.choice(string.ascii_letters) for _ in range(12))
 		str_value = ''.join(ary_value)
+		byt_value = str_value.encode()
 		cases = (
-			(ary_value, str_value),
+			(ary_value, byt_value, str_value),
 			(None,  0,  2),
 			(None, -1, -3),
 		)

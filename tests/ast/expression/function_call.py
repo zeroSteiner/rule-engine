@@ -137,3 +137,13 @@ class FunctionCallExpressionTests(unittest.TestCase):
 			raise SomeException()
 		with self.assertRaises(errors.EvaluationError):
 			function_call.evaluate({'function': _function})
+
+	def test_ast_expression_function_call_error_on_incompatible_return_type(self):
+		symbol = ast.SymbolExpression(context, 'function')
+		function_call = ast.FunctionCallExpression(context, symbol, [])
+		function_call.result_type = ast.DataType.FUNCTION('function', return_type=ast.DataType.FLOAT)
+
+		def _function():
+			return ''
+		with self.assertRaises(errors.FunctionCallError):
+			function_call.evaluate({'function': _function})

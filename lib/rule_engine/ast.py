@@ -738,9 +738,10 @@ class ContainsExpression(ExpressionBase):
 
 	def evaluate(self, thing):
 		container_value = self.container.evaluate(thing)
+		container_value_type = DataType.from_value(container_value)
 		member_value = self.member.evaluate(thing)
-		if DataType.from_value(container_value) == DataType.STRING:
-			if DataType.from_value(member_value) != DataType.STRING:
+		if container_value_type == DataType.BYTES or container_value_type == DataType.STRING:
+			if DataType.from_value(member_value) != container_value_type:
 				raise errors.EvaluationError('data type mismatch')
 		return bool(member_value in container_value)
 

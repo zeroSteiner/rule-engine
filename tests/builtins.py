@@ -78,7 +78,7 @@ class BuiltinsTests(unittest.TestCase):
 		self.assertTrue(ast.DataType.is_compatible(result_type, function_type.return_type))
 		return result
 
-	def test_engine_builtin_functions(self):
+	def test_builtin_functions(self):
 		blts = builtins.Builtins.from_defaults()
 		for name in blts:
 			data_type = blts.resolve_type(name)
@@ -86,7 +86,7 @@ class BuiltinsTests(unittest.TestCase):
 				continue
 			self.assertEqual(name, data_type.value_name)
 
-	def test_engine_builtins(self):
+	def test_builtins(self):
 		blts = builtins.Builtins.from_defaults({'test': {'one': 1.0, 'two': 2.0}})
 		self.assertIsInstance(blts, builtins.Builtins)
 		self.assertIsNone(blts.namespace)
@@ -118,52 +118,52 @@ class BuiltinsTests(unittest.TestCase):
 		with self.assertRaises(errors.EvaluationError):
 			engine.Rule('$name + 1', context=context)
 
-	def test_engine_builtins_function_abs(self):
+	def test_builtins_function_abs(self):
 		self.assertBuiltinFunction('abs', 30, -30)
 		self.assertBuiltinFunction('abs', 30, 30)
 
-	def test_engine_builtins_function_any(self):
+	def test_builtins_function_any(self):
 		self.assertBuiltinFunction('any', True, [0, 1, 2])
 		self.assertBuiltinFunction('any', False, [None])
 		self.assertBuiltinFunction('any', False, [])
 
-	def test_engine_builtins_function_all(self):
+	def test_builtins_function_all(self):
 		self.assertBuiltinFunction('all', True, [1, 2])
 		self.assertBuiltinFunction('all', False, [0, 1, 2])
 		self.assertBuiltinFunction('all', False, [None])
 		self.assertBuiltinFunction('all', True, [])
 
-	def test_engine_builtins_function_split(self):
+	def test_builtins_function_split(self):
 		self.assertBuiltinFunction('split', ('one', 'two'), 'one two')
 		self.assertBuiltinFunction('split', ('o', 'e two'), 'one two', 'n')
 		self.assertBuiltinFunction('split', ('one two',), 'one two', ' ', 0)
 		with self.assertRaises(errors.FunctionCallError):
 			self.assertBuiltinFunction('split', ('one', 'two'), 'one two', ' ', 1.5)
 
-	def test_engine_builtins_function_sum(self):
+	def test_builtins_function_sum(self):
 		self.assertBuiltinFunction('sum', 10, [1, 2, 3, 4])
 
-	def test_engine_buitins_function_map(self):
+	def test_builtins_function_map(self):
 		self.assertBuiltinFunction('map', (2, 4, 6), lambda i: i * 2, [1, 2, 3])
 		self.assertBuiltinFunction('map', ('A', 'B'), lambda c: c.upper(), ['A', 'B'])
 
-	def test_engine_builtins_function_max(self):
+	def test_builtins_function_max(self):
 		self.assertBuiltinFunction('max', 10, [1, 10, -1, 1.5])
 
-	def test_engine_builtins_function_min(self):
+	def test_builtins_function_min(self):
 		self.assertBuiltinFunction('min', -1, [1, 10, -1, 1.5])
 
-	def test_engine_buitins_function_filter(self):
+	def test_builtins_function_filter(self):
 		self.assertBuiltinFunction('filter', (1, 3), lambda i: i % 2, [1, 2, 3])
 		self.assertBuiltinFunction('filter', ('A', 'B'), lambda c: len(c), ['', 'A', 'B'])
 
-	def test_engine_builtins_function_parse_datetime(self):
+	def test_builtins_function_parse_datetime(self):
 		now = datetime.datetime.now()
 		self.assertBuiltinFunction('parse_datetime', now.replace(tzinfo=dateutil.tz.tzlocal()), now.isoformat())
 		with self.assertRaises(errors.DatetimeSyntaxError):
 			self.assertBuiltinFunction('parse_datetime', now, '')
 
-	def test_engine_builtins_function_parse_float(self):
+	def test_builtins_function_parse_float(self):
 		self.assertBuiltinFunction('parse_float', 1, '1')
 		self.assertBuiltinFunction('parse_float', 0b10, '0b10')
 		self.assertBuiltinFunction('parse_float', 0o10, '0o10')
@@ -175,12 +175,12 @@ class BuiltinsTests(unittest.TestCase):
 		with self.assertRaises(errors.FloatSyntaxError):
 			self.assertBuiltinFunction('parse_float', 1, 'f00d')
 
-	def test_engine_builtins_function_parse_timedelta(self):
+	def test_builtins_function_parse_timedelta(self):
 		self.assertBuiltinFunction('parse_timedelta', datetime.timedelta(days=1), 'P1D')
 		with self.assertRaises(errors.TimedeltaSyntaxError):
 			self.assertBuiltinFunction('parse_timedelta', datetime.timedelta(), '')
 
-	def test_engine_builtins_function_random(self):
+	def test_builtins_function_random(self):
 		with disable_random() as state:
 			value = random.random()
 			random.setstate(state)
@@ -192,7 +192,7 @@ class BuiltinsTests(unittest.TestCase):
 		with self.assertRaises(errors.FunctionCallError):
 			self.assertBuiltinFunction('random', 1, 1.5)
 
-	def test_engine_builtins_function_range(self):
+	def test_builtins_function_range(self):
 		self.assertBuiltinFunction('range', [1, 2, 3, 4], 1, 5)
 		self.assertBuiltinFunction('range', [1, 4], 1, 5, 3)
 		self.assertBuiltinFunction('range', [1, 2, 3, 4], 1.0, 5.0, 1.0)
@@ -200,9 +200,13 @@ class BuiltinsTests(unittest.TestCase):
 		self.assertBuiltinFunction('range', [0, 1, 2, 3, 4, 5, 6, 7], 8)
 		self.assertBuiltinFunction('range', [], -8)
 		with self.assertRaises(errors.FunctionCallError):
-			self.assertBuiltinFunction('range', 1, 3.5)
+			self.assertBuiltinFunction('range', None, 3.5)
+		with self.assertRaises(errors.FunctionCallError):
+			self.assertBuiltinFunction('range', None, 0, float('inf'))
+		with self.assertRaises(errors.FunctionCallError):
+			self.assertBuiltinFunction('range', None, 0, 5, 0.5)
 
-	def test_engine_builtins_re_groups(self):
+	def test_builtins_re_groups(self):
 		context = engine.Context()
 		rule = engine.Rule('words =~ "(\\w+) (\\w+) (\\w+)" and $re_groups[0] == word0', context=context)
 		self.assertIsNone(context._tls.regex_groups)
@@ -216,3 +220,13 @@ class BuiltinsTests(unittest.TestCase):
 
 		self.assertFalse(rule.matches({'words': ''.join(words), 'word0': words[0]}))
 		self.assertIsNone(context._tls.regex_groups)
+
+	def test_builtins_recursive(self):
+		blts = builtins.Builtins({'count': 1, 'owner': {'name': 'Spencer McIntyre'}}, namespace='people')
+		self.assertEqual(blts.namespace, 'people')
+		self.assertEqual(blts['count'], 1)
+
+		owner_blts = blts['owner']
+		self.assertIsInstance(owner_blts, builtins.Builtins)
+		self.assertEqual(owner_blts.namespace, 'people.owner')
+		self.assertEqual(owner_blts['name'], 'Spencer McIntyre')

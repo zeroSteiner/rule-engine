@@ -66,6 +66,10 @@ class ContextTests(unittest.TestCase):
 		with self.assertRaises(TypeError):
 			engine.Context(default_timezone=600)
 
+	def test_context_type_resolver_mapping(self):
+		context = engine.Context(type_resolver={'name': ast.DataType.STRING})
+		self.assertEqual(context.resolve_type('name'), ast.DataType.STRING)
+
 class EngineTests(unittest.TestCase):
 	def test_engine_resolve_attribute(self):
 		thing = collections.namedtuple('Person', ('name',))(name='alice')

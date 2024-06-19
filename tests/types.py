@@ -306,11 +306,19 @@ class MetaDataTypeTests(unittest.TestCase):
 		self.assertFalse(DataType.is_definition(None))
 
 	def test_data_type_supports_contains(self):
+		self.assertIn('ARRAY', DataType)
+		self.assertIn('FUNCTION', DataType)
+		self.assertIn('MAPPING', DataType)
 		self.assertIn('STRING', DataType)
+		self.assertIn('UNDEFINED', DataType)
+
 
 	def test_data_type_supports_getitem(self):
-		dt = DataType['STRING']
-		self.assertEqual(dt, DataType.STRING)
+		self.assertEqual(DataType['ARRAY'], DataType.ARRAY)
+		self.assertEqual(DataType['FUNCTION'], DataType.FUNCTION)
+		self.assertEqual(DataType['MAPPING'], DataType.MAPPING)
+		self.assertEqual(DataType['STRING'], DataType.STRING)
+		self.assertEqual(DataType['UNDEFINED'], DataType.UNDEFINED)
 
 inf = float('inf')
 nan = float('nan')

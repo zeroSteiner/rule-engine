@@ -384,24 +384,29 @@ class _FunctionDataTypeDef(_DataTypeDef):
 class DataTypeMeta(type):
 	def __new__(metacls, cls, bases, classdict):
 		data_type = super().__new__(metacls, cls, bases, classdict)
-		data_type._member_map_ = collections.OrderedDict()
+		members = []
 		for key, value in classdict.items():
-			if not isinstance(value, _DataTypeDef):
+			if not key.upper() == key:
 				continue
-			data_type._member_map_[key] = value
+			if not isinstance(value, (_DataTypeDef, staticmethod)):
+				continue
+			members.append(key)
+		data_type._members_ = tuple(members)
 		return data_type
 
 	def __contains__(self, item):
-		return item in self._member_map_
+		return item in self._members_
 
 	def __getitem__(cls, item):
-		return cls._member_map_[item]
+		if item not in cls._members_:
+			raise KeyError(item)
+		return getattr(cls, item)
 
 	def __iter__(cls):
-		yield from cls._member_map_
+		yield from cls._members_
 
 	def __len__(cls):
-		return len(cls._member_map_)
+		return len(cls._members_)
 
 class DataType(metaclass=DataTypeMeta):
 	"""

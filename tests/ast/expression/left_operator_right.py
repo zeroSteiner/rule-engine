@@ -37,6 +37,7 @@ import unittest
 
 from .literal import context, trueish, falseish
 import rule_engine.ast as ast
+import rule_engine.engine as engine
 import rule_engine.errors as errors
 
 __all__ = (
@@ -57,15 +58,22 @@ __all__ = (
 class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):
 	ExpressionClass = None
 	false_value = False
-	thing = {}
 	def assertExpressionTests(self, operation, left_value=None, right_value=None, equals_value=None):
 		left_value = left_value or self.left_value
 		right_value = right_value or self.right_value
 		equals_value = self.false_value if equals_value is None else equals_value
+
+		# test #1: literals
 		expression = self.ExpressionClass(context, operation, left_value, right_value)
 		self.assertIsInstance(expression, ast.LeftOperatorRightExpressionBase)
 		message = "{0}({1!r} {2} {3!r})".format(self.ExpressionClass.__name__, left_value, operation, right_value)
-		self.assertEqual(expression.evaluate(self.thing), equals_value, msg=message)
+		self.assertEqual(expression.evaluate(None), equals_value, msg=message)
+
+		# test #2: symbols
+		expression = self.ExpressionClass(context, operation, ast.SymbolExpression(context, 'left_value'), ast.SymbolExpression(context, 'right_value'))
+		self.assertIsInstance(expression, ast.LeftOperatorRightExpressionBase)
+		message = "{0}({1!r} {2} {3!r})".format(self.ExpressionClass.__name__, left_value, operation, right_value)
+		self.assertEqual(expression.evaluate({'left_value': left_value.evaluate(None), 'right_value': right_value.evaluate(None)}), equals_value, msg=message)
 
 	def test_ast_expression_left_operator_right_operation_error(self):
 		if self.ExpressionClass is None:
@@ -151,7 +159,7 @@ class AddExpressionTests(LeftOperatorRightExpresisonTestsBase):
 class AddDatetimeExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.AddExpression
 	def test_add_datetime_to_timedelta(self):
-		start_datetime = datetime.datetime(year=2022, month=6, day=28, hour=1, minute=2, second=3)
+		start_datetime = datetime.datetime(year=2022, month=6, day=28, hour=1, minute=2, second=3, tzinfo=context.default_timezone)
 		start_datetime_expr = ast.DatetimeExpression(context, start_datetime)
 		assert_func = functools.partial(self.assertExpressionTests, 'add')
 		td_expr_func = functools.partial(ast.TimedeltaExpression, context)
@@ -361,10 +369,9 @@ class LogicExpressionTests(LeftOperatorRightExpresisonTestsBase):
 ################################################################################
 class ComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.ComparisonExpression
-	thing = {'pi': 3.14159}
 	def test_ast_expression_left_operator_right_comparison(self):
 		chain = tuple(itertools.chain(
-			(ast.SymbolExpression(context, 'pi'),),
+			(ast.FloatExpression(context, 3.14159),),
 			trueish,
 			falseish
 		))
@@ -458,7 +465,6 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 class FuzzyComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.FuzzyComparisonExpression
 	left_value = luke = ast.StringExpression(context, 'Luke Skywalker')
-	thing = {'darth': 'Vader', 'luke': 'Skywalker', 'zero': 0.0}
 	def test_ast_expression_left_operator_right_fuzzycomparison_literal(self):
 		fuzzy = functools.partial(ast.StringExpression, context)
 		darth = ast.StringExpression(context, 'Darth Vader')
@@ -487,22 +493,17 @@ class FuzzyComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			self.assertExpressionTests(operation, left_value=left, right_value=right, equals_value=left is not right)
 
 	def test_ast_expression_left_operator_right_fuzzycomparison_symbolic(self):
-		fuzzy = functools.partial(ast.SymbolExpression, context)
-		darth = ast.SymbolExpression(context, 'darth')
+		darth = ast.StringExpression(context, 'Vader')
 		self.assertExpressionTests('eq_fzm', right_value=self.luke, equals_value=True)
-		self.assertExpressionTests('eq_fzm', right_value=fuzzy('luke'), equals_value=False)
 		self.assertExpressionTests('eq_fzm', right_value=darth, equals_value=False)
 
 		self.assertExpressionTests('eq_fzs', right_value=self.luke, equals_value=True)
-		self.assertExpressionTests('eq_fzs', right_value=fuzzy('luke'), equals_value=True)
 		self.assertExpressionTests('eq_fzs', right_value=darth, equals_value=False)
 
 		self.assertExpressionTests('ne_fzm', right_value=self.luke, equals_value=False)
-		self.assertExpressionTests('ne_fzm', right_value=fuzzy('luke'), equals_value=True)
 		self.assertExpressionTests('ne_fzm', right_value=darth, equals_value=True)
 
 		self.assertExpressionTests('ne_fzs', right_value=self.luke, equals_value=False)
-		self.assertExpressionTests('ne_fzs', right_value=fuzzy('luke'), equals_value=False)
 		self.assertExpressionTests('ne_fzs', right_value=darth, equals_value=True)
 
 	def test_ast_expression_left_operator_right_fuzzycomparison_type_errors(self):

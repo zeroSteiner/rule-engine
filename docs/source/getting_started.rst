@@ -338,6 +338,8 @@ function will be used automatically.
        })
    )
 
+.. _changing-builtin-symbols:
+
 Changing Builtin Symbols
 ^^^^^^^^^^^^^^^^^^^^^^^^
 To remove the default :ref:`builtin symbols<builtin-symbols>` that are provided, simply initialize a

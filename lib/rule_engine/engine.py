@@ -127,6 +127,9 @@ def _value_to_set_result_type(object_type):
 		return ast.DataType.SET(ast.DataType.STRING)
 	return ast.DataType.SET(object_type.value_type)
 
+def _value_with_result_type(name, object_type):
+	return ast.DataType.FUNCTION(name, argument_types=(object_type,), return_type=ast.DataType.BOOLEAN)
+
 class _AttributeResolverFunction(object):
 	__slots__ = ('function', 'type_resolver')
 	def __init__(self, function, *, result_type, type_resolver):
@@ -354,6 +357,13 @@ class _AttributeResolver(object):
 	def timedelta_total_seconds(self, value):
 		return value.total_seconds()
 
+	@attribute('ends_with', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'ends_with'))
+	def value_ends_with(self, value):
+		return functools.partial(self._value_ends_with, value)
+
+	def _value_ends_with(self, value, suffix):
+		return value[-len(suffix):] == suffix
+
 	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.BOOLEAN)
 	def value_is_empty(self, value):
 		return len(value) == 0
@@ -361,6 +371,13 @@ class _AttributeResolver(object):
 	@attribute('length', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.FLOAT)
 	def value_length(self, value):
 		return len(value)
+
+	@attribute('starts_with', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'starts_with'))
+	def value_starts_with(self, value):
+		return functools.partial(self._value_starts_with, value)
+
+	def _value_starts_with(self, value, prefix):
+		return value[:len(prefix)] == prefix
 
 	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.SET, ast.DataType.STRING, type_resolver=_value_to_ary_result_type)
 	def value_to_ary(self, value):

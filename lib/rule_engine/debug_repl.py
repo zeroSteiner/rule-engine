@@ -124,13 +124,14 @@ def main():
 				print("  Regex:   {!r}".format(error.error.pattern))
 				print("  Details: {} at position {}".format(error.error.msg, error.error.pos))
 			elif isinstance(error, errors.FunctionCallError):
-				if debugging:
+				print("  Function:  {!r}".format(error.function_name))
+				if debugging and error.error:
 					inner_exception = ''.join(traceback.format_exception(
 						error.error,
 						error.error,
 						error.error.__traceback__
 					))
-					print(textwrap.indent(inner_exception, ' ' * 2))
+					print(textwrap.indent(inner_exception, ' ' * 4))
 			if debugging:
 				traceback.print_exc()
 		except Exception as error:

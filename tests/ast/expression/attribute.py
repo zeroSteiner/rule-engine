@@ -102,6 +102,36 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		expression = ast.GetAttributeExpression(typed_context, typed_symbol, 'to_ary')
 		self.assertEqual(expression.result_type, typed_context.resolve_type(symbol.name))
 
+	def test_ast_expression_array_method_ends_with(self):
+		combos = [
+			(('Rule',), False),
+			(('Engine',), True),
+		]
+		for suffix, result in combos:
+			array_expression = ast.ArrayExpression(context, [
+				ast.StringExpression(context, 'Rule'),
+				ast.StringExpression(context, 'Engine')
+			])
+			expression = ast.GetAttributeExpression(context, array_expression, 'ends_with')
+			method = expression.evaluate(None)
+			self.assertTrue(callable(method), "attribute ends_with failed (method not callable)")
+			self.assertEqual(method(suffix), result)
+
+	def test_ast_expression_array_method_starts_with(self):
+		combos = [
+			(('Rule',), True),
+			(('Engine',), False),
+		]
+		for prefix, result in combos:
+			array_expression = ast.ArrayExpression(context, [
+				ast.StringExpression(context, 'Rule'),
+				ast.StringExpression(context, 'Engine')
+			])
+			expression = ast.GetAttributeExpression(context, array_expression, 'starts_with')
+			method = expression.evaluate(None)
+			self.assertTrue(callable(method), "attribute starts_with failed (method not callable)")
+			self.assertEqual(method(prefix), result)
+
 	def test_ast_expression_bytes_attributes(self):
 		value = b'Rule Engine'
 		symbol = ast.BytesExpression(context, value)
@@ -131,6 +161,30 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			self.assertEqual(method(encoding), string)
 		with self.assertRaises(errors.FunctionCallError):
 			method('invalid-encoding')
+
+	def test_ast_expression_bytes_method_ends_with(self):
+		combos = [
+			(b'Rule', False),
+			(b'Engine', True),
+		]
+		for suffix, result in combos:
+			bytes_expression = ast.BytesExpression(context, b'Rule Engine')
+			expression = ast.GetAttributeExpression(context, bytes_expression, 'ends_with')
+			method = expression.evaluate(None)
+			self.assertTrue(callable(method), "attribute ends_with failed (method not callable)")
+			self.assertEqual(method(suffix), result)
+
+	def test_ast_expression_bytes_method_starts_with(self):
+		combos = [
+			(b'Rule', True),
+			(b'Engine', False),
+		]
+		for prefix, result in combos:
+			bytes_expression = ast.BytesExpression(context, b'Rule Engine')
+			expression = ast.GetAttributeExpression(context, bytes_expression, 'starts_with')
+			method = expression.evaluate(None)
+			self.assertTrue(callable(method), "attribute starts_with failed (method not callable)")
+			self.assertEqual(method(prefix), result)
 
 	def test_ast_expression_datetime_attributes(self):
 		timestamp = datetime.datetime(2019, 9, 11, 20, 46, 57, 506406, tzinfo=dateutil.tz.UTC)
@@ -270,6 +324,30 @@ class GetAttributeExpressionTests(unittest.TestCase):
 			method('invalid-encoding')
 		with self.assertRaises(errors.FunctionCallError):
 			method('base16') # last one is base64 so this should fail
+
+	def test_ast_expression_string_method_ends_with(self):
+		combos = [
+			('Rule', False),
+			('Engine', True),
+		]
+		for suffix, result in combos:
+			string_expression = ast.StringExpression(context, 'Rule Engine')
+			expression = ast.GetAttributeExpression(context, string_expression, 'ends_with')
+			method = expression.evaluate(None)
+			self.assertTrue(callable(method), "attribute ends_with failed (method not callable)")
+			self.assertEqual(method(suffix), result)
+
+	def test_ast_expression_string_method_starts_with(self):
+		combos = [
+			('Rule', True),
+			('Engine', False),
+		]
+		for prefix, result in combos:
+			string_expression = ast.StringExpression(context, 'Rule Engine')
+			expression = ast.GetAttributeExpression(context, string_expression, 'starts_with')
+			method = expression.evaluate(None)
+			self.assertTrue(callable(method), "attribute starts_with failed (method not callable)")
+			self.assertEqual(method(prefix), result)
 
 	def test_ast_expression_string_attributes_flt(self):
 		combos = (

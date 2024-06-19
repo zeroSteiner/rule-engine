@@ -114,6 +114,10 @@ def type_resolver_from_dict(dictionary):
 	return functools.partial(_type_resolver, type_map)
 
 def _value_to_ary_result_type(object_type):
+	if object_type == ast.DataType.BYTES:
+		return ast.DataType.ARRAY(ast.DataType.FLOAT)
+	elif object_type == ast.DataType.STRING:
+		return ast.DataType.ARRAY(ast.DataType.STRING)
 	return ast.DataType.ARRAY(object_type.value_type)
 
 def _value_to_set_result_type(object_type):
@@ -317,10 +321,6 @@ class _AttributeResolver(object):
 		except LookupError as error:
 			raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='encode')
 
-	@attribute('to_ary', ast.DataType.STRING, result_type=ast.DataType.ARRAY(ast.DataType.STRING))
-	def string_to_ary(self, value):
-		return tuple(value)
-
 	@attribute('to_flt', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
 	def string_to_flt(self, value):
 		value = value.strip()
@@ -362,7 +362,7 @@ class _AttributeResolver(object):
 	def value_length(self, value):
 		return len(value)
 
-	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.SET, type_resolver=_value_to_ary_result_type)
+	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.SET, ast.DataType.STRING, type_resolver=_value_to_ary_result_type)
 	def value_to_ary(self, value):
 		return tuple(value)
 

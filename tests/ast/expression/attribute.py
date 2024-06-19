@@ -107,6 +107,7 @@ class GetAttributeExpressionTests(unittest.TestCase):
 		symbol = ast.BytesExpression(context, value)
 
 		attributes = {
+			'to_ary': tuple(value),
 			'to_set': set(value),
 			'length': len(value),
 			'is_empty': False

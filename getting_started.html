@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started &mdash; Rule Engine 4.4.1 documentation</title>
+  <title>Getting Started &mdash; Rule Engine 4.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8b5852d8"></script>
+        <script src="_static/documentation_options.js?v=5ef59c98"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.4.1
+                4.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -413,7 +413,7 @@ to <a class="reference internal" href="rule_engine/types.html#id0" title="rule_e
 <p>Like compound types, functions can include type information by calling the respective type, in this case
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a>. Functions only support positional arguments and not keyword arguments but positional
 arguments can be defined as optional through the <em>minimum_arguments</em> option.</p>
-<p>For example, the <a class="reference internal" href="syntax.html#builtin-function-split"><span class="std std-ref">builtin  split</span></a> can be called with as few as 1 arguments and as many as
+<p>For example, the <a class="reference internal" href="syntax.html#builtin-function-split"><span class="std std-ref">builtin split</span></a> can be called with as few as 1 arguments and as many as
 3 arguments. The first argument is always required, so <em>minimum_arguments</em> is set to 1. This means the remaining 2
 arguments are optional, however for the third argument to be defined in a function call, the second must also be
 defined. For the split function, the first argument is the string to split, followed by the seperator string to split on
@@ -456,7 +456,7 @@ function will be used automatically.</p>
 </section>
 </section>
 <section id="changing-builtin-symbols">
-<h3>Changing Builtin Symbols<a class="headerlink" href="#changing-builtin-symbols" title="Link to this heading"></a></h3>
+<span id="id1"></span><h3>Changing Builtin Symbols<a class="headerlink" href="#changing-builtin-symbols" title="Link to this heading"></a></h3>
 <p>To remove the default <a class="reference internal" href="syntax.html#builtin-symbols"><span class="std std-ref">builtin symbols</span></a> that are provided, simply initialize a
 <a class="reference internal" href="rule_engine/builtins.html#rule_engine.builtins.Builtins" title="rule_engine.builtins.Builtins"><code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code></a> instance with a <em>values</em> of an empty dictionary. This will remove all builtin
 values, and the dictionary can optionally be populated with alternative values.</p>

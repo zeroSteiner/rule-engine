@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.errors &mdash; Rule Engine 4.4.1 documentation</title>
+  <title>rule_engine.errors &mdash; Rule Engine 4.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=8b5852d8"></script>
+        <script src="../../_static/documentation_options.js?v=5ef59c98"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -35,7 +35,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.4.1
+                4.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -159,6 +159,48 @@
 <a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.SyntaxError">[docs]</a>
 <span class="k">class</span> <span class="nc">SyntaxError</span><span class="p">(</span><span class="n">EngineError</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A base error for syntax related issues.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="BytesSyntaxError">
+<a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.BytesSyntaxError">[docs]</a>
+<span class="k">class</span> <span class="nc">BytesSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised for issues regarding the use of improperly formatted bytes expressions.</span>
+
+<span class="sd">	.. versionadded:: 4.5.0</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BytesSyntaxError.__init__">
+<a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.BytesSyntaxError.__init__">[docs]</a>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str message: A text description of what error occurred.</span>
+<span class="sd">		:param str value: The bytes value which contains the syntax error which caused this exception to be raised.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">BytesSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;The bytes value which contains the syntax error which caused this exception to be raised.&quot;&quot;&quot;</span></div>
+</div>
+
+
+<div class="viewcode-block" id="StringSyntaxError">
+<a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.StringSyntaxError">[docs]</a>
+<span class="k">class</span> <span class="nc">StringSyntaxError</span><span class="p">(</span><span class="ne">SyntaxError</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	An error raised for issues regarding the use of improperly formatted string expressions.</span>
+
+<span class="sd">	.. versionadded:: 4.5.0</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="StringSyntaxError.__init__">
+<a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.StringSyntaxError.__init__">[docs]</a>
+	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:param str message: A text description of what error occurred.</span>
+<span class="sd">		:param str value: The string value which contains the syntax error which caused this exception to be raised.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="nb">super</span><span class="p">(</span><span class="n">StringSyntaxError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+<span class="w">		</span><span class="sd">&quot;&quot;&quot;The string value which contains the syntax error which caused this exception to be raised.&quot;&quot;&quot;</span></div>
+</div>
 
 
 <div class="viewcode-block" id="DatetimeSyntaxError">

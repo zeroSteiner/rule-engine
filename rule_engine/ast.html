@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ast &mdash; Rule Engine 4.4.1 documentation</title>
+  <title>ast &mdash; Rule Engine 4.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=0c24fe83" />
@@ -16,7 +16,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../_static/documentation_options.js?v=8b5852d8"></script>
+        <script src="../_static/documentation_options.js?v=5ef59c98"></script>
         <script src="../_static/doctools.js?v=9a2dae69"></script>
         <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.4.1
+                4.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -380,6 +380,19 @@ match.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="rule_engine.ast.BytesExpression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BytesExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#BytesExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BytesExpression" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiteralExpressionBase</span></code></a></p>
+<p>Literal bytes expressions representing a binary string. This expression type always evaluates to true when not empty.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rule_engine.ast.BytesExpression.result_type">
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">BYTES</span></em><a class="headerlink" href="#rule_engine.ast.BytesExpression.result_type" title="Link to this definition"></a></dt>
+<dd><p>The data type of the result of successful evaluation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.DatetimeExpression">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DatetimeExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#DatetimeExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.DatetimeExpression" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiteralExpressionBase</span></code></a></p>
@@ -400,6 +413,19 @@ match.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.FloatExpression.result_type">
 <span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">FLOAT</span></em><a class="headerlink" href="#rule_engine.ast.FloatExpression.result_type" title="Link to this definition"></a></dt>
+<dd><p>The data type of the result of successful evaluation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rule_engine.ast.FunctionExpression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FunctionExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#FunctionExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.FunctionExpression" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.LiteralExpressionBase" title="rule_engine.ast.LiteralExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiteralExpressionBase</span></code></a></p>
+<p>Literal mapping expression representing a function.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rule_engine.ast.FunctionExpression.result_type">
+<span class="sig-name descname"><span class="pre">result_type</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">FUNCTION</span></em><a class="headerlink" href="#rule_engine.ast.FunctionExpression.result_type" title="Link to this definition"></a></dt>
 <dd><p>The data type of the result of successful evaluation.</p>
 </dd></dl>
 

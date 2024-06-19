@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.parser.utilities &mdash; Rule Engine 4.4.1 documentation</title>
+  <title>rule_engine.parser.utilities &mdash; Rule Engine 4.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=0c24fe83" />
@@ -15,7 +15,7 @@
   
         <script src="../../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=8b5852d8"></script>
+        <script src="../../../_static/documentation_options.js?v=5ef59c98"></script>
         <script src="../../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -35,7 +35,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.4.1
+                4.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -115,6 +115,7 @@
 <span class="c1">#</span>
 
 <span class="kn">import</span> <span class="nn">ast</span> <span class="k">as</span> <span class="nn">pyast</span>
+<span class="kn">import</span> <span class="nn">binascii</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">decimal</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -148,7 +149,7 @@
 	<span class="k">try</span><span class="p">:</span>
 		<span class="n">dt</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">isoparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
 	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
 	<span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 		<span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">default_timezone</span><span class="p">)</span>
 	<span class="k">return</span> <span class="n">dt</span></div>

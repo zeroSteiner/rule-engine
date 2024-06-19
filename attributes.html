@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Attributes &mdash; Rule Engine 4.4.1 documentation</title>
+  <title>Data Attributes &mdash; Rule Engine 4.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8b5852d8"></script>
+        <script src="_static/documentation_options.js?v=5ef59c98"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.4.1
+                4.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -56,6 +56,8 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Data Attributes</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#builtin-attributes">Builtin Attributes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#float-attributes-1">FLOAT Attributes <sup>1</sup></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#encoding-and-decoding">Encoding and Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#object-methods">Object Methods</a></li>
 </ul>
 </li>
 </ul>
@@ -104,17 +106,46 @@ submembers. If the resolver function fails, the attribute will be checked to det
 </tr>
 <tr class="row-even"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> <strong>Attributes</strong></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">is_empty</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ends_with(prefix)</span></code></p></td>
+<td><p><a class="reference internal" href="#builtin-method-ends-with"><span class="std std-ref">FUNCTION</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">is_empty</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">length</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">length</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">starts_with(prefix)</span></code></p></td>
+<td><p><a class="reference internal" href="#builtin-method-starts-with"><span class="std std-ref">FUNCTION</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">to_ary</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">to_set</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.SET" title="rule_engine.types.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BYTES" title="rule_engine.types.DataType.BYTES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BYTES</span></code></a> <strong>Attributes</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ends_with(prefix)</span></code></p></td>
+<td><p><a class="reference internal" href="#builtin-method-ends-with"><span class="std std-ref">FUNCTION</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">is_empty</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">length</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">starts_with(prefix)</span></code></p></td>
+<td><p><a class="reference internal" href="#builtin-method-starts-with"><span class="std std-ref">FUNCTION</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">to_ary</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">to_set</span></code></p></td>
+<td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.SET" title="rule_engine.types.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">decode(encoding)</span></code></p></td>
+<td><p><a class="reference internal" href="#builtin-method-decode"><span class="std std-ref">FUNCTION</span></a></p></td>
 </tr>
 <tr class="row-odd"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> <strong>Attributes</strong></p></td>
 </tr>
@@ -154,7 +185,7 @@ submembers. If the resolver function fails, the attribute will be checked to det
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">zone_name</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a>   <strong>Attributes</strong> <sup>1</sup></p></td>
+<tr class="row-even"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a> <strong>Attributes</strong> <sup>1</sup></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ceiling</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
@@ -207,6 +238,12 @@ submembers. If the resolver function fails, the attribute will be checked to det
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">as_upper</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">encode(encoding)</span></code></p></td>
+<td><p><a class="reference internal" href="#builtin-method-encode"><span class="std std-ref">FUNCTION</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ends_with(prefix)</span></code></p></td>
+<td><p><a class="reference internal" href="#builtin-method-ends-with"><span class="std std-ref">FUNCTION</span></a></p></td>
+</tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">to_ary</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a></p></td>
 </tr>
@@ -228,18 +265,21 @@ submembers. If the resolver function fails, the attribute will be checked to det
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">length</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> <strong>Attributes</strong></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">starts_with(prefix)</span></code></p></td>
+<td><p><a class="reference internal" href="#builtin-method-starts-with"><span class="std std-ref">FUNCTION</span></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">days</span></code></p></td>
+<tr class="row-odd"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> <strong>Attributes</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">days</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">seconds</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">seconds</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">microseconds</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">microseconds</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">total_seconds</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">total_seconds</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
 </tr>
 </tbody>
@@ -248,6 +288,72 @@ submembers. If the resolver function fails, the attribute will be checked to det
 <h3>FLOAT Attributes <sup>1</sup><a class="headerlink" href="#float-attributes-1" title="Link to this heading"></a></h3>
 <p>Due to the syntax of floating point literals, the attributes must be accessed using parenthesis. For example
 <code class="docutils literal notranslate"><span class="pre">3.14.to_str</span></code> is invalid while <code class="docutils literal notranslate"><span class="pre">(3.14).to_str</span></code> is valid.</p>
+</section>
+<section id="encoding-and-decoding">
+<h3>Encoding and Decoding<a class="headerlink" href="#encoding-and-decoding" title="Link to this heading"></a></h3>
+<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BYTES" title="rule_engine.types.DataType.BYTES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BYTES</span></code></a> values can be converted to <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> values by calling their <code class="docutils literal notranslate"><span class="pre">.decode</span></code>
+method. <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> values can be converted to <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BYTES" title="rule_engine.types.DataType.BYTES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BYTES</span></code></a> values by calling their
+<code class="docutils literal notranslate"><span class="pre">.encode</span></code> method. This resembles Python’s native functionality and the <code class="docutils literal notranslate"><span class="pre">encoding</span></code> argument to each is the same, i.e.
+it can be any encoding name that Python can handle such as <code class="docutils literal notranslate"><span class="pre">UTF-8</span></code>. In addition to the encoding names that Python can
+handle, the special names <code class="docutils literal notranslate"><span class="pre">hex</span></code>, <code class="docutils literal notranslate"><span class="pre">base16</span></code> and <code class="docutils literal notranslate"><span class="pre">base64</span></code> can be used for transcoding ascii-hex, and base-64
+formatted data.</p>
+</section>
+<section id="object-methods">
+<h3>Object Methods<a class="headerlink" href="#object-methods" title="Link to this heading"></a></h3>
+<p>Much like in Python, a method is a function that is associated with an object. They are defined as
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a> values and are accessed as attributes.</p>
+<p id="builtin-method-decode"><code class="docutils literal notranslate"><span class="pre">BYTES</span> <span class="pre">decode(STRING</span> <span class="pre">encoding)</span> <span class="pre">-&gt;</span> <span class="pre">STRING</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p>
+</dd>
+<dt class="field-even">encoding<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>) The encoding name to use.</p>
+</dd>
+</dl>
+<p>Returns the decoded value.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 4.5.0.</span></p>
+</div>
+<p id="builtin-method-encode"><code class="docutils literal notranslate"><span class="pre">STRING</span> <span class="pre">encode(STRING</span> <span class="pre">encoding)</span> <span class="pre">-&gt;</span> <span class="pre">BYTES</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BYTES" title="rule_engine.types.DataType.BYTES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BYTES</span></code></a></p>
+</dd>
+<dt class="field-even">encoding<span class="colon">:</span></dt>
+<dd class="field-even"><p>(<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a>) The encoding name to use.</p>
+</dd>
+</dl>
+<p>Returns the encoded value.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 4.5.0.</span></p>
+</div>
+<p id="builtin-method-ends-with"><code class="docutils literal notranslate"><span class="pre">ARRAY</span> <span class="pre">|</span> <span class="pre">BYTES</span> <span class="pre">|</span> <span class="pre">STRING</span> <span class="pre">ends_with(ARRAY</span> <span class="pre">|</span> <span class="pre">BYTES</span> <span class="pre">|</span> <span class="pre">STRING</span> <span class="pre">suffix)</span> <span class="pre">-&gt;</span> <span class="pre">BOOLEAN</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p>
+</dd>
+<dt class="field-even">suffix<span class="colon">:</span></dt>
+<dd class="field-even"><p>The suffix to check for. The data type must match the object type.</p>
+</dd>
+</dl>
+<p>Check whether the value ends with the specified value.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 4.5.0.</span></p>
+</div>
+<p id="builtin-method-starts-with"><code class="docutils literal notranslate"><span class="pre">ARRAY</span> <span class="pre">|</span> <span class="pre">BYTES</span> <span class="pre">|</span> <span class="pre">STRING</span> <span class="pre">starts_with(ARRAY</span> <span class="pre">|</span> <span class="pre">BYTES</span> <span class="pre">|</span> <span class="pre">STRING</span> <span class="pre">prefix)</span> <span class="pre">-&gt;</span> <span class="pre">BOOLEAN</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p>
+</dd>
+<dt class="field-even">prefix<span class="colon">:</span></dt>
+<dd class="field-even"><p>The prefix to check for. The data type must match the object type.</p>
+</dd>
+</dl>
+<p>Check whether the value starts with the specified value.</p>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 4.5.0.</span></p>
+</div>
 </section>
 </section>
 </section>

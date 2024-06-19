@@ -24,6 +24,11 @@ Exceptions
    :show-inheritance:
    :special-members: __init__
 
+.. autoexception:: BytesSyntaxError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: DatetimeSyntaxError
    :members:
    :show-inheritance:
@@ -64,6 +69,11 @@ Exceptions
    :show-inheritance:
    :special-members: __init__
 
+.. autoexception:: StringSyntaxError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: SymbolResolutionError
    :members:
    :show-inheritance:
@@ -100,8 +110,10 @@ The class hierarchy for Rule Engine exceptions is:
          +-- SymbolResolutionError
          +-- SymbolTypeError
     +-- SyntaxError
+         +-- BytesSyntaxError
          +-- DatetimeSyntaxError
          +-- FloatSyntaxError
          +-- RegexSyntaxError
          +-- RuleSyntaxError
+         +-- StringSyntaxError
          +-- TimedeltaSyntaxError

@@ -294,7 +294,7 @@ Like compound types, functions can include type information by calling the respe
 :py:attr:`~.DataType.FUNCTION`. Functions only support positional arguments and not keyword arguments but positional
 arguments can be defined as optional through the *minimum_arguments* option.
 
-For example, the :ref:`builtin  split<builtin-function-split>` can be called with as few as 1 arguments and as many as
+For example, the :ref:`builtin split<builtin-function-split>` can be called with as few as 1 arguments and as many as
 3 arguments. The first argument is always required, so *minimum_arguments* is set to 1. This means the remaining 2
 arguments are optional, however for the third argument to be defined in a function call, the second must also be
 defined. For the split function, the first argument is the string to split, followed by the seperator string to split on
@@ -337,6 +337,8 @@ function will be used automatically.
            'released':  rule_engine.DataType.DATETIME
        })
    )
+
+.. _changing-builtin-symbols:
 
 Changing Builtin Symbols
 ^^^^^^^^^^^^^^^^^^^^^^^^

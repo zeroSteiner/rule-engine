@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Types &mdash; Rule Engine 4.4.1 documentation</title>
+  <title>Data Types &mdash; Rule Engine 4.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -16,7 +16,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=8b5852d8"></script>
+        <script src="_static/documentation_options.js?v=5ef59c98"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.4.1
+                4.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -106,31 +106,34 @@ compatible with. For a information regarding supported operations, see the
 <tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BYTES" title="rule_engine.types.DataType.BYTES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BYTES</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#bytes" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.12/library/datetime.html#datetime.date" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></a>,
 <a class="reference external" href="https://docs.python.org/3.12/library/datetime.html#datetime.datetime" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>,
 <a class="reference external" href="https://docs.python.org/3.12/library/functions.html#float" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>
 <a class="reference external" href="https://docs.python.org/3.12/library/decimal.html#decimal.Decimal" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a></p></td>
 <td><p><em>anything callable</em></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a></p></td>
 <td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.SET" title="rule_engine.types.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.SET" title="rule_engine.types.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#set" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.12/library/datetime.html#datetime.timedelta" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.timedelta</span></code></a></p></td>
 </tr>
 </tbody>
@@ -175,8 +178,9 @@ using Rule Engine should take care to not use compound data types with a mix of 
 <h2>FUNCTION<a class="headerlink" href="#function" title="Link to this heading"></a></h2>
 <p>Version <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v4.0.0">v4.0.0</a> added the <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a> datatype. This can be used to make functions available
 to rule authors. Rule Engine contains a few <a class="reference internal" href="syntax.html#builtin-functions"><span class="std std-ref">builtin functions</span></a> that can be used by default.
-Additional functions can either be added to the evaluated object or by extending the builtin symbols. It is only possible
-to call a function from within the rule text. Functions can not be defined as other data types can be.</p>
+Additional functions must be defined in Python and can either be added to the evaluated object or by
+<a class="reference internal" href="getting_started.html#changing-builtin-symbols"><span class="std std-ref">extending the builtin symbols</span></a>. It is only possible to call a function from within the
+rule text. Functions can not be defined by rule authors as other data types can be.</p>
 </section>
 <section id="timedelta">
 <h2>TIMEDELTA<a class="headerlink" href="#timedelta" title="Link to this heading"></a></h2>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.ast &mdash; Rule Engine 4.4.1 documentation</title>
+  <title>rule_engine.ast &mdash; Rule Engine 4.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
@@ -15,7 +15,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=8b5852d8"></script>
+        <script src="../../_static/documentation_options.js?v=5ef59c98"></script>
         <script src="../../_static/doctools.js?v=9a2dae69"></script>
         <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -35,7 +35,7 @@
             Rule Engine
           </a>
               <div class="version">
-                4.4.1
+                4.5.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -124,6 +124,10 @@
 <span class="kn">from</span> <span class="nn">.parser.utilities</span> <span class="kn">import</span> <span class="n">parse_datetime</span><span class="p">,</span> <span class="n">parse_float</span><span class="p">,</span> <span class="n">parse_timedelta</span>
 <span class="kn">from</span> <span class="nn">.suggestions</span> <span class="kn">import</span> <span class="n">suggest_symbol</span>
 <span class="kn">from</span> <span class="nn">.types</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">def</span> <span class="nf">_assert_is_bytes</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+	<span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="p">[</span><span class="nb">bytes</span><span class="p">])):</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a bytes value)&#39;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">_assert_is_integer_number</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_integer_number</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
@@ -253,7 +257,7 @@
 <span class="sd">		:param value: The native Python value.</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
-		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">python_type</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">is_scalar</span> <span class="ow">and</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;__init__ argument 2 must be </span><span class="si">{}</span><span class="s2">, not </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span></div>
 
@@ -336,6 +340,15 @@
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span></div>
 
 
+<div class="viewcode-block" id="BytesExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.BytesExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">BytesExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Literal bytes expressions representing a binary string. This expression type always evaluates to true when not empty.</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BYTES</span></div>
+
+
 <div class="viewcode-block" id="DatetimeExpression">
 <a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.DatetimeExpression">[docs]</a>
 <span class="k">class</span> <span class="nc">DatetimeExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
@@ -375,6 +388,15 @@
 	<span class="nd">@classmethod</span>
 	<span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FunctionExpression">
+<a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.FunctionExpression">[docs]</a>
+<span class="k">class</span> <span class="nc">FunctionExpression</span><span class="p">(</span><span class="n">LiteralExpressionBase</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">&quot;&quot;&quot;Literal mapping expression representing a function.&quot;&quot;&quot;</span>
+	<span class="c1"># there&#39;s no syntax for defining functions, but this is required by the parser when a method is referred to on a</span>
+	<span class="c1"># literal value, e.g. `b&quot;41&quot;.decode(&#39;utf-8&#39;)`</span>
+	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span></div>
 
 
 <div class="viewcode-block" id="MappingExpression">
@@ -525,7 +547,7 @@
 <a class="viewcode-back" href="../../rule_engine/ast.html#rule_engine.ast.AddExpression">[docs]</a>
 <span class="k">class</span> <span class="nc">AddExpression</span><span class="p">(</span><span class="n">LeftOperatorRightExpressionBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;A class for representing addition expressions from the grammar text.&quot;&quot;&quot;</span>
-	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">)</span>
+	<span class="n">compatible_types</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">BYTES</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">)</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
 
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -553,6 +575,8 @@
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">):</span>
 			<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)):</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a datetime or timedelta value)&#39;</span><span class="p">)</span>
+		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+			<span class="n">_assert_is_bytes</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
 		<span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
 			<span class="n">_assert_is_string</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
 		<span class="k">else</span><span class="p">:</span>
@@ -865,8 +889,8 @@
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;container&#39;</span><span class="p">,</span> <span class="s1">&#39;member&#39;</span><span class="p">)</span>
 	<span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BOOLEAN</span>
 	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">member</span><span class="p">):</span>
-		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
-			<span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BYTES</span> <span class="ow">or</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
 		<span class="k">elif</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
@@ -883,9 +907,10 @@
 
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">container_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+		<span class="n">container_value_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">container_value</span><span class="p">)</span>
 		<span class="n">member_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">member</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">container_value</span><span class="p">)</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
-			<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">member_value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">container_value_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BYTES</span> <span class="ow">or</span> <span class="n">container_value_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">member_value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">container_value_type</span><span class="p">:</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
 		<span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">member_value</span> <span class="ow">in</span> <span class="n">container_value</span><span class="p">)</span>
 
@@ -969,7 +994,10 @@
 	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="p">):</span>
 			<span class="k">return</span> <span class="bp">self</span>
-		<span class="k">return</span> <span class="n">LiteralExpressionBase</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+		<span class="n">literal</span> <span class="o">=</span> <span class="n">LiteralExpressionBase</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+		<span class="k">if</span> <span class="n">literal</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span> <span class="ow">and</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="p">):</span>
+			<span class="n">literal</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span>
+		<span class="k">return</span> <span class="n">literal</span>
 
 	<span class="k">def</span> <span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 		<span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">name=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
@@ -995,7 +1023,11 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
-		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BYTES</span><span class="p">:</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">):</span>
+				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not an integer number)&#39;</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
+		<span class="k">elif</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 			<span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">):</span>
 				<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not an integer number)&#39;</span><span class="p">)</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span>
@@ -1032,7 +1064,7 @@
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (container is null)&#39;</span><span class="p">)</span>
 
 		<span class="n">resolved_item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
-		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolved_obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolved_obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
 			<span class="n">_assert_is_integer_number</span><span class="p">(</span><span class="n">resolved_item</span><span class="p">)</span>
 			<span class="n">resolved_item</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">resolved_item</span><span class="p">)</span>
 		<span class="k">try</span><span class="p">:</span>
@@ -1078,7 +1110,9 @@
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
-		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BYTES</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">BYTES</span>
+		<span class="k">elif</span> <span class="n">container</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span>
 		<span class="c1"># check against __class__ so the parent class is dynamic in case it changes in the future, what we&#39;re doing here</span>
 		<span class="c1"># is explicitly checking if result_type is an array with out checking the value_type</span>
@@ -1218,7 +1252,10 @@
 	<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">arguments</span><span class="p">):</span>
 		<span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">function</span><span class="o">.</span><span class="n">build</span><span class="p">(),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">argument</span><span class="o">.</span><span class="n">build</span><span class="p">()</span> <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">))</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
 
-	<span class="c1"># because there is no syntax for defining a function, they can&#39;t be reduced until symbols can be reduced</span>
+	<span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span>
+		<span class="k">return</span> <span class="n">LiteralExpressionBase</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
 
 	<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">):</span>
 		<span class="n">function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
@@ -1239,7 +1276,10 @@
 			<span class="k">raise</span> <span class="n">error</span>
 		<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;function call failed&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span> <span class="n">function_name</span><span class="o">=</span><span class="n">function_name</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_value</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+		<span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_value</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;function call failed (data type mismatch on returned value)&#39;</span><span class="p">,</span> <span class="n">function_name</span><span class="o">=</span><span class="n">function_name</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">result</span>
 
 	<span class="k">def</span> <span class="nf">_validate_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_type</span><span class="p">,</span> <span class="n">arguments</span><span class="p">):</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>

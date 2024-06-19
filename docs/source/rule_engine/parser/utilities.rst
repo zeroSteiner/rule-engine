@@ -9,8 +9,6 @@ This module contains utility functions for parsing various strings.
 Functions
 ---------
 
-.. autofunction:: parse_bytes
-
 .. autofunction:: parse_datetime
 
 .. autofunction:: parse_float

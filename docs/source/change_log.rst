@@ -10,6 +10,8 @@ Version 4.x.x
 Version 4.5.0
 ^^^^^^^^^^^^^
 
+Released :release:`4.5.0` on June 19th, 2024
+
 * :py:class:`~rule_engine.errors.StringSyntaxError` is now raised for invalid string literals
 * :py:class:`~rule_engine.errors.FunctionCallError` is now raised when a typed function returns an incompatible value
 * Added the new :py:class:`~rule_engine.types.DataType.BYTES` data type

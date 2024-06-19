@@ -111,7 +111,7 @@ The following table outlines all operators that can be used in Rule Engine expre
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``in``       | Membership check             | :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.BYTES`,       |
 |              |                              | :py:attr:`~.DataType.MAPPING`, :py:attr:`~.DataType.SET`,       |
-|              |                              |:py:attr:`~.DataType.STRING`                                     |
+|              |                              | :py:attr:`~.DataType.STRING`                                    |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | **Accessor Operators**                                                                                        |
 +--------------+------------------------------+-----------------------------------------------------------------+
@@ -208,7 +208,7 @@ more argument expressions to pass to the function. Functions support optional po
 function can take two arguments and one or both can specify a default value and then be omitted when called. Functions
 do not support keyword arguments.
 
-Using the :ref:`builtin  split<builtin-function-split>` function as an example, it can be called with up to 3 arguments.
+Using the :ref:`builtin split<builtin-function-split>` function as an example, it can be called with up to 3 arguments.
 The first is required while the second two are optional. The ``split`` symbol requires the ``$`` prefix to access the
 builtin value.
 
@@ -362,7 +362,12 @@ custom subclass of :py:class:`~engine.Context` and setting the :py:attr:`~engine
 Functions
 ^^^^^^^^^
 
-``FLOAT abs(FLOAT value)``
+.. note::
+   The following functions use a pseudo syntax to define their signature for use within rules. The signature is:
+
+   ``functionName(argumentType argumentName, ...) -> returnType``
+
+``abs(FLOAT value) -> FLOAT``
 
 :returns: :py:attr:`~.DataType.FLOAT`
 :value: (:py:attr:`~.DataType.FLOAT`) The numeric to get the absolute value of.
@@ -371,14 +376,14 @@ Returns the absolute value of *value*.
 
 .. versionadded:: 4.1.0
 
-``BOOLEAN all(ARRAY[??] values)``
+``all(ARRAY[??] values) -> BOOLEAN``
 
 :returns: :py:attr:`~.DataType.BOOLEAN`
 :values: (:py:attr:`~.DataType.ARRAY` of *anything*) An array of values to check.
 
 Returns true if every member of the array argument is truthy. If *values* is empty, the function returns true.
 
-``BOOLEAN any(ARRAY[??] values)``
+``any(ARRAY[??] values) -> BOOLEAN``
 
 :returns: :py:attr:`~.DataType.BOOLEAN`
 :values: (:py:attr:`~.DataType.ARRAY` of *anything*) An array of values to check.
@@ -399,7 +404,7 @@ Returns an array containing a subset of members from *values* where *function* r
 :function: (:py:attr:`~.DataType.FUNCTION`) The function to call on each of the values.
 :values: (:py:attr:`~.DataType.ARRAY` of *anything*) The array of values to apply *function* to.
 
-``FLOAT max(ARRAY[FLOAT] values)``
+``max(ARRAY[FLOAT] values) -> FLOAT``
 
 :returns: :py:attr:`~.DataType.FLOAT`
 :values: (:py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`) An array of values to check.
@@ -407,7 +412,7 @@ Returns an array containing a subset of members from *values* where *function* r
 Returns the largest value from the array of values. If *values* is empty, a :py:exc:`~.errors.FunctionCallError` is
 raised.
 
-``FLOAT min(ARRAY[FLOAT] values)``
+``min(ARRAY[FLOAT] values) -> FLOAT``
 
 :returns: :py:attr:`~.DataType.FLOAT`
 :values: (:py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`) An array of values to check.
@@ -415,7 +420,7 @@ raised.
 Returns the smallest value from the array of values. If *values* is empty, a :py:exc:`~.errors.FunctionCallError` is
 raised.
 
-``DATETIME parse_datetime(STRING value)``
+``parse_datetime(STRING value) -> DATETIME``
 
 :returns: :py:attr:`~.DataType.DATETIME`
 :value: (:py:attr:`~.DataType.STRING`) The string value to parse into a timestamp.
@@ -423,7 +428,7 @@ raised.
 Parses the string value into a :py:attr:`~.DataType.DATETIME` value. The string must be in ISO-8601 format and if it
 fails to parse, a :py:exc:`~.errors.DatetimeSyntaxError` is raised.
 
-``FLOAT parse_float(STRING value)``
+``parse_float(STRING value) -> FLOAT``
 
 :returns: :py:attr:`~.DataType.FLOAT`
 :value: (:py:attr:`~.DataType.STRING`) The string value to parse into a numeric.
@@ -431,7 +436,7 @@ fails to parse, a :py:exc:`~.errors.DatetimeSyntaxError` is raised.
 Parses the string value into a :py:attr:`~.DataType.FLOAT` value. The string must be properly formatted and if it
 fails to parse, a :py:exc:`~.errors.FloatSyntaxError` is raised.
 
-``FLOAT parse_timedelta(STRING value)``
+``parse_timedelta(STRING value) -> FLOAT``
 
 :returns: :py:attr:`~.DataType.TIMEDELTA`
 :value: (:py:attr:`~.DataType.STRING`) The string value to parse into a time period.
@@ -439,7 +444,7 @@ fails to parse, a :py:exc:`~.errors.FloatSyntaxError` is raised.
 Parses the string value into a :py:attr:`~.DataType.TIMEDELTA` value. The string must be properly formatted and if it
 fails to parse, a :py:exc:`~.errors.TimedeltaSyntaxError` is raised.
 
-``FLOAT random([FLOAT boundary])``
+``random([FLOAT boundary]) -> FLOAT``
 
 :returns: :py:attr:`~.DataType.FLOAT`
 :boundary: (Optional :py:attr:`~.DataType.FLOAT`) The upper boundary to generate a random number for.
@@ -482,7 +487,7 @@ For example:
 If *maxsplit* is specified, it must be a natural number and will be used as the maximum number of times to split
 *string*. This will guarantee that the resulting array length is less than or equal to *maxsplit* + 1.
 
-``FLOAT sum(ARRAY[FLOAT] values)``
+``sum(ARRAY[FLOAT] values) -> FLOAT``
 
 :returns: :py:attr:`~.DataType.FLOAT`
 :values: (:py:attr:`~.DataType.ARRAY` of :py:attr:`~.DataType.FLOAT`) An array of values to add.

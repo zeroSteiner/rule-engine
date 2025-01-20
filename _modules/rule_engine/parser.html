@@ -1,23 +1,21 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rule_engine.parser &mdash; Rule Engine 4.5.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=fa8d1881"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fa8d1881"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -34,9 +32,6 @@
           <a href="../../index.html" class="icon icon-home">
             Rule Engine
           </a>
-              <div class="version">
-                4.5.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -113,20 +108,20 @@
 <span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 
-<span class="kn">import</span> <span class="nn">ast</span> <span class="k">as</span> <span class="nn">pyast</span>
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">types</span> <span class="k">as</span> <span class="nn">pytypes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pyast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pytypes</span>
 
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">ast</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">errors</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">ParserBase</span>
-<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">timedelta_regex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">ast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParserBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta_regex</span>
 
 <span class="n">literal_eval</span> <span class="o">=</span> <span class="n">pyast</span><span class="o">.</span><span class="n">literal_eval</span>
 
-<span class="k">class</span> <span class="nc">_DeferredAstNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_DeferredAstNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">)</span>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;build&#39;</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;build&#39;</span><span class="p">):</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">ASTNodeBase</span><span class="p">):</span>
 			<span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;cls is not a subclass of AstNodeBase&#39;</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="o">=</span> <span class="bp">cls</span>
@@ -134,13 +129,13 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
 
-	<span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="n">constructor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">constructor</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Parser">
 <a class="viewcode-back" href="../../rule_engine/parser/index.html#rule_engine.parser.Parser">[docs]</a>
-<span class="k">class</span> <span class="nc">Parser</span><span class="p">(</span><span class="n">ParserBase</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Parser</span><span class="p">(</span><span class="n">ParserBase</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	The parser class for the rule grammar. This class contains many ply specific</span>
 <span class="sd">	members to define the various components of the grammar allowing it to be</span>
@@ -246,7 +241,7 @@
 	<span class="p">))</span>
 
 	<span class="nd">@classmethod</span>
-	<span class="k">def</span> <span class="nf">get_token_regex</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">token_name</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">get_token_regex</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">token_name</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Return the regex that is used by the specified token.</span>
 
@@ -260,84 +255,84 @@
 			<span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span>
 		<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown token: &#39;</span> <span class="o">+</span> <span class="n">token_name</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="nf">t_POW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_POW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;\*\*?&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
 			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;MUL&#39;</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_FDIV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_FDIV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;\/\/?&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
 			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;TDIV&#39;</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_LT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_LT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;&lt;([=&lt;])?&#39;</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&lt;&#39;</span><span class="p">:</span> <span class="s1">&#39;LT&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;LE&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;&lt;&#39;</span><span class="p">:</span> <span class="s1">&#39;BWLSH&#39;</span><span class="p">}[</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_GT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_GT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;&gt;([=&gt;])?&#39;</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;GT&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;GE&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;BWRSH&#39;</span><span class="p">}[</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_EQ_FZS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_EQ_FZS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;=~~?&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;=~&#39;</span><span class="p">:</span>
 			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;EQ_FZM&#39;</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_NE_FZS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_NE_FZS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;!~~?&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;!~&#39;</span><span class="p">:</span>
 			<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;NE_FZM&#39;</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_BYTES</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_BYTES</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;b(?P&lt;quote&gt;[&quot;</span><span class="se">\&#39;</span><span class="s1">])([^</span><span class="se">\\</span><span class="s1">\n]|(</span><span class="se">\\</span><span class="s1">.))*?(?P=quote)&#39;</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_DATETIME</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_DATETIME</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;d(?P&lt;quote&gt;[&quot;</span><span class="se">\&#39;</span><span class="s1">])([^</span><span class="se">\\</span><span class="s1">\n]|(</span><span class="se">\\</span><span class="s1">.))*?(?P=quote)&#39;</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_TIMEDELTA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_TIMEDELTA</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;t(?P&lt;quote&gt;[&quot;</span><span class="se">\&#39;</span><span class="s1">])([^</span><span class="se">\\</span><span class="s1">\n]|(</span><span class="se">\\</span><span class="s1">.))*?(?P=quote)&#39;</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_STRING</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_STRING</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;s?(?P&lt;quote&gt;[&quot;</span><span class="se">\&#39;</span><span class="s1">])([^</span><span class="se">\\</span><span class="s1">\n]|(</span><span class="se">\\</span><span class="s1">.))*?(?P=quote)&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
 			<span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_SYMBOL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_SYMBOL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;\$?[a-zA-Z_][a-zA-Z0-9_]*&#39;</span>
 		<span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;elif&#39;</span><span class="p">,</span> <span class="s1">&#39;else&#39;</span><span class="p">,</span> <span class="s1">&#39;while&#39;</span><span class="p">):</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s2">&quot;syntax error (the </span><span class="si">{}</span><span class="s2"> keyword is reserved for future use)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reserved_words</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;SYMBOL&#39;</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_COMMENT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_COMMENT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;\#.*$&#39;</span>
 		<span class="k">return</span> <span class="n">t</span>
 
-	<span class="k">def</span> <span class="nf">t_newline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_newline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="sa">r</span><span class="s1">&#39;\n+&#39;</span>
 		<span class="n">t</span><span class="o">.</span><span class="n">lexer</span><span class="o">.</span><span class="n">lineno</span> <span class="o">+=</span> <span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="nf">t_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">t_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s2">&quot;syntax error (illegal character </span><span class="si">{0!r}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">t</span><span class="p">)</span>
 
 	<span class="c1"># Parsing Rules</span>
-	<span class="k">def</span> <span class="nf">p_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s1">&#39;syntax error&#39;</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="nf">p_statement_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_statement_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		statement : expression</span>
 <span class="sd">		          | expression COMMENT</span>
@@ -347,7 +342,7 @@
 			<span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comment&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">Comment</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">Statement</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : object ATTR SYMBOL</span>
 <span class="sd">		       | object ATTR_SAFE SYMBOL</span>
@@ -355,20 +350,20 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">GetAttributeExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;safe&#39;</span><span class="p">:</span> <span class="n">op_name</span> <span class="o">==</span> <span class="s1">&#39;ATTR_SAFE&#39;</span><span class="p">})</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : object</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_ternary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_ternary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression QMARK expression COLON expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">condition</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">case_false</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">TernaryExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">case_true</span><span class="p">,</span> <span class="n">case_false</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression MOD    expression</span>
 <span class="sd">				   | expression MUL    expression</span>
@@ -380,7 +375,7 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression ADD    expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -388,7 +383,7 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">AddExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_sub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_sub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression SUB    expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
@@ -396,7 +391,7 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">SubtractExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_bitwise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_bitwise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression BWAND  expression</span>
 <span class="sd">				   | expression BWOR   expression</span>
@@ -406,7 +401,7 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">BitwiseExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_bitwise_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_bitwise_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression BWLSH  expression</span>
 <span class="sd">				   | expression BWRSH  expression</span>
@@ -415,7 +410,7 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">BitwiseShiftExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression IN     expression</span>
 <span class="sd">				   | expression NOT IN expression</span>
@@ -428,7 +423,7 @@
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ContainsExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">member</span><span class="p">))</span>
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression EQ     expression</span>
 <span class="sd">				   | expression NE     expression</span>
@@ -437,7 +432,7 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ComparisonExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_arithmetic_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_arithmetic_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression GT     expression</span>
 <span class="sd">				   | expression GE     expression</span>
@@ -448,7 +443,7 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ArithmeticComparisonExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_fuzzy_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_fuzzy_comparison</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression EQ_FZM expression</span>
 <span class="sd">				   | expression EQ_FZS expression</span>
@@ -459,7 +454,7 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FuzzyComparisonExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : expression AND    expression</span>
 <span class="sd">				   | expression OR     expression</span>
@@ -468,15 +463,15 @@
 		<span class="n">op_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_names</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">LogicExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;object : LPAREN expression RPAREN&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_negate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_negate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : NOT expression&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="s1">&#39;NOT&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;object : SYMBOL&#39;</span>
 		<span class="n">name</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 		<span class="n">scope</span> <span class="o">=</span> <span class="kc">None</span>
@@ -485,36 +480,36 @@
 			<span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">SymbolExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;scope&#39;</span><span class="p">:</span> <span class="n">scope</span><span class="p">})</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_uminus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_uminus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;expression : SUB expression %prec UMINUS&#39;</span>
 		<span class="n">names</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;-&#39;</span><span class="p">:</span> <span class="s1">&#39;UMINUS&#39;</span><span class="p">}</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">UnaryExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">names</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
 
 	<span class="c1"># Literal expressions</span>
-	<span class="k">def</span> <span class="nf">p_expression_boolean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_boolean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : TRUE</span>
 <span class="sd">				   | FALSE</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;object : BYTES&#39;</span>
 		<span class="k">try</span><span class="p">:</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="n">literal_eval</span><span class="p">(</span><span class="s1">&#39;b&#39;</span> <span class="o">+</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 		<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">BytesSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid bytes literal&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="kn">from</span> <span class="kc">None</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">BytesSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid bytes literal&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">BytesExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_datetime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;object : DATETIME&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DatetimeExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;from_string&#39;</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_timedelta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_timedelta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;object : TIMEDELTA&#39;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">TimedeltaExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;from_string&#39;</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		expression : FLOAT</span>
 <span class="sd">				   | FLOAT_NAN</span>
@@ -523,27 +518,27 @@
 		<span class="n">str_val</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">FloatExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">str_val</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;from_string&#39;</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_null</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_null</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;object : NULL&#39;</span>
 		<span class="c1"># null is an object because of the safe operator</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">NullExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : LBRACE ary_members RBRACE</span>
 <span class="sd">			   | LBRACE ary_members COMMA RBRACE</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">SetExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 		<span class="s1">&#39;object : STRING&#39;</span>
 		<span class="k">try</span><span class="p">:</span>
 			<span class="n">value</span> <span class="o">=</span> <span class="n">literal_eval</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 		<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">StringSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid string literal&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="kn">from</span> <span class="kc">None</span>
+			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">StringSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid string literal&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">StringExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : LBRACKET RBRACKET</span>
 <span class="sd">			   | LBRACKET ary_members RBRACKET</span>
@@ -554,7 +549,7 @@
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ArrayExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_array_comprehension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_array_comprehension</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : LBRACKET expression FOR SYMBOL IN expression RBRACKET</span>
 <span class="sd">			   | LBRACKET expression FOR SYMBOL IN expression IF expression RBRACKET</span>
@@ -564,7 +559,7 @@
 			<span class="n">condition</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">ComprehensionExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">6</span><span class="p">]),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;condition&#39;</span><span class="p">:</span> <span class="n">condition</span><span class="p">})</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_array_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_array_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		ary_members : expression</span>
 <span class="sd">					| ary_members COMMA expression</span>
@@ -577,7 +572,7 @@
 			<span class="n">deque</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : LBRACE RBRACE</span>
 <span class="sd">			   | LBRACE map_members RBRACE</span>
@@ -588,27 +583,27 @@
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">MappingExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_mapping_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_mapping_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		map_member : expression COLON expression</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_mapping_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_mapping_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		map_members : map_member</span>
 <span class="sd">					| map_members COMMA map_member</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_expression_array_members</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_getitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : object LBRACKET expression RBRACKET</span>
 <span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">container</span><span class="p">,</span> <span class="n">lbracket</span><span class="p">,</span> <span class="n">item</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">GetItemExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">item</span><span class="p">),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;safe&#39;</span><span class="p">:</span> <span class="n">lbracket</span> <span class="o">==</span> <span class="s1">&#39;&amp;[&#39;</span><span class="p">})</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_getslice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_getslice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : object LBRACKET COLON RBRACKET</span>
 <span class="sd">		       | object LBRACKET COLON expression RBRACKET</span>
@@ -630,7 +625,7 @@
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">RuleSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid get slice expression&#39;</span><span class="p">)</span>
 		<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DeferredAstNode</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">GetSliceExpression</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">),</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;safe&#39;</span><span class="p">:</span> <span class="n">safe</span><span class="p">})</span>
 
-	<span class="k">def</span> <span class="nf">p_expression_function_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">p_expression_function_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		object : expression LPAREN RPAREN</span>
 <span class="sd">		       | expression LPAREN ary_members RPAREN</span>
@@ -653,7 +648,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Spencer McIntyre.</p>
+    <p>&#169; Copyright 2025, Spencer McIntyre.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -5,20 +7,16 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data Types &mdash; Rule Engine 4.5.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=fa8d1881"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fa8d1881"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -37,9 +35,6 @@
           <a href="index.html" class="icon icon-home">
             Rule Engine
           </a>
-              <div class="version">
-                4.5.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -154,7 +149,7 @@ operations apply to the members of <a class="reference internal" href="rule_engi
 <section id="float">
 <h2>FLOAT<a class="headerlink" href="#float" title="Link to this heading"></a></h2>
 <p>See <a class="reference internal" href="syntax.html#literal-float-values"><span class="std std-ref">Literal FLOAT Values</span></a> for syntax.</p>
-<p>Starting in <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.0.0">v3.0.0</a>, the <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> datatype is backed by Python’s <a class="reference external" href="https://docs.python.org/3.12/library/decimal.html#decimal.Decimal" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> object. This
+<p>Starting in <a class="extlink-release reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.0.0">v3.0.0</a>, the <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> datatype is backed by Python’s <a class="reference external" href="https://docs.python.org/3.12/library/decimal.html#decimal.Decimal" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Decimal</span></code></a> object. This
 makes the evaluation of arithmetic more intuitive for the audience of rule authors who are not assumed to be familiar
 with the nuances of binary floating point arithmetic. To take an example from the <a class="reference external" href="https://docs.python.org/3.12/library/decimal.html#module-decimal" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">decimal</span></code></a> documentation, rule
 authors should not have to know that <code class="docutils literal notranslate"><span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.1</span> <span class="pre">+</span> <span class="pre">0.1</span> <span class="pre">-</span> <span class="pre">0.3</span> <span class="pre">!=</span> <span class="pre">0</span></code>.</p>
@@ -176,7 +171,7 @@ using Rule Engine should take care to not use compound data types with a mix of 
 </section>
 <section id="function">
 <h2>FUNCTION<a class="headerlink" href="#function" title="Link to this heading"></a></h2>
-<p>Version <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v4.0.0">v4.0.0</a> added the <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a> datatype. This can be used to make functions available
+<p>Version <a class="extlink-release reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v4.0.0">v4.0.0</a> added the <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.FUNCTION" title="rule_engine.types.DataType.FUNCTION"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FUNCTION</span></code></a> datatype. This can be used to make functions available
 to rule authors. Rule Engine contains a few <a class="reference internal" href="syntax.html#builtin-functions"><span class="std std-ref">builtin functions</span></a> that can be used by default.
 Additional functions must be defined in Python and can either be added to the evaluated object or by
 <a class="reference internal" href="getting_started.html#changing-builtin-symbols"><span class="std std-ref">extending the builtin symbols</span></a>. It is only possible to call a function from within the
@@ -185,7 +180,7 @@ rule text. Functions can not be defined by rule authors as other data types can 
 <section id="timedelta">
 <h2>TIMEDELTA<a class="headerlink" href="#timedelta" title="Link to this heading"></a></h2>
 <p>See <a class="reference internal" href="syntax.html#literal-timedelta-values"><span class="std std-ref">Literal TIMEDELTA Values</span></a> for syntax.</p>
-<p>Version <a class="reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.5.0">v3.5.0</a> introduced the <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> datatype, backed by Python’s
+<p>Version <a class="extlink-release reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v3.5.0">v3.5.0</a> introduced the <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> datatype, backed by Python’s
 <a class="reference external" href="https://docs.python.org/3.12/library/datetime.html#datetime.timedelta" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code></a> class. This also comes with the ability to perform arithmetic with both
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> <em>and</em> <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> values. This allows you to create rules for things
 such as “has it been 30 days since this thing happened?” or “how much time passed between two events?”.</p>
@@ -211,7 +206,7 @@ such as “has it been 30 days since this thing happened?” or “how much time
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Spencer McIntyre.</p>
+    <p>&#169; Copyright 2025, Spencer McIntyre.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

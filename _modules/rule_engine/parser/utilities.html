@@ -1,23 +1,21 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rule_engine.parser.utilities &mdash; Rule Engine 4.5.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=0c24fe83" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=fa8d1881"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=fa8d1881"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -34,9 +32,6 @@
           <a href="../../../index.html" class="icon icon-home">
             Rule Engine
           </a>
-              <div class="version">
-                4.5.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -114,15 +109,15 @@
 <span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 
-<span class="kn">import</span> <span class="nn">ast</span> <span class="k">as</span> <span class="nn">pyast</span>
-<span class="kn">import</span> <span class="nn">binascii</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">decimal</span>
-<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pyast</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">binascii</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">decimal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
 
-<span class="kn">import</span> <span class="nn">dateutil.parser</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dateutil.parser</span>
 
 <span class="n">_sub_regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[0-9]+([,.][0-9]+)?&#39;</span>
 <span class="n">timedelta_regex</span> <span class="o">=</span> <span class="p">(</span>
@@ -138,7 +133,7 @@
 
 <div class="viewcode-block" id="parse_datetime">
 <a class="viewcode-back" href="../../../rule_engine/parser/utilities.html#rule_engine.parser.utilities.parse_datetime">[docs]</a>
-<span class="k">def</span> <span class="nf">parse_datetime</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">default_timezone</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_datetime</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">default_timezone</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Parse a timestamp string. If the timestamp does not specify a timezone, *default_timezone* is used.</span>
 
@@ -149,7 +144,7 @@
 	<span class="k">try</span><span class="p">:</span>
 		<span class="n">dt</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">isoparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
 	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 	<span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 		<span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">default_timezone</span><span class="p">)</span>
 	<span class="k">return</span> <span class="n">dt</span></div>
@@ -157,7 +152,7 @@
 
 <div class="viewcode-block" id="parse_float">
 <a class="viewcode-back" href="../../../rule_engine/parser/utilities.html#rule_engine.parser.utilities.parse_float">[docs]</a>
-<span class="k">def</span> <span class="nf">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Parse a literal string representing a floating point value.</span>
 
@@ -172,13 +167,13 @@
 		<span class="k">else</span><span class="p">:</span>
 			<span class="n">val</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
 	<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
 	<span class="k">return</span> <span class="n">val</span></div>
 
 
 <div class="viewcode-block" id="parse_timedelta">
 <a class="viewcode-back" href="../../../rule_engine/parser/utilities.html#rule_engine.parser.utilities.parse_timedelta">[docs]</a>
-<span class="k">def</span> <span class="nf">parse_timedelta</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_timedelta</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Parse a literal string representing a time period in the ISO-8601 duration format.</span>
 
@@ -215,7 +210,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Spencer McIntyre.</p>
+    <p>&#169; Copyright 2025, Spencer McIntyre.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

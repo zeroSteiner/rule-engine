@@ -1,23 +1,21 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rule_engine.builtins &mdash; Rule Engine 4.5.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=fa8d1881"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fa8d1881"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -34,9 +32,6 @@
           <a href="../../index.html" class="icon icon-home">
             Rule Engine
           </a>
-              <div class="version">
-                4.5.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -113,38 +108,38 @@
 <span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 
-<span class="kn">import</span> <span class="nn">collections</span>
-<span class="kn">import</span> <span class="nn">collections.abc</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">decimal</span>
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections.abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">decimal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">ast</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">errors</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">types</span>
-<span class="kn">from</span> <span class="nn">.parser.utilities</span> <span class="kn">import</span> <span class="n">parse_datetime</span><span class="p">,</span> <span class="n">parse_float</span><span class="p">,</span> <span class="n">parse_timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">ast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parser.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_datetime</span><span class="p">,</span> <span class="n">parse_float</span><span class="p">,</span> <span class="n">parse_timedelta</span>
 
-<span class="kn">import</span> <span class="nn">dateutil.tz</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dateutil.tz</span>
 
-<span class="k">def</span> <span class="nf">_builtin_filter</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_builtin_filter</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
 	<span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">iterable</span><span class="p">))</span>
 
-<span class="k">def</span> <span class="nf">_builtin_map</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_builtin_map</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">iterable</span><span class="p">):</span>
 	<span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">iterable</span><span class="p">))</span>
 
-<span class="k">def</span> <span class="nf">_builtin_parse_datetime</span><span class="p">(</span><span class="n">builtins</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_builtin_parse_datetime</span><span class="p">(</span><span class="n">builtins</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
 	<span class="k">return</span> <span class="n">parse_datetime</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">builtins</span><span class="o">.</span><span class="n">timezone</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">_builtin_random</span><span class="p">(</span><span class="n">boundary</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_builtin_random</span><span class="p">(</span><span class="n">boundary</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 	<span class="k">if</span> <span class="n">boundary</span><span class="p">:</span>
 		<span class="k">if</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">is_natural_number</span><span class="p">(</span><span class="n">boundary</span><span class="p">):</span>
 			<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;argument #1 (boundary) must be a natural number&#39;</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">boundary</span><span class="p">))</span>
 	<span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">_builtin_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_builtin_range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 	<span class="k">if</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">is_integer_number</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;argument #1 (start) must be an integer number&#39;</span><span class="p">)</span>
 	<span class="k">if</span> <span class="n">stop</span><span class="p">:</span>
@@ -157,7 +152,7 @@
 		<span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">stop</span><span class="p">)))</span>
 	<span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)))</span>
 
-<span class="k">def</span> <span class="nf">_builtins_split</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_builtins_split</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 	<span class="k">if</span> <span class="n">maxsplit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 		<span class="n">maxsplit</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 	<span class="k">elif</span> <span class="n">types</span><span class="o">.</span><span class="n">is_natural_number</span><span class="p">(</span><span class="n">maxsplit</span><span class="p">):</span>
@@ -166,7 +161,7 @@
 		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;argument #3 (maxsplit) must be a natural number&#39;</span><span class="p">)</span>
 	<span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="n">maxsplit</span><span class="p">))</span>
 
-<span class="k">class</span> <span class="nc">BuiltinValueGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BuiltinValueGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class used as a wrapper for builtin values to differentiate between a value that is a function and a value that</span>
 <span class="sd">	should be generated by calling a function. A value that is generated by calling a function is useful for determining</span>
@@ -175,15 +170,15 @@
 <span class="sd">	.. versionadded:: 4.0.0</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;callable&#39;</span><span class="p">,)</span>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">callable</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">callable</span><span class="p">):</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">callable</span> <span class="o">=</span> <span class="nb">callable</span>
 
-	<span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builtins</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">builtins</span><span class="p">):</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">callable</span><span class="p">(</span><span class="n">builtins</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Builtins">
 <a class="viewcode-back" href="../../rule_engine/builtins.html#rule_engine.builtins.Builtins">[docs]</a>
-<span class="k">class</span> <span class="nc">Builtins</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Builtins</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	A class to define and provide variables to within the builtin context of rules. These can be accessed by specifying</span>
 <span class="sd">	a symbol name with the ``$`` prefix.</span>
@@ -192,7 +187,7 @@
 <span class="w">	</span><span class="sd">&quot;&quot;&quot;The identity name of the scope for builtin symbols.&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="Builtins.__init__">
 <a class="viewcode-back" href="../../rule_engine/builtins.html#rule_engine.builtins.Builtins.__init__">[docs]</a>
-	<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timezone</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		:param dict values: A mapping of string keys to be used as symbol names with values of either Python literals or</span>
 <span class="sd">			a function which will be called when the symbol is accessed. When using a function, it will be passed a</span>
@@ -213,7 +208,7 @@
 
 <div class="viewcode-block" id="Builtins.resolve_type">
 <a class="viewcode-back" href="../../rule_engine/builtins.html#rule_engine.builtins.Builtins.resolve_type">[docs]</a>
-	<span class="k">def</span> <span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		The method to use for resolving the data type of a builtin symbol.</span>
 
@@ -223,10 +218,10 @@
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">)</span></div>
 
 
-	<span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> namespace=</span><span class="si">{!r}</span><span class="s2"> keys=</span><span class="si">{!r}</span><span class="s2"> timezone=</span><span class="si">{!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 		<span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
 		<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
 			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -238,16 +233,16 @@
 			<span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 		<span class="k">return</span> <span class="n">value</span>
 
-	<span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">)</span>
 
-	<span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__values</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Builtins.from_defaults">
 <a class="viewcode-back" href="../../rule_engine/builtins.html#rule_engine.builtins.Builtins.from_defaults">[docs]</a>
 	<span class="nd">@classmethod</span>
-	<span class="k">def</span> <span class="nf">from_defaults</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+	<span class="k">def</span><span class="w"> </span><span class="nf">from_defaults</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">		</span><span class="sd">&quot;&quot;&quot;Initialize a :py:class:`Builtins` instance with a set of default values.&quot;&quot;&quot;</span>
 		<span class="n">now</span> <span class="o">=</span> <span class="n">BuiltinValueGenerator</span><span class="p">(</span><span class="k">lambda</span> <span class="n">builtins</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">builtins</span><span class="o">.</span><span class="n">timezone</span><span class="p">))</span>
 		<span class="c1"># there may be errors here if the decimal.Context precision exceeds what is provided by the math constants</span>
@@ -316,7 +311,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Spencer McIntyre.</p>
+    <p>&#169; Copyright 2025, Spencer McIntyre.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

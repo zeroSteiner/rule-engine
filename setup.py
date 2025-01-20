@@ -87,9 +87,9 @@ setup(
 		'Operating System :: OS Independent',
 		#'Programming Language :: Python :: 3.4',  # dropped in v4.0
 		#'Programming Language :: Python :: 3.5',  # dropped in v4.0
-		'Programming Language :: Python :: 3.6',
-		'Programming Language :: Python :: 3.7',
-		'Programming Language :: Python :: 3.8',
+		'Programming Language :: Python :: 3.6',   # will be dropped in v5.0
+		'Programming Language :: Python :: 3.7',   # will be dropped in v5.0
+		'Programming Language :: Python :: 3.8',   # will be dropped in v5.0
 		'Programming Language :: Python :: 3.9',
 		'Programming Language :: Python :: 3.10',
 		'Programming Language :: Python :: 3.11',

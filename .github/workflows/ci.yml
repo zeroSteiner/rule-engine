@@ -131,7 +131,7 @@ jobs:
           pipenv install --dev
 
       - name: Create the distribution
-        run: pipenv run python setup.py build sdist
+        run: pipenv run python -m build
 
       - name: Publish the distribution
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -147,4 +147,3 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-

@@ -2,7 +2,7 @@ VERSION := $(shell ./setup.py --version)
 
 .PHONY: build
 build:
-	python setup.py build sdist
+	python -m build
 
 .PHONY: clean
 clean:
@@ -18,4 +18,3 @@ release: build
 	$(eval RELEASE_TAG := v$(VERSION))
 	git tag -sm "Version $(VERSION)" $(RELEASE_TAG)
 	git push --tags
-

@@ -14,6 +14,7 @@ graphviz = "*"
 coverage = "*"
 ipython = "*"
 setuptools = "*"
+build = "*"
 
 [scripts]
 tests = 'sh -c "PYTHONPATH=$(pwd)/lib python -m unittest -v tests"'

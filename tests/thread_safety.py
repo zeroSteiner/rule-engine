@@ -74,7 +74,7 @@ class ThreadSafetyTests(unittest.TestCase):
 
 	def test_tls_for_regex1(self):
 		context = engine.Context()
-		rule = engine.Rule('words =~ "(\w+) \w+"', context=context)
+		rule = engine.Rule(r'words =~ "(\\w+) \\w+"', context=context)
 		rule.evaluate({'words': 'MainThread Test'})
 		self.assertEqual(context._tls.regex_groups, ('MainThread',))
 		RuleThread(rule, {'words': 'AlternateThread Test'}).join()
@@ -83,7 +83,7 @@ class ThreadSafetyTests(unittest.TestCase):
 	def test_tls_for_regex2(self):
 		lock = threading.RLock()
 		context = engine.Context(resolver=functools.partial(testing_resolver, lock))
-		rule = engine.Rule('words =~ "(\w+) \w+" and lock and $re_groups[0] == "MainThread"', context=context)
+		rule = engine.Rule(r'words =~ "(\\w+) \\w+" and lock and $re_groups[0] == "MainThread"', context=context)
 		self.assertTrue(rule.evaluate({'words': 'MainThread Test'}))
 		lock.release()
 		with lock:

@@ -453,7 +453,7 @@ class Parser(ParserBase):
 	def p_expression_string(self, p):
 		'object : STRING'
 		try:
-			value = literal_eval(p[1])
+			value = p[1][1:-1].encode().decode('unicode-escape')
 		except Exception:
 			raise errors.StringSyntaxError('invalid string literal', p[1][1:-1]) from None
 		p[0] = _DeferredAstNode(ast.StringExpression, args=(self.context, value))

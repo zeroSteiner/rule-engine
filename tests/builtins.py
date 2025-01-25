@@ -208,7 +208,7 @@ class BuiltinsTests(unittest.TestCase):
 
 	def test_builtins_re_groups(self):
 		context = engine.Context()
-		rule = engine.Rule('words =~ "(\\w+) (\\w+) (\\w+)" and $re_groups[0] == word0', context=context)
+		rule = engine.Rule(r'words =~ "(\\w+) (\\w+) (\\w+)" and $re_groups[0] == word0', context=context)
 		self.assertIsNone(context._tls.regex_groups)
 		words = (
 			''.join(random.choice(string.ascii_letters) for _ in range(random.randint(4, 12))),

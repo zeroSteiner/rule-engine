@@ -144,20 +144,22 @@ class Parser(ParserBase):
 		# reverse the order to lowest to highest for ply
 		reversed((
 			('nonassoc', 'LPAREN', 'RPAREN'),
+			('nonassoc', 'LBRACKET', 'RBRACKET'),
 			('left',     'ATTR', 'ATTR_SAFE'),
-			('right',    'UMINUS'),
 			('left',     'POW'),
+			('right',    'UMINUS'),
 			('left',     'MUL', 'TDIV', 'FDIV', 'MOD'),
-			('left',     'BWLSH', 'BWRSH'),
 			('left',     'ADD', 'SUB'),
-			('nonassoc', 'EQ', 'NE', 'EQ_FZM', 'EQ_FZS', 'NE_FZM', 'NE_FZS', 'GE', 'GT', 'LE', 'LT', 'IN'),  # Nonassociative operators
-			('right',    'QMARK', 'COLON'),
+			('left',     'BWLSH', 'BWRSH'),
 			('left',     'BWAND'),
 			('left',     'BWXOR'),
 			('left',     'BWOR'),
+			('nonassoc', 'EQ_FZM', 'EQ_FZS', 'NE_FZM', 'NE_FZS', 'GE', 'GT', 'LE', 'LT', 'IN'),  # Nonassociative operators
+			('nonassoc', 'EQ', 'NE'),
 			('right',    'NOT'),
 			('left',     'AND'),
 			('left',     'OR'),
+			('right',    'QMARK', 'COLON'),
 		)
 	))
 

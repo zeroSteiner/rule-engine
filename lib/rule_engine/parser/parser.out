@@ -3745,7 +3745,6 @@ state 52
     MUL             reduce using rule 36 (expression -> SUB expression .)
     FDIV            reduce using rule 36 (expression -> SUB expression .)
     TDIV            reduce using rule 36 (expression -> SUB expression .)
-    POW             reduce using rule 36 (expression -> SUB expression .)
     ADD             reduce using rule 36 (expression -> SUB expression .)
     SUB             reduce using rule 36 (expression -> SUB expression .)
     BWAND           reduce using rule 36 (expression -> SUB expression .)
@@ -3775,15 +3774,16 @@ state 52
     FOR             reduce using rule 36 (expression -> SUB expression .)
     RBRACKET        reduce using rule 36 (expression -> SUB expression .)
     IF              reduce using rule 36 (expression -> SUB expression .)
+    POW             shift and go to state 26
     LPAREN          shift and go to state 48
 
+  ! POW             [ reduce using rule 36 (expression -> SUB expression .) ]
   ! LPAREN          [ reduce using rule 36 (expression -> SUB expression .) ]
   ! QMARK           [ shift and go to state 21 ]
   ! MOD             [ shift and go to state 22 ]
   ! MUL             [ shift and go to state 23 ]
   ! FDIV            [ shift and go to state 24 ]
   ! TDIV            [ shift and go to state 25 ]
-  ! POW             [ shift and go to state 26 ]
   ! ADD             [ shift and go to state 27 ]
   ! SUB             [ shift and go to state 28 ]
   ! BWAND           [ shift and go to state 29 ]
@@ -3841,6 +3841,7 @@ state 53
     (68) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 34 (expression -> NOT expression .)
+    QMARK           reduce using rule 34 (expression -> NOT expression .)
     AND             reduce using rule 34 (expression -> NOT expression .)
     OR              reduce using rule 34 (expression -> NOT expression .)
     $end            reduce using rule 34 (expression -> NOT expression .)
@@ -3851,7 +3852,6 @@ state 53
     FOR             reduce using rule 34 (expression -> NOT expression .)
     RBRACKET        reduce using rule 34 (expression -> NOT expression .)
     IF              reduce using rule 34 (expression -> NOT expression .)
-    QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
     FDIV            shift and go to state 24
@@ -3878,7 +3878,6 @@ state 53
     NE_FZS          shift and go to state 45
     LPAREN          shift and go to state 48
 
-  ! QMARK           [ reduce using rule 34 (expression -> NOT expression .) ]
   ! MOD             [ reduce using rule 34 (expression -> NOT expression .) ]
   ! MUL             [ reduce using rule 34 (expression -> NOT expression .) ]
   ! FDIV            [ reduce using rule 34 (expression -> NOT expression .) ]
@@ -3904,6 +3903,7 @@ state 53
   ! NE_FZM          [ reduce using rule 34 (expression -> NOT expression .) ]
   ! NE_FZS          [ reduce using rule 34 (expression -> NOT expression .) ]
   ! LPAREN          [ reduce using rule 34 (expression -> NOT expression .) ]
+  ! QMARK           [ shift and go to state 21 ]
   ! AND             [ shift and go to state 46 ]
   ! OR              [ shift and go to state 47 ]
 
@@ -4846,6 +4846,8 @@ state 69
     BWAND           reduce using rule 12 (expression -> expression ADD expression .)
     BWOR            reduce using rule 12 (expression -> expression ADD expression .)
     BWXOR           reduce using rule 12 (expression -> expression ADD expression .)
+    BWLSH           reduce using rule 12 (expression -> expression ADD expression .)
+    BWRSH           reduce using rule 12 (expression -> expression ADD expression .)
     IN              reduce using rule 12 (expression -> expression ADD expression .)
     NOT             reduce using rule 12 (expression -> expression ADD expression .)
     EQ              reduce using rule 12 (expression -> expression ADD expression .)
@@ -4873,8 +4875,6 @@ state 69
     FDIV            shift and go to state 24
     TDIV            shift and go to state 25
     POW             shift and go to state 26
-    BWLSH           shift and go to state 32
-    BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
 
   ! MOD             [ reduce using rule 12 (expression -> expression ADD expression .) ]
@@ -4882,8 +4882,6 @@ state 69
   ! FDIV            [ reduce using rule 12 (expression -> expression ADD expression .) ]
   ! TDIV            [ reduce using rule 12 (expression -> expression ADD expression .) ]
   ! POW             [ reduce using rule 12 (expression -> expression ADD expression .) ]
-  ! BWLSH           [ reduce using rule 12 (expression -> expression ADD expression .) ]
-  ! BWRSH           [ reduce using rule 12 (expression -> expression ADD expression .) ]
   ! LPAREN          [ reduce using rule 12 (expression -> expression ADD expression .) ]
   ! QMARK           [ shift and go to state 21 ]
   ! ADD             [ shift and go to state 27 ]
@@ -4891,6 +4889,8 @@ state 69
   ! BWAND           [ shift and go to state 29 ]
   ! BWOR            [ shift and go to state 30 ]
   ! BWXOR           [ shift and go to state 31 ]
+  ! BWLSH           [ shift and go to state 32 ]
+  ! BWRSH           [ shift and go to state 33 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -4947,6 +4947,8 @@ state 70
     BWAND           reduce using rule 13 (expression -> expression SUB expression .)
     BWOR            reduce using rule 13 (expression -> expression SUB expression .)
     BWXOR           reduce using rule 13 (expression -> expression SUB expression .)
+    BWLSH           reduce using rule 13 (expression -> expression SUB expression .)
+    BWRSH           reduce using rule 13 (expression -> expression SUB expression .)
     IN              reduce using rule 13 (expression -> expression SUB expression .)
     NOT             reduce using rule 13 (expression -> expression SUB expression .)
     EQ              reduce using rule 13 (expression -> expression SUB expression .)
@@ -4974,8 +4976,6 @@ state 70
     FDIV            shift and go to state 24
     TDIV            shift and go to state 25
     POW             shift and go to state 26
-    BWLSH           shift and go to state 32
-    BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
 
   ! MOD             [ reduce using rule 13 (expression -> expression SUB expression .) ]
@@ -4983,8 +4983,6 @@ state 70
   ! FDIV            [ reduce using rule 13 (expression -> expression SUB expression .) ]
   ! TDIV            [ reduce using rule 13 (expression -> expression SUB expression .) ]
   ! POW             [ reduce using rule 13 (expression -> expression SUB expression .) ]
-  ! BWLSH           [ reduce using rule 13 (expression -> expression SUB expression .) ]
-  ! BWRSH           [ reduce using rule 13 (expression -> expression SUB expression .) ]
   ! LPAREN          [ reduce using rule 13 (expression -> expression SUB expression .) ]
   ! QMARK           [ shift and go to state 21 ]
   ! ADD             [ shift and go to state 27 ]
@@ -4992,6 +4990,8 @@ state 70
   ! BWAND           [ shift and go to state 29 ]
   ! BWOR            [ shift and go to state 30 ]
   ! BWXOR           [ shift and go to state 31 ]
+  ! BWLSH           [ shift and go to state 32 ]
+  ! BWRSH           [ shift and go to state 33 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -5042,10 +5042,22 @@ state 71
     (68) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 14 (expression -> expression BWAND expression .)
+    QMARK           reduce using rule 14 (expression -> expression BWAND expression .)
     BWAND           reduce using rule 14 (expression -> expression BWAND expression .)
     BWOR            reduce using rule 14 (expression -> expression BWAND expression .)
     BWXOR           reduce using rule 14 (expression -> expression BWAND expression .)
+    IN              reduce using rule 14 (expression -> expression BWAND expression .)
     NOT             reduce using rule 14 (expression -> expression BWAND expression .)
+    EQ              reduce using rule 14 (expression -> expression BWAND expression .)
+    NE              reduce using rule 14 (expression -> expression BWAND expression .)
+    GT              reduce using rule 14 (expression -> expression BWAND expression .)
+    GE              reduce using rule 14 (expression -> expression BWAND expression .)
+    LT              reduce using rule 14 (expression -> expression BWAND expression .)
+    LE              reduce using rule 14 (expression -> expression BWAND expression .)
+    EQ_FZM          reduce using rule 14 (expression -> expression BWAND expression .)
+    EQ_FZS          reduce using rule 14 (expression -> expression BWAND expression .)
+    NE_FZM          reduce using rule 14 (expression -> expression BWAND expression .)
+    NE_FZS          reduce using rule 14 (expression -> expression BWAND expression .)
     AND             reduce using rule 14 (expression -> expression BWAND expression .)
     OR              reduce using rule 14 (expression -> expression BWAND expression .)
     $end            reduce using rule 14 (expression -> expression BWAND expression .)
@@ -5056,7 +5068,6 @@ state 71
     FOR             reduce using rule 14 (expression -> expression BWAND expression .)
     RBRACKET        reduce using rule 14 (expression -> expression BWAND expression .)
     IF              reduce using rule 14 (expression -> expression BWAND expression .)
-    QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
     FDIV            shift and go to state 24
@@ -5066,20 +5077,8 @@ state 71
     SUB             shift and go to state 28
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
-    IN              shift and go to state 34
-    EQ              shift and go to state 36
-    NE              shift and go to state 37
-    GT              shift and go to state 38
-    GE              shift and go to state 39
-    LT              shift and go to state 40
-    LE              shift and go to state 41
-    EQ_FZM          shift and go to state 42
-    EQ_FZS          shift and go to state 43
-    NE_FZM          shift and go to state 44
-    NE_FZS          shift and go to state 45
     LPAREN          shift and go to state 48
 
-  ! QMARK           [ reduce using rule 14 (expression -> expression BWAND expression .) ]
   ! MOD             [ reduce using rule 14 (expression -> expression BWAND expression .) ]
   ! MUL             [ reduce using rule 14 (expression -> expression BWAND expression .) ]
   ! FDIV            [ reduce using rule 14 (expression -> expression BWAND expression .) ]
@@ -5089,22 +5088,23 @@ state 71
   ! SUB             [ reduce using rule 14 (expression -> expression BWAND expression .) ]
   ! BWLSH           [ reduce using rule 14 (expression -> expression BWAND expression .) ]
   ! BWRSH           [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! IN              [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! EQ              [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! NE              [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! GT              [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! GE              [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! LT              [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! LE              [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! EQ_FZM          [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! EQ_FZS          [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! NE_FZM          [ reduce using rule 14 (expression -> expression BWAND expression .) ]
-  ! NE_FZS          [ reduce using rule 14 (expression -> expression BWAND expression .) ]
   ! LPAREN          [ reduce using rule 14 (expression -> expression BWAND expression .) ]
+  ! QMARK           [ shift and go to state 21 ]
   ! BWAND           [ shift and go to state 29 ]
   ! BWOR            [ shift and go to state 30 ]
   ! BWXOR           [ shift and go to state 31 ]
+  ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
+  ! EQ              [ shift and go to state 36 ]
+  ! NE              [ shift and go to state 37 ]
+  ! GT              [ shift and go to state 38 ]
+  ! GE              [ shift and go to state 39 ]
+  ! LT              [ shift and go to state 40 ]
+  ! LE              [ shift and go to state 41 ]
+  ! EQ_FZM          [ shift and go to state 42 ]
+  ! EQ_FZS          [ shift and go to state 43 ]
+  ! NE_FZM          [ shift and go to state 44 ]
+  ! NE_FZS          [ shift and go to state 45 ]
   ! AND             [ shift and go to state 46 ]
   ! OR              [ shift and go to state 47 ]
 
@@ -5143,8 +5143,20 @@ state 72
     (68) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 15 (expression -> expression BWOR expression .)
+    QMARK           reduce using rule 15 (expression -> expression BWOR expression .)
     BWOR            reduce using rule 15 (expression -> expression BWOR expression .)
+    IN              reduce using rule 15 (expression -> expression BWOR expression .)
     NOT             reduce using rule 15 (expression -> expression BWOR expression .)
+    EQ              reduce using rule 15 (expression -> expression BWOR expression .)
+    NE              reduce using rule 15 (expression -> expression BWOR expression .)
+    GT              reduce using rule 15 (expression -> expression BWOR expression .)
+    GE              reduce using rule 15 (expression -> expression BWOR expression .)
+    LT              reduce using rule 15 (expression -> expression BWOR expression .)
+    LE              reduce using rule 15 (expression -> expression BWOR expression .)
+    EQ_FZM          reduce using rule 15 (expression -> expression BWOR expression .)
+    EQ_FZS          reduce using rule 15 (expression -> expression BWOR expression .)
+    NE_FZM          reduce using rule 15 (expression -> expression BWOR expression .)
+    NE_FZS          reduce using rule 15 (expression -> expression BWOR expression .)
     AND             reduce using rule 15 (expression -> expression BWOR expression .)
     OR              reduce using rule 15 (expression -> expression BWOR expression .)
     $end            reduce using rule 15 (expression -> expression BWOR expression .)
@@ -5155,7 +5167,6 @@ state 72
     FOR             reduce using rule 15 (expression -> expression BWOR expression .)
     RBRACKET        reduce using rule 15 (expression -> expression BWOR expression .)
     IF              reduce using rule 15 (expression -> expression BWOR expression .)
-    QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
     FDIV            shift and go to state 24
@@ -5167,20 +5178,8 @@ state 72
     BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
-    IN              shift and go to state 34
-    EQ              shift and go to state 36
-    NE              shift and go to state 37
-    GT              shift and go to state 38
-    GE              shift and go to state 39
-    LT              shift and go to state 40
-    LE              shift and go to state 41
-    EQ_FZM          shift and go to state 42
-    EQ_FZS          shift and go to state 43
-    NE_FZM          shift and go to state 44
-    NE_FZS          shift and go to state 45
     LPAREN          shift and go to state 48
 
-  ! QMARK           [ reduce using rule 15 (expression -> expression BWOR expression .) ]
   ! MOD             [ reduce using rule 15 (expression -> expression BWOR expression .) ]
   ! MUL             [ reduce using rule 15 (expression -> expression BWOR expression .) ]
   ! FDIV            [ reduce using rule 15 (expression -> expression BWOR expression .) ]
@@ -5192,20 +5191,21 @@ state 72
   ! BWXOR           [ reduce using rule 15 (expression -> expression BWOR expression .) ]
   ! BWLSH           [ reduce using rule 15 (expression -> expression BWOR expression .) ]
   ! BWRSH           [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! IN              [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! EQ              [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! NE              [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! GT              [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! GE              [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! LT              [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! LE              [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! EQ_FZM          [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! EQ_FZS          [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! NE_FZM          [ reduce using rule 15 (expression -> expression BWOR expression .) ]
-  ! NE_FZS          [ reduce using rule 15 (expression -> expression BWOR expression .) ]
   ! LPAREN          [ reduce using rule 15 (expression -> expression BWOR expression .) ]
+  ! QMARK           [ shift and go to state 21 ]
   ! BWOR            [ shift and go to state 30 ]
+  ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
+  ! EQ              [ shift and go to state 36 ]
+  ! NE              [ shift and go to state 37 ]
+  ! GT              [ shift and go to state 38 ]
+  ! GE              [ shift and go to state 39 ]
+  ! LT              [ shift and go to state 40 ]
+  ! LE              [ shift and go to state 41 ]
+  ! EQ_FZM          [ shift and go to state 42 ]
+  ! EQ_FZS          [ shift and go to state 43 ]
+  ! NE_FZM          [ shift and go to state 44 ]
+  ! NE_FZS          [ shift and go to state 45 ]
   ! AND             [ shift and go to state 46 ]
   ! OR              [ shift and go to state 47 ]
 
@@ -5244,9 +5244,21 @@ state 73
     (68) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 16 (expression -> expression BWXOR expression .)
+    QMARK           reduce using rule 16 (expression -> expression BWXOR expression .)
     BWOR            reduce using rule 16 (expression -> expression BWXOR expression .)
     BWXOR           reduce using rule 16 (expression -> expression BWXOR expression .)
+    IN              reduce using rule 16 (expression -> expression BWXOR expression .)
     NOT             reduce using rule 16 (expression -> expression BWXOR expression .)
+    EQ              reduce using rule 16 (expression -> expression BWXOR expression .)
+    NE              reduce using rule 16 (expression -> expression BWXOR expression .)
+    GT              reduce using rule 16 (expression -> expression BWXOR expression .)
+    GE              reduce using rule 16 (expression -> expression BWXOR expression .)
+    LT              reduce using rule 16 (expression -> expression BWXOR expression .)
+    LE              reduce using rule 16 (expression -> expression BWXOR expression .)
+    EQ_FZM          reduce using rule 16 (expression -> expression BWXOR expression .)
+    EQ_FZS          reduce using rule 16 (expression -> expression BWXOR expression .)
+    NE_FZM          reduce using rule 16 (expression -> expression BWXOR expression .)
+    NE_FZS          reduce using rule 16 (expression -> expression BWXOR expression .)
     AND             reduce using rule 16 (expression -> expression BWXOR expression .)
     OR              reduce using rule 16 (expression -> expression BWXOR expression .)
     $end            reduce using rule 16 (expression -> expression BWXOR expression .)
@@ -5257,7 +5269,6 @@ state 73
     FOR             reduce using rule 16 (expression -> expression BWXOR expression .)
     RBRACKET        reduce using rule 16 (expression -> expression BWXOR expression .)
     IF              reduce using rule 16 (expression -> expression BWXOR expression .)
-    QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
     FDIV            shift and go to state 24
@@ -5268,20 +5279,8 @@ state 73
     BWAND           shift and go to state 29
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
-    IN              shift and go to state 34
-    EQ              shift and go to state 36
-    NE              shift and go to state 37
-    GT              shift and go to state 38
-    GE              shift and go to state 39
-    LT              shift and go to state 40
-    LE              shift and go to state 41
-    EQ_FZM          shift and go to state 42
-    EQ_FZS          shift and go to state 43
-    NE_FZM          shift and go to state 44
-    NE_FZS          shift and go to state 45
     LPAREN          shift and go to state 48
 
-  ! QMARK           [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
   ! MOD             [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
   ! MUL             [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
   ! FDIV            [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
@@ -5292,21 +5291,22 @@ state 73
   ! BWAND           [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
   ! BWLSH           [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
   ! BWRSH           [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! IN              [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! EQ              [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! NE              [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! GT              [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! GE              [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! LT              [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! LE              [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! EQ_FZM          [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! EQ_FZS          [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! NE_FZM          [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
-  ! NE_FZS          [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
   ! LPAREN          [ reduce using rule 16 (expression -> expression BWXOR expression .) ]
+  ! QMARK           [ shift and go to state 21 ]
   ! BWOR            [ shift and go to state 30 ]
   ! BWXOR           [ shift and go to state 31 ]
+  ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
+  ! EQ              [ shift and go to state 36 ]
+  ! NE              [ shift and go to state 37 ]
+  ! GT              [ shift and go to state 38 ]
+  ! GE              [ shift and go to state 39 ]
+  ! LT              [ shift and go to state 40 ]
+  ! LE              [ shift and go to state 41 ]
+  ! EQ_FZM          [ shift and go to state 42 ]
+  ! EQ_FZS          [ shift and go to state 43 ]
+  ! NE_FZM          [ shift and go to state 44 ]
+  ! NE_FZS          [ shift and go to state 45 ]
   ! AND             [ shift and go to state 46 ]
   ! OR              [ shift and go to state 47 ]
 
@@ -5346,8 +5346,6 @@ state 74
 
     COMMENT         reduce using rule 17 (expression -> expression BWLSH expression .)
     QMARK           reduce using rule 17 (expression -> expression BWLSH expression .)
-    ADD             reduce using rule 17 (expression -> expression BWLSH expression .)
-    SUB             reduce using rule 17 (expression -> expression BWLSH expression .)
     BWAND           reduce using rule 17 (expression -> expression BWLSH expression .)
     BWOR            reduce using rule 17 (expression -> expression BWLSH expression .)
     BWXOR           reduce using rule 17 (expression -> expression BWLSH expression .)
@@ -5380,6 +5378,8 @@ state 74
     FDIV            shift and go to state 24
     TDIV            shift and go to state 25
     POW             shift and go to state 26
+    ADD             shift and go to state 27
+    SUB             shift and go to state 28
     LPAREN          shift and go to state 48
 
   ! MOD             [ reduce using rule 17 (expression -> expression BWLSH expression .) ]
@@ -5387,10 +5387,10 @@ state 74
   ! FDIV            [ reduce using rule 17 (expression -> expression BWLSH expression .) ]
   ! TDIV            [ reduce using rule 17 (expression -> expression BWLSH expression .) ]
   ! POW             [ reduce using rule 17 (expression -> expression BWLSH expression .) ]
+  ! ADD             [ reduce using rule 17 (expression -> expression BWLSH expression .) ]
+  ! SUB             [ reduce using rule 17 (expression -> expression BWLSH expression .) ]
   ! LPAREN          [ reduce using rule 17 (expression -> expression BWLSH expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! ADD             [ shift and go to state 27 ]
-  ! SUB             [ shift and go to state 28 ]
   ! BWAND           [ shift and go to state 29 ]
   ! BWOR            [ shift and go to state 30 ]
   ! BWXOR           [ shift and go to state 31 ]
@@ -5447,8 +5447,6 @@ state 75
 
     COMMENT         reduce using rule 18 (expression -> expression BWRSH expression .)
     QMARK           reduce using rule 18 (expression -> expression BWRSH expression .)
-    ADD             reduce using rule 18 (expression -> expression BWRSH expression .)
-    SUB             reduce using rule 18 (expression -> expression BWRSH expression .)
     BWAND           reduce using rule 18 (expression -> expression BWRSH expression .)
     BWOR            reduce using rule 18 (expression -> expression BWRSH expression .)
     BWXOR           reduce using rule 18 (expression -> expression BWRSH expression .)
@@ -5481,6 +5479,8 @@ state 75
     FDIV            shift and go to state 24
     TDIV            shift and go to state 25
     POW             shift and go to state 26
+    ADD             shift and go to state 27
+    SUB             shift and go to state 28
     LPAREN          shift and go to state 48
 
   ! MOD             [ reduce using rule 18 (expression -> expression BWRSH expression .) ]
@@ -5488,10 +5488,10 @@ state 75
   ! FDIV            [ reduce using rule 18 (expression -> expression BWRSH expression .) ]
   ! TDIV            [ reduce using rule 18 (expression -> expression BWRSH expression .) ]
   ! POW             [ reduce using rule 18 (expression -> expression BWRSH expression .) ]
+  ! ADD             [ reduce using rule 18 (expression -> expression BWRSH expression .) ]
+  ! SUB             [ reduce using rule 18 (expression -> expression BWRSH expression .) ]
   ! LPAREN          [ reduce using rule 18 (expression -> expression BWRSH expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! ADD             [ shift and go to state 27 ]
-  ! SUB             [ shift and go to state 28 ]
   ! BWAND           [ shift and go to state 29 ]
   ! BWOR            [ shift and go to state 30 ]
   ! BWXOR           [ shift and go to state 31 ]
@@ -5548,9 +5548,6 @@ state 76
 
     COMMENT         reduce using rule 19 (expression -> expression IN expression .)
     QMARK           reduce using rule 19 (expression -> expression IN expression .)
-    BWAND           reduce using rule 19 (expression -> expression IN expression .)
-    BWOR            reduce using rule 19 (expression -> expression IN expression .)
-    BWXOR           reduce using rule 19 (expression -> expression IN expression .)
     IN              reduce using rule 19 (expression -> expression IN expression .)
     NOT             reduce using rule 19 (expression -> expression IN expression .)
     EQ              reduce using rule 19 (expression -> expression IN expression .)
@@ -5580,6 +5577,9 @@ state 76
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -5591,13 +5591,13 @@ state 76
   ! POW             [ reduce using rule 19 (expression -> expression IN expression .) ]
   ! ADD             [ reduce using rule 19 (expression -> expression IN expression .) ]
   ! SUB             [ reduce using rule 19 (expression -> expression IN expression .) ]
+  ! BWAND           [ reduce using rule 19 (expression -> expression IN expression .) ]
+  ! BWOR            [ reduce using rule 19 (expression -> expression IN expression .) ]
+  ! BWXOR           [ reduce using rule 19 (expression -> expression IN expression .) ]
   ! BWLSH           [ reduce using rule 19 (expression -> expression IN expression .) ]
   ! BWRSH           [ reduce using rule 19 (expression -> expression IN expression .) ]
   ! LPAREN          [ reduce using rule 19 (expression -> expression IN expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -5734,21 +5734,9 @@ state 78
 
     COMMENT         reduce using rule 21 (expression -> expression EQ expression .)
     QMARK           reduce using rule 21 (expression -> expression EQ expression .)
-    BWAND           reduce using rule 21 (expression -> expression EQ expression .)
-    BWOR            reduce using rule 21 (expression -> expression EQ expression .)
-    BWXOR           reduce using rule 21 (expression -> expression EQ expression .)
-    IN              reduce using rule 21 (expression -> expression EQ expression .)
     NOT             reduce using rule 21 (expression -> expression EQ expression .)
     EQ              reduce using rule 21 (expression -> expression EQ expression .)
     NE              reduce using rule 21 (expression -> expression EQ expression .)
-    GT              reduce using rule 21 (expression -> expression EQ expression .)
-    GE              reduce using rule 21 (expression -> expression EQ expression .)
-    LT              reduce using rule 21 (expression -> expression EQ expression .)
-    LE              reduce using rule 21 (expression -> expression EQ expression .)
-    EQ_FZM          reduce using rule 21 (expression -> expression EQ expression .)
-    EQ_FZS          reduce using rule 21 (expression -> expression EQ expression .)
-    NE_FZM          reduce using rule 21 (expression -> expression EQ expression .)
-    NE_FZS          reduce using rule 21 (expression -> expression EQ expression .)
     AND             reduce using rule 21 (expression -> expression EQ expression .)
     OR              reduce using rule 21 (expression -> expression EQ expression .)
     $end            reduce using rule 21 (expression -> expression EQ expression .)
@@ -5766,8 +5754,20 @@ state 78
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
+    IN              shift and go to state 34
+    GT              shift and go to state 38
+    GE              shift and go to state 39
+    LT              shift and go to state 40
+    LE              shift and go to state 41
+    EQ_FZM          shift and go to state 42
+    EQ_FZS          shift and go to state 43
+    NE_FZM          shift and go to state 44
+    NE_FZS          shift and go to state 45
     LPAREN          shift and go to state 48
 
   ! MOD             [ reduce using rule 21 (expression -> expression EQ expression .) ]
@@ -5777,25 +5777,25 @@ state 78
   ! POW             [ reduce using rule 21 (expression -> expression EQ expression .) ]
   ! ADD             [ reduce using rule 21 (expression -> expression EQ expression .) ]
   ! SUB             [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! BWAND           [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! BWOR            [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! BWXOR           [ reduce using rule 21 (expression -> expression EQ expression .) ]
   ! BWLSH           [ reduce using rule 21 (expression -> expression EQ expression .) ]
   ! BWRSH           [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! IN              [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! GT              [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! GE              [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! LT              [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! LE              [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! EQ_FZM          [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! EQ_FZS          [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! NE_FZM          [ reduce using rule 21 (expression -> expression EQ expression .) ]
+  ! NE_FZS          [ reduce using rule 21 (expression -> expression EQ expression .) ]
   ! LPAREN          [ reduce using rule 21 (expression -> expression EQ expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
-  ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
   ! NE              [ shift and go to state 37 ]
-  ! GT              [ shift and go to state 38 ]
-  ! GE              [ shift and go to state 39 ]
-  ! LT              [ shift and go to state 40 ]
-  ! LE              [ shift and go to state 41 ]
-  ! EQ_FZM          [ shift and go to state 42 ]
-  ! EQ_FZS          [ shift and go to state 43 ]
-  ! NE_FZM          [ shift and go to state 44 ]
-  ! NE_FZS          [ shift and go to state 45 ]
   ! AND             [ shift and go to state 46 ]
   ! OR              [ shift and go to state 47 ]
 
@@ -5835,21 +5835,9 @@ state 79
 
     COMMENT         reduce using rule 22 (expression -> expression NE expression .)
     QMARK           reduce using rule 22 (expression -> expression NE expression .)
-    BWAND           reduce using rule 22 (expression -> expression NE expression .)
-    BWOR            reduce using rule 22 (expression -> expression NE expression .)
-    BWXOR           reduce using rule 22 (expression -> expression NE expression .)
-    IN              reduce using rule 22 (expression -> expression NE expression .)
     NOT             reduce using rule 22 (expression -> expression NE expression .)
     EQ              reduce using rule 22 (expression -> expression NE expression .)
     NE              reduce using rule 22 (expression -> expression NE expression .)
-    GT              reduce using rule 22 (expression -> expression NE expression .)
-    GE              reduce using rule 22 (expression -> expression NE expression .)
-    LT              reduce using rule 22 (expression -> expression NE expression .)
-    LE              reduce using rule 22 (expression -> expression NE expression .)
-    EQ_FZM          reduce using rule 22 (expression -> expression NE expression .)
-    EQ_FZS          reduce using rule 22 (expression -> expression NE expression .)
-    NE_FZM          reduce using rule 22 (expression -> expression NE expression .)
-    NE_FZS          reduce using rule 22 (expression -> expression NE expression .)
     AND             reduce using rule 22 (expression -> expression NE expression .)
     OR              reduce using rule 22 (expression -> expression NE expression .)
     $end            reduce using rule 22 (expression -> expression NE expression .)
@@ -5867,8 +5855,20 @@ state 79
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
+    IN              shift and go to state 34
+    GT              shift and go to state 38
+    GE              shift and go to state 39
+    LT              shift and go to state 40
+    LE              shift and go to state 41
+    EQ_FZM          shift and go to state 42
+    EQ_FZS          shift and go to state 43
+    NE_FZM          shift and go to state 44
+    NE_FZS          shift and go to state 45
     LPAREN          shift and go to state 48
 
   ! MOD             [ reduce using rule 22 (expression -> expression NE expression .) ]
@@ -5878,25 +5878,25 @@ state 79
   ! POW             [ reduce using rule 22 (expression -> expression NE expression .) ]
   ! ADD             [ reduce using rule 22 (expression -> expression NE expression .) ]
   ! SUB             [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! BWAND           [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! BWOR            [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! BWXOR           [ reduce using rule 22 (expression -> expression NE expression .) ]
   ! BWLSH           [ reduce using rule 22 (expression -> expression NE expression .) ]
   ! BWRSH           [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! IN              [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! GT              [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! GE              [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! LT              [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! LE              [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! EQ_FZM          [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! EQ_FZS          [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! NE_FZM          [ reduce using rule 22 (expression -> expression NE expression .) ]
+  ! NE_FZS          [ reduce using rule 22 (expression -> expression NE expression .) ]
   ! LPAREN          [ reduce using rule 22 (expression -> expression NE expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
-  ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
   ! NE              [ shift and go to state 37 ]
-  ! GT              [ shift and go to state 38 ]
-  ! GE              [ shift and go to state 39 ]
-  ! LT              [ shift and go to state 40 ]
-  ! LE              [ shift and go to state 41 ]
-  ! EQ_FZM          [ shift and go to state 42 ]
-  ! EQ_FZS          [ shift and go to state 43 ]
-  ! NE_FZM          [ shift and go to state 44 ]
-  ! NE_FZS          [ shift and go to state 45 ]
   ! AND             [ shift and go to state 46 ]
   ! OR              [ shift and go to state 47 ]
 
@@ -5936,9 +5936,6 @@ state 80
 
     COMMENT         reduce using rule 23 (expression -> expression GT expression .)
     QMARK           reduce using rule 23 (expression -> expression GT expression .)
-    BWAND           reduce using rule 23 (expression -> expression GT expression .)
-    BWOR            reduce using rule 23 (expression -> expression GT expression .)
-    BWXOR           reduce using rule 23 (expression -> expression GT expression .)
     IN              reduce using rule 23 (expression -> expression GT expression .)
     NOT             reduce using rule 23 (expression -> expression GT expression .)
     EQ              reduce using rule 23 (expression -> expression GT expression .)
@@ -5968,6 +5965,9 @@ state 80
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -5979,13 +5979,13 @@ state 80
   ! POW             [ reduce using rule 23 (expression -> expression GT expression .) ]
   ! ADD             [ reduce using rule 23 (expression -> expression GT expression .) ]
   ! SUB             [ reduce using rule 23 (expression -> expression GT expression .) ]
+  ! BWAND           [ reduce using rule 23 (expression -> expression GT expression .) ]
+  ! BWOR            [ reduce using rule 23 (expression -> expression GT expression .) ]
+  ! BWXOR           [ reduce using rule 23 (expression -> expression GT expression .) ]
   ! BWLSH           [ reduce using rule 23 (expression -> expression GT expression .) ]
   ! BWRSH           [ reduce using rule 23 (expression -> expression GT expression .) ]
   ! LPAREN          [ reduce using rule 23 (expression -> expression GT expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -6037,9 +6037,6 @@ state 81
 
     COMMENT         reduce using rule 24 (expression -> expression GE expression .)
     QMARK           reduce using rule 24 (expression -> expression GE expression .)
-    BWAND           reduce using rule 24 (expression -> expression GE expression .)
-    BWOR            reduce using rule 24 (expression -> expression GE expression .)
-    BWXOR           reduce using rule 24 (expression -> expression GE expression .)
     IN              reduce using rule 24 (expression -> expression GE expression .)
     NOT             reduce using rule 24 (expression -> expression GE expression .)
     EQ              reduce using rule 24 (expression -> expression GE expression .)
@@ -6069,6 +6066,9 @@ state 81
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -6080,13 +6080,13 @@ state 81
   ! POW             [ reduce using rule 24 (expression -> expression GE expression .) ]
   ! ADD             [ reduce using rule 24 (expression -> expression GE expression .) ]
   ! SUB             [ reduce using rule 24 (expression -> expression GE expression .) ]
+  ! BWAND           [ reduce using rule 24 (expression -> expression GE expression .) ]
+  ! BWOR            [ reduce using rule 24 (expression -> expression GE expression .) ]
+  ! BWXOR           [ reduce using rule 24 (expression -> expression GE expression .) ]
   ! BWLSH           [ reduce using rule 24 (expression -> expression GE expression .) ]
   ! BWRSH           [ reduce using rule 24 (expression -> expression GE expression .) ]
   ! LPAREN          [ reduce using rule 24 (expression -> expression GE expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -6138,9 +6138,6 @@ state 82
 
     COMMENT         reduce using rule 25 (expression -> expression LT expression .)
     QMARK           reduce using rule 25 (expression -> expression LT expression .)
-    BWAND           reduce using rule 25 (expression -> expression LT expression .)
-    BWOR            reduce using rule 25 (expression -> expression LT expression .)
-    BWXOR           reduce using rule 25 (expression -> expression LT expression .)
     IN              reduce using rule 25 (expression -> expression LT expression .)
     NOT             reduce using rule 25 (expression -> expression LT expression .)
     EQ              reduce using rule 25 (expression -> expression LT expression .)
@@ -6170,6 +6167,9 @@ state 82
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -6181,13 +6181,13 @@ state 82
   ! POW             [ reduce using rule 25 (expression -> expression LT expression .) ]
   ! ADD             [ reduce using rule 25 (expression -> expression LT expression .) ]
   ! SUB             [ reduce using rule 25 (expression -> expression LT expression .) ]
+  ! BWAND           [ reduce using rule 25 (expression -> expression LT expression .) ]
+  ! BWOR            [ reduce using rule 25 (expression -> expression LT expression .) ]
+  ! BWXOR           [ reduce using rule 25 (expression -> expression LT expression .) ]
   ! BWLSH           [ reduce using rule 25 (expression -> expression LT expression .) ]
   ! BWRSH           [ reduce using rule 25 (expression -> expression LT expression .) ]
   ! LPAREN          [ reduce using rule 25 (expression -> expression LT expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -6239,9 +6239,6 @@ state 83
 
     COMMENT         reduce using rule 26 (expression -> expression LE expression .)
     QMARK           reduce using rule 26 (expression -> expression LE expression .)
-    BWAND           reduce using rule 26 (expression -> expression LE expression .)
-    BWOR            reduce using rule 26 (expression -> expression LE expression .)
-    BWXOR           reduce using rule 26 (expression -> expression LE expression .)
     IN              reduce using rule 26 (expression -> expression LE expression .)
     NOT             reduce using rule 26 (expression -> expression LE expression .)
     EQ              reduce using rule 26 (expression -> expression LE expression .)
@@ -6271,6 +6268,9 @@ state 83
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -6282,13 +6282,13 @@ state 83
   ! POW             [ reduce using rule 26 (expression -> expression LE expression .) ]
   ! ADD             [ reduce using rule 26 (expression -> expression LE expression .) ]
   ! SUB             [ reduce using rule 26 (expression -> expression LE expression .) ]
+  ! BWAND           [ reduce using rule 26 (expression -> expression LE expression .) ]
+  ! BWOR            [ reduce using rule 26 (expression -> expression LE expression .) ]
+  ! BWXOR           [ reduce using rule 26 (expression -> expression LE expression .) ]
   ! BWLSH           [ reduce using rule 26 (expression -> expression LE expression .) ]
   ! BWRSH           [ reduce using rule 26 (expression -> expression LE expression .) ]
   ! LPAREN          [ reduce using rule 26 (expression -> expression LE expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -6340,9 +6340,6 @@ state 84
 
     COMMENT         reduce using rule 27 (expression -> expression EQ_FZM expression .)
     QMARK           reduce using rule 27 (expression -> expression EQ_FZM expression .)
-    BWAND           reduce using rule 27 (expression -> expression EQ_FZM expression .)
-    BWOR            reduce using rule 27 (expression -> expression EQ_FZM expression .)
-    BWXOR           reduce using rule 27 (expression -> expression EQ_FZM expression .)
     IN              reduce using rule 27 (expression -> expression EQ_FZM expression .)
     NOT             reduce using rule 27 (expression -> expression EQ_FZM expression .)
     EQ              reduce using rule 27 (expression -> expression EQ_FZM expression .)
@@ -6372,6 +6369,9 @@ state 84
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -6383,13 +6383,13 @@ state 84
   ! POW             [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
   ! ADD             [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
   ! SUB             [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
+  ! BWAND           [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
+  ! BWOR            [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
+  ! BWXOR           [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
   ! BWLSH           [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
   ! BWRSH           [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
   ! LPAREN          [ reduce using rule 27 (expression -> expression EQ_FZM expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -6441,9 +6441,6 @@ state 85
 
     COMMENT         reduce using rule 28 (expression -> expression EQ_FZS expression .)
     QMARK           reduce using rule 28 (expression -> expression EQ_FZS expression .)
-    BWAND           reduce using rule 28 (expression -> expression EQ_FZS expression .)
-    BWOR            reduce using rule 28 (expression -> expression EQ_FZS expression .)
-    BWXOR           reduce using rule 28 (expression -> expression EQ_FZS expression .)
     IN              reduce using rule 28 (expression -> expression EQ_FZS expression .)
     NOT             reduce using rule 28 (expression -> expression EQ_FZS expression .)
     EQ              reduce using rule 28 (expression -> expression EQ_FZS expression .)
@@ -6473,6 +6470,9 @@ state 85
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -6484,13 +6484,13 @@ state 85
   ! POW             [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
   ! ADD             [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
   ! SUB             [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
+  ! BWAND           [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
+  ! BWOR            [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
+  ! BWXOR           [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
   ! BWLSH           [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
   ! BWRSH           [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
   ! LPAREN          [ reduce using rule 28 (expression -> expression EQ_FZS expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -6542,9 +6542,6 @@ state 86
 
     COMMENT         reduce using rule 29 (expression -> expression NE_FZM expression .)
     QMARK           reduce using rule 29 (expression -> expression NE_FZM expression .)
-    BWAND           reduce using rule 29 (expression -> expression NE_FZM expression .)
-    BWOR            reduce using rule 29 (expression -> expression NE_FZM expression .)
-    BWXOR           reduce using rule 29 (expression -> expression NE_FZM expression .)
     IN              reduce using rule 29 (expression -> expression NE_FZM expression .)
     NOT             reduce using rule 29 (expression -> expression NE_FZM expression .)
     EQ              reduce using rule 29 (expression -> expression NE_FZM expression .)
@@ -6574,6 +6571,9 @@ state 86
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -6585,13 +6585,13 @@ state 86
   ! POW             [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
   ! ADD             [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
   ! SUB             [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
+  ! BWAND           [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
+  ! BWOR            [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
+  ! BWXOR           [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
   ! BWLSH           [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
   ! BWRSH           [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
   ! LPAREN          [ reduce using rule 29 (expression -> expression NE_FZM expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -6643,9 +6643,6 @@ state 87
 
     COMMENT         reduce using rule 30 (expression -> expression NE_FZS expression .)
     QMARK           reduce using rule 30 (expression -> expression NE_FZS expression .)
-    BWAND           reduce using rule 30 (expression -> expression NE_FZS expression .)
-    BWOR            reduce using rule 30 (expression -> expression NE_FZS expression .)
-    BWXOR           reduce using rule 30 (expression -> expression NE_FZS expression .)
     IN              reduce using rule 30 (expression -> expression NE_FZS expression .)
     NOT             reduce using rule 30 (expression -> expression NE_FZS expression .)
     EQ              reduce using rule 30 (expression -> expression NE_FZS expression .)
@@ -6675,6 +6672,9 @@ state 87
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -6686,13 +6686,13 @@ state 87
   ! POW             [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
   ! ADD             [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
   ! SUB             [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
+  ! BWAND           [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
+  ! BWOR            [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
+  ! BWXOR           [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
   ! BWLSH           [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
   ! BWRSH           [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
   ! LPAREN          [ reduce using rule 30 (expression -> expression NE_FZS expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -6743,6 +6743,7 @@ state 88
     (68) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 31 (expression -> expression AND expression .)
+    QMARK           reduce using rule 31 (expression -> expression AND expression .)
     AND             reduce using rule 31 (expression -> expression AND expression .)
     OR              reduce using rule 31 (expression -> expression AND expression .)
     $end            reduce using rule 31 (expression -> expression AND expression .)
@@ -6753,7 +6754,6 @@ state 88
     FOR             reduce using rule 31 (expression -> expression AND expression .)
     RBRACKET        reduce using rule 31 (expression -> expression AND expression .)
     IF              reduce using rule 31 (expression -> expression AND expression .)
-    QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
     FDIV            shift and go to state 24
@@ -6780,7 +6780,6 @@ state 88
     NE_FZS          shift and go to state 45
     LPAREN          shift and go to state 48
 
-  ! QMARK           [ reduce using rule 31 (expression -> expression AND expression .) ]
   ! MOD             [ reduce using rule 31 (expression -> expression AND expression .) ]
   ! MUL             [ reduce using rule 31 (expression -> expression AND expression .) ]
   ! FDIV            [ reduce using rule 31 (expression -> expression AND expression .) ]
@@ -6806,6 +6805,7 @@ state 88
   ! NE_FZM          [ reduce using rule 31 (expression -> expression AND expression .) ]
   ! NE_FZS          [ reduce using rule 31 (expression -> expression AND expression .) ]
   ! LPAREN          [ reduce using rule 31 (expression -> expression AND expression .) ]
+  ! QMARK           [ shift and go to state 21 ]
   ! AND             [ shift and go to state 46 ]
   ! OR              [ shift and go to state 47 ]
 
@@ -6844,6 +6844,7 @@ state 89
     (68) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 32 (expression -> expression OR expression .)
+    QMARK           reduce using rule 32 (expression -> expression OR expression .)
     OR              reduce using rule 32 (expression -> expression OR expression .)
     $end            reduce using rule 32 (expression -> expression OR expression .)
     RPAREN          reduce using rule 32 (expression -> expression OR expression .)
@@ -6853,7 +6854,6 @@ state 89
     FOR             reduce using rule 32 (expression -> expression OR expression .)
     RBRACKET        reduce using rule 32 (expression -> expression OR expression .)
     IF              reduce using rule 32 (expression -> expression OR expression .)
-    QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
     FDIV            shift and go to state 24
@@ -6881,7 +6881,6 @@ state 89
     AND             shift and go to state 46
     LPAREN          shift and go to state 48
 
-  ! QMARK           [ reduce using rule 32 (expression -> expression OR expression .) ]
   ! MOD             [ reduce using rule 32 (expression -> expression OR expression .) ]
   ! MUL             [ reduce using rule 32 (expression -> expression OR expression .) ]
   ! FDIV            [ reduce using rule 32 (expression -> expression OR expression .) ]
@@ -6908,6 +6907,7 @@ state 89
   ! NE_FZS          [ reduce using rule 32 (expression -> expression OR expression .) ]
   ! AND             [ reduce using rule 32 (expression -> expression OR expression .) ]
   ! LPAREN          [ reduce using rule 32 (expression -> expression OR expression .) ]
+  ! QMARK           [ shift and go to state 21 ]
   ! OR              [ shift and go to state 47 ]
 
 
@@ -7937,9 +7937,6 @@ state 107
 
     COMMENT         reduce using rule 20 (expression -> expression NOT IN expression .)
     QMARK           reduce using rule 20 (expression -> expression NOT IN expression .)
-    BWAND           reduce using rule 20 (expression -> expression NOT IN expression .)
-    BWOR            reduce using rule 20 (expression -> expression NOT IN expression .)
-    BWXOR           reduce using rule 20 (expression -> expression NOT IN expression .)
     IN              reduce using rule 20 (expression -> expression NOT IN expression .)
     NOT             reduce using rule 20 (expression -> expression NOT IN expression .)
     EQ              reduce using rule 20 (expression -> expression NOT IN expression .)
@@ -7969,6 +7966,9 @@ state 107
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     LPAREN          shift and go to state 48
@@ -7980,13 +7980,13 @@ state 107
   ! POW             [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
   ! ADD             [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
   ! SUB             [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
+  ! BWAND           [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
+  ! BWOR            [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
+  ! BWXOR           [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
   ! BWLSH           [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
   ! BWRSH           [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
   ! LPAREN          [ reduce using rule 20 (expression -> expression NOT IN expression .) ]
   ! QMARK           [ shift and go to state 21 ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
   ! IN              [ shift and go to state 34 ]
   ! NOT             [ shift and go to state 35 ]
   ! EQ              [ shift and go to state 36 ]
@@ -8761,12 +8761,6 @@ state 122
     (68) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
-    BWAND           reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
-    BWOR            reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
-    BWXOR           reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
-    NOT             reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
-    AND             reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
-    OR              reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
     $end            reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
     RPAREN          reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
     COLON           reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
@@ -8783,9 +8777,13 @@ state 122
     POW             shift and go to state 26
     ADD             shift and go to state 27
     SUB             shift and go to state 28
+    BWAND           shift and go to state 29
+    BWOR            shift and go to state 30
+    BWXOR           shift and go to state 31
     BWLSH           shift and go to state 32
     BWRSH           shift and go to state 33
     IN              shift and go to state 34
+    NOT             shift and go to state 35
     EQ              shift and go to state 36
     NE              shift and go to state 37
     GT              shift and go to state 38
@@ -8796,6 +8794,8 @@ state 122
     EQ_FZS          shift and go to state 43
     NE_FZM          shift and go to state 44
     NE_FZS          shift and go to state 45
+    AND             shift and go to state 46
+    OR              shift and go to state 47
     LPAREN          shift and go to state 48
 
   ! QMARK           [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
@@ -8806,9 +8806,13 @@ state 122
   ! POW             [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! ADD             [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! SUB             [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
+  ! BWAND           [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
+  ! BWOR            [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
+  ! BWXOR           [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! BWLSH           [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! BWRSH           [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! IN              [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
+  ! NOT             [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! EQ              [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! NE              [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! GT              [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
@@ -8819,13 +8823,9 @@ state 122
   ! EQ_FZS          [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! NE_FZM          [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! NE_FZS          [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
+  ! AND             [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
+  ! OR              [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
   ! LPAREN          [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
-  ! BWAND           [ shift and go to state 29 ]
-  ! BWOR            [ shift and go to state 30 ]
-  ! BWXOR           [ shift and go to state 31 ]
-  ! NOT             [ shift and go to state 35 ]
-  ! AND             [ shift and go to state 46 ]
-  ! OR              [ shift and go to state 47 ]
 
 
 state 123

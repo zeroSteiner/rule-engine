@@ -32,7 +32,9 @@
 
 import datetime
 import random
+import re
 import unittest
+import warnings
 
 import rule_engine.engine as engine
 import rule_engine.errors as errors
@@ -113,3 +115,18 @@ class GitHubIssueTests(unittest.TestCase):
 		except Exception:
 			self.fail('evaluation raised an exception')
 		self.assertEqual(result, 1)
+
+	def test_number_98(self):
+		value = re.escape("joe.blogs")
+
+		# Check if the some_attribute key in the dictionary matches 'joe.blogs' exactly
+		with warnings.catch_warnings(record=True) as w:
+			warnings.simplefilter('always', SyntaxWarning)
+			engine.Rule(rf'some_attribute =~ "^{value}$"')
+			for warning in w:
+				if issubclass(warning.category, SyntaxWarning):
+					self.fail('SyntaxWarning was raised')
+
+	def test_number_104(self):
+		rule = engine.Rule(r"'André' in name")
+		self.assertTrue(rule.matches({'name': 'André the Giant'}))

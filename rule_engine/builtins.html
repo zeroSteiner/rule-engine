@@ -98,12 +98,12 @@
            <div itemprop="articleBody">
              
   <section id="module-rule_engine.builtins">
-<span id="builtins"></span><h1><a class="reference external" href="https://docs.python.org/3.12/library/builtins.html#module-builtins" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">builtins</span></code></a><a class="headerlink" href="#module-rule_engine.builtins" title="Link to this heading"></a></h1>
+<span id="builtins"></span><h1><a class="reference external" href="https://docs.python.org/3.13/library/builtins.html#module-builtins" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">builtins</span></code></a><a class="headerlink" href="#module-rule_engine.builtins" title="Link to this heading"></a></h1>
 <p>This module contains the class which defines the builtin values for the engine.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.builtins.Builtins">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Builtins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/builtins.html#Builtins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.builtins.Builtins" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.13/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a></p>
 <p>A class to define and provide variables to within the builtin context of rules. These can be accessed by specifying
 a symbol name with the <code class="docutils literal notranslate"><span class="pre">$</span></code> prefix.</p>
 <dl class="py method">
@@ -112,12 +112,12 @@ a symbol name with the <code class="docutils literal notranslate"><span class="p
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – A mapping of string keys to be used as symbol names with values of either Python literals or
+<li><p><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A mapping of string keys to be used as symbol names with values of either Python literals or
 a function which will be called when the symbol is accessed. When using a function, it will be passed a
 single argument, which is the instance of <a class="reference internal" href="#rule_engine.builtins.Builtins" title="rule_engine.builtins.Builtins"><code class="xref py py-class docutils literal notranslate"><span class="pre">Builtins</span></code></a>.</p></li>
-<li><p><strong>namespace</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The namespace of the variables to resolve.</p></li>
-<li><p><strong>timezone</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/datetime.html#datetime.tzinfo" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a>) – A timezone to use when resolving timestamps.</p></li>
-<li><p><strong>value_types</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – A mapping of the values to their datatypes.</p></li>
+<li><p><strong>namespace</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The namespace of the variables to resolve.</p></li>
+<li><p><strong>timezone</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a>) – A timezone to use when resolving timestamps.</p></li>
+<li><p><strong>value_types</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A mapping of the values to their datatypes.</p></li>
 </ul>
 </dd>
 </dl>
@@ -138,7 +138,7 @@ single argument, which is the instance of <a class="reference internal" href="#r
 <dd><p>The method to use for resolving the data type of a builtin symbol.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The name of the symbol to retrieve the data type of.</p>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the symbol to retrieve the data type of.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The data type of the symbol or <code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code>.</p>

@@ -110,7 +110,7 @@
 <dt class="sig sig-object py" id="rule_engine.engine.resolve_attribute">
 <span class="sig-name descname"><span class="pre">resolve_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#resolve_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.resolve_attribute" title="Link to this definition"></a></dt>
 <dd><p>A replacement resolver function for looking up symbols as members of <em>thing</em>. This is effectively the same as
-<code class="docutils literal notranslate"><span class="pre">thing.name</span></code>. The <em>thing</em> object can be a <a class="reference external" href="https://docs.python.org/3.12/library/collections.html#collections.namedtuple" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">namedtuple()</span></code></a>, a custom Python class or any other
+<code class="docutils literal notranslate"><span class="pre">thing.name</span></code>. The <em>thing</em> object can be a <a class="reference external" href="https://docs.python.org/3.13/library/collections.html#collections.namedtuple" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">namedtuple()</span></code></a>, a custom Python class or any other
 object. Each of the members of <em>thing</em> must be of a compatible data type.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -121,7 +121,7 @@ used that checks <em>name</em> against a whitelist of attributes that are allowe
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>thing</strong> – The object on which the <em>name</em> attribute will be accessed.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The symbol name that is being resolved.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The symbol name that is being resolved.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -134,13 +134,13 @@ used that checks <em>name</em> against a whitelist of attributes that are allowe
 <dt class="sig sig-object py" id="rule_engine.engine.resolve_item">
 <span class="sig-name descname"><span class="pre">resolve_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#resolve_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.resolve_item" title="Link to this definition"></a></dt>
 <dd><p>A resolver function for looking up symbols as items from an object (<em>thing</em>) which supports the
-<a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a> interface, such as a dictionary. This is effectively the same as
+<a class="reference external" href="https://docs.python.org/3.13/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a> interface, such as a dictionary. This is effectively the same as
 <code class="docutils literal notranslate"><span class="pre">thing['name']</span></code>. Each of the values in <em>thing</em> must be of a compatible data type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>thing</strong> – The object from which the <em>name</em> item will be accessed.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The symbol name that is being resolved.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The symbol name that is being resolved.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -153,12 +153,12 @@ used that checks <em>name</em> against a whitelist of attributes that are allowe
 <dt class="sig sig-object py" id="rule_engine.engine.type_resolver_from_dict">
 <span class="sig-name descname"><span class="pre">type_resolver_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#type_resolver_from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.type_resolver_from_dict" title="Link to this definition"></a></dt>
 <dd><p>Return a function suitable for use as the <em>type_resolver</em> for a <a class="reference internal" href="#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> instance from a dictionary. If
-any of the values within the dictionary are not of a compatible data type, a <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#TypeError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> will be raised.
+any of the values within the dictionary are not of a compatible data type, a <a class="reference external" href="https://docs.python.org/3.13/library/exceptions.html#TypeError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> will be raised.
 Additionally, the resulting function will raise a <a class="reference internal" href="errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> if the symbol
 name does not exist within the dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dictionary</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – A dictionary (or any other object which supports the <a class="reference external" href="https://docs.python.org/3.12/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>
+<dd class="field-odd"><p><strong>dictionary</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A dictionary (or any other object which supports the <a class="reference external" href="https://docs.python.org/3.13/library/collections.abc.html#collections.abc.Mapping" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapping</span></code></a>
 interface) from which to create the callback function.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -176,7 +176,7 @@ interface) from which to create the callback function.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.engine.Context">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex_flags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_resolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'local'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decimal_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.Context" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.12/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.13/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An object defining the context for a rule’s evaluation. This can be used to change the behavior of certain aspects
 of the rule such as how symbols are resolved and what regex flags should be used.</p>
 <dl class="py method">
@@ -185,16 +185,16 @@ of the rule such as how symbols are resolved and what regex flags should be used
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>regex_flags</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The flags to provide to functions in the <a class="reference external" href="https://docs.python.org/3.12/library/re.html#module-re" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> module when calling either the
-<a class="reference external" href="https://docs.python.org/3.12/library/re.html#re.match" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">match()</span></code></a> or <a class="reference external" href="https://docs.python.org/3.12/library/re.html#re.search" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a> functions for comparison expressions.</p></li>
+<li><p><strong>regex_flags</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The flags to provide to functions in the <a class="reference external" href="https://docs.python.org/3.13/library/re.html#module-re" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">re</span></code></a> module when calling either the
+<a class="reference external" href="https://docs.python.org/3.13/library/re.html#re.match" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">match()</span></code></a> or <a class="reference external" href="https://docs.python.org/3.13/library/re.html#re.search" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">search()</span></code></a> functions for comparison expressions.</p></li>
 <li><p><strong>resolver</strong> – An optional callback function to use in place of <a class="reference internal" href="#rule_engine.engine.Context.resolve" title="rule_engine.engine.Context.resolve"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resolve()</span></code></a>.</p></li>
-<li><p><strong>type_resolver</strong> (<em>function</em><em>, </em><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – An optional callback function to use in place of <a class="reference internal" href="#rule_engine.engine.Context.resolve_type" title="rule_engine.engine.Context.resolve_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resolve_type()</span></code></a>.</p></li>
-<li><p><strong>default_timezone</strong> (str, <a class="reference external" href="https://docs.python.org/3.12/library/datetime.html#datetime.tzinfo" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a>) – The default timezone to apply to <a class="reference external" href="https://docs.python.org/3.12/library/datetime.html#datetime.datetime" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> instances which do not
+<li><p><strong>type_resolver</strong> (<em>function</em><em>, </em><a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – An optional callback function to use in place of <a class="reference internal" href="#rule_engine.engine.Context.resolve_type" title="rule_engine.engine.Context.resolve_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">resolve_type()</span></code></a>.</p></li>
+<li><p><strong>default_timezone</strong> (str, <a class="reference external" href="https://docs.python.org/3.13/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a>) – The default timezone to apply to <a class="reference external" href="https://docs.python.org/3.13/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> instances which do not
 have one specified. This is necessary for comparison operations. The value should either be a
-<a class="reference external" href="https://docs.python.org/3.12/library/datetime.html#datetime.tzinfo" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> instance, or a string. If <em>default_timzezone</em> is a string it must be one of the
+<a class="reference external" href="https://docs.python.org/3.13/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> instance, or a string. If <em>default_timzezone</em> is a string it must be one of the
 specially supported (case-insensitive) values of “local” or “utc”.</p></li>
 <li><p><strong>default_value</strong> – The default value to return when resolving either a missing symbol or attribute.</p></li>
-<li><p><strong>decimal_context</strong> – A specific <a class="reference external" href="https://docs.python.org/3.12/library/decimal.html#decimal.Context" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Context</span></code></a> object to use for evaluation of <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> values.
+<li><p><strong>decimal_context</strong> – A specific <a class="reference external" href="https://docs.python.org/3.13/library/decimal.html#decimal.Context" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Context</span></code></a> object to use for evaluation of <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> values.
 The default value will be taken from the current thread and will be used by all evaluations using this
 <a class="reference internal" href="#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> regardless of the decimal context of the thread which evaluates the
 rule. This causes the rule evaluation to be consistent regardless of the calling thread.</p></li>
@@ -268,7 +268,7 @@ then up to the caller to determine whether or not it is appropriate to use <a cl
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>thing</strong> – The object from which the <em>name</em> item will be accessed.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The symbol name that is being resolved.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The symbol name that is being resolved.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -289,7 +289,7 @@ then up to the caller to determine whether or not it is appropriate to use <a cl
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>thing</strong> – The object from which the <em>object_</em> was retrieved.</p></li>
 <li><p><strong>object</strong> – The object from which the <em>name</em> attribute will be accessed.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The attribute name that is being resolved.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The attribute name that is being resolved.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -306,7 +306,7 @@ then up to the caller to determine whether or not it is appropriate to use <a cl
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>object_type</strong> – The data type of the object that <em>name</em> is an attribute of.</p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The name of the attribute to retrieve the data type of.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The name of the attribute to retrieve the data type of.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -325,8 +325,8 @@ return <code class="xref py py-data docutils literal notranslate"><span class="p
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The symbol name to provide a type hint for.</p></li>
-<li><p><strong>scope</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – An optional scope name that identifies from where to resolve the name.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The symbol name to provide a type hint for.</p></li>
+<li><p><strong>scope</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – An optional scope name that identifies from where to resolve the name.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -348,7 +348,7 @@ evaluated.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.engine.Rule">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/engine.html#Rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.engine.Rule" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.12/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.13/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A rule which parses a string with a logical expression and can then evaluate an arbitrary object for whether or not
 it matches based on the constraints of the expression.</p>
 <dl class="py method">
@@ -357,7 +357,7 @@ it matches based on the constraints of the expression.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The text of the logical expression.</p></li>
+<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The text of the logical expression.</p></li>
 <li><p><strong>context</strong> (<a class="reference internal" href="#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression on arbitrary objects. This can be used to
 change the default behavior. The default context is <a class="reference internal" href="#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> but any object providing the same
 interface (such as a subclass) can be used.</p></li>
@@ -403,7 +403,7 @@ there are no type compatibility issues regarding literals or symbols with known 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The text of the logical expression.</p></li>
+<li><p><strong>text</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The text of the logical expression.</p></li>
 <li><p><strong>context</strong> – The context as would be passed to the <a class="reference internal" href="#rule_engine.engine.Rule.__init__" title="rule_engine.engine.Rule.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></a> method. This can be used for
 specifying symbol type information.</p></li>
 </ul>
@@ -412,7 +412,7 @@ specifying symbol type information.</p></li>
 <dd class="field-even"><p>Whether or not the expression is well formed and appears valid.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.13/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -430,7 +430,7 @@ exception will be raised.</p>
 <dd class="field-even"><p>Whether or not the rule matches.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.13/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>

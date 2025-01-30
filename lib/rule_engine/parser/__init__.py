@@ -31,6 +31,7 @@
 #
 
 import ast as pyast
+import codecs
 import collections
 import types as pytypes
 
@@ -452,9 +453,12 @@ class Parser(ParserBase):
 
 	def p_expression_string(self, p):
 		'object : STRING'
+		value = p[1][1:-1]
 		try:
-			value = p[1][1:-1].encode().decode('unicode-escape')
-		except Exception:
+			value = codecs.encode(value, 'unicode-escape').decode()
+			value = value.replace('\\\\', '\\')
+			value = codecs.decode(value, 'unicode-escape')
+		except UnicodeError:
 			raise errors.StringSyntaxError('invalid string literal', p[1][1:-1]) from None
 		p[0] = _DeferredAstNode(ast.StringExpression, args=(self.context, value))
 

@@ -4,6 +4,17 @@ Change Log
 This document contains notes on the major changes for each version of the Rule Engine. In comparison to the git log,
 this list is curated by the development team for note worthy changes.
 
+Version 5.x.x
+-------------
+
+Version 5.0.0
+^^^^^^^^^^^^^
+
+*In Progress*
+
+* **Breaking:** Dropped support for Python versions 3.6, 3.7 and 3.8
+* **Breaking:** Changed the precedence of operators to be more aligned with common programming languages
+
 Version 4.x.x
 -------------
 

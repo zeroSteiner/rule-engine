@@ -32,8 +32,10 @@
 
 import argparse
 import code
+import os
 import pprint
 import re
+import sys
 import textwrap
 import traceback
 
@@ -43,6 +45,7 @@ from . import errors
 
 try:
 	from IPython import embed
+	from IPython.core import ultratb
 	from prompt_toolkit import PromptSession
 except ImportError:
 	has_development_dependencies = False
@@ -75,6 +78,11 @@ def main():
 	if not has_development_dependencies:
 		parser.error('development dependencies are not installed, install them with: pipenv install --dev')
 
+	if os.environ.get('NO_COLOR'):
+		color_scheme = 'nocolor'
+	else:
+		color_scheme = 'neutral'
+
 	context = engine.Context()
 	thing = None
 	if arguments.edit_console or arguments.edit_file:
@@ -95,11 +103,12 @@ def main():
 			namespace = {'context': context, 'thing': thing}
 			print("Starting IPython shell...")
 			print("Edit the \'context\' and \'thing\' objects as necessary")
-			embed(colors="neutral", user_ns=namespace)
+			embed(colors=color_scheme, user_ns=namespace)
 			context = namespace.get('context', context)
 			thing = namespace.get('thing', thing)
 	debugging = arguments.debug
 	session = PromptSession()
+	color_tb = ultratb.ColorTB(color_scheme=color_scheme)
 
 	while True:
 		try:
@@ -117,25 +126,21 @@ def main():
 			rule = engine.Rule(rule_text, context=context)
 			result = rule.evaluate(thing)
 		except errors.EngineError as error:
-			print("{}: {}".format(error.__class__.__name__, error.message))
+			print(f"{color_tb.Colors.excName}{error.__class__.__name__}:{color_tb.Colors.Normal} {error.message}", file=sys.stderr)
 			if isinstance(error, (errors.AttributeResolutionError, errors.SymbolResolutionError)) and error.suggestion:
-				print("Did you mean '{}'?".format(error.suggestion))
+				print(f"Did you mean '{error.suggestion}'?", file=sys.stderr)
 			elif isinstance(error, errors.RegexSyntaxError):
-				print("  Regex:   {!r}".format(error.error.pattern))
-				print("  Details: {} at position {}".format(error.error.msg, error.error.pos))
+				print(f"  Regex:   {error.error.pattern!r}", file=sys.stderr)
+				print(f"  Details: {error.error.msg} at position {error.error.pos}", file=sys.stderr)
 			elif isinstance(error, errors.FunctionCallError):
-				print("  Function:  {!r}".format(error.function_name))
+				print(f"  Function:  {error.function_name!r}", file=sys.stderr)
 				if debugging and error.error:
-					inner_exception = ''.join(traceback.format_exception(
-						error.error,
-						error.error,
-						error.error.__traceback__
-					))
-					print(textwrap.indent(inner_exception, ' ' * 4))
+					inner_exception = color_tb.text(error.error.__class__, error.error, error.error.__traceback__)
+					print(textwrap.indent(inner_exception, ' ' * 2), file=sys.stderr)
 			if debugging:
-				traceback.print_exc()
+				print(color_tb.text(error.__class__, error, error.__traceback__), file=sys.stderr)
 		except Exception as error:
-			traceback.print_exc()
+			print(color_tb.text(error.__class__, error, error.__traceback__), file=sys.stderr)
 		else:
 			print('result: ')
 			pprint.pprint(result, indent=4)

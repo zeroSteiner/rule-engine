@@ -14,6 +14,7 @@ Version 5.0.0
 
 * **Breaking:** Dropped support for Python versions 3.6, 3.7 and 3.8
 * **Breaking:** Changed the precedence of operators to be more aligned with common programming languages
+* **Breaking:** The :ref:`debug-repl` utility now requires development dependencies to be installed
 
 Version 4.x.x
 -------------
@@ -86,7 +87,7 @@ Version 3.6.0
 Released :release:`3.6.0` on June 16th, 2023
 
 * Removed testing for Python versions 3.4 and 3.5 on GitHub Actions
-* Add regex error details to the debug REPL
+* Add regex error details to the :ref:`debug-repl` utility
 * Add support for Python-style comments
 
 Version 3.5.0

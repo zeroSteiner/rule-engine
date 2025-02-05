@@ -32,11 +32,8 @@
 
 import argparse
 import code
-import io
-import os
 import pprint
 import re
-import sys
 import textwrap
 import traceback
 
@@ -44,15 +41,13 @@ from . import __version__
 from . import engine
 from . import errors
 
-def _console_interact(console, *args, **kwargs):
-	# see: https://bugs.python.org/issue34115
-	stdin = os.dup(0)
-	try:
-		console.interact(*args, **kwargs)
-	except SystemExit:
-		if 'exitmsg' in kwargs:
-			print(kwargs['exitmsg'])
-	sys.stdin = io.TextIOWrapper(io.BufferedReader(io.FileIO(stdin, mode='rb', closefd=False)))
+try:
+	from IPython import embed
+	from prompt_toolkit import PromptSession
+except ImportError:
+	has_development_dependencies = False
+else:
+	has_development_dependencies = True
 
 def main():
 	parser = argparse.ArgumentParser(description='Rule Engine: Debug REPL', conflict_handler='resolve')
@@ -77,6 +72,9 @@ def main():
 	parser.add_argument('-v', '--version', action='version', version=parser.prog + ' Version: ' + __version__)
 	arguments = parser.parse_args()
 
+	if not has_development_dependencies:
+		parser.error('development dependencies are not installed, install them with: pipenv install --dev')
+
 	context = engine.Context()
 	thing = None
 	if arguments.edit_console or arguments.edit_file:
@@ -91,19 +89,21 @@ def main():
 				filename=arguments.edit_file.name,
 				symbol='exec'
 			))
+			context = console.locals['context']
+			thing = console.locals['thing']
 		if arguments.edit_console:
-			_console_interact(
-				console,
-				banner='edit the \'context\' and \'thing\' objects as necessary',
-				exitmsg='exiting the edit console...'
-			)
-		context = console.locals['context']
-		thing = console.locals['thing']
+			namespace = {'context': context, 'thing': thing}
+			print("Starting IPython shell...")
+			print("Edit the \'context\' and \'thing\' objects as necessary")
+			embed(colors="neutral", user_ns=namespace)
+			context = namespace.get('context', context)
+			thing = namespace.get('thing', thing)
 	debugging = arguments.debug
+	session = PromptSession()
 
 	while True:
 		try:
-			rule_text = input('rule > ')
+			rule_text = session.prompt('rule > ')
 		except (EOFError, KeyboardInterrupt):
 			break
 

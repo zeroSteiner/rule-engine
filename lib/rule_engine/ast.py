@@ -494,7 +494,13 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 		_assert_is_numeric(left_value)
 		right_value = self.right.evaluate(thing)
 		_assert_is_numeric(right_value)
-		return op(left_value, right_value)
+		try:
+			result = op(left_value, right_value)
+		except ZeroDivisionError:
+			raise errors.EvaluationError('arithmetic error: division by zero') from None
+		except ArithmeticError:
+			raise errors.EvaluationError('arithmetic error') from None
+		return result
 
 	_op_fdiv = functools.partialmethod(__op_arithmetic, operator.floordiv)
 	_op_tdiv = functools.partialmethod(__op_arithmetic, operator.truediv)

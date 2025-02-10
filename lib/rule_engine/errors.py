@@ -61,7 +61,6 @@ class EvaluationError(EngineError):
 	An error raised for issues which occur while the rule is being evaluated. This can occur at parse time while AST
 	nodes are being evaluated during the reduction phase.
 	"""
-	pass
 
 class SyntaxError(EngineError):
 	"""A base error for syntax related issues."""
@@ -171,7 +170,7 @@ class RuleSyntaxError(SyntaxError):
 
 class AttributeResolutionError(EvaluationError):
 	"""
-	An error raised with an attribute can not be resolved to a value.
+	An error raised when an attribute can not be resolved to a value.
 
 	.. versionadded:: 2.0.0
 	"""
@@ -309,3 +308,10 @@ class FunctionCallError(EvaluationError):
 		self.error = error
 		"""The exception from which this error was triggered."""
 		self.function_name = function_name
+
+class ArithmeticError(EvaluationError):
+	"""
+	An error raised when there is an issue performing an arithmetic operation.
+
+	.. versionadded:: 5.0.0
+	"""

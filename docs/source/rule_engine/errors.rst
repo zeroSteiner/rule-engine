@@ -14,6 +14,11 @@ Data
 Exceptions
 ----------
 
+.. autoexception:: ArithmeticError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: AttributeResolutionError
    :members:
    :show-inheritance:
@@ -103,6 +108,7 @@ The class hierarchy for Rule Engine exceptions is:
 
    EngineError
     +-- EvaluationError
+         +-- ArithmeticError
          +-- AttributeResolutionError
          +-- AttributeTypeError
          +-- FunctionCallError

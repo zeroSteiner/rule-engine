@@ -96,6 +96,11 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('mul', equals_value=8.0)
 		self.assertExpressionTests('pow', equals_value=16.0)
 
+	def test_ast_expression_left_operator_right_arithmetic_errors(self):
+		for operation in ('fdiv', 'tdiv'):
+			with self.assertRaises(errors.ArithmeticError):
+				self.assertExpressionTests(operation, ast.FloatExpression(context, 2.0), ast.FloatExpression(context, 0.0))
+
 	def test_ast_expression_left_operator_right_arithmetic_type_errors(self):
 		for operation in ('fdiv', 'tdiv', 'mod', 'mul', 'pow'):
 			with self.assertRaises(errors.EvaluationError):
@@ -106,7 +111,6 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 				self.assertExpressionTests(operation, ast.FloatExpression(context, 2.0), ast.BooleanExpression(context, True))
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, ast.BooleanExpression(context, True), ast.FloatExpression(context, 4.0))
-
 class AddExpressionTests(LeftOperatorRightExpresisonTestsBase):
 	ExpressionClass = ast.AddExpression
 	false_value = 0.0

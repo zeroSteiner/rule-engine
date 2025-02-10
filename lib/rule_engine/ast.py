@@ -497,9 +497,9 @@ class ArithmeticExpression(LeftOperatorRightExpressionBase):
 		try:
 			result = op(left_value, right_value)
 		except ZeroDivisionError:
-			raise errors.EvaluationError('arithmetic error: division by zero') from None
+			raise errors.ArithmeticError('arithmetic error: division by zero') from None
 		except ArithmeticError:
-			raise errors.EvaluationError('arithmetic error') from None
+			raise errors.ArithmeticError('arithmetic error') from None
 		return result
 
 	_op_fdiv = functools.partialmethod(__op_arithmetic, operator.floordiv)

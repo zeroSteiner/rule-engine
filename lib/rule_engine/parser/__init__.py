@@ -34,6 +34,7 @@ import ast as pyast
 import codecs
 import collections
 import types as pytypes
+import re
 
 from .. import ast
 from .. import errors
@@ -41,6 +42,20 @@ from .base import ParserBase
 from .utilities import timedelta_regex
 
 literal_eval = pyast.literal_eval
+re
+def _repl_byte_escape(match):
+	token = match.group(1)
+	if token[0] == ord('x'):  # x
+		return bytes([int(token[1:], 16)])
+	table = {
+		b't':  '\t'.encode(),
+		b'n':  '\n'.encode(),
+		b'r':  '\r'.encode(),
+		b'"':  '\"'.encode(),
+		b"'":  '\''.encode(),
+		b'\\': '\\'.encode()
+	}
+	return table[token]
 
 class _DeferredAstNode(object):
 	__slots__ = ('cls', 'args', 'kwargs', 'method')
@@ -418,10 +433,17 @@ class Parser(ParserBase):
 
 	def p_expression_bytes(self, p):
 		'object : BYTES'
+		value = p[1][1:-1]
 		try:
-			value = literal_eval('b' + p[1])
-		except Exception:
+			value = codecs.encode(value, 'unicode-escape').decode()
+		except UnicodeError:
 			raise errors.BytesSyntaxError('invalid bytes literal', p[1][1:-1]) from None
+		value = value.replace('\\\\', '\\')
+		if (match := re.search(r'(?<!\\)(?:\\\\)*\\(?!\\|t|n|r|"|\'|x[0-9A-Fa-f]{2}).?', value)):
+			raise errors.BytesSyntaxError(f"invalid bytes literal (invalid escape at position {match.start()})", p[1][1:-1])
+		value = value.encode()
+		value = re.sub(br'\\(x[0-9A-Fa-f]{2})', _repl_byte_escape, value)
+		value = re.sub(br'\\(.)', _repl_byte_escape, value)
 		p[0] = _DeferredAstNode(ast.BytesExpression, args=(self.context, value))
 
 	def p_expression_datetime(self, p):

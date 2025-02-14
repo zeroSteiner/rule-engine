@@ -313,11 +313,24 @@ class ParserLiteralTests(ParserTestsBase):
 
 	def test_parse_bytes(self):
 		self.assertLiteralStatementEqual('b""', ast.BytesExpression, b'')
-		self.assertLiteralStatementEqual('b"dead\x13\x37"', ast.BytesExpression, b'dead\x13\x37')
-		self.assertLiteralStatementEqual('b"\\xde\\xad"', ast.BytesExpression, b'\xde\xad')
-		self.assertLiteralStatementEqual('b"\\xDE\\xAD"', ast.BytesExpression, b'\xde\xad')
+
+	def test_parse_bytes_escape(self):
+		self.assertLiteralStatementEqual('b""', ast.BytesExpression, b'')
+		self.assertLiteralStatementEqual(r'b"foo\tbar"', ast.BytesExpression, b'foo\x09bar')
+		self.assertLiteralStatementEqual(r'b"foo\nbar"', ast.BytesExpression, b'foo\x0abar')
+		self.assertLiteralStatementEqual(r'b"foo\rbar"', ast.BytesExpression, b'foo\x0dbar')
+		self.assertLiteralStatementEqual(r'b"foo\"bar"', ast.BytesExpression, b'foo\x22bar')
+		self.assertLiteralStatementEqual(r'b"foo\'bar"', ast.BytesExpression, b'foo\x27bar')
+		self.assertLiteralStatementEqual(r'b"foo\\bar"', ast.BytesExpression, b'foo\x5cbar')
 		with self.assertRaises(errors.BytesSyntaxError):
-			self._parse('b"\\xyz"', self.context)
+			self._parse(r'b"\u0123"', self.context)
+
+	def test_parse_bytes_escape_hexl(self):
+		self.assertLiteralStatementEqual(r'b"dead\x13\x37"', ast.BytesExpression, b'dead\x13\x37')
+		self.assertLiteralStatementEqual(r'b"\xde\xad"', ast.BytesExpression, b'\xde\xad')
+		self.assertLiteralStatementEqual(r'b"\xDE\xAD"', ast.BytesExpression, b'\xde\xad')
+		with self.assertRaises(errors.BytesSyntaxError):
+			self._parse(r'b"\xyz"', self.context)
 
 	def test_parse_datetime(self):
 		self.assertLiteralStatementEqual('d"2016-10-15"', ast.DatetimeExpression, datetime.datetime(2016, 10, 15, tzinfo=dateutil.tz.tzlocal()))

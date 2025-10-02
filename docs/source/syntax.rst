@@ -27,7 +27,7 @@ The following table outlines all operators that can be used in Rule Engine expre
 | **Arithmetic Operators**                                                                                      |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``+``        | Addition                     | :py:attr:`~.DataType.BYTES`, :py:attr:`~.DataType.DATETIME`,    |
-|              |                              | :py:attr:`~.DataType.FLOAT`, py:attr:`~.DataType.STRING`,       |
+|              |                              | :py:attr:`~.DataType.FLOAT`, :py:attr:`~.DataType.STRING`,      |
 |              |                              | :py:attr:`~.DataType.TIMEDELTA` :sup:`1`                        |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``-``        | Subtraction                  | :py:attr:`~.DataType.FLOAT`, :py:attr:`~.DataType.DATETIME`,    |

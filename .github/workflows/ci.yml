@@ -7,14 +7,16 @@ on:
 jobs:
   unit-tests:
     name: Test on Python v${{ matrix.python-version }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         include:
           - pipenv-version: '2022.4.8'
             python-version: '3.6'
+            install-with: pyenv
           - pipenv-version: '2022.4.8'
             python-version: '3.7'
+            install-with: pyenv
           - pipenv-version: '2022.4.8'
             python-version: '3.8'
           - pipenv-version: '2022.4.8'
@@ -30,15 +32,27 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Install build essentials
         run: sudo apt-get --yes install build-essential
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Install Python via pyenv
+        if: matrix.install-with == 'pyenv'
+        run: |
+          export PYENV_GIT_TAG="v2.6.11"
+          curl https://pyenv.run | bash
+          export PATH="$HOME/.pyenv/bin:$PATH"
+          eval "$(pyenv init -)"
+          pyenv install ${{ matrix.python-version }}
+          pyenv global ${{ matrix.python-version }}
+          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
+
+      - name: Install Python via actions/setup-python
+        if: matrix.install-with == null || matrix.install-with == 'actions/setup'
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -57,15 +71,27 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Install build essentials
         run: sudo apt-get --yes install build-essential
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Install Python via pyenv
+        if: matrix.install-with == 'pyenv'
+        run: |
+          export PYENV_GIT_TAG="v2.6.11"
+          curl https://pyenv.run | bash
+          export PATH="$HOME/.pyenv/bin:$PATH"
+          eval "$(pyenv init -)"
+          pyenv install ${{ matrix.python-version }}
+          pyenv global ${{ matrix.python-version }}
+          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
+
+      - name: Install Python via actions/setup-python
+        if: matrix.install-with == null || matrix.install-with == 'actions/setup'
+        uses: actions/setup-python@v6
 
       - name: Install dependencies
         run: |
@@ -82,15 +108,27 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Install build essentials
         run: sudo apt-get --yes install build-essential
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Install Python via pyenv
+        if: matrix.install-with == 'pyenv'
+        run: |
+          export PYENV_GIT_TAG="v2.6.11"
+          curl https://pyenv.run | bash
+          export PATH="$HOME/.pyenv/bin:$PATH"
+          eval "$(pyenv init -)"
+          pyenv install ${{ matrix.python-version }}
+          pyenv global ${{ matrix.python-version }}
+          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
+
+      - name: Install Python via actions/setup-python
+        if: matrix.install-with == null || matrix.install-with == 'actions/setup'
+        uses: actions/setup-python@v6
 
       - name: Install dependencies
         run: |
@@ -115,15 +153,27 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: Install build essentials
         run: sudo apt-get --yes install build-essential
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Install Python via pyenv
+        if: matrix.install-with == 'pyenv'
+        run: |
+          export PYENV_GIT_TAG="v2.6.11"
+          curl https://pyenv.run | bash
+          export PATH="$HOME/.pyenv/bin:$PATH"
+          eval "$(pyenv init -)"
+          pyenv install ${{ matrix.python-version }}
+          pyenv global ${{ matrix.python-version }}
+          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
+
+      - name: Install Python via actions/setup-python
+        if: matrix.install-with == null || matrix.install-with == 'actions/setup'
+        uses: actions/setup-python@v6
 
       - name: Install dependencies
         run: |

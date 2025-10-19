@@ -286,6 +286,15 @@ difference comes in an optional leading character before the opening quote. Eith
 ``s`` will specify a standard :py:attr:`~.DataType.STRING` value, while a single ``d`` will specify a
 :py:attr:`~.DataType.DATETIME` value, and a single ``t`` will specify a :py:attr:`~.DataType.TIMEDELTA` value.
 
+.. _literal-bytes-values:
+
+Literal BYTES Values
+""""""""""""""""""""
+
+:py:attr:`~.DataType.BYTES` literals are strings prefixed with ``b`` followed by either a single or double quote. The
+contents of the string may use escape sequences by specifying ``\`` followed by a single selection of ``tnr"'\`` or
+``x`` followed by two hexadecimal digits.
+
 .. _literal-datetime-values:
 
 Literal DATETIME Values

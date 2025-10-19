@@ -15,6 +15,7 @@ Version 5.0.0
 * **Breaking:** Dropped support for Python versions 3.6, 3.7 and 3.8
 * **Breaking:** Changed the precedence of operators to be more aligned with common programming languages
 * **Breaking:** The :ref:`debug-repl` utility now requires development dependencies to be installed
+* **Breaking:** BYTES literals now throw exceptions for invalid escape sequences
 
 Version 4.x.x
 -------------

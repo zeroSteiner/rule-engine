@@ -42,7 +42,7 @@ from .base import ParserBase
 from .utilities import timedelta_regex
 
 literal_eval = pyast.literal_eval
-re
+
 def _repl_byte_escape(match):
 	token = match.group(1)
 	if token[0] == ord('x'):  # x

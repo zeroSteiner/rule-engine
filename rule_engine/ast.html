@@ -100,7 +100,7 @@
            <div itemprop="articleBody">
              
   <section id="module-rule_engine.ast">
-<span id="ast"></span><h1><a class="reference external" href="https://docs.python.org/3.13/library/ast.html#module-ast" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a><a class="headerlink" href="#module-rule_engine.ast" title="Link to this heading"></a></h1>
+<span id="ast"></span><h1><a class="reference external" href="https://docs.python.org/3.12/library/ast.html#module-ast" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a><a class="headerlink" href="#module-rule_engine.ast" title="Link to this heading"></a></h1>
 <p>This module contains the nodes which comprise the abstract syntax tree generated from parsed grammar text.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -115,7 +115,7 @@ an API breaking way in order to add new features.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.Assignment">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Assignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">UNDEFINED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast.html#Assignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.Assignment" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.13/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.12/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>An internal assignment whereby a symbol is populated with a value of the specified type.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.ast.Assignment.__init__">
@@ -123,7 +123,7 @@ an API breaking way in order to add new features.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The symbol name that the assignment is defining.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The symbol name that the assignment is defining.</p></li>
 <li><p><strong>value</strong> – The value of the assignment.</p></li>
 <li><p><strong>value_type</strong> (<a class="reference internal" href="types.html#rule_engine.types.DataType" title="rule_engine.types.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>) – The data type of the assignment.</p></li>
 </ul>
@@ -190,7 +190,7 @@ be used to indicate that arithmetic operations are compatible with <a class="ref
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</p></li>
-<li><p><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.13/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The grammar type of operator at the center of the expression. Subclasses must define operator
+<li><p><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The grammar type of operator at the center of the expression. Subclasses must define operator
 methods to handle evaluation based on this value.</p></li>
 <li><p><strong>left</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the left of the operator.</p></li>
 <li><p><strong>right</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the right of the operator.</p></li>

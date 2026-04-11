@@ -40,6 +40,7 @@ import functools
 import math
 import re
 import threading
+import warnings
 
 from . import ast
 from . import builtins
@@ -429,7 +430,8 @@ class Context(object):
 			type_resolver=None,
 			default_timezone='local',
 			default_value=errors.UNDEFINED,
-			decimal_context=None
+			decimal_context=None,
+			mapping_attribute_lookup=True
 	):
 		"""
 		:param int regex_flags: The flags to provide to functions in the :py:mod:`re` module when calling either the
@@ -447,6 +449,11 @@ class Context(object):
 			The default value will be taken from the current thread and will be used by all evaluations using this
 			:py:class:`~rule_engine.engine.Context` regardless of the decimal context of the thread which evaluates the
 			rule. This causes the rule evaluation to be consistent regardless of the calling thread.
+		:param bool mapping_attribute_lookup: Whether or not to allow attribute-style access on :py:attr:`.MAPPING`
+			values as a fallback to key-style lookup. When ``True`` (the default), accessing ``mapping.key`` falls
+			back to ``mapping['key']`` and emits a :py:exc:`~rule_engine.errors.MappingAttributeLookupDeprecation`
+			once per context. When ``False``, attribute access on a :py:attr:`.MAPPING` raises a parse-time error.
+			This fallback is scheduled for removal in v6.0.
 
 		.. versionchanged:: 2.0.0
 			Added the *default_value* parameter.
@@ -457,6 +464,9 @@ class Context(object):
 
 		.. versionchanged:: 3.0.0
 			Added the *decimal_context* parameter.
+
+		.. versionchanged:: 5.0.0
+			Added the *mapping_attribute_lookup* parameter.
 		"""
 		self.regex_flags = regex_flags
 		"""The *regex_flags* parameter from :py:meth:`~__init__`"""
@@ -493,6 +503,10 @@ class Context(object):
 			type_resolver = type_resolver_from_dict(type_resolver)
 		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
 		self.__resolver = resolver or resolve_item
+		self.mapping_attribute_lookup = mapping_attribute_lookup
+		"""The *mapping_attribute_lookup* parameter from :py:meth:`~__init__`."""
+		self._mapping_fallback_lock = threading.Lock()
+		self._mapping_fallback_warned = False
 
 	@contextlib.contextmanager
 	def assignments(self, *assignments):
@@ -556,6 +570,19 @@ class Context(object):
 		"""
 		return self.__resolve_attribute(thing, object_, name)
 	resolve_attribute_type = __resolve_attribute.resolve_type
+
+	def _warn_mapping_fallback(self, attribute_name):
+		with self._mapping_fallback_lock:
+			if self._mapping_fallback_warned:
+				return
+			self._mapping_fallback_warned = True
+		message = (
+			"accessing attribute {0!r} on a MAPPING value via dot syntax is deprecated; "
+			"use mapping[{0!r}] instead. This fallback will be removed in v6.0. Set "
+			"Context(mapping_attribute_lookup=False) to opt out now, or filter "
+			"rule_engine.errors.MappingAttributeLookupDeprecation to silence this warning."
+		).format(attribute_name)
+		warnings.warn(errors.MappingAttributeLookupDeprecation(message), stacklevel=2)
 
 	def resolve_type(self, name, scope=None):
 		"""

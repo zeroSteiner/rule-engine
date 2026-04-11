@@ -53,7 +53,9 @@ class GitHubIssueTests(unittest.TestCase):
 		rule_text = 'c.c1 == ' + str(value)
 		rule1 = engine.Rule(rule_text, context=engine.Context())
 		rule2 = engine.Rule(rule_text, context=engine.Context(default_value=None))
-		self.assertEqual(rule1.evaluate(thing), rule2.evaluate(thing))
+		with warnings.catch_warnings():
+			warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
+			self.assertEqual(rule1.evaluate(thing), rule2.evaluate(thing))
 
 	def test_number_14(self):
 		context = engine.Context(
@@ -77,7 +79,9 @@ class GitHubIssueTests(unittest.TestCase):
 			})
 		)
 		rule = engine.Rule('facts.abc == "def"', context=context)
-		self.assertTrue(rule.matches({'facts': {'abc': 'def'}}))
+		with warnings.catch_warnings():
+			warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
+			self.assertTrue(rule.matches({'facts': {'abc': 'def'}}))
 
 	def test_number_20(self):
 		rule = engine.Rule('a / b ** 2')
@@ -87,9 +91,11 @@ class GitHubIssueTests(unittest.TestCase):
 		rules = ('object["timestamp"] > $now', 'object.timestamp > $now')
 		for rule in rules:
 			rule = engine.Rule(rule)
-			self.assertFalse(rule.evaluate({
-				'object': {'timestamp': datetime.datetime(2021, 8, 19)}
-			}))
+			with warnings.catch_warnings():
+				warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
+				self.assertFalse(rule.evaluate({
+					'object': {'timestamp': datetime.datetime(2021, 8, 19)}
+				}))
 
 	def test_number_54(self):
 		rules = (

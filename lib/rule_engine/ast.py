@@ -37,6 +37,7 @@ import functools
 import operator
 import re
 
+from . import builtins as _builtins
 from . import errors
 from .parser.utilities import parse_datetime, parse_float, parse_timedelta
 from .suggestions import suggest_symbol
@@ -787,6 +788,12 @@ class GetAttributeExpression(ExpressionBase):
 					# this is necessary because MAPPING objects can have their keys accessed as attributes
 					if not isinstance(self.object.result_type, DataType.MAPPING.__class__):
 						raise error
+					if not context.mapping_attribute_lookup:
+						raise errors.EvaluationError(
+							"attribute access on a MAPPING is disabled - use mapping[{0!r}] instead, "
+							"or set mapping_attribute_lookup=True on the Context for v4-compatible "
+							"behavior (deprecated, removal scheduled for v6.0)".format(name)
+						)
 					# leave the result type undefined because the name could be a mapping key or attribute
 		self.name = name
 		self.safe = safe
@@ -810,6 +817,11 @@ class GetAttributeExpression(ExpressionBase):
 			attribute_error = error
 		else:
 			return self._new_value(value, verify_type=False)
+
+		if isinstance(resolved_obj, collections.abc.Mapping) and not isinstance(resolved_obj, _builtins.Builtins):
+			if not self.context.mapping_attribute_lookup:
+				raise attribute_error
+			self.context._warn_mapping_fallback(self.name)
 
 		try:
 			value = self.context.resolve(resolved_obj, self.name)

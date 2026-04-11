@@ -56,6 +56,17 @@ class EngineError(Exception):
 	def __repr__(self):
 		return "<{} message={!r} >".format(self.__class__.__name__, self.message)
 
+class MappingAttributeLookupDeprecation(DeprecationWarning):
+	"""
+	A :py:exc:`DeprecationWarning` subclass emitted when a rule accesses an attribute on a
+	:py:attr:`~rule_engine.types.DataType.MAPPING` value via dot syntax, falling back to key-style lookup. The
+	fallback is scheduled for removal in v6.0; migrate to ``mapping['key']`` syntax or construct the
+	:py:class:`~rule_engine.engine.Context` with ``mapping_attribute_lookup=False`` to opt out now. Filter this
+	class via :py:mod:`warnings` to silence the notice during the transition window.
+
+	.. versionadded:: 5.0.0
+	"""
+
 class EvaluationError(EngineError):
 	"""
 	An error raised for issues which occur while the rule is being evaluated. This can occur at parse time while AST

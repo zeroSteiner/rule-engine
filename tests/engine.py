@@ -38,6 +38,7 @@ import re
 import sys
 import types
 import unittest
+import warnings
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
@@ -69,6 +70,107 @@ class ContextTests(unittest.TestCase):
 	def test_context_type_resolver_mapping(self):
 		context = engine.Context(type_resolver={'name': ast.DataType.STRING})
 		self.assertEqual(context.resolve_type('name'), ast.DataType.STRING)
+
+	def test_context_mapping_attribute_lookup_default(self):
+		context = engine.Context()
+		self.assertTrue(context.mapping_attribute_lookup)
+
+	def test_context_mapping_attribute_lookup_disabled(self):
+		context = engine.Context(mapping_attribute_lookup=False)
+		self.assertFalse(context.mapping_attribute_lookup)
+
+	def test_context_mapping_attribute_lookup_parse_time_error(self):
+		context = engine.Context(
+			mapping_attribute_lookup=False,
+			type_resolver={'facts': ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.STRING)},
+		)
+		with self.assertRaisesRegex(errors.EvaluationError, r'attribute access on a MAPPING is disabled'):
+			engine.Rule('facts.abc == "xyz"', context=context)
+
+	def test_context_mapping_attribute_lookup_parse_time_error_mentions_migration(self):
+		context = engine.Context(
+			mapping_attribute_lookup=False,
+			type_resolver={'facts': ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.STRING)},
+		)
+		try:
+			engine.Rule('facts.abc == "xyz"', context=context)
+		except errors.EvaluationError as error:
+			self.assertIn("mapping['abc']", error.message)
+			self.assertIn('v6.0', error.message)
+		else:
+			self.fail('EvaluationError was not raised')
+
+	def test_context_mapping_attribute_lookup_disabled_bracket_still_works(self):
+		context = engine.Context(
+			mapping_attribute_lookup=False,
+			type_resolver={'facts': ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.STRING)},
+		)
+		rule = engine.Rule('facts["abc"] == "xyz"', context=context)
+		self.assertTrue(rule.matches({'facts': {'abc': 'xyz'}}))
+
+	def test_context_mapping_attribute_lookup_disabled_runtime_mapping(self):
+		# result_type is UNDEFINED at parse time, but the object is a mapping at runtime — the fallback is refused
+		context = engine.Context(mapping_attribute_lookup=False)
+		rule = engine.Rule('facts.abc', context=context)
+		with self.assertRaises(errors.AttributeResolutionError):
+			rule.evaluate({'facts': {'abc': 'xyz'}})
+
+	def test_context_mapping_attribute_lookup_warning_fires_once(self):
+		context = engine.Context()
+		rule = engine.Rule('facts.abc == "xyz"', context=context)
+		thing = {'facts': {'abc': 'xyz'}}
+		with warnings.catch_warnings(record=True) as captured:
+			warnings.simplefilter('always', category=errors.MappingAttributeLookupDeprecation)
+			rule.matches(thing)
+			rule.matches(thing)
+			rule.matches(thing)
+		dep = [w for w in captured if issubclass(w.category, errors.MappingAttributeLookupDeprecation)]
+		self.assertEqual(len(dep), 1)
+
+	def test_context_mapping_attribute_lookup_warning_is_per_context(self):
+		thing = {'facts': {'abc': 'xyz'}}
+		with warnings.catch_warnings(record=True) as captured:
+			warnings.simplefilter('always', category=errors.MappingAttributeLookupDeprecation)
+			rule_a = engine.Rule('facts.abc == "xyz"', context=engine.Context())
+			rule_a.matches(thing)
+			rule_b = engine.Rule('facts.abc == "xyz"', context=engine.Context())
+			rule_b.matches(thing)
+		dep = [w for w in captured if issubclass(w.category, errors.MappingAttributeLookupDeprecation)]
+		self.assertEqual(len(dep), 2)
+
+	def test_context_mapping_attribute_lookup_warning_message_content(self):
+		context = engine.Context()
+		rule = engine.Rule('facts.abc == "xyz"', context=context)
+		with warnings.catch_warnings(record=True) as captured:
+			warnings.simplefilter('always', category=errors.MappingAttributeLookupDeprecation)
+			rule.matches({'facts': {'abc': 'xyz'}})
+		self.assertEqual(len(captured), 1)
+		message = str(captured[0].message)
+		self.assertIn("'abc'", message)
+		self.assertIn("mapping['abc']", message)
+		self.assertIn('v6.0', message)
+		self.assertIn('MappingAttributeLookupDeprecation', message)
+
+	def test_context_mapping_attribute_lookup_warning_concurrent(self):
+		# spawn two threads both exercising the fallback against a shared Context; the warning should fire exactly once
+		import threading
+		context = engine.Context()
+		rule = engine.Rule('facts.abc == "xyz"', context=context)
+		thing = {'facts': {'abc': 'xyz'}}
+		barrier = threading.Barrier(2)
+		def worker():
+			barrier.wait()
+			rule.matches(thing)
+		with warnings.catch_warnings(record=True) as captured:
+			warnings.simplefilter('always', category=errors.MappingAttributeLookupDeprecation)
+			t1 = threading.Thread(target=worker)
+			t2 = threading.Thread(target=worker)
+			t1.start()
+			t2.start()
+			t1.join()
+			t2.join()
+		dep = [w for w in captured if issubclass(w.category, errors.MappingAttributeLookupDeprecation)]
+		self.assertEqual(len(dep), 1)
 
 class EngineTests(unittest.TestCase):
 	def test_engine_resolve_attribute(self):
@@ -171,18 +273,20 @@ class EngineRuleTests(unittest.TestCase):
 	def test_engine_rule_evaluate_attributes(self):
 		# ensure that multiple levels can be evaluated as attributes
 		rule = engine.Rule('a.b.c')
-		self.assertTrue(rule.evaluate({'a': {'b': {'c': True}}}))
+		with warnings.catch_warnings():
+			warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
+			self.assertTrue(rule.evaluate({'a': {'b': {'c': True}}}))
 
-		value = rule.evaluate({'a': {'b': {'c': 1}}})
-		self.assertIsInstance(value, decimal.Decimal)
-		self.assertEqual(value, 1.0)
+			value = rule.evaluate({'a': {'b': {'c': 1}}})
+			self.assertIsInstance(value, decimal.Decimal)
+			self.assertEqual(value, 1.0)
 
-		value = rule.evaluate({'a': {'b': {'c': {'d': None}}}})
-		self.assertIsInstance(value, dict)
-		self.assertIn('d', value)
+			value = rule.evaluate({'a': {'b': {'c': {'d': None}}}})
+			self.assertIsInstance(value, dict)
+			self.assertIn('d', value)
 
-		with self.assertRaises(errors.AttributeResolutionError):
-			rule.evaluate({'a': {}})
+			with self.assertRaises(errors.AttributeResolutionError):
+				rule.evaluate({'a': {}})
 
 	def test_engine_rule_debug_parser(self):
 		with open(os.devnull, 'w') as file_h:

@@ -6,7 +6,7 @@
 .github/workflows/*.jnj
 .pylintrc
 .python-version
-Pipfile.lock
+.venv/
 repl_setup.py
 build/*
 dist/*

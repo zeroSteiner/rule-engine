@@ -16,6 +16,8 @@ Version 5.0.0
 * **Breaking:** Changed the precedence of operators to be more aligned with common programming languages
 * **Breaking:** The :ref:`debug-repl` utility now requires development dependencies to be installed
 * **Breaking:** BYTES literals now throw exceptions for invalid escape sequences
+* **Breaking:** Removed ``setup.py``; project metadata now lives entirely in ``pyproject.toml`` (PEP 517/621)
+* Migrated the development workflow and CI from pipenv to `uv <https://docs.astral.sh/uv/>`_
 * Added support for raw STRING literals using the ``r`` prefix (e.g. ``r'\w+'``)
 * Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy
   removes an external install requirement and silences third-party vulnerability reports targeting it

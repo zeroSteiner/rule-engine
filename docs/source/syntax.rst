@@ -283,8 +283,16 @@ Literal Values
 :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.STRING`, and :py:attr:`TIMEDELTA` literal values are specified in a
 very similar manner by defining the value as a string of characters enclosed in either single or double quotes. The
 difference comes in an optional leading character before the opening quote. Either no leading character or a single
-``s`` will specify a standard :py:attr:`~.DataType.STRING` value, while a single ``d`` will specify a
+``s`` will specify a standard :py:attr:`~.DataType.STRING` value, a single ``r`` will specify a raw
+:py:attr:`~.DataType.STRING` value in which backslashes are treated literally, while a single ``d`` will specify a
 :py:attr:`~.DataType.DATETIME` value, and a single ``t`` will specify a :py:attr:`~.DataType.TIMEDELTA` value.
+
+Raw string literals (``r'...'`` / ``r"..."``) are useful when writing values that contain backslashes such as regular
+expressions or Windows-style paths. In a raw string, ``\`` is always a literal backslash — no escape sequences are
+processed. For example, ``r'\w+'`` is a four character string identical to ``'\\w+'``. As in Python, a backslash
+still prevents the following quote character from terminating the string, but the backslash itself is retained, so
+``r'it\'s'`` is the five character string ``it\'s``. A raw string literal cannot end with an odd number of trailing
+backslashes.
 
 .. _literal-bytes-values:
 

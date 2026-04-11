@@ -447,6 +447,14 @@ class ParserLiteralTests(ParserTestsBase):
 		with self.assertRaises(errors.StringSyntaxError):
 			self._parse('"\\xyz"', self.context)
 
+	def test_parse_string_raw(self):
+		self.assertLiteralStatementEqual("r'Alice'", ast.StringExpression, 'Alice')
+		self.assertLiteralStatementEqual('r"Alice"', ast.StringExpression, 'Alice')
+		# backslashes are literal in raw strings
+		self.assertLiteralStatementEqual("r'\\w'", ast.StringExpression, '\\w')
+		self.assertLiteralStatementEqual("r'\\n'", ast.StringExpression, '\\n')
+		self.assertLiteralStatementEqual("r'C:\\path\\to\\file'", ast.StringExpression, 'C:\\path\\to\\file')
+
 	def test_parse_xxx_edge_cases(self):
 		# test the safe getattr parsing for weird edge cases
 		self.assertLiteralStatementEqual('null&.doesnotexist', ast.NullExpression, None)

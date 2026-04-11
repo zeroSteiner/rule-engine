@@ -243,9 +243,7 @@ class Parser(ParserBase):
 		return t
 
 	def t_STRING(self, t):
-		r's?(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
-		if t.value[0] == 's':
-			t.value = t.value[1:]
+		r'[rs]?(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
 		return t
 
 	def t_SYMBOL(self, t):
@@ -477,13 +475,22 @@ class Parser(ParserBase):
 
 	def p_expression_string(self, p):
 		'object : STRING'
-		value = p[1][1:-1]
-		try:
-			value = codecs.encode(value, 'unicode-escape').decode()
-			value = value.replace('\\\\', '\\')
-			value = codecs.decode(value, 'unicode-escape')
-		except UnicodeError:
-			raise errors.StringSyntaxError('invalid string literal', p[1][1:-1]) from None
+		literal = p[1]
+		prefix = literal[0] if literal[0] in ('r', 's') else None
+		if prefix is not None:
+			literal = literal[1:]
+		value = literal[1:-1]
+		if prefix == 'r':
+			# raw strings: backslashes are literal. The lexer still treats
+			# \' and \" as non-terminating, but the backslash is kept.
+			pass
+		else:
+			try:
+				value = codecs.encode(value, 'unicode-escape').decode()
+				value = value.replace('\\\\', '\\')
+				value = codecs.decode(value, 'unicode-escape')
+			except UnicodeError:
+				raise errors.StringSyntaxError('invalid string literal', literal[1:-1]) from None
 		p[0] = _DeferredAstNode(ast.StringExpression, args=(self.context, value))
 
 	def p_expression_array(self, p):

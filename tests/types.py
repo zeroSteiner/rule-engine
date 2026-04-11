@@ -36,9 +36,10 @@ import sys
 import typing
 import unittest
 
+import rule_engine.errors as errors
 import rule_engine.types as types
 
-__all__ = ('DataTypeTests', 'MetaDataTypeTests', 'ValueIsTests')
+__all__ = ('DataTypeTests', 'MetaDataTypeTests', 'ObjectDataTypeTests', 'ValueIsTests')
 
 DataType = types.DataType
 
@@ -319,6 +320,297 @@ class MetaDataTypeTests(unittest.TestCase):
 		self.assertEqual(DataType['MAPPING'], DataType.MAPPING)
 		self.assertEqual(DataType['STRING'], DataType.STRING)
 		self.assertEqual(DataType['UNDEFINED'], DataType.UNDEFINED)
+
+class ObjectDataTypeTests(unittest.TestCase):
+	class _HeroDataclass(object):
+		def __init__(self, name, first_appearance):
+			self.name = name
+			self.first_appearance = first_appearance
+
+	def _build_hero(self):
+		return DataType.OBJECT('Hero', attributes={
+			'name': DataType.STRING,
+			'first_appearance': DataType.DATETIME,
+			'nemesis': DataType.reference('Hero'),
+		})
+
+	def test_object_bare_repr_and_member_registration(self):
+		self.assertIn('OBJECT', DataType)
+		self.assertRegex(repr(DataType.OBJECT), r'name=OBJECT')
+		self.assertIs(DataType.from_name('OBJECT'), DataType.OBJECT)
+		self.assertTrue(DataType.is_definition(DataType.OBJECT))
+
+	def test_object_construction_empty(self):
+		empty = DataType.OBJECT('Empty')
+		self.assertEqual(empty.name, 'Empty')
+		self.assertEqual(empty.attributes, {})
+		self.assertFalse(empty.is_scalar)
+		self.assertTrue(empty.is_compound)
+		self.assertIs(empty.accessor, getattr)
+
+	def test_object_construction_flat_schema(self):
+		Wookiee = DataType.OBJECT('Wookiee', attributes={
+			'name': DataType.STRING,
+			'homeworld': DataType.STRING,
+		})
+		self.assertEqual(Wookiee.name, 'Wookiee')
+		self.assertIs(Wookiee.attributes['name'], DataType.STRING)
+		self.assertIs(Wookiee.attributes['homeworld'], DataType.STRING)
+
+	def test_object_nested_schema(self):
+		Address = DataType.OBJECT('Address', attributes={'city': DataType.STRING})
+		Person = DataType.OBJECT('Person', attributes={
+			'name': DataType.STRING,
+			'address': Address,
+		})
+		self.assertIs(Person.attributes['address'], Address)
+
+	def test_object_self_reference_direct(self):
+		Hero = self._build_hero()
+		self.assertIs(Hero.attributes['nemesis'], Hero)
+
+	def test_object_self_reference_inside_array(self):
+		Hero = DataType.OBJECT('Hero', attributes={
+			'sidekicks': DataType.ARRAY(DataType.reference('Hero')),
+		})
+		self.assertIs(Hero.attributes['sidekicks'].value_type, Hero)
+
+	def test_object_self_reference_inside_mapping(self):
+		Hero = DataType.OBJECT('Hero', attributes={
+			'known_aliases': DataType.MAPPING(DataType.STRING, value_type=DataType.reference('Hero')),
+		})
+		self.assertIs(Hero.attributes['known_aliases'].value_type, Hero)
+
+	def test_object_self_reference_inside_function(self):
+		Hero = DataType.OBJECT('Hero', attributes={
+			'promote': DataType.FUNCTION(
+				'promote',
+				return_type=DataType.reference('Hero'),
+				argument_types=(DataType.reference('Hero'),)
+			),
+		})
+		self.assertIs(Hero.attributes['promote'].return_type, Hero)
+		self.assertIs(Hero.attributes['promote'].argument_types[0], Hero)
+
+	def test_object_cross_reference_left_unresolved(self):
+		Person = DataType.OBJECT('Person', attributes={
+			'employer': DataType.reference('Company'),
+		})
+		self.assertIsInstance(Person.attributes['employer'], types._ReferenceDataTypeDef)
+		self.assertEqual(Person.attributes['employer'].name, 'Company')
+
+	def test_object_repr_does_not_recurse(self):
+		Hero = self._build_hero()
+		text = repr(Hero)
+		self.assertRegex(text, r'name=Hero')
+		self.assertIn('nemesis', text)
+
+	def test_object_hash_does_not_recurse(self):
+		Hero = self._build_hero()
+		# would infinite-loop if __hash__ walked the schema
+		self.assertEqual(hash(Hero), hash(('OBJECT', 'Hero')))
+
+	def test_object_hash_is_nominal(self):
+		left = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		right = DataType.OBJECT('Hero', attributes={'alias': DataType.STRING})
+		# same name, different schemas — hash matches but equality does not
+		self.assertEqual(hash(left), hash(right))
+		self.assertNotEqual(left, right)
+
+	def test_object_equality_self_referential(self):
+		left = self._build_hero()
+		right = self._build_hero()
+		self.assertEqual(left, right)
+
+	def test_object_equality_distinct_schemas(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		Wookiee = DataType.OBJECT('Wookiee', attributes={'name': DataType.STRING})
+		self.assertNotEqual(Hero, Wookiee)
+
+	def test_object_equality_non_object(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		self.assertNotEqual(Hero, DataType.STRING)
+		self.assertNotEqual(Hero, None)
+
+	def test_object_equality_different_attribute_names(self):
+		left = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		right = DataType.OBJECT('Hero', attributes={'name': DataType.STRING, 'alias': DataType.STRING})
+		self.assertNotEqual(left, right)
+
+	def test_object_equality_different_nullable(self):
+		left = DataType.OBJECT('Hero', attributes={'name': DataType.STRING}, attributes_nullable={'name': True})
+		right = DataType.OBJECT('Hero', attributes={'name': DataType.STRING}, attributes_nullable={'name': False})
+		self.assertNotEqual(left, right)
+
+	def test_object_hashable_in_set(self):
+		types_set = {DataType.OBJECT('Hero'), DataType.OBJECT('Wookiee'), DataType.OBJECT('Hero')}
+		self.assertEqual(len(types_set), 2)
+
+	def test_object_is_compatible_same_name(self):
+		left = self._build_hero()
+		right = self._build_hero()
+		self.assertTrue(DataType.is_compatible(left, right))
+
+	def test_object_is_compatible_different_name(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		Wookiee = DataType.OBJECT('Wookiee', attributes={'name': DataType.STRING})
+		self.assertFalse(DataType.is_compatible(Hero, Wookiee))
+
+	def test_object_is_compatible_with_undefined(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		self.assertTrue(DataType.is_compatible(Hero, DataType.UNDEFINED))
+		self.assertTrue(DataType.is_compatible(DataType.UNDEFINED, Hero))
+
+	def test_object_is_compatible_with_reference(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		self.assertTrue(DataType.is_compatible(Hero, DataType.reference('Hero')))
+		self.assertTrue(DataType.is_compatible(DataType.reference('Hero'), Hero))
+		# even mismatching reference names are optimistically compatible; real check happens at parse time
+		self.assertTrue(DataType.is_compatible(Hero, DataType.reference('Wookiee')))
+
+	def test_object_is_compatible_with_scalar(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		self.assertFalse(DataType.is_compatible(Hero, DataType.STRING))
+		self.assertFalse(DataType.is_compatible(DataType.STRING, Hero))
+
+	def test_object_is_compatible_inside_array(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		Wookiee = DataType.OBJECT('Wookiee', attributes={'name': DataType.STRING})
+		self.assertTrue(DataType.is_compatible(DataType.ARRAY(Hero), DataType.ARRAY(Hero)))
+		self.assertFalse(DataType.is_compatible(DataType.ARRAY(Hero), DataType.ARRAY(Wookiee)))
+
+	def test_object_is_compatible_inside_mapping(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		self.assertTrue(DataType.is_compatible(
+			DataType.MAPPING(DataType.STRING, value_type=Hero),
+			DataType.MAPPING(DataType.STRING, value_type=Hero)
+		))
+
+	def test_object_set_rejection(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		with self.assertRaises(errors.EngineError):
+			DataType.SET(Hero)
+
+	def test_object_mapping_value_accepted(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		mapping = DataType.MAPPING(DataType.STRING, value_type=Hero)
+		self.assertIs(mapping.value_type, Hero)
+
+	def test_object_function_return_and_argument(self):
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+		fn = DataType.FUNCTION('promote', return_type=Hero, argument_types=(Hero,))
+		self.assertIs(fn.return_type, Hero)
+		self.assertIs(fn.argument_types[0], Hero)
+
+	def test_object_from_value_rejects_instance(self):
+		instance = self._HeroDataclass('Luke', datetime.datetime(1977, 5, 25))
+		with self.assertRaises(TypeError):
+			DataType.from_value(instance)
+
+	def test_object_from_type_rejects_class(self):
+		with self.assertRaises(ValueError):
+			DataType.from_type(self._HeroDataclass)
+
+	def test_object_from_name_unknown_schema_errors(self):
+		with self.assertRaises(ValueError):
+			DataType.from_name('Hero')
+
+	def test_object_is_attributes_nullable(self):
+		Hero = DataType.OBJECT('Hero', attributes={
+			'name': DataType.STRING,
+			'nemesis': DataType.STRING,
+		}, attributes_nullable={'nemesis': False})
+		self.assertTrue(Hero.is_attributes_nullable('name'))
+		self.assertFalse(Hero.is_attributes_nullable('nemesis'))
+		# unspecified attributes default to nullable
+		self.assertTrue(Hero.is_attributes_nullable('totally_unknown'))
+
+	def test_object_custom_accessor(self):
+		def dict_getter(obj, name):
+			return obj[name]
+		Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING}, accessor=dict_getter)
+		self.assertIs(Hero.accessor, dict_getter)
+
+	def test_reference_is_definition(self):
+		ref = DataType.reference('Hero')
+		self.assertTrue(DataType.is_definition(ref))
+		self.assertFalse(ref.is_scalar)
+		self.assertTrue(ref.is_compound)
+
+	def test_reference_equality_and_hash(self):
+		a = DataType.reference('Hero')
+		b = DataType.reference('Hero')
+		c = DataType.reference('Wookiee')
+		self.assertEqual(a, b)
+		self.assertEqual(hash(a), hash(b))
+		self.assertNotEqual(a, c)
+		self.assertNotEqual(a, 'Hero')
+
+	def test_reference_repr(self):
+		ref = DataType.reference('Hero')
+		self.assertRegex(repr(ref), r'name=Hero')
+		self.assertIn('unresolved', repr(ref))
+
+	def test_reference_inside_set_fails_during_self_resolution(self):
+		# SET(reference('Self')) gets resolved during _ObjectDataTypeDef.__init__ which triggers SET's OBJECT rejection
+		with self.assertRaises(errors.EngineError):
+			DataType.OBJECT('Hero', attributes={
+				'allies': DataType.SET(DataType.reference('Hero')),
+			})
+
+	def test_substitute_self_references_noop_on_unrelated_reference(self):
+		Person = DataType.OBJECT('Person', attributes={
+			'manager': DataType.ARRAY(DataType.reference('Manager')),
+		})
+		# cross-reference is left intact since the name doesn't match
+		self.assertIsInstance(Person.attributes['manager'].value_type, types._ReferenceDataTypeDef)
+		self.assertEqual(Person.attributes['manager'].value_type.name, 'Manager')
+
+	def test_object_equality_attribute_type_mismatch(self):
+		left = DataType.OBJECT('Hero', attributes={'rank': DataType.STRING})
+		right = DataType.OBJECT('Hero', attributes={'rank': DataType.FLOAT})
+		self.assertNotEqual(left, right)
+
+	def test_object_schema_with_mapping_attribute_no_self_ref(self):
+		# exercises the _MappingDataTypeDef no-op branch in _substitute_self_references
+		Hero = DataType.OBJECT('Hero', attributes={
+			'aliases': DataType.MAPPING(DataType.STRING, value_type=DataType.STRING),
+		})
+		self.assertIsInstance(Hero.attributes['aliases'], types._MappingDataTypeDef)
+		self.assertIs(Hero.attributes['aliases'].value_type, DataType.STRING)
+
+	def test_object_schema_with_function_attribute_no_self_ref(self):
+		# exercises the _FunctionDataTypeDef no-op branch in _substitute_self_references
+		Hero = DataType.OBJECT('Hero', attributes={
+			'describe': DataType.FUNCTION('describe', return_type=DataType.STRING),
+		})
+		self.assertIsInstance(Hero.attributes['describe'], types._FunctionDataTypeDef)
+		self.assertIs(Hero.attributes['describe'].return_type, DataType.STRING)
+
+	def test_object_schema_with_function_undefined_arguments(self):
+		# exercises the argument_types is UNDEFINED branch in _substitute_self_references
+		Hero = DataType.OBJECT('Hero', attributes={
+			'describe': DataType.FUNCTION('describe', return_type=DataType.reference('Hero')),
+		})
+		self.assertIs(Hero.attributes['describe'].return_type, Hero)
+		self.assertIs(Hero.attributes['describe'].argument_types, DataType.UNDEFINED)
+
+	def test_object_schema_with_array_attribute_no_self_ref(self):
+		Hero = DataType.OBJECT('Hero', attributes={
+			'aliases': DataType.ARRAY(DataType.STRING),
+		})
+		self.assertIsInstance(Hero.attributes['aliases'], types._ArrayDataTypeDef)
+		self.assertIs(Hero.attributes['aliases'].value_type, DataType.STRING)
+
+	def test_substitute_self_references_skips_nested_object(self):
+		Inner = DataType.OBJECT('Inner', attributes={'name': DataType.STRING})
+		Outer = DataType.OBJECT('Outer', attributes={
+			'inner': Inner,
+			'self_ref': DataType.reference('Outer'),
+		})
+		# nested OBJECT is not descended into (its own __init__ handled its scope)
+		self.assertIs(Outer.attributes['inner'], Inner)
+		self.assertIs(Outer.attributes['self_ref'], Outer)
 
 inf = float('inf')
 nan = float('nan')

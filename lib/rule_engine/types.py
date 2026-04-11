@@ -35,6 +35,7 @@ import collections.abc
 import datetime
 import decimal
 import math
+import threading
 
 from . import errors
 
@@ -48,6 +49,8 @@ __all__ = (
 	'is_real_number',
 	'iterable_member_value_type'
 )
+
+_object_compare_tls = threading.local()
 
 _PYTHON_FUNCTION_TYPE = type(lambda: None)
 NoneType = type(None)
@@ -265,7 +268,10 @@ class _ArrayDataTypeDef(_CollectionDataTypeDef):
 	pass
 
 class _SetDataTypeDef(_CollectionDataTypeDef):
-	pass
+	def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
+		if isinstance(value_type, _ObjectDataTypeDef):
+			raise errors.EngineError('OBJECT values may not be used as SET members')
+		super(_SetDataTypeDef, self).__init__(name, python_type, value_type=value_type, value_type_nullable=value_type_nullable)
 
 class _MappingDataTypeDef(_DataTypeDef):
 	__slots__ = ('key_type', 'value_type', 'value_type_nullable')
@@ -381,6 +387,166 @@ class _FunctionDataTypeDef(_DataTypeDef):
 	def __hash__(self):
 		return hash((self.python_type, self.is_scalar, hash((self.return_type, self.argument_types, self.minimum_arguments))))
 
+class _ReferenceDataTypeDef(_DataTypeDef):
+	"""
+	A forward-reference placeholder used inside an :py:class:`_ObjectDataTypeDef` schema. This is not itself a data
+	type; it exists only to be resolved to an :py:class:`_ObjectDataTypeDef` — either at construction time (for
+	self-references) or at rule parse time (for cross-type references) via a Context's ``type_resolver``.
+
+	.. versionadded:: 5.0.0
+	"""
+	__slots__ = ()
+	def __init__(self, name):
+		super(_ReferenceDataTypeDef, self).__init__(name, object)
+		self.is_scalar = False
+
+	def __repr__(self):
+		return "<{} name={} (unresolved forward reference) >".format(self.__class__.__name__, self.name)
+
+	def __eq__(self, other):
+		if not isinstance(other, _ReferenceDataTypeDef):
+			return False
+		return self.name == other.name
+
+	def __hash__(self):
+		return hash(('REFERENCE', self.name))
+
+def _substitute_self_references(definition, target):
+	"""
+	Walk a data type *definition* and replace any :py:class:`_ReferenceDataTypeDef` whose name matches *target.name*
+	with *target*. Cross-name references are left intact for later resolution. Nested :py:class:`_ObjectDataTypeDef`
+	schemas are not descended into — their own ``__init__`` already resolved self references within their scope.
+	"""
+	if isinstance(definition, _ReferenceDataTypeDef):
+		if definition.name == target.name:
+			return target
+		return definition
+	if isinstance(definition, _ObjectDataTypeDef):
+		return definition
+	if isinstance(definition, _CollectionDataTypeDef):
+		new_value_type = _substitute_self_references(definition.value_type, target)
+		if new_value_type is definition.value_type:
+			return definition
+		return definition.__class__(
+			definition.name,
+			definition.python_type,
+			value_type=new_value_type,
+			value_type_nullable=definition.value_type_nullable
+		)
+	if isinstance(definition, _MappingDataTypeDef):
+		new_key_type = _substitute_self_references(definition.key_type, target)
+		new_value_type = _substitute_self_references(definition.value_type, target)
+		if new_key_type is definition.key_type and new_value_type is definition.value_type:
+			return definition
+		return definition.__class__(
+			definition.name,
+			definition.python_type,
+			key_type=new_key_type,
+			value_type=new_value_type,
+			value_type_nullable=definition.value_type_nullable
+		)
+	if isinstance(definition, _FunctionDataTypeDef):
+		new_return_type = _substitute_self_references(definition.return_type, target)
+		if definition.argument_types is _DATA_TYPE_UNDEFINED:
+			new_argument_types = definition.argument_types
+		else:
+			new_argument_types = tuple(_substitute_self_references(arg_type, target) for arg_type in definition.argument_types)
+		if new_return_type is definition.return_type and new_argument_types is definition.argument_types:
+			return definition
+		return definition.__class__(
+			definition.name,
+			definition.python_type,
+			value_name=definition.value_name,
+			return_type=new_return_type,
+			argument_types=new_argument_types,
+			minimum_arguments=definition.minimum_arguments
+		)
+	return definition
+
+class _ObjectDataTypeDef(_DataTypeDef):
+	"""
+	A user-defined object schema. OBJECT is a nominal compound type: two OBJECT definitions are compatible iff they
+	share the same ``name`` (and, for equality, structurally-equal attribute schemas). Attribute access on an OBJECT
+	value is type-checked at rule parse time and fetches values via the type's :py:attr:`accessor` callable
+	(defaulting to :py:func:`getattr`). Unknown attributes raise at parse time; attribute access does not fall
+	through to the context's symbol resolver.
+
+	.. versionadded:: 5.0.0
+	"""
+	__slots__ = ('attributes', 'attributes_nullable', 'accessor')
+	def __init__(self, name, python_type=object, attributes=None, accessor=None, attributes_nullable=None):
+		super(_ObjectDataTypeDef, self).__init__(name, python_type)
+		self.is_scalar = False
+		self.attributes = dict(attributes) if attributes else {}
+		self.attributes_nullable = dict(attributes_nullable) if attributes_nullable else {}
+		self.accessor = accessor if accessor is not None else getattr
+		# resolve self-references in the attribute schema now that self exists; cross-name references are left intact
+		# and will be resolved lazily at rule parse time via Context.resolve_type
+		for attr_name, attr_type in list(self.attributes.items()):
+			self.attributes[attr_name] = _substitute_self_references(attr_type, self)
+
+	def __call__(self, name, attributes=None, accessor=None, attributes_nullable=None):
+		"""
+		.. versionadded:: 5.0.0
+
+		:param str name: The name of the object schema.
+		:param dict attributes: A mapping of attribute names to their data type definitions. A
+			:py:func:`~.DataType.reference` placeholder with the same ``name`` resolves to the new type itself,
+			enabling self-referential schemas.
+		:param accessor: A callable of the form ``accessor(value, attribute_name)`` used to fetch an attribute's
+			value at evaluation time. Defaults to :py:func:`getattr`.
+		:param dict attributes_nullable: A mapping of attribute names to a ``bool`` indicating whether the attribute
+			value is allowed to be :py:attr:`.NULL`. Unspecified attributes default to ``True``.
+		"""
+		return self.__class__(
+			name,
+			self.python_type,
+			attributes=attributes,
+			accessor=accessor,
+			attributes_nullable=attributes_nullable
+		)
+
+	def is_attributes_nullable(self, attribute_name):
+		return self.attributes_nullable.get(attribute_name, True)
+
+	def __repr__(self):
+		return "<{} name={} attributes=[{}] >".format(
+			self.__class__.__name__,
+			self.name,
+			', '.join(self.attributes.keys())
+		)
+
+	def __eq__(self, other):
+		if not isinstance(other, _ObjectDataTypeDef):
+			return False
+		if self.name != other.name:
+			return False
+		if self.attributes.keys() != other.attributes.keys():
+			return False
+		stack = getattr(_object_compare_tls, 'stack', None)
+		if stack is None:
+			stack = set()
+			_object_compare_tls.stack = stack
+		key = (id(self), id(other))
+		if key in stack:
+			# break recursive comparisons by assuming equality (standard cycle-breaking fixpoint)
+			return True
+		stack.add(key)
+		try:
+			for attr_name in self.attributes:
+				if self.attributes[attr_name] != other.attributes[attr_name]:
+					return False
+				if self.is_attributes_nullable(attr_name) != other.is_attributes_nullable(attr_name):
+					return False
+			return True
+		finally:
+			stack.discard(key)
+
+	def __hash__(self):
+		# nominal hashing only: hashing the attribute schema would infinite-loop on self-references and provides no
+		# benefit over name-based hashing since equality requires a full structural match anyway
+		return hash(('OBJECT', self.name))
+
 class DataTypeMeta(type):
 	def __new__(metacls, cls, bases, classdict):
 		data_type = super().__new__(metacls, cls, bases, classdict)
@@ -445,6 +611,7 @@ class DataType(metaclass=DataTypeMeta):
 	FUNCTION = staticmethod(_FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE))
 	MAPPING = staticmethod(_MappingDataTypeDef('MAPPING', dict))
 	NULL = _DataTypeDef('NULL', NoneType)
+	OBJECT = staticmethod(_ObjectDataTypeDef('OBJECT', object))
 	SET = staticmethod(_SetDataTypeDef('SET', set))
 	STRING = _DataTypeDef('STRING', str)
 	TIMEDELTA = _DataTypeDef('TIMEDELTA', datetime.timedelta)
@@ -453,6 +620,20 @@ class DataType(metaclass=DataTypeMeta):
 	Undefined values. This constant can be used to indicate that a particular symbol is valid, but it's data type is
 	currently unknown.
 	"""
+	@staticmethod
+	def reference(name):
+		"""
+		Construct a forward-reference placeholder for use inside an :py:class:`~._ObjectDataTypeDef` schema. This is
+		**not** itself a data type — it is a placeholder that resolves to an :py:class:`~._ObjectDataTypeDef` either
+		at construction time (for self references within the same schema) or at rule parse time (for cross-type
+		references) via a :py:class:`~rule_engine.engine.Context`'s ``type_resolver``.
+
+		.. versionadded:: 5.0.0
+
+		:param str name: The name of the referenced OBJECT schema.
+		"""
+		return _ReferenceDataTypeDef(name)
+
 	@classmethod
 	def from_name(cls, name):
 		"""
@@ -577,6 +758,10 @@ class DataType(metaclass=DataTypeMeta):
 			raise TypeError('argument is not a data type definition')
 		if dt1 is _DATA_TYPE_UNDEFINED or dt2 is _DATA_TYPE_UNDEFINED:
 			return True
+		# unresolved forward references are treated as compatible with anything; actual resolution happens at rule
+		# parse time via Context.resolve_type
+		if isinstance(dt1, _ReferenceDataTypeDef) or isinstance(dt2, _ReferenceDataTypeDef):
+			return True
 		if dt1.is_scalar and dt2.is_scalar:
 			if isinstance(dt1, DataType.FUNCTION.__class__) and isinstance(dt2, DataType.FUNCTION.__class__):
 				if not cls.is_compatible(dt1.return_type, dt2.return_type):
@@ -602,6 +787,8 @@ class DataType(metaclass=DataTypeMeta):
 				return True
 			elif isinstance(dt1, DataType.SET.__class__) and isinstance(dt2, DataType.SET.__class__):
 				return cls.is_compatible(dt1.value_type, dt2.value_type)
+			elif isinstance(dt1, _ObjectDataTypeDef) and isinstance(dt2, _ObjectDataTypeDef):
+				return dt1.name == dt2.name
 		return False
 
 	@classmethod

@@ -17,6 +17,8 @@ Version 5.0.0
 * **Breaking:** The :ref:`debug-repl` utility now requires development dependencies to be installed
 * **Breaking:** BYTES literals now throw exceptions for invalid escape sequences
 * Added support for raw STRING literals using the ``r`` prefix (e.g. ``r'\w+'``)
+* Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy
+  removes an external install requirement and silences third-party vulnerability reports targeting it
 
 Version 4.x.x
 -------------

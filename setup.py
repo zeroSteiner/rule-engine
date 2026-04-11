@@ -78,11 +78,14 @@ setup(
 	license='BSD',
 	# these are duplicated in requirements.txt
 	install_requires=[
-		'ply>=3.9',
 		'python-dateutil~=2.7'
 	],
 	package_dir={'': 'lib'},
 	packages=find_packages('lib'),
+	package_data={
+		# ship the LICENSE for the vendored PLY copy
+		'rule_engine._vendor.ply': ['LICENSE'],
+	},
 	classifiers=[
 		'Development Status :: 5 - Production/Stable',
 		'Environment :: Console',

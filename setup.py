@@ -90,10 +90,11 @@ setup(
 		'Programming Language :: Python :: 3.6',   # will be dropped in v5.0
 		'Programming Language :: Python :: 3.7',   # will be dropped in v5.0
 		'Programming Language :: Python :: 3.8',   # will be dropped in v5.0
-		'Programming Language :: Python :: 3.9',
+		'Programming Language :: Python :: 3.9',   # will be dropped in v5.0
 		'Programming Language :: Python :: 3.10',
 		'Programming Language :: Python :: 3.11',
 		'Programming Language :: Python :: 3.12',
+		'Programming Language :: Python :: 3.13',
 		'Topic :: Software Development :: Libraries :: Python Modules'
 	]
 )

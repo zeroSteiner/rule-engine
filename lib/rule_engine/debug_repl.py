@@ -76,7 +76,7 @@ def main():
 	arguments = parser.parse_args()
 
 	if not has_development_dependencies:
-		parser.error('development dependencies are not installed, install them with: pipenv install --dev')
+		parser.error('development dependencies are not installed, install them with: uv sync --group dev')
 
 	if os.environ.get('NO_COLOR'):
 		color_scheme = 'nocolor'
@@ -108,7 +108,13 @@ def main():
 			thing = namespace.get('thing', thing)
 	debugging = arguments.debug
 	session = PromptSession()
-	color_tb = ultratb.ColorTB(color_scheme=color_scheme)
+	color_tb = ultratb.FormattedTB(theme_name=color_scheme)
+	if color_scheme == 'nocolor':
+		exc_name_color = ''
+		normal_color = ''
+	else:
+		exc_name_color = '\033[31m'
+		normal_color = '\033[0m'
 
 	while True:
 		try:
@@ -126,7 +132,7 @@ def main():
 			rule = engine.Rule(rule_text, context=context)
 			result = rule.evaluate(thing)
 		except errors.EngineError as error:
-			print(f"{color_tb.Colors.excName}{error.__class__.__name__}:{color_tb.Colors.Normal} {error.message}", file=sys.stderr)
+			print(f"{exc_name_color}{error.__class__.__name__}:{normal_color} {error.message}", file=sys.stderr)
 			if isinstance(error, (errors.AttributeResolutionError, errors.SymbolResolutionError)) and error.suggestion:
 				print(f"Did you mean '{error.suggestion}'?", file=sys.stderr)
 			elif isinstance(error, errors.RegexSyntaxError):

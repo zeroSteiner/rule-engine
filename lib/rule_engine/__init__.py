@@ -30,7 +30,7 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__version__ = '5.0.0-alpha'
+__version__ = '5.0.0a1'
 
 from .engine import resolve_attribute
 from .engine import resolve_item

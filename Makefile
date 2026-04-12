@@ -1,8 +1,8 @@
-VERSION := $(shell ./setup.py --version)
+VERSION := $(shell uv run python -c "import rule_engine; print(rule_engine.__version__)")
 
 .PHONY: build
 build:
-	python setup.py build sdist
+	uv build
 
 .PHONY: clean
 clean:
@@ -10,8 +10,8 @@ clean:
 
 .PHONY: docs
 docs:
-	pipenv install --dev
-	pipenv run sphinx-build -b html -a -E -v docs/source docs/html
+	uv sync --group dev
+	uv run sphinx-build -b html -a -E -v docs/source docs/html
 
 .PHONY: release
 release: build

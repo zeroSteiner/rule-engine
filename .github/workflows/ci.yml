@@ -120,12 +120,18 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
 
+      - name: Check if pre-release
+        id: check_prerelease
+        run: |
+          if echo "${{ github.ref_name }}" | grep -qE '(a|b|rc)[0-9]+$'; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create the release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          generate_release_notes: true
+          prerelease: ${{ steps.check_prerelease.outputs.prerelease == 'true' }}
 

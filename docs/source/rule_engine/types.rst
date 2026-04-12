@@ -52,6 +52,10 @@ Classes
    .. autoattribute:: NULL
       :annotation:
 
+   .. automethod:: OBJECT
+
+   .. automethod:: reference
+
    .. automethod:: SET
 
    .. autoattribute:: STRING

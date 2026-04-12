@@ -31,6 +31,8 @@ compatible with. For a information regarding supported operations, see the
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.NULL`     | :py:class:`NoneType`          |
 +-------------------------------+-------------------------------+
+| :py:attr:`~DataType.OBJECT`   | *any* (schema-driven)         |
++-------------------------------+-------------------------------+
 | :py:attr:`~DataType.SET`      | :py:class:`set`               |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.STRING`   | :py:class:`str`               |
@@ -51,6 +53,92 @@ section on :ref:`getting-started-compound-data-types` in the Getting Started pag
 Compound data types are also iterable, meaning that array comprehension operations can be applied to them. Iteration
 operations apply to the members of :py:attr:`~DataType.ARRAY` and :py:attr:`~DataType.SET` values, and the keys of
 :py:attr:`~DataType.MAPPING` values. This allows the types to behave in the same was as they do in Python.
+
+OBJECT
+------
+
+.. versionadded:: 5.0.0
+
+The :py:attr:`~DataType.OBJECT` type represents a user-defined schema with named, typed attributes. Unlike
+:py:attr:`~DataType.MAPPING`, which is keyed by arbitrary values, an ``OBJECT`` has a fixed set of attributes known at
+rule parse time. This enables parse-time validation: accessing an unknown attribute raises an
+:py:class:`~rule_engine.errors.ObjectAttributeError` with a suggestion, and item access (``obj["name"]``) is rejected
+outright.
+
+Defining an Object Type
+^^^^^^^^^^^^^^^^^^^^^^^
+
+An ``OBJECT`` type is created by calling :py:attr:`~DataType.OBJECT` with a name and an attribute schema:
+
+.. code-block:: python
+
+   import rule_engine
+
+   Hero = rule_engine.DataType.OBJECT('Hero', attributes={
+       'name': rule_engine.DataType.STRING,
+       'publisher': rule_engine.DataType.STRING,
+       'first_appearance': rule_engine.DataType.DATETIME,
+   })
+
+The *name* is used for nominal type compatibility: two ``OBJECT`` types are compatible only when their names match.
+
+Custom Accessors
+^^^^^^^^^^^^^^^^
+
+By default, attribute values are fetched with :py:func:`getattr`. A custom *accessor* can be provided to support other
+backing stores (dictionaries, database rows, etc.):
+
+.. code-block:: python
+
+   # use a dict-backed object instead of an attribute-backed one
+   Hero = rule_engine.DataType.OBJECT('Hero',
+       attributes={'name': rule_engine.DataType.STRING},
+       accessor=lambda obj, name: obj[name]
+   )
+
+Forward References and Recursion
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Use :py:meth:`DataType.reference` to create a forward-reference placeholder inside an attribute schema.
+Self-references are resolved automatically at construction:
+
+.. code-block:: python
+
+   Hero = rule_engine.DataType.OBJECT('Hero', attributes={
+       'name': rule_engine.DataType.STRING,
+       'nemesis': rule_engine.DataType.reference('Hero'),  # resolved to Hero
+   })
+
+For mutually-recursive types, place both types in the ``type_resolver`` dict and the references will be resolved lazily
+at rule parse time:
+
+.. code-block:: python
+
+   Person = rule_engine.DataType.OBJECT('Person', attributes={
+       'name': rule_engine.DataType.STRING,
+       'employer': rule_engine.DataType.reference('Company'),
+   })
+   Company = rule_engine.DataType.OBJECT('Company', attributes={
+       'name': rule_engine.DataType.STRING,
+       'ceo': rule_engine.DataType.reference('Person'),
+   })
+
+   context = rule_engine.Context(type_resolver={
+       'employee': Person,
+       'Person': Person,
+       'Company': Company,
+   })
+   rule = rule_engine.Rule('employee.employer.ceo.name == "Palpatine"', context=context)
+
+Restrictions
+^^^^^^^^^^^^
+
+- Item access on an ``OBJECT`` is a parse-time error. Use ``obj.attribute`` instead of ``obj["attribute"]``.
+- Containment checks (``"name" in obj``) are rejected at parse time.
+- ``SET(OBJECT(...))`` is rejected at construction because ``OBJECT`` values are not guaranteed to be hashable.
+  Use ``ARRAY(OBJECT(...))`` instead.
+- ``OBJECT`` types are not inferred by :py:meth:`~DataType.from_value`. They must be annotated explicitly via the
+  ``type_resolver``.
 
 FLOAT
 -----

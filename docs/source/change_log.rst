@@ -21,6 +21,23 @@ Version 5.0.0
 * Added support for raw STRING literals using the ``r`` prefix (e.g. ``r'\w+'``)
 * Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy
   removes an external install requirement and silences third-party vulnerability reports targeting it
+* Added the new :py:attr:`~rule_engine.types.DataType.OBJECT` compound data type for user-defined schemas with named,
+  typed attributes. See the :ref:`OBJECT section<data-types>` in the Data Types page for details.
+
+    * Use :py:meth:`~rule_engine.types.DataType.reference` for self-referential and mutually-recursive schemas
+    * Attribute access is validated at parse time against the declared schema
+    * Item access (``obj["name"]``) and containment checks (``"name" in obj``) on ``OBJECT`` values are rejected at
+      parse time
+    * ``SET(OBJECT(...))`` is rejected at construction; use ``ARRAY(OBJECT(...))`` instead
+    * A custom *accessor* callable can be specified per ``OBJECT`` type (default: :py:func:`getattr`)
+
+* Added :py:class:`~rule_engine.errors.ObjectAttributeError`, a subclass of
+  :py:class:`~rule_engine.errors.AttributeResolutionError`, raised when an attribute is not found in an ``OBJECT``
+  schema
+* **Deprecated:** Accessing :py:attr:`~rule_engine.types.DataType.MAPPING` keys via dot syntax (``mapping.key``) now
+  emits a :py:class:`~rule_engine.errors.MappingAttributeLookupDeprecation` warning. Use bracket syntax
+  (``mapping["key"]``) instead. This fallback will be removed in v6.0. Set ``Context(mapping_attribute_lookup=False)``
+  to opt out now.
 
 Version 4.x.x
 -------------

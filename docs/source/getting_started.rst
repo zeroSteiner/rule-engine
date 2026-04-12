@@ -271,6 +271,81 @@ In all cases, when a *type_resolver* is defined, the :py:class:`~engine.Rule` ob
    rule = rule_engine.Rule('author == "Stan Lee"')
    # => <Rule text='author == "Stan Lee"' >
 
+.. _getting-started-object-data-types:
+
+Object Data Types
+"""""""""""""""""
+
+.. versionadded:: 5.0.0
+
+The :py:attr:`~.DataType.OBJECT` type defines a schema with named, typed attributes. This gives parse-time validation:
+an unknown attribute in a rule will raise an error immediately, before the rule is ever applied to real data.
+
+Continuing the comic book example, suppose the data is backed by Python objects instead of plain dictionaries:
+
+.. code-block:: python
+
+   import dataclasses
+   import datetime
+   import rule_engine
+
+   @dataclasses.dataclass
+   class Hero:
+       name: str
+       publisher: str
+       first_appearance: datetime.date
+       nemesis: 'Hero' = None  # self-referential
+
+Define the corresponding ``OBJECT`` type and place it in the ``type_resolver``. Use
+:py:meth:`~.DataType.reference` for the self-referential ``nemesis`` attribute:
+
+.. code-block:: python
+
+   HeroType = rule_engine.DataType.OBJECT('Hero', attributes={
+       'name': rule_engine.DataType.STRING,
+       'publisher': rule_engine.DataType.STRING,
+       'first_appearance': rule_engine.DataType.DATETIME,
+       'nemesis': rule_engine.DataType.reference('Hero'),
+   })
+
+   context = rule_engine.Context(type_resolver={
+       'hero': HeroType,
+       'Hero': HeroType,
+   })
+
+Now rules get attribute validation at parse time:
+
+.. code-block:: python
+
+   # valid rule - 'name' is in the schema
+   rule = rule_engine.Rule('hero.name == "Batman"', context=context)
+
+   # invalid rule - 'secret_identity' is not in the schema
+   rule = rule_engine.Rule('hero.secret_identity == "Bruce Wayne"', context=context)
+   # => ObjectAttributeError: unknown attribute: 'secret_identity'
+
+Self-referential chains work automatically:
+
+.. code-block:: python
+
+   rule = rule_engine.Rule('hero.nemesis.name == "Joker"', context=context)
+
+   batman = Hero('Batman', 'DC', datetime.date(1939, 5, 1))
+   joker = Hero('Joker', 'DC', datetime.date(1940, 4, 25), nemesis=batman)
+   batman.nemesis = joker
+
+   rule.matches({'hero': batman})  # => True
+
+For mutually recursive types (e.g. ``Hero`` and ``Sidekick``), place both types in the same ``type_resolver`` dict.
+Cross-type references are resolved lazily at rule parse time - see the :ref:`OBJECT reference<data-types>` in the Data
+Types page for a full example.
+
+.. note::
+
+   ``OBJECT`` attributes are accessed with dot syntax (``hero.name``). Item access (``hero["name"]``) is not supported
+   and will raise a parse-time error. If your data is dictionary-shaped, consider using the ``accessor`` parameter to
+   customize how values are fetched - see :py:attr:`~.DataType.OBJECT` for details.
+
 .. _getting-started-compound-data-types:
 
 Compound Data Types

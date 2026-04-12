@@ -167,7 +167,11 @@ def iterable_member_value_type(python_value):
 		if DataType.is_definition(subvalue):
 			subvalue_type = subvalue
 		else:
-			subvalue_type = DataType.from_value(subvalue)
+			try:
+				subvalue_type = DataType.from_value(subvalue)
+			except TypeError:
+				# unknown runtime values (e.g. OBJECT instances) are left for the declared type to validate
+				subvalue_type = _DATA_TYPE_UNDEFINED
 		subvalue_types.add(subvalue_type)
 	if DataType.NULL in subvalue_types:
 		# treat NULL as a special case, allowing typed arrays to be a specified type *or* NULL
@@ -788,6 +792,10 @@ class DataType(metaclass=DataTypeMeta):
 			elif isinstance(dt1, DataType.SET.__class__) and isinstance(dt2, DataType.SET.__class__):
 				return cls.is_compatible(dt1.value_type, dt2.value_type)
 			elif isinstance(dt1, _ObjectDataTypeDef) and isinstance(dt2, _ObjectDataTypeDef):
+				# bare DataType.OBJECT acts as a wildcard, mirroring how an untyped ARRAY (value_type UNDEFINED)
+				# matches any typed ARRAY via its value_type compatibility check
+				if dt1 is DataType.OBJECT or dt2 is DataType.OBJECT:
+					return True
 				return dt1.name == dt2.name
 		return False
 

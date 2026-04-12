@@ -31,6 +31,7 @@
 #
 
 import collections
+import dataclasses
 import datetime
 import decimal
 import os
@@ -171,6 +172,236 @@ class ContextTests(unittest.TestCase):
 			t2.join()
 		dep = [w for w in captured if issubclass(w.category, errors.MappingAttributeLookupDeprecation)]
 		self.assertEqual(len(dep), 1)
+
+@dataclasses.dataclass
+class _TestPerson:
+	name: str
+	rank: str = 'Padawan'
+	manager: 'typing.Any' = None
+
+
+class ObjectTypeTests(unittest.TestCase):
+	def _person_type(self, **kwargs):
+		return ast.DataType.OBJECT('Person', attributes={
+			'name': ast.DataType.STRING,
+			'rank': ast.DataType.STRING,
+			'manager': ast.DataType.reference('Person'),
+		}, **kwargs)
+
+	def _context(self, **extra_types):
+		type_map = {'employee': self._person_type(), 'Person': self._person_type()}
+		type_map.update(extra_types)
+		return engine.Context(type_resolver=type_map)
+
+	def test_object_rule_happy_path_dataclass(self):
+		rule = engine.Rule('employee.name == "Luke"', context=self._context())
+		self.assertTrue(rule.matches({'employee': _TestPerson(name='Luke')}))
+		self.assertFalse(rule.matches({'employee': _TestPerson(name='Vader')}))
+
+	def test_object_rule_chained_self_reference(self):
+		luke = _TestPerson(name='Luke')
+		yoda = _TestPerson(name='Yoda', manager=luke)
+		obi = _TestPerson(name='Obi-Wan', manager=yoda)
+		rule = engine.Rule('employee.manager.manager.name == "Luke"', context=self._context())
+		self.assertTrue(rule.matches({'employee': obi}))
+
+	def test_object_rule_unknown_attribute_parse_error(self):
+		try:
+			engine.Rule('employee.unknown_attr', context=self._context())
+		except errors.ObjectAttributeError as error:
+			self.assertEqual(error.attribute_name, 'unknown_attr')
+			self.assertIn(error.suggestion, {'name', 'rank', 'manager'})
+		else:
+			self.fail('ObjectAttributeError was not raised')
+
+	def test_object_rule_item_access_rejected(self):
+		with self.assertRaisesRegex(errors.EvaluationError, 'item access on OBJECT'):
+			engine.Rule('employee["name"]', context=self._context())
+
+	def test_object_rule_containment_rejected(self):
+		with self.assertRaisesRegex(errors.EvaluationError, 'containment check on OBJECT'):
+			engine.Rule('"name" in employee', context=self._context())
+
+	def test_object_rule_cross_type_mutual_reference(self):
+		Person = ast.DataType.OBJECT('Person', attributes={
+			'name': ast.DataType.STRING,
+			'employer': ast.DataType.reference('Company'),
+		})
+		Company = ast.DataType.OBJECT('Company', attributes={
+			'name': ast.DataType.STRING,
+			'ceo': ast.DataType.reference('Person'),
+		})
+		context = engine.Context(type_resolver={'employee': Person, 'Person': Person, 'Company': Company})
+		rule = engine.Rule('employee.employer.ceo.name == "Palpatine"', context=context)
+
+		@dataclasses.dataclass
+		class _Person:
+			name: str
+			employer: 'typing.Any' = None
+
+		@dataclasses.dataclass
+		class _Company:
+			name: str
+			ceo: 'typing.Any' = None
+
+		sheev = _Person(name='Palpatine')
+		empire = _Company(name='Empire', ceo=sheev)
+		vader = _Person(name='Vader', employer=empire)
+		self.assertTrue(rule.matches({'employee': vader}))
+
+	def test_object_rule_unresolved_cross_reference(self):
+		Person = ast.DataType.OBJECT('Person', attributes={
+			'employer': ast.DataType.reference('Company'),
+			'name': ast.DataType.STRING,
+		})
+		context = engine.Context(type_resolver={'employee': Person, 'Person': Person})
+		with self.assertRaisesRegex(errors.EvaluationError, "unresolved object reference: 'Company'"):
+			engine.Rule('employee.employer.name', context=context)
+
+	def test_object_rule_reference_resolves_to_non_object(self):
+		Person = ast.DataType.OBJECT('Person', attributes={
+			'employer': ast.DataType.reference('Company'),
+		})
+		context = engine.Context(type_resolver={
+			'employee': Person,
+			'Person': Person,
+			'Company': ast.DataType.STRING,
+		})
+		with self.assertRaisesRegex(errors.EvaluationError, "does not resolve to an OBJECT"):
+			engine.Rule('employee.employer', context=context)
+
+	def test_object_rule_reference_name_mismatch(self):
+		Person = ast.DataType.OBJECT('Person', attributes={
+			'employer': ast.DataType.reference('Company'),
+		})
+		Corporation = ast.DataType.OBJECT('Corporation', attributes={'name': ast.DataType.STRING})
+		context = engine.Context(type_resolver={
+			'employee': Person,
+			'Person': Person,
+			'Company': Corporation,
+		})
+		with self.assertRaisesRegex(errors.EvaluationError, "mismatched name"):
+			engine.Rule('employee.employer', context=context)
+
+	def test_object_rule_array_of_objects(self):
+		Person = self._person_type()
+		context = engine.Context(type_resolver={
+			'crew': ast.DataType.ARRAY(Person),
+			'Person': Person,
+		})
+		rule = engine.Rule('crew[0].name == "Han"', context=context)
+		self.assertTrue(rule.matches({'crew': [_TestPerson(name='Han'), _TestPerson(name='Chewie')]}))
+
+	def test_object_rule_array_of_reference(self):
+		Person = self._person_type()
+		context = engine.Context(type_resolver={
+			'crew': ast.DataType.ARRAY(ast.DataType.reference('Person')),
+			'Person': Person,
+		})
+		rule = engine.Rule('crew[0].name == "Han"', context=context)
+		self.assertTrue(rule.matches({'crew': [_TestPerson(name='Han'), _TestPerson(name='Chewie')]}))
+
+	def test_object_rule_mapping_of_objects(self):
+		Person = self._person_type()
+		context = engine.Context(type_resolver={
+			'roster': ast.DataType.MAPPING(ast.DataType.STRING, value_type=Person),
+			'Person': Person,
+		})
+		rule = engine.Rule('roster["alice"].name == "Alice"', context=context)
+		self.assertTrue(rule.matches({'roster': {'alice': _TestPerson(name='Alice')}}))
+
+	def test_object_rule_mapping_of_reference(self):
+		Person = self._person_type()
+		context = engine.Context(type_resolver={
+			'roster': ast.DataType.MAPPING(ast.DataType.STRING, value_type=ast.DataType.reference('Person')),
+			'Person': Person,
+		})
+		rule = engine.Rule('roster["alice"].name == "Alice"', context=context)
+		self.assertTrue(rule.matches({'roster': {'alice': _TestPerson(name='Alice')}}))
+
+	def test_object_rule_custom_accessor(self):
+		Person = ast.DataType.OBJECT(
+			'Person',
+			attributes={'name': ast.DataType.STRING},
+			accessor=lambda obj, name: obj[name]
+		)
+		context = engine.Context(type_resolver={'employee': Person, 'Person': Person})
+		rule = engine.Rule('employee.name == "Leia"', context=context)
+		self.assertTrue(rule.matches({'employee': {'name': 'Leia'}}))
+
+	def test_object_rule_accessor_missing_uses_default_value(self):
+		Person = ast.DataType.OBJECT('Person', attributes={'name': ast.DataType.STRING})
+		context = engine.Context(
+			type_resolver={'employee': Person, 'Person': Person},
+			default_value=None,
+		)
+		rule = engine.Rule('employee.name', context=context)
+		class _Blank:
+			pass
+		self.assertIsNone(rule.evaluate({'employee': _Blank()}))
+
+	def test_object_rule_accessor_missing_raises(self):
+		Person = ast.DataType.OBJECT('Person', attributes={'name': ast.DataType.STRING})
+		context = engine.Context(type_resolver={'employee': Person, 'Person': Person})
+		rule = engine.Rule('employee.name', context=context)
+		class _Blank:
+			pass
+		with self.assertRaises(errors.ObjectAttributeError):
+			rule.evaluate({'employee': _Blank()})
+
+	def test_object_rule_accessor_propagates_other_errors(self):
+		def angry_accessor(obj, name):
+			raise RuntimeError('boom')
+		Person = ast.DataType.OBJECT('Person', attributes={'name': ast.DataType.STRING}, accessor=angry_accessor)
+		context = engine.Context(type_resolver={'employee': Person, 'Person': Person})
+		rule = engine.Rule('employee.name', context=context)
+		with self.assertRaises(RuntimeError):
+			rule.evaluate({'employee': _TestPerson(name='Luke')})
+
+	def test_object_rule_equality(self):
+		rule = engine.Rule('employee == other', context=engine.Context(type_resolver={
+			'employee': self._person_type(),
+			'other': self._person_type(),
+			'Person': self._person_type(),
+		}))
+		luke = _TestPerson(name='Luke')
+		self.assertTrue(rule.evaluate({'employee': luke, 'other': luke}))
+		self.assertFalse(rule.evaluate({'employee': luke, 'other': _TestPerson(name='Vader')}))
+
+	def test_object_rule_equality_with_null(self):
+		rule = engine.Rule('employee == null', context=self._context())
+		# note: in Python, None compared to a dataclass instance uses type()-mismatch and returns False
+		self.assertFalse(rule.matches({'employee': _TestPerson(name='Luke')}))
+
+	def test_object_rule_cross_schema_comparison_returns_false(self):
+		Hero = ast.DataType.OBJECT('Hero', attributes={'name': ast.DataType.STRING})
+		context = engine.Context(type_resolver={
+			'employee': self._person_type(),
+			'villain': Hero,
+			'Person': self._person_type(),
+		})
+		rule = engine.Rule('employee == villain', context=context)
+		self.assertFalse(rule.evaluate({
+			'employee': _TestPerson(name='Luke'),
+			'villain': _TestPerson(name='Vader'),
+		}))
+
+	def test_object_rule_comprehension_over_array_of_reference(self):
+		Person = self._person_type()
+		context = engine.Context(type_resolver={
+			'crew': ast.DataType.ARRAY(ast.DataType.reference('Person')),
+			'Person': Person,
+		})
+		rule = engine.Rule('[m for m in crew if m.name == "Han"]', context=context)
+		result = rule.evaluate({'crew': [_TestPerson(name='Han'), _TestPerson(name='Chewie')]})
+		self.assertEqual(len(result), 1)
+		self.assertEqual(result[0].name, 'Han')
+
+	def test_object_rule_symbols_tracked(self):
+		context = self._context()
+		engine.Rule('employee.name == "Luke"', context=context)
+		self.assertIn('employee', context.symbols)
+
 
 class EngineTests(unittest.TestCase):
 	def test_engine_resolve_attribute(self):

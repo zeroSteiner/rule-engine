@@ -42,6 +42,7 @@ from . import errors
 from .parser.utilities import parse_datetime, parse_float, parse_timedelta
 from .suggestions import suggest_symbol
 from .types import *
+from .types import _ObjectDataTypeDef, _ReferenceDataTypeDef
 
 def _assert_is_bytes(*values):
 	if not all(map(isinstance, values, [bytes])):
@@ -76,6 +77,74 @@ def _iterable_member_value_type(value):
 		member.result_type if isinstance(member, ExpressionBase) else member for member in value
 	)
 	return iterable_member_value_type(value)
+
+def _resolve_type(definition, context):
+	"""
+	Resolve any :py:class:`~rule_engine.types._ReferenceDataTypeDef` placeholders inside *definition* via the
+	*context*'s :py:meth:`~rule_engine.engine.Context.resolve_type` callback. Returns a new definition with the
+	placeholders substituted; the input is never mutated. Already-resolved definitions pass through unchanged.
+
+	This helper is used at rule parse time to complete the cross-type reference resolution that
+	:py:class:`_ObjectDataTypeDef` deliberately leaves for later (self references are already bound at construction
+	time).
+	"""
+	if isinstance(definition, _ReferenceDataTypeDef):
+		try:
+			resolved = context.resolve_type(definition.name)
+		except errors.SymbolResolutionError as error:
+			raise errors.EvaluationError(
+				"unresolved object reference: {0!r} - add it to the Context type_resolver".format(definition.name)
+			) from error
+		if not isinstance(resolved, _ObjectDataTypeDef):
+			raise errors.EvaluationError(
+				"reference {0!r} does not resolve to an OBJECT type".format(definition.name)
+			)
+		if resolved.name != definition.name:
+			raise errors.EvaluationError(
+				"reference {0!r} resolves to an OBJECT with mismatched name {1!r}".format(definition.name, resolved.name)
+			)
+		return resolved
+	if isinstance(definition, _ObjectDataTypeDef):
+		return definition
+	if isinstance(definition, DataType.ARRAY.__class__) or isinstance(definition, DataType.SET.__class__):
+		new_value_type = _resolve_type(definition.value_type, context)
+		if new_value_type is definition.value_type:
+			return definition
+		return definition.__class__(
+			definition.name,
+			definition.python_type,
+			value_type=new_value_type,
+			value_type_nullable=definition.value_type_nullable
+		)
+	if isinstance(definition, DataType.MAPPING.__class__):
+		new_key_type = _resolve_type(definition.key_type, context)
+		new_value_type = _resolve_type(definition.value_type, context)
+		if new_key_type is definition.key_type and new_value_type is definition.value_type:
+			return definition
+		return definition.__class__(
+			definition.name,
+			definition.python_type,
+			key_type=new_key_type,
+			value_type=new_value_type,
+			value_type_nullable=definition.value_type_nullable
+		)
+	if isinstance(definition, DataType.FUNCTION.__class__):
+		new_return_type = _resolve_type(definition.return_type, context)
+		if definition.argument_types is DataType.UNDEFINED:
+			new_argument_types = definition.argument_types
+		else:
+			new_argument_types = tuple(_resolve_type(arg, context) for arg in definition.argument_types)
+		if new_return_type is definition.return_type and new_argument_types is definition.argument_types:
+			return definition
+		return definition.__class__(
+			definition.name,
+			definition.python_type,
+			value_name=definition.value_name,
+			return_type=new_return_type,
+			argument_types=new_argument_types,
+			minimum_arguments=definition.minimum_arguments
+		)
+	return definition
 
 class Assignment(object):
 	"""An internal assignment whereby a symbol is populated with a value of the specified type."""
@@ -577,6 +646,7 @@ class LogicExpression(LeftOperatorRightExpressionBase):
 ################################################################################
 class ComparisonExpression(LeftOperatorRightExpressionBase):
 	"""A class for representing comparison expressions from the grammar text such as equality checks."""
+	compatible_types = LeftOperatorRightExpressionBase.compatible_types + (DataType.OBJECT,)
 	def _op_eq(self, thing):
 		left_value = self.left.evaluate(thing)
 		right_value = self.right.evaluate(thing)
@@ -690,7 +760,8 @@ class ComprehensionExpression(ExpressionBase):
 		iterable = iterable.build()
 		if iterable.result_type is not DataType.UNDEFINED and not iterable.result_type.is_iterable:
 			raise errors.EvaluationError('data type mismatch (comprehension requires an iterable)')
-		assignment = Assignment(variable, value_type=getattr(iterable.result_type, 'iterable_type', DataType.UNDEFINED))
+		resolved_iterable_type = _resolve_type(iterable.result_type, context)
+		assignment = Assignment(variable, value_type=getattr(resolved_iterable_type, 'iterable_type', DataType.UNDEFINED))
 		with context.assignments(assignment):
 			if condition is not None:
 				condition = condition.build()
@@ -730,6 +801,8 @@ class ContainsExpression(ExpressionBase):
 		if container.result_type == DataType.BYTES or container.result_type == DataType.STRING:
 			if member.result_type != DataType.UNDEFINED and member.result_type != container.result_type:
 				raise errors.EvaluationError('data type mismatch')
+		elif isinstance(_resolve_type(container.result_type, context), _ObjectDataTypeDef):
+			raise errors.EvaluationError('data type mismatch (containment check on OBJECT)')
 		elif container.result_type != DataType.UNDEFINED and container.result_type.is_scalar:
 			raise errors.EvaluationError('data type mismatch')
 		self.context = context
@@ -766,7 +839,7 @@ class ContainsExpression(ExpressionBase):
 
 class GetAttributeExpression(ExpressionBase):
 	"""A class representing an expression in which *name* is retrieved as an attribute of *object*."""
-	__slots__ = ('name', 'object', 'safe')
+	__slots__ = ('name', 'object', 'safe', '_object_type')
 	def __init__(self, context, object_, name, safe=False):
 		"""
 		:param context: The context to use for evaluating the expression.
@@ -780,21 +853,34 @@ class GetAttributeExpression(ExpressionBase):
 		"""
 		self.context = context
 		self.object = object_
+		self._object_type = None
 		if self.object.result_type != DataType.UNDEFINED:
 			if not (self.object.result_type == DataType.NULL and safe):
-				try:
-					self.result_type = context.resolve_attribute_type(self.object.result_type, name)
-				except errors.AttributeResolutionError as error:
-					# this is necessary because MAPPING objects can have their keys accessed as attributes
-					if not isinstance(self.object.result_type, DataType.MAPPING.__class__):
-						raise error
-					if not context.mapping_attribute_lookup:
-						raise errors.EvaluationError(
-							"attribute access on a MAPPING is disabled - use mapping[{0!r}] instead, "
-							"or set mapping_attribute_lookup=True on the Context for v4-compatible "
-							"behavior (deprecated, removal scheduled for v6.0)".format(name)
+				resolved_object_type = _resolve_type(self.object.result_type, context)
+				if isinstance(resolved_object_type, _ObjectDataTypeDef):
+					if name not in resolved_object_type.attributes:
+						raise errors.ObjectAttributeError(
+							name,
+							resolved_object_type,
+							suggestion=suggest_symbol(name, resolved_object_type.attributes.keys())
 						)
-					# leave the result type undefined because the name could be a mapping key or attribute
+					self._object_type = resolved_object_type
+					attribute_type = _resolve_type(resolved_object_type.attributes[name], context)
+					self.result_type = attribute_type
+				else:
+					try:
+						self.result_type = context.resolve_attribute_type(self.object.result_type, name)
+					except errors.AttributeResolutionError as error:
+						# this is necessary because MAPPING objects can have their keys accessed as attributes
+						if not isinstance(self.object.result_type, DataType.MAPPING.__class__):
+							raise error
+						if not context.mapping_attribute_lookup:
+							raise errors.EvaluationError(
+								"attribute access on a MAPPING is disabled - use mapping[{0!r}] instead, "
+								"or set mapping_attribute_lookup=True on the Context for v4-compatible "
+								"behavior (deprecated, removal scheduled for v6.0)".format(name)
+							)
+						# leave the result type undefined because the name could be a mapping key or attribute
 		self.name = name
 		self.safe = safe
 
@@ -809,6 +895,21 @@ class GetAttributeExpression(ExpressionBase):
 		resolved_obj = self.object.evaluate(thing)
 		if resolved_obj is None and self.safe:
 			return resolved_obj
+
+		if self._object_type is not None:
+			try:
+				value = self._object_type.accessor(resolved_obj, self.name)
+			except (AttributeError, KeyError):
+				default_value = self.context.default_value
+				if default_value is errors.UNDEFINED:
+					raise errors.ObjectAttributeError(
+						self.name,
+						self._object_type,
+						thing=thing,
+						suggestion=suggest_symbol(self.name, self._object_type.attributes.keys())
+					) from None
+				value = default_value
+			return self._new_value(value, verify_type=False)
 
 		attribute_error = None
 		try:
@@ -866,6 +967,7 @@ class GetItemExpression(ExpressionBase):
 		"""
 		self.context = context
 		self.container = container
+		resolved_container_type = _resolve_type(container.result_type, context)
 		if container.result_type == DataType.BYTES:
 			if not DataType.is_compatible(item.result_type, DataType.FLOAT):
 				raise errors.EvaluationError('data type mismatch (not an integer number)')
@@ -876,16 +978,20 @@ class GetItemExpression(ExpressionBase):
 			self.result_type = DataType.STRING
 		# check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
 		# is explicitly checking if result_type is an array with out checking the value_type
-		elif isinstance(container.result_type, DataType.ARRAY.__class__):
+		elif isinstance(resolved_container_type, DataType.ARRAY.__class__):
 			if not DataType.is_compatible(item.result_type, DataType.FLOAT):
 				raise errors.EvaluationError('data type mismatch (not an integer number)')
-			self.result_type = container.result_type.value_type
-		elif isinstance(container.result_type, DataType.MAPPING.__class__):
-			if not (safe or DataType.is_compatible(item.result_type, container.result_type.key_type)):
+			self.result_type = _resolve_type(resolved_container_type.value_type, context)
+		elif isinstance(resolved_container_type, DataType.MAPPING.__class__):
+			if not (safe or DataType.is_compatible(item.result_type, resolved_container_type.key_type)):
 				raise errors.LookupError(errors.UNDEFINED, errors.UNDEFINED)
-			self.result_type = container.result_type.value_type
-		elif isinstance(container.result_type, DataType.SET.__class__):
+			self.result_type = _resolve_type(resolved_container_type.value_type, context)
+		elif isinstance(resolved_container_type, DataType.SET.__class__):
 			raise errors.EvaluationError('data type mismatch (container is a set)')
+		elif isinstance(resolved_container_type, _ObjectDataTypeDef):
+			raise errors.EvaluationError(
+				"data type mismatch (item access on OBJECT - use {0}.attribute instead)".format(resolved_container_type.name)
+			)
 		elif container.result_type != DataType.UNDEFINED:
 			if not (container.result_type == DataType.NULL and safe):
 				raise errors.EvaluationError('data type mismatch')
@@ -1049,6 +1155,11 @@ class SymbolExpression(ExpressionBase):
 		if self.result_type == DataType.UNDEFINED:
 			return value
 
+		# OBJECT values are opaque to DataType.from_value; trust the schema annotation and delegate attribute-level
+		# type checking to GetAttributeExpression
+		if isinstance(self.result_type, _ObjectDataTypeDef):
+			return value
+
 		# use DataType.from_value to raise a TypeError if value is not of a
 		# compatible data type
 		value_type = DataType.from_value(value)
@@ -1058,6 +1169,8 @@ class SymbolExpression(ExpressionBase):
 			if self.result_type.is_scalar:
 				return value
 			if self.result_type.value_type == DataType.UNDEFINED:
+				return value
+			if value_type.value_type == DataType.UNDEFINED:
 				return value
 			if self.result_type.value_type != DataType.NULL and not self.result_type.value_type_nullable and any(v is None for v in value):
 				raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)

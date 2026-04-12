@@ -208,6 +208,15 @@ class AttributeResolutionError(EvaluationError):
 	def __repr__(self):
 		return "<{} message={!r} suggestion={!r} >".format(self.__class__.__name__, self.message, self.suggestion)
 
+class ObjectAttributeError(AttributeResolutionError):
+	"""
+	An error raised when an attribute can not be resolved against an :py:attr:`~rule_engine.types.DataType.OBJECT`
+	schema. This is a subclass of :py:exc:`AttributeResolutionError` so existing handlers keep working, but it lets
+	users identify schema-driven lookup failures specifically.
+
+	.. versionadded:: 5.0.0
+	"""
+
 class AttributeTypeError(EvaluationError):
 	"""
 	An error raised when an attribute with type information is resolved to a Python value that is not of that type.

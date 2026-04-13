@@ -39,6 +39,7 @@ import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 import rule_engine.parser as parser
+import rule_engine.types as types
 
 inf = float('inf')
 nan = float('nan')
@@ -293,12 +294,12 @@ class AstTests(unittest.TestCase):
 		parser_ = parser.Parser()
 		cases = (
 			# type,             type_is,             type_is_not
-			('symbol << 1',     ast.DataType.FLOAT,  ast.DataType.STRING),
-			('symbol + 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
-			('symbol - 1',      ast.DataType.FLOAT,  ast.DataType.STRING),
-			('symbol[1]',       ast.DataType.STRING, ast.DataType.FLOAT),
-			('symbol[1]',       ast.DataType.ARRAY,  ast.DataType.FLOAT),
-			('symbol =~ "foo"', ast.DataType.STRING, ast.DataType.FLOAT),
+			('symbol << 1',     types.DataType.FLOAT,  types.DataType.STRING),
+			('symbol + 1',      types.DataType.FLOAT,  types.DataType.STRING),
+			('symbol - 1',      types.DataType.FLOAT,  types.DataType.STRING),
+			('symbol[1]',       types.DataType.STRING, types.DataType.FLOAT),
+			('symbol[1]',       types.DataType.ARRAY,  types.DataType.FLOAT),
+			('symbol =~ "foo"', types.DataType.STRING, types.DataType.FLOAT),
 		)
 		for case, type_is, type_is_not in cases:
 			parser_.parse(case, self.context)

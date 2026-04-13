@@ -37,11 +37,10 @@ import functools
 import math
 import re
 
-from .. import ast
 from .. import errors
 from .. import parser
+from .. import types
 from ..suggestions import suggest_symbol
-from ..types import DataType
 
 def _float_op(value, op):
 	if value.is_nan() or value.is_infinite():
@@ -49,34 +48,34 @@ def _float_op(value, op):
 	return op(value)
 
 def _value_to_ary_result_type(object_type):
-	if object_type == ast.DataType.BYTES:
-		return ast.DataType.ARRAY(ast.DataType.FLOAT)
-	elif object_type == ast.DataType.STRING:
-		return ast.DataType.ARRAY(ast.DataType.STRING)
-	return ast.DataType.ARRAY(object_type.value_type)
+	if object_type == types.DataType.BYTES:
+		return types.DataType.ARRAY(types.DataType.FLOAT)
+	elif object_type == types.DataType.STRING:
+		return types.DataType.ARRAY(types.DataType.STRING)
+	return types.DataType.ARRAY(object_type.value_type)
 
 def _value_to_set_result_type(object_type):
-	if object_type == ast.DataType.BYTES:
-		return ast.DataType.SET(ast.DataType.FLOAT)
-	elif object_type == ast.DataType.STRING:
-		return ast.DataType.SET(ast.DataType.STRING)
-	return ast.DataType.SET(object_type.value_type)
+	if object_type == types.DataType.BYTES:
+		return types.DataType.SET(types.DataType.FLOAT)
+	elif object_type == types.DataType.STRING:
+		return types.DataType.SET(types.DataType.STRING)
+	return types.DataType.SET(object_type.value_type)
 
 def _value_with_result_type(name, object_type):
-	return ast.DataType.FUNCTION(name, argument_types=(object_type,), return_type=ast.DataType.BOOLEAN)
+	return types.DataType.FUNCTION(name, argument_types=(object_type,), return_type=types.DataType.BOOLEAN)
 
 class _AttributeResolverFunction(object):
 	__slots__ = ('function', 'type_resolver')
 	def __init__(self, function, *, result_type, type_resolver):
 		self.function = function
-		if result_type and result_type is not ast.DataType.UNDEFINED:
-			if not DataType.is_definition(result_type):
-				raise TypeError('result_type must be a DataType definition')
+		if result_type and result_type is not types.DataType.UNDEFINED:
+			if not types.DataType.is_definition(result_type):
+				raise TypeError('result_type must be a types.DataType definition')
 			if type_resolver:
 				raise ValueError('both result_type and type_resolver can not be specified')
 			type_resolver = functools.partial(self._type_resolver, result_type)
 		elif not type_resolver:
-			type_resolver = functools.partial(self._type_resolver, ast.DataType.UNDEFINED)
+			type_resolver = functools.partial(self._type_resolver, types.DataType.UNDEFINED)
 		self.type_resolver = type_resolver
 
 	@staticmethod
@@ -90,7 +89,7 @@ class _AttributeResolver(object):
 	class attribute(object):
 		__slots__ = ('types', 'name', 'result_type', 'type_resolver')
 		type_map = collections.defaultdict(dict)
-		def __init__(self, name, *data_types, result_type=ast.DataType.UNDEFINED, type_resolver=errors.UNDEFINED):
+		def __init__(self, name, *data_types, result_type=types.DataType.UNDEFINED, type_resolver=errors.UNDEFINED):
 			self.types = data_types
 			self.name = name
 			self.result_type = result_type
@@ -103,22 +102,22 @@ class _AttributeResolver(object):
 
 	def __call__(self, thing, object_, name):
 		try:
-			object_type = ast.DataType.from_value(object_)
+			object_type = types.DataType.from_value(object_)
 		except TypeError:
 			# if the object can't be mapped to a supported type, raise a resolution error
 			raise errors.AttributeResolutionError(name, object_, thing=thing) from None
 		resolver = self._get_resolver(object_type, name, thing=thing)
 		value = resolver.function(self, object_)
-		value = ast.coerce_value(value)
-		value_type = ast.DataType.from_value(value)
+		value = types.coerce_value(value)
+		value_type = types.DataType.from_value(value)
 		expected_value_type = resolver.resolve_type(value_type)
-		if ast.DataType.is_compatible(expected_value_type, value_type):
+		if types.DataType.is_compatible(expected_value_type, value_type):
 			return value
 		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=expected_value_type)
 
 	def _get_resolver(self, object_type, name, thing=errors.UNDEFINED):
 		for data_type, attribute_resolvers in self.attribute.type_map.items():
-			if ast.DataType.is_compatible(data_type, object_type):
+			if types.DataType.is_compatible(data_type, object_type):
 				break
 		else:
 			raise errors.AttributeResolutionError(name, object_type, thing=thing)
@@ -137,7 +136,7 @@ class _AttributeResolver(object):
 		"""
 		return self._get_resolver(object_type, name).resolve_type(object_type)
 
-	@attribute('decode', ast.DataType.BYTES, result_type=ast.DataType.FUNCTION('decode', return_type=ast.DataType.STRING, argument_types=(ast.DataType.STRING,)))
+	@attribute('decode', types.DataType.BYTES, result_type=types.DataType.FUNCTION('decode', return_type=types.DataType.STRING, argument_types=(types.DataType.STRING,)))
 	def bytes_decode(self, value):
 		return functools.partial(self._bytes_decode, value)
 
@@ -153,94 +152,94 @@ class _AttributeResolver(object):
 		except LookupError as error:
 			raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='decode')
 
-	@attribute('to_epoch', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('to_epoch', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_to_epoch(self, value):
 		return value.timestamp()
 
-	@attribute('date', ast.DataType.DATETIME, result_type=ast.DataType.DATETIME)
+	@attribute('date', types.DataType.DATETIME, result_type=types.DataType.DATETIME)
 	def datetime_date(self, value):
 		return value.replace(hour=0, minute=0, second=0, microsecond=0)
 
-	@attribute('day', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('day', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_day(self, value):
 		return value.day
 
-	@attribute('hour', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('hour', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_hour(self, value):
 		return value.hour
 
-	@attribute('microsecond', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('microsecond', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_microsecond(self, value):
 		return value.microsecond
 
-	@attribute('millisecond', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('millisecond', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_millisecond(self, value):
 		return value.microsecond / 1000
 
-	@attribute('minute', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('minute', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_minute(self, value):
 		return value.minute
 
-	@attribute('month', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('month', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_month(self, value):
 		return value.month
 
-	@attribute('second', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('second', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_second(self, value):
 		return value.second
 
-	@attribute('weekday', ast.DataType.DATETIME, result_type=ast.DataType.STRING)
+	@attribute('weekday', types.DataType.DATETIME, result_type=types.DataType.STRING)
 	def datetime_weekday(self, value):
 		# use strftime %A so the value is localized
 		return value.strftime('%A')
 
-	@attribute('year', ast.DataType.DATETIME, result_type=ast.DataType.FLOAT)
+	@attribute('year', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
 	def datetime_year(self, value):
 		return value.year
 
-	@attribute('zone_name', ast.DataType.DATETIME, result_type=ast.DataType.STRING)
+	@attribute('zone_name', types.DataType.DATETIME, result_type=types.DataType.STRING)
 	def datetime_zone_name(self, value):
 		return value.tzname()
 
-	@attribute('ceiling', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
+	@attribute('ceiling', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
 	def float_ceiling(self, value):
 		return _float_op(value, math.ceil)
 
-	@attribute('floor', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
+	@attribute('floor', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
 	def float_floor(self, value):
 		return _float_op(value, math.floor)
 
-	@attribute('is_nan', ast.DataType.FLOAT, result_type=ast.DataType.BOOLEAN)
+	@attribute('is_nan', types.DataType.FLOAT, result_type=types.DataType.BOOLEAN)
 	def float_is_nan(self, value):
 		return math.isnan(value)
 
-	@attribute('to_flt', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
+	@attribute('to_flt', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
 	def float_to_flt(self, value):
 		return value
 
-	@attribute('to_int', ast.DataType.FLOAT, result_type=ast.DataType.FLOAT)
+	@attribute('to_int', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
 	def float_to_int(self, value):
-		if not ast.is_integer_number(value):
+		if not types.is_integer_number(value):
 			raise errors.EvaluationError('data type mismatch (not an integer number)')
 		return value
 
-	@attribute('keys', ast.DataType.MAPPING, result_type=ast.DataType.ARRAY)
+	@attribute('keys', types.DataType.MAPPING, result_type=types.DataType.ARRAY)
 	def mapping_keys(self, value):
 		return tuple(value.keys())
 
-	@attribute('values', ast.DataType.MAPPING, result_type=ast.DataType.ARRAY)
+	@attribute('values', types.DataType.MAPPING, result_type=types.DataType.ARRAY)
 	def mapping_values(self, value):
 		return tuple(value.values())
 
-	@attribute('as_lower', ast.DataType.STRING, result_type=ast.DataType.STRING)
+	@attribute('as_lower', types.DataType.STRING, result_type=types.DataType.STRING)
 	def string_as_lower(self, value):
 		return value.lower()
 
-	@attribute('as_upper', ast.DataType.STRING, result_type=ast.DataType.STRING)
+	@attribute('as_upper', types.DataType.STRING, result_type=types.DataType.STRING)
 	def string_as_upper(self, value):
 		return value.upper()
 
-	@attribute('encode', ast.DataType.STRING, result_type=ast.DataType.FUNCTION('encode', return_type=ast.DataType.BYTES, argument_types=(ast.DataType.STRING,)))
+	@attribute('encode', types.DataType.STRING, result_type=types.DataType.FUNCTION('encode', return_type=types.DataType.BYTES, argument_types=(types.DataType.STRING,)))
 	def string_encode(self, value):
 		return functools.partial(self._string_encode, value)
 
@@ -259,7 +258,7 @@ class _AttributeResolver(object):
 		except LookupError as error:
 			raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='encode')
 
-	@attribute('to_flt', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
+	@attribute('to_flt', types.DataType.STRING, result_type=types.DataType.FLOAT)
 	def string_to_flt(self, value):
 		value = value.strip()
 		if re.match(r'-?inf', value):
@@ -269,56 +268,56 @@ class _AttributeResolver(object):
 			return decimal.Decimal('nan')
 		return parser.literal_eval(match.group(0))
 
-	@attribute('to_int', ast.DataType.STRING, result_type=ast.DataType.FLOAT)
+	@attribute('to_int', types.DataType.STRING, result_type=types.DataType.FLOAT)
 	def string_to_int(self, value):
 		value = self.string_to_flt(value)
-		if not ast.is_integer_number(value):
+		if not types.is_integer_number(value):
 			raise errors.EvaluationError('data type mismatch (not an integer number)')
 		return value
 
-	@attribute('days', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	@attribute('days', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
 	def timedelta_days(self, value):
 		return value.days
 
-	@attribute('seconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	@attribute('seconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
 	def timedelta_seconds(self, value):
 		return value.seconds
 
-	@attribute('microseconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	@attribute('microseconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
 	def timedelta_microseconds(self, value):
 		return value.microseconds
 
-	@attribute('total_seconds', ast.DataType.TIMEDELTA, result_type=ast.DataType.FLOAT)
+	@attribute('total_seconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
 	def timedelta_total_seconds(self, value):
 		return value.total_seconds()
 
-	@attribute('ends_with', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'ends_with'))
+	@attribute('ends_with', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'ends_with'))
 	def value_ends_with(self, value):
 		return functools.partial(self._value_ends_with, value)
 
 	def _value_ends_with(self, value, suffix):
 		return value[-len(suffix):] == suffix
 
-	@attribute('is_empty', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.BOOLEAN)
+	@attribute('is_empty', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, types.DataType.MAPPING, types.DataType.SET, result_type=types.DataType.BOOLEAN)
 	def value_is_empty(self, value):
 		return len(value) == 0
 
-	@attribute('length', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, ast.DataType.MAPPING, ast.DataType.SET, result_type=ast.DataType.FLOAT)
+	@attribute('length', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, types.DataType.MAPPING, types.DataType.SET, result_type=types.DataType.FLOAT)
 	def value_length(self, value):
 		return len(value)
 
-	@attribute('starts_with', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'starts_with'))
+	@attribute('starts_with', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'starts_with'))
 	def value_starts_with(self, value):
 		return functools.partial(self._value_starts_with, value)
 
 	def _value_starts_with(self, value, prefix):
 		return value[:len(prefix)] == prefix
 
-	@attribute('to_ary', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.SET, ast.DataType.STRING, type_resolver=_value_to_ary_result_type)
+	@attribute('to_ary', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.SET, types.DataType.STRING, type_resolver=_value_to_ary_result_type)
 	def value_to_ary(self, value):
 		return tuple(value)
 
-	@attribute('to_str', ast.DataType.FLOAT, ast.DataType.STRING, result_type=ast.DataType.STRING)
+	@attribute('to_str', types.DataType.FLOAT, types.DataType.STRING, result_type=types.DataType.STRING)
 	def value_to_str(self, value):
 		if isinstance(value, str):
 			return value
@@ -332,6 +331,6 @@ class _AttributeResolver(object):
 				return 'inf'
 		return str(value)
 
-	@attribute('to_set', ast.DataType.ARRAY, ast.DataType.BYTES, ast.DataType.SET, ast.DataType.STRING, type_resolver=_value_to_set_result_type)
+	@attribute('to_set', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.SET, types.DataType.STRING, type_resolver=_value_to_set_result_type)
 	def value_to_set(self, value):
 		return set(value)

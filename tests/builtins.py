@@ -37,8 +37,8 @@ import random
 import string
 import unittest
 
-import rule_engine.ast as ast
 import rule_engine.builtins as builtins
+import rule_engine.types as types
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 
@@ -68,21 +68,21 @@ class BuiltinsTests(unittest.TestCase):
 		function_type = blts.resolve_type(name)
 		self.assertIsNot(
 			function_type.minimum_arguments,
-			ast.DataType.UNDEFINED,
+			types.DataType.UNDEFINED,
 			msg='builtin function should have a defined minimum number of arguments'
 		)
 		self.assertTrue(callable(function), msg='builtin functions should be callable')
 		result = function(*arguments)
 		self.assertEqual(result, expected_result, msg='builtin functions should return the expected result')
-		result_type = ast.DataType.from_value(result)
-		self.assertTrue(ast.DataType.is_compatible(result_type, function_type.return_type))
+		result_type = types.DataType.from_value(result)
+		self.assertTrue(types.DataType.is_compatible(result_type, function_type.return_type))
 		return result
 
 	def test_builtin_functions(self):
 		blts = builtins.Builtins.from_defaults()
 		for name in blts:
 			data_type = blts.resolve_type(name)
-			if not isinstance(data_type, ast.DataType.FUNCTION.__class__):
+			if not isinstance(data_type, types.DataType.FUNCTION.__class__):
 				continue
 			self.assertEqual(name, data_type.value_name)
 
@@ -108,10 +108,10 @@ class BuiltinsTests(unittest.TestCase):
 		# test that builtins have correct type hints
 		blts = builtins.Builtins.from_defaults(
 			{'name': 'Alice'},
-			value_types={'name': ast.DataType.STRING}
+			value_types={'name': types.DataType.STRING}
 		)
-		self.assertEqual(blts.resolve_type('name'), ast.DataType.STRING)
-		self.assertEqual(blts.resolve_type('missing'), ast.DataType.UNDEFINED)
+		self.assertEqual(blts.resolve_type('name'), types.DataType.STRING)
+		self.assertEqual(blts.resolve_type('missing'), types.DataType.UNDEFINED)
 		context = engine.Context()
 		context.builtins = blts
 		engine.Rule('$name =~ ""')

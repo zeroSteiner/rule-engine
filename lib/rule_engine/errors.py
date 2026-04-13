@@ -226,8 +226,8 @@ class AttributeTypeError(EvaluationError):
 		:param str attribute_name: The name of the symbol that can not be resolved.
 		:param object_type: The value that *attribute_name* was used as an attribute for.
 		:param is_value: The native Python value of the incompatible attribute.
-		:param is_type: The :py:class:`rule-engine type<rule_engine.ast.DataType>` of the incompatible attribute.
-		:param expected_type: The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this
+		:param is_type: The :py:class:`rule-engine type<rule_engine.types.DataType>` of the incompatible attribute.
+		:param expected_type: The :py:class:`rule-engine type<rule_engine.types.DataType>` that was expected for this
 			attribute.
 		"""
 		self.attribute_name = attribute_name
@@ -237,9 +237,9 @@ class AttributeTypeError(EvaluationError):
 		self.is_value = is_value
 		"""The native Python value of the incompatible attribute."""
 		self.is_type = is_type
-		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` of the incompatible attribute."""
+		"""The :py:class:`rule-engine type<rule_engine.types.DataType>` of the incompatible attribute."""
 		self.expected_type = expected_type
-		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this attribute."""
+		"""The :py:class:`rule-engine type<rule_engine.types.DataType>` that was expected for this attribute."""
 		message = "attribute {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(
 			attribute_name,
 			is_type.name,
@@ -298,8 +298,8 @@ class SymbolTypeError(EvaluationError):
 		"""
 		:param str symbol_name: The name of the symbol that is of an incompatible type.
 		:param is_value: The native Python value of the incompatible symbol.
-		:param is_type: The :py:class:`rule-engine type<rule_engine.ast.DataType>` of the incompatible symbol.
-		:param expected_type: The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this
+		:param is_type: The :py:class:`rule-engine type<rule_engine.types.DataType>` of the incompatible symbol.
+		:param expected_type: The :py:class:`rule-engine type<rule_engine.types.DataType>` that was expected for this
 			symbol.
 		"""
 		self.symbol_name = symbol_name
@@ -307,9 +307,9 @@ class SymbolTypeError(EvaluationError):
 		self.is_value = is_value
 		"""The native Python value of the incompatible symbol."""
 		self.is_type = is_type
-		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` of the incompatible symbol."""
+		"""The :py:class:`rule-engine type<rule_engine.types.DataType>` of the incompatible symbol."""
 		self.expected_type = expected_type
-		"""The :py:class:`rule-engine type<rule_engine.ast.DataType>` that was expected for this symbol."""
+		"""The :py:class:`rule-engine type<rule_engine.types.DataType>` that was expected for this symbol."""
 		message = "symbol {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(
 			symbol_name,
 			is_type.name,

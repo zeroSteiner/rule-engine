@@ -38,7 +38,6 @@ import functools
 import math
 import random
 
-from . import ast
 from . import errors
 from . import types
 from .parser.utilities import parse_datetime, parse_float, parse_timedelta
@@ -137,9 +136,9 @@ class Builtins(collections.abc.Mapping):
 		The method to use for resolving the data type of a builtin symbol.
 
 		:param str name: The name of the symbol to retrieve the data type of.
-		:return: The data type of the symbol or :py:attr:`~rule_engine.ast.DataType.UNDEFINED`.
+		:return: The data type of the symbol or :py:attr:`~rule_engine.types.DataType.UNDEFINED`.
 		"""
-		return self.__value_types.get(name, ast.DataType.UNDEFINED)
+		return self.__value_types.get(name, types.DataType.UNDEFINED)
 
 	def __repr__(self):
 		return "<{} namespace={!r} keys={!r} timezone={!r} >".format(self.__class__.__name__, self.namespace, tuple(self.keys()), self.timezone)
@@ -193,29 +192,29 @@ class Builtins(collections.abc.Mapping):
 		default_values.update(values or {})
 		default_value_types = {
 			# mathematical constants
-			'e': ast.DataType.FLOAT,
-			'pi': ast.DataType.FLOAT,
+			'e': types.DataType.FLOAT,
+			'pi': types.DataType.FLOAT,
 			# timestamps
-			'now': ast.DataType.DATETIME,
-			'today': ast.DataType.DATETIME,
+			'now': types.DataType.DATETIME,
+			'today': types.DataType.DATETIME,
 			# functions
-			'abs': ast.DataType.FUNCTION('abs', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.FLOAT,)),
-			'all': ast.DataType.FUNCTION('all', return_type=ast.DataType.BOOLEAN, argument_types=(ast.DataType.ARRAY,)),
-			'any': ast.DataType.FUNCTION('any', return_type=ast.DataType.BOOLEAN, argument_types=(ast.DataType.ARRAY,)),
-			'sum': ast.DataType.FUNCTION('sum', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.ARRAY(ast.DataType.FLOAT),)),
-			'map': ast.DataType.FUNCTION('map', return_type=ast.DataType.ARRAY, argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
-			'max': ast.DataType.FUNCTION('max', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.ARRAY(ast.DataType.FLOAT),)),
-			'min': ast.DataType.FUNCTION('min', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.ARRAY(ast.DataType.FLOAT),)),
-			'filter': ast.DataType.FUNCTION('filter', return_type=ast.DataType.ARRAY, argument_types=(ast.DataType.FUNCTION, ast.DataType.ARRAY)),
-			'parse_datetime': ast.DataType.FUNCTION('parse_datetime', return_type=ast.DataType.DATETIME, argument_types=(ast.DataType.STRING,)),
-			'parse_float': ast.DataType.FUNCTION('parse_float', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.STRING,)),
-			'parse_timedelta': ast.DataType.FUNCTION('parse_timedelta', return_type=ast.DataType.TIMEDELTA, argument_types=(ast.DataType.STRING,)),
-			'random': ast.DataType.FUNCTION('random', return_type=ast.DataType.FLOAT, argument_types=(ast.DataType.FLOAT,), minimum_arguments=0),
-			'range': ast.DataType.FUNCTION('range', return_type=ast.DataType.ARRAY(ast.DataType.FLOAT), argument_types=(ast.DataType.FLOAT, ast.DataType.FLOAT, ast.DataType.FLOAT,), minimum_arguments=1),
-			'split': ast.DataType.FUNCTION(
+			'abs': types.DataType.FUNCTION('abs', return_type=types.DataType.FLOAT, argument_types=(types.DataType.FLOAT,)),
+			'all': types.DataType.FUNCTION('all', return_type=types.DataType.BOOLEAN, argument_types=(types.DataType.ARRAY,)),
+			'any': types.DataType.FUNCTION('any', return_type=types.DataType.BOOLEAN, argument_types=(types.DataType.ARRAY,)),
+			'sum': types.DataType.FUNCTION('sum', return_type=types.DataType.FLOAT, argument_types=(types.DataType.ARRAY(types.DataType.FLOAT),)),
+			'map': types.DataType.FUNCTION('map', return_type=types.DataType.ARRAY, argument_types=(types.DataType.FUNCTION, types.DataType.ARRAY)),
+			'max': types.DataType.FUNCTION('max', return_type=types.DataType.FLOAT, argument_types=(types.DataType.ARRAY(types.DataType.FLOAT),)),
+			'min': types.DataType.FUNCTION('min', return_type=types.DataType.FLOAT, argument_types=(types.DataType.ARRAY(types.DataType.FLOAT),)),
+			'filter': types.DataType.FUNCTION('filter', return_type=types.DataType.ARRAY, argument_types=(types.DataType.FUNCTION, types.DataType.ARRAY)),
+			'parse_datetime': types.DataType.FUNCTION('parse_datetime', return_type=types.DataType.DATETIME, argument_types=(types.DataType.STRING,)),
+			'parse_float': types.DataType.FUNCTION('parse_float', return_type=types.DataType.FLOAT, argument_types=(types.DataType.STRING,)),
+			'parse_timedelta': types.DataType.FUNCTION('parse_timedelta', return_type=types.DataType.TIMEDELTA, argument_types=(types.DataType.STRING,)),
+			'random': types.DataType.FUNCTION('random', return_type=types.DataType.FLOAT, argument_types=(types.DataType.FLOAT,), minimum_arguments=0),
+			'range': types.DataType.FUNCTION('range', return_type=types.DataType.ARRAY(types.DataType.FLOAT), argument_types=(types.DataType.FLOAT, types.DataType.FLOAT, types.DataType.FLOAT,), minimum_arguments=1),
+			'split': types.DataType.FUNCTION(
 				'split',
-				return_type=ast.DataType.ARRAY(ast.DataType.STRING),
-				argument_types=(ast.DataType.STRING, ast.DataType.STRING, ast.DataType.FLOAT),
+				return_type=types.DataType.ARRAY(types.DataType.STRING),
+				argument_types=(types.DataType.STRING, types.DataType.STRING, types.DataType.FLOAT),
 				minimum_arguments=1
 			)
 		}

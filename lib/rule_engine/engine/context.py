@@ -39,11 +39,11 @@ import functools
 import threading
 import warnings
 
-from .. import ast
+from .. import ast  # noqa: F401 — must be imported before builtins to avoid a circular import
 from .. import builtins
 from .. import errors
+from .. import types
 from ..suggestions import suggest_symbol
-from ..types import DataType
 
 from ._attribute_resolver import _AttributeResolver
 
@@ -54,7 +54,7 @@ def _tls_getter(thread_local, key, _builtins):
 	return getattr(thread_local.storage, key)
 
 def _default_type_resolver(_):
-	return ast.DataType.UNDEFINED
+	return types.DataType.UNDEFINED
 
 def resolve_attribute(thing, name):
 	"""
@@ -107,7 +107,7 @@ def type_resolver_from_dict(dictionary):
 	:return: The callback function.
 	:rtype: function
 	"""
-	type_map = {key: value if ast.DataType.is_definition(value) else ast.DataType.from_value(value) for key, value in dictionary.items()}
+	type_map = {key: value if types.DataType.is_definition(value) else types.DataType.from_value(value) for key, value in dictionary.items()}
 	return functools.partial(_type_resolver, type_map)
 
 class _ThreadLocalStorage(object):
@@ -201,7 +201,7 @@ class Context(object):
 		"""The *default_value* parameter from :py:meth:`~__init__`"""
 		self.builtins = builtins.Builtins.from_defaults(
 			values={'re_groups': builtins.BuiltinValueGenerator(functools.partial(_tls_getter, self._thread_local, 'regex_groups'))},
-			value_types={'re_groups': ast.DataType.ARRAY(ast.DataType.STRING)},
+			value_types={'re_groups': types.DataType.ARRAY(types.DataType.STRING)},
 			timezone=default_timezone
 		)
 		"""An instance of :py:class:`~rule_engine.builtins.Builtins` to provided a default set of builtin symbol values."""
@@ -244,7 +244,7 @@ class Context(object):
 		self._mapping_fallback_lock = threading.Lock()
 		self.builtins = builtins.Builtins.from_defaults(
 			values={'re_groups': builtins.BuiltinValueGenerator(functools.partial(_tls_getter, self._thread_local, 'regex_groups'))},
-			value_types={'re_groups': ast.DataType.ARRAY(ast.DataType.STRING)},
+			value_types={'re_groups': types.DataType.ARRAY(types.DataType.STRING)},
 			timezone=self.default_timezone
 		)
 
@@ -329,7 +329,7 @@ class Context(object):
 		A method for providing type hints while the rule is being generated. This can be used to ensure that all symbol
 		names are valid and that the types are appropriate for the operations being performed. It must then return one
 		of the compatible data type constants if the symbol is valid or raise an exception. The default behavior is to
-		return :py:data:`~rule_engine.ast.DataType.UNDEFINED` for all symbols.
+		return :py:data:`~rule_engine.types.DataType.UNDEFINED` for all symbols.
 
 		:param str name: The symbol name to provide a type hint for.
 		:param str scope: An optional scope name that identifies from where to resolve the name.

@@ -229,7 +229,7 @@ symbol is resolved.
 
 To define type information, a *type_resolver* function must be passed to the :py:class:`~engine.Context` class. The type
 resolver function is expected to take a single argument, and that is the name of the symbol (as a Python string) whose
-type needs to be resolved. The return type should be a member of the :py:class:`~ast.DataType` enumeration.
+type needs to be resolved. The return type should be a member of the :py:class:`~types.DataType` enumeration.
 
 .. code-block:: python
 
@@ -381,12 +381,12 @@ and finally the maximum number of times to split the string.
        # the name of the function is provided for error messages
        'split',
        # the return data type, in this case an array of strings
-       return_type=ast.DataType.ARRAY(ast.DataType.STRING),
+       return_type=rule_engine.DataType.ARRAY(rule_engine.DataType.STRING),
        # the data type of each of the three arguments
        argument_types=(
-          ast.DataType.STRING, # argument 1, the string to split
-          ast.DataType.STRING, # argument 2, the seperator to split on
-          ast.DataType.FLOAT   # argument 3, the maximum times to split the string
+          rule_engine.DataType.STRING, # argument 1, the string to split
+          rule_engine.DataType.STRING, # argument 2, the seperator to split on
+          rule_engine.DataType.FLOAT   # argument 3, the maximum times to split the string
        ),
        # the minimum number of arguments, in this case the second two arguments are optional
        minimum_arguments=1
@@ -397,7 +397,7 @@ If the return type, or argument types are not specified, then no type checking i
 Defining Types From A Dictionary
 """"""""""""""""""""""""""""""""
 For convenience, the :py:func:`~engine.type_resolver_from_dict` function can be used to generate a *type_resolver*
-function from a dictionary mapping symbol names to their respective :py:class:`~ast.DataType`. Starting with version
+function from a dictionary mapping symbol names to their respective :py:class:`~types.DataType`. Starting with version
 :release:`2.1.0` if a :py:class:`dict` is passed as the *type_resolver*, the :py:func:`~engine.type_resolver_from_dict`
 function will be used automatically.
 

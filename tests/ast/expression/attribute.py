@@ -47,8 +47,8 @@ import dateutil.tz
 __all__ = ('GetAttributeExpressionTests',)
 
 class BadAttributeResolver(_AttributeResolver):
-	@_AttributeResolver.attribute('undefined', ast.DataType.STRING)
-	@_AttributeResolver.attribute('unsupported', ast.DataType.STRING, result_type=ast.DataType.BOOLEAN)
+	@_AttributeResolver.attribute('undefined', types.DataType.STRING)
+	@_AttributeResolver.attribute('unsupported', types.DataType.STRING, result_type=types.DataType.BOOLEAN)
 	def string_attribute(self, value):
 		return None
 

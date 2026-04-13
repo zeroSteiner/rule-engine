@@ -36,6 +36,7 @@ from .literal import context
 import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
+import rule_engine.types as types
 
 __all__ = (
 	'FunctionCallExpressionTests',
@@ -54,7 +55,7 @@ class FunctionCallExpressionTests(unittest.TestCase):
 		with self.assertRaises(errors.EvaluationError):
 			context = engine.Context(
 				type_resolver=engine.type_resolver_from_dict({
-					'function': ast.DataType.NULL
+					'function': types.DataType.NULL
 				})
 			)
 			ast.FunctionCallExpression(
@@ -68,9 +69,9 @@ class FunctionCallExpressionTests(unittest.TestCase):
 		with self.assertRaises(errors.EvaluationError):
 			context = engine.Context(
 				type_resolver=engine.type_resolver_from_dict({
-					'function': ast.DataType.FUNCTION(
+					'function': types.DataType.FUNCTION(
 						'function',
-						argument_types=(ast.DataType.FLOAT,)
+						argument_types=(types.DataType.FLOAT,)
 					)
 				})
 			)
@@ -92,10 +93,10 @@ class FunctionCallExpressionTests(unittest.TestCase):
 	def test_ast_expression_function_call_error_on_to_few_arguments(self):
 		context = engine.Context(
 			type_resolver=engine.type_resolver_from_dict({
-				'function': ast.DataType.FUNCTION(
+				'function': types.DataType.FUNCTION(
 					'function',
-					return_type=ast.DataType.FLOAT,
-					argument_types=(ast.DataType.FLOAT, ast.DataType.FLOAT,),
+					return_type=types.DataType.FLOAT,
+					argument_types=(types.DataType.FLOAT, types.DataType.FLOAT,),
 					minimum_arguments=1
 				)
 			})
@@ -109,10 +110,10 @@ class FunctionCallExpressionTests(unittest.TestCase):
 	def test_ast_expression_function_call_error_on_to_many_arguments(self):
 		context = engine.Context(
 			type_resolver=engine.type_resolver_from_dict({
-				'function': ast.DataType.FUNCTION(
+				'function': types.DataType.FUNCTION(
 					'function',
-					return_type=ast.DataType.FLOAT,
-					argument_types=(ast.DataType.FLOAT,),
+					return_type=types.DataType.FLOAT,
+					argument_types=(types.DataType.FLOAT,),
 					minimum_arguments=1
 				)
 			})
@@ -141,7 +142,7 @@ class FunctionCallExpressionTests(unittest.TestCase):
 	def test_ast_expression_function_call_error_on_incompatible_return_type(self):
 		symbol = ast.SymbolExpression(context, 'function')
 		function_call = ast.FunctionCallExpression(context, symbol, [])
-		function_call.result_type = ast.DataType.FUNCTION('function', return_type=ast.DataType.FLOAT)
+		function_call.result_type = types.DataType.FUNCTION('function', return_type=types.DataType.FLOAT)
 
 		def _function():
 			return ''

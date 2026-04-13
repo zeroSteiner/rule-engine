@@ -87,6 +87,4 @@ from .expression import (
 # deprecated alias — use BinaryExpressionBase instead
 LeftOperatorRightExpressionBase = BinaryExpressionBase
 
-# re-export everything from types that the old ast.py re-exported via `from .types import *`
-from ..types import *
 from ..types import _ObjectDataTypeDef, _ReferenceDataTypeDef

@@ -32,8 +32,11 @@
 
 import functools
 import re
+from collections.abc import Sequence
+from typing import Any
 
-def jaro_distance(str1, str2):
+
+def jaro_distance(str1: str, str2: str) -> float:
     if str1 == str2:
         return 1.0
 
@@ -70,7 +73,7 @@ def jaro_distance(str1, str2):
         k += 1
     return ((matches / str1_len) + (matches / str2_len) + ((matches - transpositions / 2.0) / matches)) / 3.0
 
-def jaro_winkler_distance(str1, str2, scale=0.1):
+def jaro_winkler_distance(str1: str, str2: str, scale: float = 0.1) -> float:
     jaro_dist = jaro_distance(str1, str2)
     if jaro_dist > 0.7:
         prefix = 0
@@ -79,15 +82,15 @@ def jaro_winkler_distance(str1, str2, scale=0.1):
         jaro_dist += scale * prefix * (1 - jaro_dist)
     return jaro_dist
 
-def jaro_winkler_similarity(*args, **kwargs):
+def jaro_winkler_similarity(*args: Any, **kwargs: Any) -> float:
     return 1 - jaro_winkler_distance(*args, **kwargs)
 
-def _suggest(word, options):
+def _suggest(word: str, options: Sequence[str]) -> str | None:
     if not len(options):
         return None
     return sorted(options, key=functools.partial(jaro_winkler_similarity, word))[0]
 
-def suggest_symbol(word, options):
+def suggest_symbol(word: str, options: Sequence[str]) -> str | None:
     """
     Select the best match for *word* from a list of value *options*. Values that are not suitable symbol names will be
     filtered out of *options*. If no match is found, this function will return None.

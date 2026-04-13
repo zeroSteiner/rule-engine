@@ -46,9 +46,24 @@ dev = [
     "graphviz",
     "invoke",
     "ipython>=9.0; python_version >= '3.11'",
+    "mypy",
     "sphinx",
     "sphinx-rtd-theme",
+    "types-python-dateutil",
 ]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["lib/rule_engine"]
+exclude = ["lib/rule_engine/_vendor/", "lib/rule_engine/parser/parsetab\\.py"]
+
+[[tool.mypy.overrides]]
+module = ["rule_engine._vendor.*", "rule_engine.parser.parsetab"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["graphviz", "invoke.*"]
+ignore_missing_imports = true
 
 [tool.setuptools]
 package-dir = {"" = "lib"}

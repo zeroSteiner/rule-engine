@@ -23,6 +23,12 @@ def docs(c):
     c.run('uv run sphinx-build -b html -a -E -v docs/source docs/html')
 
 
+@task
+def typechecks(c):
+    """Run mypy static type checks."""
+    c.run('uv run mypy')
+
+
 @task(pre=[build])
 def release(c):
     """Tag and push the current version as a release."""

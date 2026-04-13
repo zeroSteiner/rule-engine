@@ -38,99 +38,99 @@ import math
 from .datatype import DataType
 
 def _to_decimal(value):
-	if isinstance(value, decimal.Decimal):
-		return value
-	return decimal.Decimal(repr(value))
+    if isinstance(value, decimal.Decimal):
+        return value
+    return decimal.Decimal(repr(value))
 
 def coerce_value(value, verify_type=True):
-	"""
-	Take a native Python *value* and convert it to a value of a data type which can be represented by a Rule Engine
-	:py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as
-	when resolving a symbol from an object external to the engine.
+    """
+    Take a native Python *value* and convert it to a value of a data type which can be represented by a Rule Engine
+    :py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as
+    when resolving a symbol from an object external to the engine.
 
-	.. versionadded:: 2.0.0
+    .. versionadded:: 2.0.0
 
-	:param value: The value to convert.
-	:param bool verify_type: Whether or not to verify the converted value's type.
-	:return: The converted value.
-	"""
-	# ARRAY
-	if isinstance(value, (list, range, tuple)):
-		value = tuple(coerce_value(v, verify_type=verify_type) for v in value)
-	# DATETIME
-	elif isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
-		value = datetime.datetime(value.year, value.month, value.day)
-	# FLOAT
-	elif isinstance(value, (float, int)) and not isinstance(value, bool):
-		value = _to_decimal(value)
-	# MAPPING
-	elif isinstance(value, (dict, collections.OrderedDict)):
-		value = collections.OrderedDict(
-			(coerce_value(k, verify_type=verify_type), coerce_value(v, verify_type=verify_type)) for k, v in value.items()
-		)
-	if verify_type:
-		DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
-	return value
+    :param value: The value to convert.
+    :param bool verify_type: Whether or not to verify the converted value's type.
+    :return: The converted value.
+    """
+    # ARRAY
+    if isinstance(value, (list, range, tuple)):
+        value = tuple(coerce_value(v, verify_type=verify_type) for v in value)
+    # DATETIME
+    elif isinstance(value, datetime.date) and not isinstance(value, datetime.datetime):
+        value = datetime.datetime(value.year, value.month, value.day)
+    # FLOAT
+    elif isinstance(value, (float, int)) and not isinstance(value, bool):
+        value = _to_decimal(value)
+    # MAPPING
+    elif isinstance(value, (dict, collections.OrderedDict)):
+        value = collections.OrderedDict(
+                (coerce_value(k, verify_type=verify_type), coerce_value(v, verify_type=verify_type)) for k, v in value.items()
+        )
+    if verify_type:
+        DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
+    return value
 
 def is_integer_number(value):
-	"""
-	Check whether *value* is an integer number (i.e. a whole, number). This can, for example, be used to check if a
-	floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
+    """
+    Check whether *value* is an integer number (i.e. a whole, number). This can, for example, be used to check if a
+    floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
 
-	.. versionadded:: 2.1.0
+    .. versionadded:: 2.1.0
 
-	:param value: The value to check. This value is a native Python type.
-	:return: Whether or not the value is an integer number.
-	:rtype: bool
-	"""
-	if not is_real_number(value):
-		return False
-	if math.floor(value) != value:
-		return False
-	return True
+    :param value: The value to check. This value is a native Python type.
+    :return: Whether or not the value is an integer number.
+    :rtype: bool
+    """
+    if not is_real_number(value):
+        return False
+    if math.floor(value) != value:
+        return False
+    return True
 
 def is_natural_number(value):
-	"""
-	Check whether *value* is a natural number (i.e. a whole, non-negative number). This can, for example, be used to
-	check if a floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
+    """
+    Check whether *value* is a natural number (i.e. a whole, non-negative number). This can, for example, be used to
+    check if a floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
 
-	:param value: The value to check. This value is a native Python type.
-	:return: Whether or not the value is a natural number.
-	:rtype: bool
-	"""
-	if not is_integer_number(value):
-		return False
-	if value < 0:
-		return False
-	return True
+    :param value: The value to check. This value is a native Python type.
+    :return: Whether or not the value is a natural number.
+    :rtype: bool
+    """
+    if not is_integer_number(value):
+        return False
+    if value < 0:
+        return False
+    return True
 
 def is_real_number(value):
-	"""
-	Check whether *value* is a real number (i.e. capable of being represented as a floating point value without loss of
-	information as well as being finite). Despite being able to be represented as a float, ``NaN`` is not considered a
-	real number for the purposes of this function.
+    """
+    Check whether *value* is a real number (i.e. capable of being represented as a floating point value without loss of
+    information as well as being finite). Despite being able to be represented as a float, ``NaN`` is not considered a
+    real number for the purposes of this function.
 
-	:param value: The value to check. This value is a native Python type.
-	:return: Whether or not the value is a natural number.
-	:rtype: bool
-	"""
-	if not is_numeric(value):
-		return False
-	if not math.isfinite(value):
-		return False
-	return True
+    :param value: The value to check. This value is a native Python type.
+    :return: Whether or not the value is a natural number.
+    :rtype: bool
+    """
+    if not is_numeric(value):
+        return False
+    if not math.isfinite(value):
+        return False
+    return True
 
 def is_numeric(value):
-	"""
-	Check whether *value* is a numeric value (i.e. capable of being represented as a floating point value without loss
-	of information).
+    """
+    Check whether *value* is a numeric value (i.e. capable of being represented as a floating point value without loss
+    of information).
 
-	:param value: The value to check. This value is a native Python type.
-	:return: Whether or not the value is numeric.
-	:rtype: bool
-	"""
-	if not isinstance(value, (decimal.Decimal, float, int)):
-		return False
-	if isinstance(value, bool):
-		return False
-	return True
+    :param value: The value to check. This value is a native Python type.
+    :return: Whether or not the value is numeric.
+    :rtype: bool
+    """
+    if not isinstance(value, (decimal.Decimal, float, int)):
+        return False
+    if isinstance(value, bool):
+        return False
+    return True

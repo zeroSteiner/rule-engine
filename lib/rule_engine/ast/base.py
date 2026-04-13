@@ -37,259 +37,259 @@ from ..types import *
 from ..types import _ObjectDataTypeDef, _ReferenceDataTypeDef
 
 def _assert_is_bytes(*values):
-	if not all(map(isinstance, values, [bytes])):
-		raise errors.EvaluationError('data type mismatch (not a bytes value)')
+    if not all(map(isinstance, values, [bytes])):
+        raise errors.EvaluationError('data type mismatch (not a bytes value)')
 
 def _assert_is_integer_number(*values):
-	if not all(map(is_integer_number, values)):
-		raise errors.EvaluationError('data type mismatch (not an integer number)')
+    if not all(map(is_integer_number, values)):
+        raise errors.EvaluationError('data type mismatch (not an integer number)')
 
 def _assert_is_natural_number(*values):
-	if not all(map(is_natural_number, values)):
-		raise errors.EvaluationError('data type mismatch (not a natural number)')
+    if not all(map(is_natural_number, values)):
+        raise errors.EvaluationError('data type mismatch (not a natural number)')
 
 def _assert_is_numeric(*values):
-	if not all(map(is_numeric, values)):
-		raise errors.EvaluationError('data type mismatch (not a numeric value)')
+    if not all(map(is_numeric, values)):
+        raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
 def _assert_is_string(*values):
-	if not all(map(isinstance, values, [str])):
-		raise errors.EvaluationError('data type mismatch (not a string value)')
+    if not all(map(isinstance, values, [str])):
+        raise errors.EvaluationError('data type mismatch (not a string value)')
 
 def _is_reduced(*values):
-	"""
-	Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of its
-	members are reduced literals. A value that causes this to evaluate to True for is able to be evaluated without a
-	*thing*.
-	"""
-	return all((isinstance(value, LiteralExpressionBase) and value.is_reduced) for value in values)
+    """
+    Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of its
+    members are reduced literals. A value that causes this to evaluate to True for is able to be evaluated without a
+    *thing*.
+    """
+    return all((isinstance(value, LiteralExpressionBase) and value.is_reduced) for value in values)
 
 def _iterable_member_value_type(value):
-	value = (
-		member.result_type if isinstance(member, ExpressionBase) else member for member in value
-	)
-	return iterable_member_value_type(value)
+    value = (
+            member.result_type if isinstance(member, ExpressionBase) else member for member in value
+    )
+    return iterable_member_value_type(value)
 
 def _resolve_type(definition, context):
-	"""
-	Resolve any :py:class:`~rule_engine.types._ReferenceDataTypeDef` placeholders inside *definition* via the
-	*context*'s :py:meth:`~rule_engine.engine.Context.resolve_type` callback. Returns a new definition with the
-	placeholders substituted; the input is never mutated. Already-resolved definitions pass through unchanged.
+    """
+    Resolve any :py:class:`~rule_engine.types._ReferenceDataTypeDef` placeholders inside *definition* via the
+    *context*'s :py:meth:`~rule_engine.engine.Context.resolve_type` callback. Returns a new definition with the
+    placeholders substituted; the input is never mutated. Already-resolved definitions pass through unchanged.
 
-	This helper is used at rule parse time to complete the cross-type reference resolution that
-	:py:class:`_ObjectDataTypeDef` deliberately leaves for later (self references are already bound at construction
-	time).
-	"""
-	if isinstance(definition, _ReferenceDataTypeDef):
-		try:
-			resolved = context.resolve_type(definition.name)
-		except errors.SymbolResolutionError as error:
-			raise errors.EvaluationError(
-				"unresolved object reference: {0!r} - add it to the Context type_resolver".format(definition.name)
-			) from error
-		if not isinstance(resolved, _ObjectDataTypeDef):
-			raise errors.EvaluationError(
-				"reference {0!r} does not resolve to an OBJECT type".format(definition.name)
-			)
-		if resolved.name != definition.name:
-			raise errors.EvaluationError(
-				"reference {0!r} resolves to an OBJECT with mismatched name {1!r}".format(definition.name, resolved.name)
-			)
-		return resolved
-	if isinstance(definition, _ObjectDataTypeDef):
-		return definition
-	if isinstance(definition, DataType.ARRAY.__class__) or isinstance(definition, DataType.SET.__class__):
-		new_value_type = _resolve_type(definition.value_type, context)
-		if new_value_type is definition.value_type:
-			return definition
-		return definition.__class__(
-			definition.name,
-			definition.python_type,
-			value_type=new_value_type,
-			value_type_nullable=definition.value_type_nullable
-		)
-	if isinstance(definition, DataType.MAPPING.__class__):
-		new_key_type = _resolve_type(definition.key_type, context)
-		new_value_type = _resolve_type(definition.value_type, context)
-		if new_key_type is definition.key_type and new_value_type is definition.value_type:
-			return definition
-		return definition.__class__(
-			definition.name,
-			definition.python_type,
-			key_type=new_key_type,
-			value_type=new_value_type,
-			value_type_nullable=definition.value_type_nullable
-		)
-	if isinstance(definition, DataType.FUNCTION.__class__):
-		new_return_type = _resolve_type(definition.return_type, context)
-		if definition.argument_types is DataType.UNDEFINED:
-			new_argument_types = definition.argument_types
-		else:
-			new_argument_types = tuple(_resolve_type(arg, context) for arg in definition.argument_types)
-		if new_return_type is definition.return_type and new_argument_types is definition.argument_types:
-			return definition
-		return definition.__class__(
-			definition.name,
-			definition.python_type,
-			value_name=definition.value_name,
-			return_type=new_return_type,
-			argument_types=new_argument_types,
-			minimum_arguments=definition.minimum_arguments
-		)
-	return definition
+    This helper is used at rule parse time to complete the cross-type reference resolution that
+    :py:class:`_ObjectDataTypeDef` deliberately leaves for later (self references are already bound at construction
+    time).
+    """
+    if isinstance(definition, _ReferenceDataTypeDef):
+        try:
+            resolved = context.resolve_type(definition.name)
+        except errors.SymbolResolutionError as error:
+            raise errors.EvaluationError(
+                    "unresolved object reference: {0!r} - add it to the Context type_resolver".format(definition.name)
+            ) from error
+        if not isinstance(resolved, _ObjectDataTypeDef):
+            raise errors.EvaluationError(
+                    "reference {0!r} does not resolve to an OBJECT type".format(definition.name)
+            )
+        if resolved.name != definition.name:
+            raise errors.EvaluationError(
+                    "reference {0!r} resolves to an OBJECT with mismatched name {1!r}".format(definition.name, resolved.name)
+            )
+        return resolved
+    if isinstance(definition, _ObjectDataTypeDef):
+        return definition
+    if isinstance(definition, DataType.ARRAY.__class__) or isinstance(definition, DataType.SET.__class__):
+        new_value_type = _resolve_type(definition.value_type, context)
+        if new_value_type is definition.value_type:
+            return definition
+        return definition.__class__(
+                definition.name,
+                definition.python_type,
+                value_type=new_value_type,
+                value_type_nullable=definition.value_type_nullable
+        )
+    if isinstance(definition, DataType.MAPPING.__class__):
+        new_key_type = _resolve_type(definition.key_type, context)
+        new_value_type = _resolve_type(definition.value_type, context)
+        if new_key_type is definition.key_type and new_value_type is definition.value_type:
+            return definition
+        return definition.__class__(
+                definition.name,
+                definition.python_type,
+                key_type=new_key_type,
+                value_type=new_value_type,
+                value_type_nullable=definition.value_type_nullable
+        )
+    if isinstance(definition, DataType.FUNCTION.__class__):
+        new_return_type = _resolve_type(definition.return_type, context)
+        if definition.argument_types is DataType.UNDEFINED:
+            new_argument_types = definition.argument_types
+        else:
+            new_argument_types = tuple(_resolve_type(arg, context) for arg in definition.argument_types)
+        if new_return_type is definition.return_type and new_argument_types is definition.argument_types:
+            return definition
+        return definition.__class__(
+                definition.name,
+                definition.python_type,
+                value_name=definition.value_name,
+                return_type=new_return_type,
+                argument_types=new_argument_types,
+                minimum_arguments=definition.minimum_arguments
+        )
+    return definition
 
 class Assignment(object):
-	"""An internal assignment whereby a symbol is populated with a value of the specified type."""
-	__slots__ = ('name', 'value', 'value_type')
-	def __init__(self, name, *, value=errors.UNDEFINED, value_type=None):
-		"""
-		:param str name: The symbol name that the assignment is defining.
-		:param value: The value of the assignment.
-		:param value_type: The data type of the assignment.
-		:type value_type: :py:class:`~.DataType`
-		"""
-		self.name = name
-		self.value = value
-		if value is not errors.UNDEFINED and value_type is not None:
-			value_type = DataType.from_value(value)
-		self.value_type = value_type
+    """An internal assignment whereby a symbol is populated with a value of the specified type."""
+    __slots__ = ('name', 'value', 'value_type')
+    def __init__(self, name, *, value=errors.UNDEFINED, value_type=None):
+        """
+        :param str name: The symbol name that the assignment is defining.
+        :param value: The value of the assignment.
+        :param value_type: The data type of the assignment.
+        :type value_type: :py:class:`~.DataType`
+        """
+        self.name = name
+        self.value = value
+        if value is not errors.UNDEFINED and value_type is not None:
+            value_type = DataType.from_value(value)
+        self.value_type = value_type
 
-	def __repr__(self):
-		return "<{} name={!r} value={!r} value_type={!r} >".format(self.__class__.__name__, self.name, self.value, self.value_type)
+    def __repr__(self):
+        return "<{} name={!r} value={!r} value_type={!r} >".format(self.__class__.__name__, self.name, self.value, self.value_type)
 
 class ASTNodeBase(object):
-	def to_graphviz(self, digraph):
-		digraph.node(str(id(self)), self.__class__.__name__)
+    def to_graphviz(self, digraph):
+        digraph.node(str(id(self)), self.__class__.__name__)
 
-	@classmethod
-	def build(cls, *args, **kwargs):
-		return cls(*args, **kwargs).reduce()
+    @classmethod
+    def build(cls, *args, **kwargs):
+        return cls(*args, **kwargs).reduce()
 
-	def evaluate(self, thing):
-		"""
-		Evaluate this AST node and all applicable children nodes.
+    def evaluate(self, thing):
+        """
+        Evaluate this AST node and all applicable children nodes.
 
-		:param thing: The object to use for symbol resolution.
-		:return: The result of the evaluation as a native Python type.
-		"""
-		raise NotImplementedError()
+        :param thing: The object to use for symbol resolution.
+        :return: The result of the evaluation as a native Python type.
+        """
+        raise NotImplementedError()
 
-	def reduce(self):
-		"""
-		Reduce this expression into a smaller subset of nodes. If the expression can not be reduced, then return an
-		instance of itself, otherwise return a reduced :py:class:`.ExpressionBase` to replace it.
+    def reduce(self):
+        """
+        Reduce this expression into a smaller subset of nodes. If the expression can not be reduced, then return an
+        instance of itself, otherwise return a reduced :py:class:`.ExpressionBase` to replace it.
 
-		:return: Either a reduced version of this node or itself.
-		:rtype: :py:class:`.ExpressionBase`
-		"""
-		return self
+        :return: Either a reduced version of this node or itself.
+        :rtype: :py:class:`.ExpressionBase`
+        """
+        return self
 
 class Comment(ASTNodeBase):
-	__slots__ = ('value',)
-	def __init__(self, value):
-		self.value = value
+    __slots__ = ('value',)
+    def __init__(self, value):
+        self.value = value
 
-	def __repr__(self):
-		return "<{0} {1!r}>".format(self.__class__.__name__, self.value)
+    def __repr__(self):
+        return "<{0} {1!r}>".format(self.__class__.__name__, self.value)
 
-	def to_graphviz(self, digraph, *args, **kwargs):
-		digraph.node(str(id(self)), "{}\n{!r}".format(self.__class__.__name__, self.value))
+    def to_graphviz(self, digraph, *args, **kwargs):
+        digraph.node(str(id(self)), "{}\n{!r}".format(self.__class__.__name__, self.value))
 
 ################################################################################
 # Base Expression Classes
 ################################################################################
 class ExpressionBase(ASTNodeBase):
-	__slots__ = ('context',)
-	result_type = DataType.UNDEFINED
-	"""The data type of the result of successful evaluation."""
-	def __repr__(self):
-		return "<{0} >".format(self.__class__.__name__)
+    __slots__ = ('context',)
+    result_type = DataType.UNDEFINED
+    """The data type of the result of successful evaluation."""
+    def __repr__(self):
+        return "<{0} >".format(self.__class__.__name__)
 
-	def _new_value(self, *args, **kwargs):
-		# perform a context aware load of value
-		value = coerce_value(*args, **kwargs)
-		if isinstance(value, datetime.datetime) and value.tzinfo is None:
-			value = value.replace(tzinfo=self.context.default_timezone)
-		return value
+    def _new_value(self, *args, **kwargs):
+        # perform a context aware load of value
+        value = coerce_value(*args, **kwargs)
+        if isinstance(value, datetime.datetime) and value.tzinfo is None:
+            value = value.replace(tzinfo=self.context.default_timezone)
+        return value
 
 class LiteralExpressionBase(ExpressionBase):
-	"""A base class for representing literal values from the grammar text."""
-	__slots__ = ('value',)
-	is_reduced = True
-	def __init__(self, context, value):
-		"""
-		:param context: The context to use for evaluating the expression.
-		:type context: :py:class:`~rule_engine.engine.Context`
-		:param value: The native Python value.
-		"""
-		self.context = context
-		if self.result_type.is_scalar and DataType.from_value(value) != self.result_type:
-			raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.python_type.__name__, type(value).__name__))
-		self.value = value
+    """A base class for representing literal values from the grammar text."""
+    __slots__ = ('value',)
+    is_reduced = True
+    def __init__(self, context, value):
+        """
+        :param context: The context to use for evaluating the expression.
+        :type context: :py:class:`~rule_engine.engine.Context`
+        :param value: The native Python value.
+        """
+        self.context = context
+        if self.result_type.is_scalar and DataType.from_value(value) != self.result_type:
+            raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.python_type.__name__, type(value).__name__))
+        self.value = value
 
-	def __repr__(self):
-		return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
+    def __repr__(self):
+        return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
 
-	@classmethod
-	def from_value(cls, context, value):
-		"""
-		Create a Literal Expression instance to represent the specified *value*.
+    @classmethod
+    def from_value(cls, context, value):
+        """
+        Create a Literal Expression instance to represent the specified *value*.
 
-		.. versionadded:: 2.0.0
+        .. versionadded:: 2.0.0
 
-		:param context: The context to use for evaluating the expression.
-		:type context: :py:class:`~rule_engine.engine.Context`
-		:param value: The value to represent as a Literal Expression.
-		:return: A subclass of :py:class:`~.LiteralExpressionBase` specific to the type of *value*.
-		"""
-		datatype = DataType.from_value(value)
-		for subclass in cls.__subclasses__():
-			if DataType.is_compatible(subclass.result_type, datatype):
-				break
-		else:
-			raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
-		if datatype.is_compound:
-			if isinstance(datatype, DataType.ARRAY.__class__) or isinstance(datatype, DataType.SET.__class__):
-				value = datatype.python_type(cls.from_value(context, v) for v in value)
-			elif isinstance(datatype, DataType.MAPPING.__class__):
-				value = tuple((cls.from_value(context, k), cls.from_value(context, v)) for k, v in value.items())
-		else:
-			value = coerce_value(value)
-		return subclass(context, value)
+        :param context: The context to use for evaluating the expression.
+        :type context: :py:class:`~rule_engine.engine.Context`
+        :param value: The value to represent as a Literal Expression.
+        :return: A subclass of :py:class:`~.LiteralExpressionBase` specific to the type of *value*.
+        """
+        datatype = DataType.from_value(value)
+        for subclass in cls.__subclasses__():
+            if DataType.is_compatible(subclass.result_type, datatype):
+                break
+        else:
+            raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
+        if datatype.is_compound:
+            if isinstance(datatype, DataType.ARRAY.__class__) or isinstance(datatype, DataType.SET.__class__):
+                value = datatype.python_type(cls.from_value(context, v) for v in value)
+            elif isinstance(datatype, DataType.MAPPING.__class__):
+                value = tuple((cls.from_value(context, k), cls.from_value(context, v)) for k, v in value.items())
+        else:
+            value = coerce_value(value)
+        return subclass(context, value)
 
-	def evaluate(self, thing):
-		return self.value
+    def evaluate(self, thing):
+        return self.value
 
-	def to_graphviz(self, digraph, *args, **kwargs):
-		if self.result_type.is_compound:
-			digraph.node(str(id(self)), self.__class__.__name__)
-		else:
-			digraph.node(str(id(self)), "{}\nvalue={!r}".format(self.__class__.__name__, self.value))
+    def to_graphviz(self, digraph, *args, **kwargs):
+        if self.result_type.is_compound:
+            digraph.node(str(id(self)), self.__class__.__name__)
+        else:
+            digraph.node(str(id(self)), "{}\nvalue={!r}".format(self.__class__.__name__, self.value))
 
 class Statement(ASTNodeBase):
-	"""A class representing the top level statement of the grammar text."""
-	__slots__ = ('context', 'expression', 'comment')
-	def __init__(self, context, expression, comment=None):
-		"""
-		:param context: The context to use for evaluating the statement.
-		:type context: :py:class:`~rule_engine.engine.Context`
-		:param expression: The top level expression of the statement.
-		:type expression: :py:class:`~.ExpressionBase`
-		"""
-		self.context = context
-		self.expression = expression
-		self.comment = comment
+    """A class representing the top level statement of the grammar text."""
+    __slots__ = ('context', 'expression', 'comment')
+    def __init__(self, context, expression, comment=None):
+        """
+        :param context: The context to use for evaluating the statement.
+        :type context: :py:class:`~rule_engine.engine.Context`
+        :param expression: The top level expression of the statement.
+        :type expression: :py:class:`~.ExpressionBase`
+        """
+        self.context = context
+        self.expression = expression
+        self.comment = comment
 
-	@classmethod
-	def build(cls, context, expression, **kwargs):
-		return cls(context, expression.build(), **kwargs).reduce()
+    @classmethod
+    def build(cls, context, expression, **kwargs):
+        return cls(context, expression.build(), **kwargs).reduce()
 
-	def evaluate(self, thing):
-		return self.expression.evaluate(thing)
+    def evaluate(self, thing):
+        return self.expression.evaluate(thing)
 
-	def to_graphviz(self, digraph, *args, **kwargs):
-		super(Statement, self).to_graphviz(digraph, *args, **kwargs)
-		self.expression.to_graphviz(digraph, *args, **kwargs)
-		digraph.edge(str(id(self)), str(id(self.expression)))
-		if self.comment:
-			self.comment.to_graphviz(digraph, *args, **kwargs)
+    def to_graphviz(self, digraph, *args, **kwargs):
+        super(Statement, self).to_graphviz(digraph, *args, **kwargs)
+        self.expression.to_graphviz(digraph, *args, **kwargs)
+        digraph.edge(str(id(self)), str(id(self.expression)))
+        if self.comment:
+            self.comment.to_graphviz(digraph, *args, **kwargs)

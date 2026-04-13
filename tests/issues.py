@@ -43,96 +43,96 @@ import rule_engine.types as types
 import dateutil.tz
 
 class GitHubIssueTests(unittest.TestCase):
-	def test_number_10(self):
-		value = random.randint(1, 10000)
-		thing = {
-			'c': {
-				'c1': value,
-			}
-		}
-		rule_text = 'c.c1 == ' + str(value)
-		rule1 = engine.Rule(rule_text, context=engine.Context())
-		rule2 = engine.Rule(rule_text, context=engine.Context(default_value=None))
-		with warnings.catch_warnings():
-			warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
-			self.assertEqual(rule1.evaluate(thing), rule2.evaluate(thing))
+    def test_number_10(self):
+        value = random.randint(1, 10000)
+        thing = {
+                'c': {
+                        'c1': value,
+                }
+        }
+        rule_text = 'c.c1 == ' + str(value)
+        rule1 = engine.Rule(rule_text, context=engine.Context())
+        rule2 = engine.Rule(rule_text, context=engine.Context(default_value=None))
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
+            self.assertEqual(rule1.evaluate(thing), rule2.evaluate(thing))
 
-	def test_number_14(self):
-		context = engine.Context(
-			type_resolver=engine.type_resolver_from_dict({
-				'TEST_FLOAT': types.DataType.FLOAT,
-			})
-		)
-		rule = engine.Rule(
-			'(TEST_FLOAT == null ? 0 : TEST_FLOAT) < 42',
-			context=context
-		)
-		rule.matches({'TEST_FLOAT': None})
+    def test_number_14(self):
+        context = engine.Context(
+                type_resolver=engine.type_resolver_from_dict({
+                        'TEST_FLOAT': types.DataType.FLOAT,
+                })
+        )
+        rule = engine.Rule(
+                '(TEST_FLOAT == null ? 0 : TEST_FLOAT) < 42',
+                context=context
+        )
+        rule.matches({'TEST_FLOAT': None})
 
-	def test_number_19(self):
-		context = engine.Context(
-			type_resolver=engine.type_resolver_from_dict({
-				'facts': types.DataType.MAPPING(
-					key_type=types.DataType.STRING,
-					value_type=types.DataType.STRING
-				)
-			})
-		)
-		rule = engine.Rule('facts.abc == "def"', context=context)
-		with warnings.catch_warnings():
-			warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
-			self.assertTrue(rule.matches({'facts': {'abc': 'def'}}))
+    def test_number_19(self):
+        context = engine.Context(
+                type_resolver=engine.type_resolver_from_dict({
+                        'facts': types.DataType.MAPPING(
+                                key_type=types.DataType.STRING,
+                                value_type=types.DataType.STRING
+                        )
+                })
+        )
+        rule = engine.Rule('facts.abc == "def"', context=context)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
+            self.assertTrue(rule.matches({'facts': {'abc': 'def'}}))
 
-	def test_number_20(self):
-		rule = engine.Rule('a / b ** 2')
-		self.assertEqual(rule.evaluate({'a': 8, 'b': 4}), 0.5)
+    def test_number_20(self):
+        rule = engine.Rule('a / b ** 2')
+        self.assertEqual(rule.evaluate({'a': 8, 'b': 4}), 0.5)
 
-	def test_number_22(self):
-		rules = ('object["timestamp"] > $now', 'object.timestamp > $now')
-		for rule in rules:
-			rule = engine.Rule(rule)
-			with warnings.catch_warnings():
-				warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
-				self.assertFalse(rule.evaluate({
-					'object': {'timestamp': datetime.datetime(2021, 8, 19)}
-				}))
+    def test_number_22(self):
+        rules = ('object["timestamp"] > $now', 'object.timestamp > $now')
+        for rule in rules:
+            rule = engine.Rule(rule)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
+                self.assertFalse(rule.evaluate({
+                        'object': {'timestamp': datetime.datetime(2021, 8, 19)}
+                }))
 
-	def test_number_54(self):
-		rules = (
-			'count == 01',
-			"test=='NOTTEST' and count==01 and other=='other'"
-		)
-		for rule in rules:
-			with self.assertRaises(errors.FloatSyntaxError):
-				engine.Rule(rule)
+    def test_number_54(self):
+        rules = (
+                'count == 01',
+                "test=='NOTTEST' and count==01 and other=='other'"
+        )
+        for rule in rules:
+            with self.assertRaises(errors.FloatSyntaxError):
+                engine.Rule(rule)
 
-	def test_number_66(self):
-		rule = engine.Rule('$parse_datetime("2020-01-01")')
-		try:
-			result = rule.evaluate({})
-		except Exception:
-			self.fail('evaluation raised an exception')
-		self.assertEqual(result, datetime.datetime(2020, 1, 1, tzinfo=dateutil.tz.tzlocal()))
+    def test_number_66(self):
+        rule = engine.Rule('$parse_datetime("2020-01-01")')
+        try:
+            result = rule.evaluate({})
+        except Exception:
+            self.fail('evaluation raised an exception')
+        self.assertEqual(result, datetime.datetime(2020, 1, 1, tzinfo=dateutil.tz.tzlocal()))
 
-	def test_number_68(self):
-		rule = engine.Rule('$min(items)')
-		try:
-			result = rule.evaluate({'items': [1, 2, 3, 4, 5, 6, 7, 8, 9]})
-		except Exception:
-			self.fail('evaluation raised an exception')
-		self.assertEqual(result, 1)
+    def test_number_68(self):
+        rule = engine.Rule('$min(items)')
+        try:
+            result = rule.evaluate({'items': [1, 2, 3, 4, 5, 6, 7, 8, 9]})
+        except Exception:
+            self.fail('evaluation raised an exception')
+        self.assertEqual(result, 1)
 
-	def test_number_98(self):
-		value = re.escape("joe.blogs")
+    def test_number_98(self):
+        value = re.escape("joe.blogs")
 
-		# Check if the some_attribute key in the dictionary matches 'joe.blogs' exactly
-		with warnings.catch_warnings(record=True) as w:
-			warnings.simplefilter('always', SyntaxWarning)
-			engine.Rule(rf'some_attribute =~ "^{value}$"')
-			for warning in w:
-				if issubclass(warning.category, SyntaxWarning):
-					self.fail('SyntaxWarning was raised')
+        # Check if the some_attribute key in the dictionary matches 'joe.blogs' exactly
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always', SyntaxWarning)
+            engine.Rule(rf'some_attribute =~ "^{value}$"')
+            for warning in w:
+                if issubclass(warning.category, SyntaxWarning):
+                    self.fail('SyntaxWarning was raised')
 
-	def test_number_104(self):
-		rule = engine.Rule(r"'André' in name")
-		self.assertTrue(rule.matches({'name': 'André the Giant'}))
+    def test_number_104(self):
+        rule = engine.Rule(r"'André' in name")
+        self.assertTrue(rule.matches({'name': 'André the Giant'}))

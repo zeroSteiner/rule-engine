@@ -44,112 +44,112 @@ from . import engine
 from . import errors
 
 try:
-	from IPython import embed
-	from IPython.core import ultratb
-	from prompt_toolkit import PromptSession
+    from IPython import embed
+    from IPython.core import ultratb
+    from prompt_toolkit import PromptSession
 except ImportError:
-	has_development_dependencies = False
+    has_development_dependencies = False
 else:
-	has_development_dependencies = True
+    has_development_dependencies = True
 
 def main():
-	parser = argparse.ArgumentParser(description='Rule Engine: Debug REPL', conflict_handler='resolve')
-	parser.add_argument(
-		'--debug',
-		action='store_true',
-		default=False,
-		help='enable debugging output'
-	)
-	parser.add_argument(
-		'--edit-console',
-		action='store_true',
-		default=False,
-		help='edit the environment (via an interactive console)'
-	)
-	parser.add_argument(
-		'--edit-file',
-		metavar='<path>',
-		type=argparse.FileType('r'),
-		help='edit the environment (via a file)'
-	)
-	parser.add_argument('-v', '--version', action='version', version=parser.prog + ' Version: ' + __version__)
-	arguments = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Rule Engine: Debug REPL', conflict_handler='resolve')
+    parser.add_argument(
+            '--debug',
+            action='store_true',
+            default=False,
+            help='enable debugging output'
+    )
+    parser.add_argument(
+            '--edit-console',
+            action='store_true',
+            default=False,
+            help='edit the environment (via an interactive console)'
+    )
+    parser.add_argument(
+            '--edit-file',
+            metavar='<path>',
+            type=argparse.FileType('r'),
+            help='edit the environment (via a file)'
+    )
+    parser.add_argument('-v', '--version', action='version', version=parser.prog + ' Version: ' + __version__)
+    arguments = parser.parse_args()
 
-	if not has_development_dependencies:
-		parser.error('development dependencies are not installed, install them with: uv sync --group dev')
+    if not has_development_dependencies:
+        parser.error('development dependencies are not installed, install them with: uv sync --group dev')
 
-	if os.environ.get('NO_COLOR'):
-		color_scheme = 'nocolor'
-	else:
-		color_scheme = 'neutral'
+    if os.environ.get('NO_COLOR'):
+        color_scheme = 'nocolor'
+    else:
+        color_scheme = 'neutral'
 
-	context = engine.Context()
-	thing = None
-	if arguments.edit_console or arguments.edit_file:
-		console = code.InteractiveConsole({
-			'context': context,
-			'thing': thing
-		})
-		if arguments.edit_file:
-			print('executing: ' + arguments.edit_file.name)
-			console.runcode(code.compile_command(
-				arguments.edit_file.read(),
-				filename=arguments.edit_file.name,
-				symbol='exec'
-			))
-			context = console.locals['context']
-			thing = console.locals['thing']
-		if arguments.edit_console:
-			namespace = {'context': context, 'thing': thing}
-			print("Starting IPython shell...")
-			print("Edit the \'context\' and \'thing\' objects as necessary")
-			embed(colors=color_scheme, user_ns=namespace)
-			context = namespace.get('context', context)
-			thing = namespace.get('thing', thing)
-	debugging = arguments.debug
-	session = PromptSession()
-	color_tb = ultratb.FormattedTB(theme_name=color_scheme)
-	if color_scheme == 'nocolor':
-		exc_name_color = ''
-		normal_color = ''
-	else:
-		exc_name_color = '\033[31m'
-		normal_color = '\033[0m'
+    context = engine.Context()
+    thing = None
+    if arguments.edit_console or arguments.edit_file:
+        console = code.InteractiveConsole({
+                'context': context,
+                'thing': thing
+        })
+        if arguments.edit_file:
+            print('executing: ' + arguments.edit_file.name)
+            console.runcode(code.compile_command(
+                    arguments.edit_file.read(),
+                    filename=arguments.edit_file.name,
+                    symbol='exec'
+            ))
+            context = console.locals['context']
+            thing = console.locals['thing']
+        if arguments.edit_console:
+            namespace = {'context': context, 'thing': thing}
+            print("Starting IPython shell...")
+            print("Edit the \'context\' and \'thing\' objects as necessary")
+            embed(colors=color_scheme, user_ns=namespace)
+            context = namespace.get('context', context)
+            thing = namespace.get('thing', thing)
+    debugging = arguments.debug
+    session = PromptSession()
+    color_tb = ultratb.FormattedTB(theme_name=color_scheme)
+    if color_scheme == 'nocolor':
+        exc_name_color = ''
+        normal_color = ''
+    else:
+        exc_name_color = '\033[31m'
+        normal_color = '\033[0m'
 
-	while True:
-		try:
-			rule_text = session.prompt('rule > ')
-		except (EOFError, KeyboardInterrupt):
-			break
+    while True:
+        try:
+            rule_text = session.prompt('rule > ')
+        except (EOFError, KeyboardInterrupt):
+            break
 
-		match = re.match(r'\s*#!\s*debug\s*=\s*(\w+)', rule_text)
-		if match:
-			debugging = match.group(1).lower() != 'false'
-			print('# debugging = ' + str(debugging).lower())
-			continue
+        match = re.match(r'\s*#!\s*debug\s*=\s*(\w+)', rule_text)
+        if match:
+            debugging = match.group(1).lower() != 'false'
+            print('# debugging = ' + str(debugging).lower())
+            continue
 
-		try:
-			rule = engine.Rule(rule_text, context=context)
-			result = rule.evaluate(thing)
-		except errors.EngineError as error:
-			print(f"{exc_name_color}{error.__class__.__name__}:{normal_color} {error.message}", file=sys.stderr)
-			if isinstance(error, (errors.AttributeResolutionError, errors.SymbolResolutionError)) and error.suggestion:
-				print(f"Did you mean '{error.suggestion}'?", file=sys.stderr)
-			elif isinstance(error, errors.RegexSyntaxError):
-				print(f"  Regex:   {error.error.pattern!r}", file=sys.stderr)
-				print(f"  Details: {error.error.msg} at position {error.error.pos}", file=sys.stderr)
-			elif isinstance(error, errors.FunctionCallError):
-				print(f"  Function:  {error.function_name!r}", file=sys.stderr)
-				if debugging and error.error:
-					inner_exception = color_tb.text(error.error.__class__, error.error, error.error.__traceback__)
-					print(textwrap.indent(inner_exception, ' ' * 2), file=sys.stderr)
-			if debugging:
-				print(color_tb.text(error.__class__, error, error.__traceback__), file=sys.stderr)
-		except Exception as error:
-			print(color_tb.text(error.__class__, error, error.__traceback__), file=sys.stderr)
-		else:
-			print('result: ')
-			pprint.pprint(result, indent=4)
+        try:
+            rule = engine.Rule(rule_text, context=context)
+            result = rule.evaluate(thing)
+        except errors.EngineError as error:
+            print(f"{exc_name_color}{error.__class__.__name__}:{normal_color} {error.message}", file=sys.stderr)
+            if isinstance(error, (errors.AttributeResolutionError, errors.SymbolResolutionError)) and error.suggestion:
+                print(f"Did you mean '{error.suggestion}'?", file=sys.stderr)
+            elif isinstance(error, errors.RegexSyntaxError):
+                print(f"  Regex:   {error.error.pattern!r}", file=sys.stderr)
+                print(f"  Details: {error.error.msg} at position {error.error.pos}", file=sys.stderr)
+            elif isinstance(error, errors.FunctionCallError):
+                print(f"  Function:  {error.function_name!r}", file=sys.stderr)
+                if debugging and error.error:
+                    inner_exception = color_tb.text(error.error.__class__, error.error, error.error.__traceback__)
+                    print(textwrap.indent(inner_exception, ' ' * 2), file=sys.stderr)
+            if debugging:
+                print(color_tb.text(error.__class__, error, error.__traceback__), file=sys.stderr)
+        except Exception as error:
+            print(color_tb.text(error.__class__, error, error.__traceback__), file=sys.stderr)
+        else:
+            print('result: ')
+            pprint.pprint(result, indent=4)
 
 if __name__ == '__main__':
-	main()
+    main()

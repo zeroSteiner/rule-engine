@@ -37,29 +37,29 @@ from . import __version__
 from . import engine
 
 def _print_written(file_path):
-	size = os.stat(file_path).st_size
-	print("wrote {:,} bytes to {}".format(size, file_path))
+    size = os.stat(file_path).st_size
+    print("wrote {:,} bytes to {}".format(size, file_path))
 
 def main():
-	parser = argparse.ArgumentParser(description='Rule Engine: Debug AST', conflict_handler='resolve')
-	parser.add_argument('output', help='output files')
-	parser.add_argument('-t', '--text', dest='rule_text', help='the rule text to debug')
-	parser.add_argument('-v', '--version', action='version', version=parser.prog + ' Version: ' + __version__)
-	arguments = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Rule Engine: Debug AST', conflict_handler='resolve')
+    parser.add_argument('output', help='output files')
+    parser.add_argument('-t', '--text', dest='rule_text', help='the rule text to debug')
+    parser.add_argument('-v', '--version', action='version', version=parser.prog + ' Version: ' + __version__)
+    arguments = parser.parse_args()
 
-	rule_text = arguments.rule_text
-	if not rule_text:
-		rule_text = input('rule > ')
+    rule_text = arguments.rule_text
+    if not rule_text:
+        rule_text = input('rule > ')
 
-	rule = engine.Rule(rule_text)
-	digraph = rule.to_graphviz()
+    rule = engine.Rule(rule_text)
+    digraph = rule.to_graphviz()
 
-	digraph.save(arguments.output + '.gv')
-	_print_written(arguments.output + '.gv')
+    digraph.save(arguments.output + '.gv')
+    _print_written(arguments.output + '.gv')
 
-	digraph.render(arguments.output)
-	_print_written(arguments.output + '.pdf')
+    digraph.render(arguments.output)
+    _print_written(arguments.output + '.pdf')
 
 
 if __name__ == '__main__':
-	main()
+    main()

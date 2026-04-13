@@ -40,34 +40,34 @@ import shodan
 DESCRIPTION = 'Query results from Shodan'
 
 def main():
-	parser = argparse.ArgumentParser(
-		conflict_handler='resolve',
-		description=DESCRIPTION,
-		formatter_class=argparse.RawDescriptionHelpFormatter
-	)
-	parser.add_argument('--api-key', default=os.getenv('SHODAN_API_KEY'), help='the API key')
-	parser.add_argument('--gzip', action='store_true', default=False, help='compress the file')
-	parser.add_argument('json_file', type=argparse.FileType('wb'), help='the JSON file to write to')
-	parser.add_argument('query', nargs='+', help='the search queries to retrieve')
-	arguments = parser.parse_args()
+    parser = argparse.ArgumentParser(
+            conflict_handler='resolve',
+            description=DESCRIPTION,
+            formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('--api-key', default=os.getenv('SHODAN_API_KEY'), help='the API key')
+    parser.add_argument('--gzip', action='store_true', default=False, help='compress the file')
+    parser.add_argument('json_file', type=argparse.FileType('wb'), help='the JSON file to write to')
+    parser.add_argument('query', nargs='+', help='the search queries to retrieve')
+    arguments = parser.parse_args()
 
-	if arguments.api_key is None:
-		print('[-] The --api-key must be specified or the SHODAN_API_KEY environment variable must be defined')
-		return os.EX_CONFIG
-	api = shodan.Shodan(arguments.api_key)
+    if arguments.api_key is None:
+        print('[-] The --api-key must be specified or the SHODAN_API_KEY environment variable must be defined')
+        return os.EX_CONFIG
+    api = shodan.Shodan(arguments.api_key)
 
-	all_results = []
-	for query in arguments.query:
-		print('[*] Querying: ' + query)
+    all_results = []
+    for query in arguments.query:
+        print('[*] Querying: ' + query)
 
-		search_results = api.search(query)
-		all_results.extend(search_results['matches'])
+        search_results = api.search(query)
+        all_results.extend(search_results['matches'])
 
-	output = '\n'.join(json.dumps(result) for result in all_results)
-	output = output.encode('utf-8')
-	if arguments.gzip:
-		output = gzip.compress(output)
-	arguments.json_file.write(output)
+    output = '\n'.join(json.dumps(result) for result in all_results)
+    output = output.encode('utf-8')
+    if arguments.gzip:
+        output = gzip.compress(output)
+    arguments.json_file.write(output)
 
 if __name__ == '__main__':
-	main()
+    main()

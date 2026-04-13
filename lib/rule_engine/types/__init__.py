@@ -48,12 +48,12 @@ from .definitions import _ObjectDataTypeDef
 from .definitions import _ReferenceDataTypeDef
 
 __all__ = (
-	'DataType',
-	'NoneType',
-	'coerce_value',
-	'is_integer_number',
-	'is_natural_number',
-	'is_numeric',
-	'is_real_number',
-	'iterable_member_value_type'
+        'DataType',
+        'NoneType',
+        'coerce_value',
+        'is_integer_number',
+        'is_natural_number',
+        'is_numeric',
+        'is_real_number',
+        'iterable_member_value_type'
 )

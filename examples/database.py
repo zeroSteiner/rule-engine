@@ -37,41 +37,41 @@ import json
 import rule_engine
 
 def isiterable(thing):
-	return isinstance(thing, collections.abc.Iterable)
+    return isinstance(thing, collections.abc.Iterable)
 
 class Database(object):
-	def __init__(self, data):
-		self.data = data
-		self._rule_context = rule_engine.Context(default_value=None)
+    def __init__(self, data):
+        self.data = data
+        self._rule_context = rule_engine.Context(default_value=None)
 
-	@classmethod
-	def from_csv(cls, file_path, headers=None, skip_first=False):
-		file_h = open(file_path, 'r')
-		reader = csv.DictReader(file_h, headers)
-		if skip_first:
-			next(reader)
-		rows = tuple(reader)
-		file_h.close()
-		return cls(rows)
+    @classmethod
+    def from_csv(cls, file_path, headers=None, skip_first=False):
+        file_h = open(file_path, 'r')
+        reader = csv.DictReader(file_h, headers)
+        if skip_first:
+            next(reader)
+        rows = tuple(reader)
+        file_h.close()
+        return cls(rows)
 
-	@classmethod
-	def from_json(cls, file_path):
-		with open(file_path, 'r') as file_h:
-			data = json.load(file_h)
-		return cls(data)
+    @classmethod
+    def from_json(cls, file_path):
+        with open(file_path, 'r') as file_h:
+            data = json.load(file_h)
+        return cls(data)
 
-	def select(self, *names, from_=None, where='true', limit=None):
-		data = self.data
-		if from_ is not None:
-			data = rule_engine.Rule(from_, context=self._rule_context).evaluate(data)
-		if isinstance(data, collections.abc.Mapping):
-			data = data.values()
-		if not isiterable(data):
-			raise ValueError('data source is not iterable')
-		rule = rule_engine.Rule(where, context=self._rule_context)
-		count = 0
-		for match in rule.filter(data):
-			if count == limit:
-				break
-			yield tuple(rule_engine.Rule(name, context=self._rule_context).evaluate(match) for name in names)
-			count += 1
+    def select(self, *names, from_=None, where='true', limit=None):
+        data = self.data
+        if from_ is not None:
+            data = rule_engine.Rule(from_, context=self._rule_context).evaluate(data)
+        if isinstance(data, collections.abc.Mapping):
+            data = data.values()
+        if not isiterable(data):
+            raise ValueError('data source is not iterable')
+        rule = rule_engine.Rule(where, context=self._rule_context)
+        count = 0
+        for match in rule.filter(data):
+            if count == limit:
+                break
+            yield tuple(rule_engine.Rule(name, context=self._rule_context).evaluate(match) for name in names)
+            count += 1

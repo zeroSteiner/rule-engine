@@ -40,42 +40,42 @@ import rule_engine.suggestions as suggestions
 # https://www.census.gov/srd/papers/pdf/rr91-9.pdf
 # not all JARO_WINKLER_TEST_CASES are a perfect match, so the table is a selection of those that are
 JARO_WINKLER_TEST_CASES = (
-	('shackleford', 'shackelford', 0.9848),
-	('cunningham', 'cunnigham', 0.9833),
-	('galloway', 'calloway', 0.9167),
-	('lampley', 'campley', 0.9048),
-	('michele', 'michelle', 0.9792),
-	('jonathon', 'jonathan', 0.9583),
+        ('shackleford', 'shackelford', 0.9848),
+        ('cunningham', 'cunnigham', 0.9833),
+        ('galloway', 'calloway', 0.9167),
+        ('lampley', 'campley', 0.9048),
+        ('michele', 'michelle', 0.9792),
+        ('jonathon', 'jonathan', 0.9583),
 )
 
 class JaroWinklerTests(unittest.TestCase):
-	def test_jaro_winkler_distance(self):
-		for str1, str2, distance in JARO_WINKLER_TEST_CASES:
-			self.assertEqual(
-				round(suggestions.jaro_winkler_distance(str1, str2), 4),
-				distance,
-				msg="({}, {}) != {}".format(str1, str2, distance)
-			)
+    def test_jaro_winkler_distance(self):
+        for str1, str2, distance in JARO_WINKLER_TEST_CASES:
+            self.assertEqual(
+                    round(suggestions.jaro_winkler_distance(str1, str2), 4),
+                    distance,
+                    msg="({}, {}) != {}".format(str1, str2, distance)
+            )
 
-	def test_jaro_winkler_distance_match(self):
-		strx = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-		self.assertEqual(
-			suggestions.jaro_winkler_distance(strx, strx),
-			1.0
-		)
+    def test_jaro_winkler_distance_match(self):
+        strx = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+        self.assertEqual(
+                suggestions.jaro_winkler_distance(strx, strx),
+                1.0
+        )
 
-	def test_jaro_winkler_similarity(self):
-		for str1, str2, distance in JARO_WINKLER_TEST_CASES:
-			similarity = round(1 - distance, 4)
-			self.assertEqual(
-				round(suggestions.jaro_winkler_similarity(str1, str2), 4),
-				similarity,
-				msg="({}, {}) != {}".format(str1, str2, similarity)
-			)
+    def test_jaro_winkler_similarity(self):
+        for str1, str2, distance in JARO_WINKLER_TEST_CASES:
+            similarity = round(1 - distance, 4)
+            self.assertEqual(
+                    round(suggestions.jaro_winkler_similarity(str1, str2), 4),
+                    similarity,
+                    msg="({}, {}) != {}".format(str1, str2, similarity)
+            )
 
-	def test_jaro_winkler_similarity_match(self):
-		strx = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-		self.assertEqual(
-			suggestions.jaro_winkler_similarity(strx, strx),
-			0.0
-		)
+    def test_jaro_winkler_similarity_match(self):
+        strx = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+        self.assertEqual(
+                suggestions.jaro_winkler_similarity(strx, strx),
+                0.0
+        )

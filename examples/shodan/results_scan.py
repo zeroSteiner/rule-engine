@@ -51,63 +51,63 @@ DESCRIPTION = 'Scan results exported from Shodan for vulnerabilities.'
 RULES_FILE = get_path('rules.yml')
 
 def _print_references(references):
-	cves = references.get('cves')
-	if cves and len(cves) == 1:
-		print('CVE: CVE-' + cves[0])
-	elif cves and len(cves) > 1:
-		print('CVEs: ')
-		for cve in cves:
-			print('  * CVE-' + cve)
+    cves = references.get('cves')
+    if cves and len(cves) == 1:
+        print('CVE: CVE-' + cves[0])
+    elif cves and len(cves) > 1:
+        print('CVEs: ')
+        for cve in cves:
+            print('  * CVE-' + cve)
 
-	msf_modules = references.get('metasploit-modules')
-	if msf_modules and len(msf_modules) == 1:
-		print('Metasploit Module: ' + msf_modules[0])
-	elif msf_modules and len(msf_modules) > 1:
-		print('Metasploit Modules:')
-		for msf_module in msf_modules:
-			print('  * ' + msf_module)
+    msf_modules = references.get('metasploit-modules')
+    if msf_modules and len(msf_modules) == 1:
+        print('Metasploit Module: ' + msf_modules[0])
+    elif msf_modules and len(msf_modules) > 1:
+        print('Metasploit Modules:')
+        for msf_module in msf_modules:
+            print('  * ' + msf_module)
 
 def main():
-	parser = argparse.ArgumentParser(
-		conflict_handler='resolve',
-		description=DESCRIPTION,
-		formatter_class=argparse.RawDescriptionHelpFormatter
-	)
-	parser.add_argument('--gzip', action='store_true', default=False, help='decompress the file')
-	parser.add_argument('json_file', type=argparse.FileType('rb'), help='the JSON file to filter')
-	arguments = parser.parse_args()
+    parser = argparse.ArgumentParser(
+            conflict_handler='resolve',
+            description=DESCRIPTION,
+            formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('--gzip', action='store_true', default=False, help='decompress the file')
+    parser.add_argument('json_file', type=argparse.FileType('rb'), help='the JSON file to filter')
+    arguments = parser.parse_args()
 
-	re_flags = re.IGNORECASE | re.MULTILINE
-	context = rule_engine.Context(default_value=None, regex_flags=re_flags)
+    re_flags = re.IGNORECASE | re.MULTILINE
+    context = rule_engine.Context(default_value=None, regex_flags=re_flags)
 
-	file_object = arguments.json_file
-	if arguments.gzip:
-		file_object = gzip.GzipFile(fileobj=file_object)
-	results = [json.loads(line.decode('utf-8')) for line in file_object]
+    file_object = arguments.json_file
+    if arguments.gzip:
+        file_object = gzip.GzipFile(fileobj=file_object)
+    results = [json.loads(line.decode('utf-8')) for line in file_object]
 
-	with open(RULES_FILE, 'r') as file_h:
-		rules = yaml.load(file_h, Loader=yaml.FullLoader)
+    with open(RULES_FILE, 'r') as file_h:
+        rules = yaml.load(file_h, Loader=yaml.FullLoader)
 
-	for vulnerability in rules['rules']:
-		try:
-			rule = rule_engine.Rule(vulnerability['rule'], context=context)
-		except rule_engine.RuleSyntaxError as error:
-			print(error.message)
-			return 0
+    for vulnerability in rules['rules']:
+        try:
+            rule = rule_engine.Rule(vulnerability['rule'], context=context)
+        except rule_engine.RuleSyntaxError as error:
+            print(error.message)
+            return 0
 
-		matches = tuple(rule.filter(results))
-		if not matches:
-			continue
+        matches = tuple(rule.filter(results))
+        if not matches:
+            continue
 
-		print(vulnerability['description'])
-		references = vulnerability.get('references', {})
-		_print_references(references)
-		print('Hosts:')
-		for match in matches:
-			print("  * {}".format(results_filter.result_to_url(match)))
-		print()
-	return 0
+        print(vulnerability['description'])
+        references = vulnerability.get('references', {})
+        _print_references(references)
+        print('Hosts:')
+        for match in matches:
+            print("  * {}".format(results_filter.result_to_url(match)))
+        print()
+    return 0
 
 if __name__ == '__main__':
-	sys.exit(main())
+    sys.exit(main())
 

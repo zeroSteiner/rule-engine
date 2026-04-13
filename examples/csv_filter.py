@@ -49,33 +49,33 @@ the field names which will be used as the symbols for the rule.
 # specify a custom resolve function that checks if the symbol is a column name
 # in the csv file and if not replaces underscores with spaces
 def resolve_item(thing, name):
-	if not name in thing:
-		name = name.replace('_', ' ')
-	return rule_engine.resolve_item(thing, name)
+    if not name in thing:
+        name = name.replace('_', ' ')
+    return rule_engine.resolve_item(thing, name)
 
 def main():
-	parser = argparse.ArgumentParser(
-		conflict_handler='resolve',
-		description=DESCRIPTION,
-		formatter_class=argparse.RawDescriptionHelpFormatter
-	)
-	parser.add_argument('csv_file', type=argparse.FileType('r'), help='the CSV file to filter')
-	parser.add_argument('rule', help='the rule to apply')
-	arguments = parser.parse_args()
+    parser = argparse.ArgumentParser(
+            conflict_handler='resolve',
+            description=DESCRIPTION,
+            formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    parser.add_argument('csv_file', type=argparse.FileType('r'), help='the CSV file to filter')
+    parser.add_argument('rule', help='the rule to apply')
+    arguments = parser.parse_args()
 
-	# need to define a custom context to use a custom resolver function
-	context = rule_engine.Context(resolver=resolve_item)
-	try:
-		rule = rule_engine.Rule(arguments.rule, context=context)
-	except rule_engine.RuleSyntaxError as error:
-		print(error.message)
-		return 0
+    # need to define a custom context to use a custom resolver function
+    context = rule_engine.Context(resolver=resolve_item)
+    try:
+        rule = rule_engine.Rule(arguments.rule, context=context)
+    except rule_engine.RuleSyntaxError as error:
+        print(error.message)
+        return 0
 
-	csv_reader = csv.DictReader(arguments.csv_file)
-	csv_writer = csv.DictWriter(sys.stdout, csv_reader.fieldnames, dialect=csv_reader.dialect)
-	for row in rule.filter(csv_reader):
-		csv_writer.writerow(row)
-	return 0
+    csv_reader = csv.DictReader(arguments.csv_file)
+    csv_writer = csv.DictWriter(sys.stdout, csv_reader.fieldnames, dialect=csv_reader.dialect)
+    for row in rule.filter(csv_reader):
+        csv_writer.writerow(row)
+    return 0
 
 if __name__ == '__main__':
-	sys.exit(main())
+    sys.exit(main())

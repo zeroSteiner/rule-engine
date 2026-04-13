@@ -43,294 +43,294 @@ from .. import types
 from ..suggestions import suggest_symbol
 
 def _float_op(value, op):
-	if value.is_nan() or value.is_infinite():
-		return value
-	return op(value)
+    if value.is_nan() or value.is_infinite():
+        return value
+    return op(value)
 
 def _value_to_ary_result_type(object_type):
-	if object_type == types.DataType.BYTES:
-		return types.DataType.ARRAY(types.DataType.FLOAT)
-	elif object_type == types.DataType.STRING:
-		return types.DataType.ARRAY(types.DataType.STRING)
-	return types.DataType.ARRAY(object_type.value_type)
+    if object_type == types.DataType.BYTES:
+        return types.DataType.ARRAY(types.DataType.FLOAT)
+    elif object_type == types.DataType.STRING:
+        return types.DataType.ARRAY(types.DataType.STRING)
+    return types.DataType.ARRAY(object_type.value_type)
 
 def _value_to_set_result_type(object_type):
-	if object_type == types.DataType.BYTES:
-		return types.DataType.SET(types.DataType.FLOAT)
-	elif object_type == types.DataType.STRING:
-		return types.DataType.SET(types.DataType.STRING)
-	return types.DataType.SET(object_type.value_type)
+    if object_type == types.DataType.BYTES:
+        return types.DataType.SET(types.DataType.FLOAT)
+    elif object_type == types.DataType.STRING:
+        return types.DataType.SET(types.DataType.STRING)
+    return types.DataType.SET(object_type.value_type)
 
 def _value_with_result_type(name, object_type):
-	return types.DataType.FUNCTION(name, argument_types=(object_type,), return_type=types.DataType.BOOLEAN)
+    return types.DataType.FUNCTION(name, argument_types=(object_type,), return_type=types.DataType.BOOLEAN)
 
 class _AttributeResolverFunction(object):
-	__slots__ = ('function', 'type_resolver')
-	def __init__(self, function, *, result_type, type_resolver):
-		self.function = function
-		if result_type and result_type is not types.DataType.UNDEFINED:
-			if not types.DataType.is_definition(result_type):
-				raise TypeError('result_type must be a types.DataType definition')
-			if type_resolver:
-				raise ValueError('both result_type and type_resolver can not be specified')
-			type_resolver = functools.partial(self._type_resolver, result_type)
-		elif not type_resolver:
-			type_resolver = functools.partial(self._type_resolver, types.DataType.UNDEFINED)
-		self.type_resolver = type_resolver
+    __slots__ = ('function', 'type_resolver')
+    def __init__(self, function, *, result_type, type_resolver):
+        self.function = function
+        if result_type and result_type is not types.DataType.UNDEFINED:
+            if not types.DataType.is_definition(result_type):
+                raise TypeError('result_type must be a types.DataType definition')
+            if type_resolver:
+                raise ValueError('both result_type and type_resolver can not be specified')
+            type_resolver = functools.partial(self._type_resolver, result_type)
+        elif not type_resolver:
+            type_resolver = functools.partial(self._type_resolver, types.DataType.UNDEFINED)
+        self.type_resolver = type_resolver
 
-	@staticmethod
-	def _type_resolver(result_type, _object_type):
-		return result_type
+    @staticmethod
+    def _type_resolver(result_type, _object_type):
+        return result_type
 
-	def resolve_type(self, object_type):
-		return self.type_resolver(object_type)
+    def resolve_type(self, object_type):
+        return self.type_resolver(object_type)
 
 class _AttributeResolver(object):
-	class attribute(object):
-		__slots__ = ('types', 'name', 'result_type', 'type_resolver')
-		type_map = collections.defaultdict(dict)
-		def __init__(self, name, *data_types, result_type=types.DataType.UNDEFINED, type_resolver=errors.UNDEFINED):
-			self.types = data_types
-			self.name = name
-			self.result_type = result_type
-			self.type_resolver = type_resolver
+    class attribute(object):
+        __slots__ = ('types', 'name', 'result_type', 'type_resolver')
+        type_map = collections.defaultdict(dict)
+        def __init__(self, name, *data_types, result_type=types.DataType.UNDEFINED, type_resolver=errors.UNDEFINED):
+            self.types = data_types
+            self.name = name
+            self.result_type = result_type
+            self.type_resolver = type_resolver
 
-		def __call__(self, function):
-			for type_ in self.types:
-				self.type_map[type_][self.name] = _AttributeResolverFunction(function, result_type=self.result_type, type_resolver=self.type_resolver)
-			return function
+        def __call__(self, function):
+            for type_ in self.types:
+                self.type_map[type_][self.name] = _AttributeResolverFunction(function, result_type=self.result_type, type_resolver=self.type_resolver)
+            return function
 
-	def __call__(self, thing, object_, name):
-		try:
-			object_type = types.DataType.from_value(object_)
-		except TypeError:
-			# if the object can't be mapped to a supported type, raise a resolution error
-			raise errors.AttributeResolutionError(name, object_, thing=thing) from None
-		resolver = self._get_resolver(object_type, name, thing=thing)
-		value = resolver.function(self, object_)
-		value = types.coerce_value(value)
-		value_type = types.DataType.from_value(value)
-		expected_value_type = resolver.resolve_type(value_type)
-		if types.DataType.is_compatible(expected_value_type, value_type):
-			return value
-		raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=expected_value_type)
+    def __call__(self, thing, object_, name):
+        try:
+            object_type = types.DataType.from_value(object_)
+        except TypeError:
+            # if the object can't be mapped to a supported type, raise a resolution error
+            raise errors.AttributeResolutionError(name, object_, thing=thing) from None
+        resolver = self._get_resolver(object_type, name, thing=thing)
+        value = resolver.function(self, object_)
+        value = types.coerce_value(value)
+        value_type = types.DataType.from_value(value)
+        expected_value_type = resolver.resolve_type(value_type)
+        if types.DataType.is_compatible(expected_value_type, value_type):
+            return value
+        raise errors.AttributeTypeError(name, object_, is_value=value, is_type=value_type, expected_type=expected_value_type)
 
-	def _get_resolver(self, object_type, name, thing=errors.UNDEFINED):
-		for data_type, attribute_resolvers in self.attribute.type_map.items():
-			if types.DataType.is_compatible(data_type, object_type):
-				break
-		else:
-			raise errors.AttributeResolutionError(name, object_type, thing=thing)
-		resolver = attribute_resolvers.get(name)
-		if resolver is None:
-			raise errors.AttributeResolutionError(name, object_type, thing=thing, suggestion=suggest_symbol(name, attribute_resolvers.keys()))
-		return resolver
+    def _get_resolver(self, object_type, name, thing=errors.UNDEFINED):
+        for data_type, attribute_resolvers in self.attribute.type_map.items():
+            if types.DataType.is_compatible(data_type, object_type):
+                break
+        else:
+            raise errors.AttributeResolutionError(name, object_type, thing=thing)
+        resolver = attribute_resolvers.get(name)
+        if resolver is None:
+            raise errors.AttributeResolutionError(name, object_type, thing=thing, suggestion=suggest_symbol(name, attribute_resolvers.keys()))
+        return resolver
 
-	def resolve_type(self, object_type, name):
-		"""
-		The method to use for resolving the data type of an attribute.
+    def resolve_type(self, object_type, name):
+        """
+        The method to use for resolving the data type of an attribute.
 
-		:param object_type: The data type of the object that *name* is an attribute of.
-		:param str name: The name of the attribute to retrieve the data type of.
-		:return: The data type of the specified attribute.
-		"""
-		return self._get_resolver(object_type, name).resolve_type(object_type)
+        :param object_type: The data type of the object that *name* is an attribute of.
+        :param str name: The name of the attribute to retrieve the data type of.
+        :return: The data type of the specified attribute.
+        """
+        return self._get_resolver(object_type, name).resolve_type(object_type)
 
-	@attribute('decode', types.DataType.BYTES, result_type=types.DataType.FUNCTION('decode', return_type=types.DataType.STRING, argument_types=(types.DataType.STRING,)))
-	def bytes_decode(self, value):
-		return functools.partial(self._bytes_decode, value)
+    @attribute('decode', types.DataType.BYTES, result_type=types.DataType.FUNCTION('decode', return_type=types.DataType.STRING, argument_types=(types.DataType.STRING,)))
+    def bytes_decode(self, value):
+        return functools.partial(self._bytes_decode, value)
 
-	@classmethod
-	def _bytes_decode(self, value, encoding):
-		encoding = encoding.lower()
-		if encoding == 'base16' or encoding == 'hex':
-			return binascii.b2a_hex(value).decode()
-		elif encoding == 'base64':
-			return binascii.b2a_base64(value).decode().strip()
-		try:
-			return value.decode(encoding)
-		except LookupError as error:
-			raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='decode')
+    @classmethod
+    def _bytes_decode(self, value, encoding):
+        encoding = encoding.lower()
+        if encoding == 'base16' or encoding == 'hex':
+            return binascii.b2a_hex(value).decode()
+        elif encoding == 'base64':
+            return binascii.b2a_base64(value).decode().strip()
+        try:
+            return value.decode(encoding)
+        except LookupError as error:
+            raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='decode')
 
-	@attribute('to_epoch', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_to_epoch(self, value):
-		return value.timestamp()
+    @attribute('to_epoch', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_to_epoch(self, value):
+        return value.timestamp()
 
-	@attribute('date', types.DataType.DATETIME, result_type=types.DataType.DATETIME)
-	def datetime_date(self, value):
-		return value.replace(hour=0, minute=0, second=0, microsecond=0)
+    @attribute('date', types.DataType.DATETIME, result_type=types.DataType.DATETIME)
+    def datetime_date(self, value):
+        return value.replace(hour=0, minute=0, second=0, microsecond=0)
 
-	@attribute('day', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_day(self, value):
-		return value.day
+    @attribute('day', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_day(self, value):
+        return value.day
 
-	@attribute('hour', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_hour(self, value):
-		return value.hour
+    @attribute('hour', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_hour(self, value):
+        return value.hour
 
-	@attribute('microsecond', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_microsecond(self, value):
-		return value.microsecond
+    @attribute('microsecond', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_microsecond(self, value):
+        return value.microsecond
 
-	@attribute('millisecond', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_millisecond(self, value):
-		return value.microsecond / 1000
+    @attribute('millisecond', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_millisecond(self, value):
+        return value.microsecond / 1000
 
-	@attribute('minute', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_minute(self, value):
-		return value.minute
+    @attribute('minute', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_minute(self, value):
+        return value.minute
 
-	@attribute('month', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_month(self, value):
-		return value.month
+    @attribute('month', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_month(self, value):
+        return value.month
 
-	@attribute('second', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_second(self, value):
-		return value.second
+    @attribute('second', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_second(self, value):
+        return value.second
 
-	@attribute('weekday', types.DataType.DATETIME, result_type=types.DataType.STRING)
-	def datetime_weekday(self, value):
-		# use strftime %A so the value is localized
-		return value.strftime('%A')
+    @attribute('weekday', types.DataType.DATETIME, result_type=types.DataType.STRING)
+    def datetime_weekday(self, value):
+        # use strftime %A so the value is localized
+        return value.strftime('%A')
 
-	@attribute('year', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
-	def datetime_year(self, value):
-		return value.year
+    @attribute('year', types.DataType.DATETIME, result_type=types.DataType.FLOAT)
+    def datetime_year(self, value):
+        return value.year
 
-	@attribute('zone_name', types.DataType.DATETIME, result_type=types.DataType.STRING)
-	def datetime_zone_name(self, value):
-		return value.tzname()
+    @attribute('zone_name', types.DataType.DATETIME, result_type=types.DataType.STRING)
+    def datetime_zone_name(self, value):
+        return value.tzname()
 
-	@attribute('ceiling', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
-	def float_ceiling(self, value):
-		return _float_op(value, math.ceil)
+    @attribute('ceiling', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
+    def float_ceiling(self, value):
+        return _float_op(value, math.ceil)
 
-	@attribute('floor', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
-	def float_floor(self, value):
-		return _float_op(value, math.floor)
+    @attribute('floor', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
+    def float_floor(self, value):
+        return _float_op(value, math.floor)
 
-	@attribute('is_nan', types.DataType.FLOAT, result_type=types.DataType.BOOLEAN)
-	def float_is_nan(self, value):
-		return math.isnan(value)
+    @attribute('is_nan', types.DataType.FLOAT, result_type=types.DataType.BOOLEAN)
+    def float_is_nan(self, value):
+        return math.isnan(value)
 
-	@attribute('to_flt', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
-	def float_to_flt(self, value):
-		return value
+    @attribute('to_flt', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
+    def float_to_flt(self, value):
+        return value
 
-	@attribute('to_int', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
-	def float_to_int(self, value):
-		if not types.is_integer_number(value):
-			raise errors.EvaluationError('data type mismatch (not an integer number)')
-		return value
+    @attribute('to_int', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
+    def float_to_int(self, value):
+        if not types.is_integer_number(value):
+            raise errors.EvaluationError('data type mismatch (not an integer number)')
+        return value
 
-	@attribute('keys', types.DataType.MAPPING, result_type=types.DataType.ARRAY)
-	def mapping_keys(self, value):
-		return tuple(value.keys())
+    @attribute('keys', types.DataType.MAPPING, result_type=types.DataType.ARRAY)
+    def mapping_keys(self, value):
+        return tuple(value.keys())
 
-	@attribute('values', types.DataType.MAPPING, result_type=types.DataType.ARRAY)
-	def mapping_values(self, value):
-		return tuple(value.values())
+    @attribute('values', types.DataType.MAPPING, result_type=types.DataType.ARRAY)
+    def mapping_values(self, value):
+        return tuple(value.values())
 
-	@attribute('as_lower', types.DataType.STRING, result_type=types.DataType.STRING)
-	def string_as_lower(self, value):
-		return value.lower()
+    @attribute('as_lower', types.DataType.STRING, result_type=types.DataType.STRING)
+    def string_as_lower(self, value):
+        return value.lower()
 
-	@attribute('as_upper', types.DataType.STRING, result_type=types.DataType.STRING)
-	def string_as_upper(self, value):
-		return value.upper()
+    @attribute('as_upper', types.DataType.STRING, result_type=types.DataType.STRING)
+    def string_as_upper(self, value):
+        return value.upper()
 
-	@attribute('encode', types.DataType.STRING, result_type=types.DataType.FUNCTION('encode', return_type=types.DataType.BYTES, argument_types=(types.DataType.STRING,)))
-	def string_encode(self, value):
-		return functools.partial(self._string_encode, value)
+    @attribute('encode', types.DataType.STRING, result_type=types.DataType.FUNCTION('encode', return_type=types.DataType.BYTES, argument_types=(types.DataType.STRING,)))
+    def string_encode(self, value):
+        return functools.partial(self._string_encode, value)
 
-	@classmethod
-	def _string_encode(self, value, encoding):
-		encoding = encoding.lower()
-		try:
-			if encoding == 'base16' or encoding == 'hex':
-				return binascii.a2b_hex(value.encode())
-			elif encoding == 'base64':
-				return binascii.a2b_base64(value.encode())
-		except binascii.Error as error:
-			raise errors.FunctionCallError("error converting to {}".format(encoding), error=error, function_name='encode')
-		try:
-			return value.encode(encoding)
-		except LookupError as error:
-			raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='encode')
+    @classmethod
+    def _string_encode(self, value, encoding):
+        encoding = encoding.lower()
+        try:
+            if encoding == 'base16' or encoding == 'hex':
+                return binascii.a2b_hex(value.encode())
+            elif encoding == 'base64':
+                return binascii.a2b_base64(value.encode())
+        except binascii.Error as error:
+            raise errors.FunctionCallError("error converting to {}".format(encoding), error=error, function_name='encode')
+        try:
+            return value.encode(encoding)
+        except LookupError as error:
+            raise errors.FunctionCallError("invalid encoding name {}".format(encoding), error=error, function_name='encode')
 
-	@attribute('to_flt', types.DataType.STRING, result_type=types.DataType.FLOAT)
-	def string_to_flt(self, value):
-		value = value.strip()
-		if re.match(r'-?inf', value):
-			return decimal.Decimal(value)
-		match = re.match(r'^(' + parser.Parser.get_token_regex('FLOAT') + ')$', value)
-		if match is None:
-			return decimal.Decimal('nan')
-		return parser.literal_eval(match.group(0))
+    @attribute('to_flt', types.DataType.STRING, result_type=types.DataType.FLOAT)
+    def string_to_flt(self, value):
+        value = value.strip()
+        if re.match(r'-?inf', value):
+            return decimal.Decimal(value)
+        match = re.match(r'^(' + parser.Parser.get_token_regex('FLOAT') + ')$', value)
+        if match is None:
+            return decimal.Decimal('nan')
+        return parser.literal_eval(match.group(0))
 
-	@attribute('to_int', types.DataType.STRING, result_type=types.DataType.FLOAT)
-	def string_to_int(self, value):
-		value = self.string_to_flt(value)
-		if not types.is_integer_number(value):
-			raise errors.EvaluationError('data type mismatch (not an integer number)')
-		return value
+    @attribute('to_int', types.DataType.STRING, result_type=types.DataType.FLOAT)
+    def string_to_int(self, value):
+        value = self.string_to_flt(value)
+        if not types.is_integer_number(value):
+            raise errors.EvaluationError('data type mismatch (not an integer number)')
+        return value
 
-	@attribute('days', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
-	def timedelta_days(self, value):
-		return value.days
+    @attribute('days', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
+    def timedelta_days(self, value):
+        return value.days
 
-	@attribute('seconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
-	def timedelta_seconds(self, value):
-		return value.seconds
+    @attribute('seconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
+    def timedelta_seconds(self, value):
+        return value.seconds
 
-	@attribute('microseconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
-	def timedelta_microseconds(self, value):
-		return value.microseconds
+    @attribute('microseconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
+    def timedelta_microseconds(self, value):
+        return value.microseconds
 
-	@attribute('total_seconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
-	def timedelta_total_seconds(self, value):
-		return value.total_seconds()
+    @attribute('total_seconds', types.DataType.TIMEDELTA, result_type=types.DataType.FLOAT)
+    def timedelta_total_seconds(self, value):
+        return value.total_seconds()
 
-	@attribute('ends_with', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'ends_with'))
-	def value_ends_with(self, value):
-		return functools.partial(self._value_ends_with, value)
+    @attribute('ends_with', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'ends_with'))
+    def value_ends_with(self, value):
+        return functools.partial(self._value_ends_with, value)
 
-	def _value_ends_with(self, value, suffix):
-		return value[-len(suffix):] == suffix
+    def _value_ends_with(self, value, suffix):
+        return value[-len(suffix):] == suffix
 
-	@attribute('is_empty', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, types.DataType.MAPPING, types.DataType.SET, result_type=types.DataType.BOOLEAN)
-	def value_is_empty(self, value):
-		return len(value) == 0
+    @attribute('is_empty', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, types.DataType.MAPPING, types.DataType.SET, result_type=types.DataType.BOOLEAN)
+    def value_is_empty(self, value):
+        return len(value) == 0
 
-	@attribute('length', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, types.DataType.MAPPING, types.DataType.SET, result_type=types.DataType.FLOAT)
-	def value_length(self, value):
-		return len(value)
+    @attribute('length', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, types.DataType.MAPPING, types.DataType.SET, result_type=types.DataType.FLOAT)
+    def value_length(self, value):
+        return len(value)
 
-	@attribute('starts_with', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'starts_with'))
-	def value_starts_with(self, value):
-		return functools.partial(self._value_starts_with, value)
+    @attribute('starts_with', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, type_resolver=functools.partial(_value_with_result_type, 'starts_with'))
+    def value_starts_with(self, value):
+        return functools.partial(self._value_starts_with, value)
 
-	def _value_starts_with(self, value, prefix):
-		return value[:len(prefix)] == prefix
+    def _value_starts_with(self, value, prefix):
+        return value[:len(prefix)] == prefix
 
-	@attribute('to_ary', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.SET, types.DataType.STRING, type_resolver=_value_to_ary_result_type)
-	def value_to_ary(self, value):
-		return tuple(value)
+    @attribute('to_ary', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.SET, types.DataType.STRING, type_resolver=_value_to_ary_result_type)
+    def value_to_ary(self, value):
+        return tuple(value)
 
-	@attribute('to_str', types.DataType.FLOAT, types.DataType.STRING, result_type=types.DataType.STRING)
-	def value_to_str(self, value):
-		if isinstance(value, str):
-			return value
-		# keep the string representations consistent for nan, inf, -inf
-		if value.is_nan():
-			return 'nan'
-		elif value.is_infinite():
-			if value.is_signed():
-				return '-inf'
-			else:
-				return 'inf'
-		return str(value)
+    @attribute('to_str', types.DataType.FLOAT, types.DataType.STRING, result_type=types.DataType.STRING)
+    def value_to_str(self, value):
+        if isinstance(value, str):
+            return value
+        # keep the string representations consistent for nan, inf, -inf
+        if value.is_nan():
+            return 'nan'
+        elif value.is_infinite():
+            if value.is_signed():
+                return '-inf'
+            else:
+                return 'inf'
+        return str(value)
 
-	@attribute('to_set', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.SET, types.DataType.STRING, type_resolver=_value_to_set_result_type)
-	def value_to_set(self, value):
-		return set(value)
+    @attribute('to_set', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.SET, types.DataType.STRING, type_resolver=_value_to_set_result_type)
+    def value_to_set(self, value):
+        return set(value)

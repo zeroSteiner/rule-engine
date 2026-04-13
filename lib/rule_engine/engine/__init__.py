@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/ast/expression/__init__.py
+#  rule_engine/engine/__init__.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,13 +30,5 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import unittest
-
-from .attribute import *
-from .function_call import *
-from .binary import *
-from .literal import *
-from .miscellaneous import *
-
-if __name__ == '__main__':
-	unittest.main()
+from .context import resolve_attribute, resolve_item, type_resolver_from_dict, Context
+from .rule import Rule, DebugRule

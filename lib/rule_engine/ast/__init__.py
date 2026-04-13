@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/ast/expression/__init__.py
+#  rule_engine/ast/__init__.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,13 +30,63 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import unittest
+from .base import (
+	ASTNodeBase,
+	Assignment,
+	Comment,
+	ExpressionBase,
+	LiteralExpressionBase,
+	Statement,
+	_assert_is_bytes,
+	_assert_is_integer_number,
+	_assert_is_natural_number,
+	_assert_is_numeric,
+	_assert_is_string,
+	_is_reduced,
+	_iterable_member_value_type,
+	_resolve_type,
+)
+from .literal import (
+	ArrayExpression,
+	BooleanExpression,
+	BytesExpression,
+	DatetimeExpression,
+	FloatExpression,
+	FunctionExpression,
+	MappingExpression,
+	NullExpression,
+	SetExpression,
+	StringExpression,
+	TimedeltaExpression,
+	_CollectionMixin,
+)
+from .binary import (
+	AddExpression,
+	ArithmeticComparisonExpression,
+	ArithmeticExpression,
+	BinaryExpressionBase,
+	BitwiseExpression,
+	BitwiseShiftExpression,
+	ComparisonExpression,
+	FuzzyComparisonExpression,
+	LogicExpression,
+	SubtractExpression,
+)
+from .expression import (
+	ComprehensionExpression,
+	ContainsExpression,
+	FunctionCallExpression,
+	GetAttributeExpression,
+	GetItemExpression,
+	GetSliceExpression,
+	SymbolExpression,
+	TernaryExpression,
+	UnaryExpression,
+)
 
-from .attribute import *
-from .function_call import *
-from .binary import *
-from .literal import *
-from .miscellaneous import *
+# deprecated alias — use BinaryExpressionBase instead
+LeftOperatorRightExpressionBase = BinaryExpressionBase
 
-if __name__ == '__main__':
-	unittest.main()
+# re-export everything from types that the old ast.py re-exported via `from .types import *`
+from ..types import *
+from ..types import _ObjectDataTypeDef, _ReferenceDataTypeDef

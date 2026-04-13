@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/ast/expression/left_operator_right.py
+#  tests/ast/expression/binary.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -55,7 +55,7 @@ __all__ = (
 	'FuzzyComparisonExpressionTests'
 )
 
-class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):
+class BinaryExpressionTestsBase(unittest.TestCase):
 	ExpressionClass = None
 	false_value = False
 	def assertExpressionTests(self, operation, left_value=None, right_value=None, equals_value=None):
@@ -65,13 +65,13 @@ class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):
 
 		# test #1: literals
 		expression = self.ExpressionClass(context, operation, left_value, right_value)
-		self.assertIsInstance(expression, ast.LeftOperatorRightExpressionBase)
+		self.assertIsInstance(expression, ast.BinaryExpressionBase)
 		message = "{0}({1!r} {2} {3!r})".format(self.ExpressionClass.__name__, left_value, operation, right_value)
 		self.assertEqual(expression.evaluate(None), equals_value, msg=message)
 
 		# test #2: symbols
 		expression = self.ExpressionClass(context, operation, ast.SymbolExpression(context, 'left_value'), ast.SymbolExpression(context, 'right_value'))
-		self.assertIsInstance(expression, ast.LeftOperatorRightExpressionBase)
+		self.assertIsInstance(expression, ast.BinaryExpressionBase)
 		message = "{0}({1!r} {2} {3!r})".format(self.ExpressionClass.__name__, left_value, operation, right_value)
 		self.assertEqual(expression.evaluate({'left_value': left_value.evaluate(None), 'right_value': right_value.evaluate(None)}), equals_value, msg=message)
 
@@ -84,7 +84,7 @@ class LeftOperatorRightExpresisonTestsBase(unittest.TestCase):
 ################################################################################
 # Left-Operator-Right Expressions
 ################################################################################
-class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class ArithmeticExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.ArithmeticExpression
 	false_value = 0.0
 	left_value = two = ast.FloatExpression(context, 2.0)
@@ -111,7 +111,7 @@ class ArithmeticExpressionTests(LeftOperatorRightExpresisonTestsBase):
 				self.assertExpressionTests(operation, ast.FloatExpression(context, 2.0), ast.BooleanExpression(context, True))
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, ast.BooleanExpression(context, True), ast.FloatExpression(context, 4.0))
-class AddExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class AddExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.AddExpression
 	false_value = 0.0
 	left_value = two = ast.FloatExpression(context, 2.0)
@@ -160,7 +160,7 @@ class AddExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		with self.assertRaises(errors.EvaluationError):
 			self.assertExpressionTests('add', ast.BooleanExpression(context, False), ast.TimedeltaExpression(context, datetime.timedelta()))
 
-class AddDatetimeExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class AddDatetimeExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.AddExpression
 	def test_add_datetime_to_timedelta(self):
 		start_datetime = datetime.datetime(year=2022, month=6, day=28, hour=1, minute=2, second=3, tzinfo=context.default_timezone)
@@ -204,7 +204,7 @@ class AddDatetimeExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			equals_value=datetime.timedelta(days=1, hours=4, seconds=54),
 		)
 
-class SubtractExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class SubtractExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.SubtractExpression
 	false_value = 0.0
 	left_value = ten = ast.FloatExpression(context, 10.0)
@@ -249,7 +249,7 @@ class SubtractExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		with self.assertRaises(errors.EvaluationError):
 			self.assertExpressionTests('sub', ast.BooleanExpression(context, False), ast.TimedeltaExpression(context, datetime.timedelta()))
 
-class SubtractDatetimeExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class SubtractDatetimeExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.SubtractExpression
 	def test_subtract_datetime_from_datetime(self):
 		dt_expr_func = functools.partial(ast.DatetimeExpression, context)
@@ -299,7 +299,7 @@ class SubtractDatetimeExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			equals_value=datetime.timedelta(seconds=53595),
 		)
 
-class BitwiseExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class BitwiseExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.BitwiseExpression
 	false_value = 0.0
 	left_value = three = ast.FloatExpression(context, 3.0)
@@ -356,7 +356,7 @@ class BitwiseShiftExpressionTests(BitwiseExpressionTests):
 				with self.assertRaises(errors.EvaluationError):
 					self.assertExpressionTests(operation, left, right)
 
-class LogicExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class LogicExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.LogicExpression
 	def test_ast_expression_left_operator_right_logical(self):
 		for operator, left, right in itertools.product(('and', 'or'), trueish, falseish):
@@ -371,7 +371,7 @@ class LogicExpressionTests(LeftOperatorRightExpresisonTestsBase):
 ################################################################################
 # Left-Operator-Right Comparison Expressions
 ################################################################################
-class ComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class ComparisonExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.ComparisonExpression
 	def test_ast_expression_left_operator_right_comparison(self):
 		chain = tuple(itertools.chain(
@@ -392,7 +392,7 @@ class ComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 		self.assertExpressionTests('ne', names1, names1, False)
 		self.assertExpressionTests('ne', names1, names2, True)
 
-class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class ArithmeticComparisonExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.ArithmeticComparisonExpression
 	def test_ast_expression_left_operator_right_arithmeticcomparison_array(self):
 		left_expr = ast.LiteralExpressionBase.from_value(context, ((1, 2, 3),))
@@ -466,7 +466,7 @@ class ArithmeticComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
 			with self.assertRaises(errors.EvaluationError):
 				self.assertExpressionTests(operation, left, right)
 
-class FuzzyComparisonExpressionTests(LeftOperatorRightExpresisonTestsBase):
+class FuzzyComparisonExpressionTests(BinaryExpressionTestsBase):
 	ExpressionClass = ast.FuzzyComparisonExpression
 	left_value = luke = ast.StringExpression(context, 'Luke Skywalker')
 	def test_ast_expression_left_operator_right_fuzzycomparison_literal(self):

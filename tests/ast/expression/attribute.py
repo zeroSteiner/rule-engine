@@ -38,6 +38,7 @@ import unittest
 from .literal import context
 import rule_engine.ast as ast
 import rule_engine.engine as engine
+from rule_engine.engine._attribute_resolver import _AttributeResolver
 import rule_engine.errors as errors
 import rule_engine.types as types
 
@@ -45,9 +46,9 @@ import dateutil.tz
 
 __all__ = ('GetAttributeExpressionTests',)
 
-class BadAttributeResolver(engine._AttributeResolver):
-	@engine._AttributeResolver.attribute('undefined', ast.DataType.STRING)
-	@engine._AttributeResolver.attribute('unsupported', ast.DataType.STRING, result_type=ast.DataType.BOOLEAN)
+class BadAttributeResolver(_AttributeResolver):
+	@_AttributeResolver.attribute('undefined', ast.DataType.STRING)
+	@_AttributeResolver.attribute('unsupported', ast.DataType.STRING, result_type=ast.DataType.BOOLEAN)
 	def string_attribute(self, value):
 		return None
 

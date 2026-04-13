@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#  tests/ast/expression/__init__.py
+#  rule_engine/types/__init__.py
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions are
@@ -30,13 +30,30 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import unittest
+from .coercion import coerce_value
+from .coercion import is_integer_number
+from .coercion import is_natural_number
+from .coercion import is_numeric
+from .coercion import is_real_number
 
-from .attribute import *
-from .function_call import *
-from .binary import *
-from .literal import *
-from .miscellaneous import *
+from .datatype import DataType
+from .datatype import iterable_member_value_type
 
-if __name__ == '__main__':
-	unittest.main()
+from .definitions import NoneType
+from .definitions import _ArrayDataTypeDef
+from .definitions import _CollectionDataTypeDef
+from .definitions import _FunctionDataTypeDef
+from .definitions import _MappingDataTypeDef
+from .definitions import _ObjectDataTypeDef
+from .definitions import _ReferenceDataTypeDef
+
+__all__ = (
+	'DataType',
+	'NoneType',
+	'coerce_value',
+	'is_integer_number',
+	'is_natural_number',
+	'is_numeric',
+	'is_real_number',
+	'iterable_member_value_type'
+)

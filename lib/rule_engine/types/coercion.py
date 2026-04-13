@@ -34,15 +34,16 @@ import collections
 import datetime
 import decimal
 import math
+from typing import Any
 
 from .datatype import DataType
 
-def _to_decimal(value):
+def _to_decimal(value: Any) -> decimal.Decimal:
     if isinstance(value, decimal.Decimal):
         return value
     return decimal.Decimal(repr(value))
 
-def coerce_value(value, verify_type=True):
+def coerce_value(value: Any, verify_type: bool = True) -> Any:
     """
     Take a native Python *value* and convert it to a value of a data type which can be represented by a Rule Engine
     :py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as
@@ -72,7 +73,7 @@ def coerce_value(value, verify_type=True):
         DataType.from_value(value)  # use this to raise a TypeError, if the type is incompatible
     return value
 
-def is_integer_number(value):
+def is_integer_number(value: Any) -> bool:
     """
     Check whether *value* is an integer number (i.e. a whole, number). This can, for example, be used to check if a
     floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
@@ -89,7 +90,7 @@ def is_integer_number(value):
         return False
     return True
 
-def is_natural_number(value):
+def is_natural_number(value: Any) -> bool:
     """
     Check whether *value* is a natural number (i.e. a whole, non-negative number). This can, for example, be used to
     check if a floating point number such as ``3.0`` can safely be converted to an integer without loss of information.
@@ -104,7 +105,7 @@ def is_natural_number(value):
         return False
     return True
 
-def is_real_number(value):
+def is_real_number(value: Any) -> bool:
     """
     Check whether *value* is a real number (i.e. capable of being represented as a floating point value without loss of
     information as well as being finite). Despite being able to be represented as a float, ``NaN`` is not considered a
@@ -120,7 +121,7 @@ def is_real_number(value):
         return False
     return True
 
-def is_numeric(value):
+def is_numeric(value: Any) -> bool:
     """
     Check whether *value* is a numeric value (i.e. capable of being represented as a floating point value without loss
     of information).

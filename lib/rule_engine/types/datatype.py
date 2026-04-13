@@ -33,6 +33,7 @@
 import collections.abc
 import datetime
 import decimal
+from typing import Any
 
 from .definitions import (
         _ArrayDataTypeDef,
@@ -48,7 +49,7 @@ from .definitions import (
         NoneType,
 )
 
-def iterable_member_value_type(python_value):
+def iterable_member_value_type(python_value: Any) -> _DataTypeDef:
     """
     Take a native *python_value* and return the corresponding data type of each of its members if the types are either
     the same or NULL. NULL is considered a special case to allow nullable-values. This by extension means that an
@@ -79,30 +80,32 @@ def iterable_member_value_type(python_value):
     return subvalue_type
 
 class DataTypeMeta(type):
-    def __new__(metacls, cls, bases, classdict):
+    _members_: tuple[str, ...]
+
+    def __new__(metacls, cls: str, bases: tuple[type, ...], classdict: dict[str, Any]) -> 'DataTypeMeta':
         data_type = super().__new__(metacls, cls, bases, classdict)
         members = []
         for key, value in classdict.items():
             if not key.upper() == key:
                 continue
-            if not isinstance(value, (_DataTypeDef, staticmethod)):
+            if not isinstance(value, _DataTypeDef):
                 continue
             members.append(key)
         data_type._members_ = tuple(members)
         return data_type
 
-    def __contains__(self, item):
-        return item in self._members_
+    def __contains__(cls, item: object) -> bool:
+        return item in cls._members_
 
-    def __getitem__(cls, item):
+    def __getitem__(cls, item: str) -> _DataTypeDef:
         if item not in cls._members_:
             raise KeyError(item)
         return getattr(cls, item)
 
-    def __iter__(cls):
+    def __iter__(cls) -> 'collections.abc.Iterator[str]':
         yield from cls._members_
 
-    def __len__(cls):
+    def __len__(cls) -> int:
         return len(cls._members_)
 
 class DataType(metaclass=DataTypeMeta):
@@ -134,16 +137,16 @@ class DataType(metaclass=DataTypeMeta):
       This checks that the types are compatible without any kind of conversion. When dealing with compound data types,
       this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.
     """
-    ARRAY = staticmethod(_ArrayDataTypeDef('ARRAY', tuple))
+    ARRAY = _ArrayDataTypeDef('ARRAY', tuple)
     BYTES = _DataTypeDef('BYTES', bytes)
     BOOLEAN = _DataTypeDef('BOOLEAN', bool)
     DATETIME = _DataTypeDef('DATETIME', datetime.datetime)
     FLOAT = _DataTypeDef('FLOAT', decimal.Decimal)
-    FUNCTION = staticmethod(_FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE))
-    MAPPING = staticmethod(_MappingDataTypeDef('MAPPING', dict))
+    FUNCTION = _FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE)
+    MAPPING = _MappingDataTypeDef('MAPPING', dict)
     NULL = _DataTypeDef('NULL', NoneType)
-    OBJECT = staticmethod(_ObjectDataTypeDef('OBJECT', object))
-    SET = staticmethod(_SetDataTypeDef('SET', set))
+    OBJECT = _ObjectDataTypeDef('OBJECT', object)
+    SET = _SetDataTypeDef('SET', set)
     STRING = _DataTypeDef('STRING', str)
     TIMEDELTA = _DataTypeDef('TIMEDELTA', datetime.timedelta)
     UNDEFINED = _DATA_TYPE_UNDEFINED
@@ -152,7 +155,7 @@ class DataType(metaclass=DataTypeMeta):
     currently unknown.
     """
     @staticmethod
-    def reference(name):
+    def reference(name: str) -> _ReferenceDataTypeDef:
         """
         Construct a forward-reference placeholder for use inside an :py:class:`~._ObjectDataTypeDef` schema. This is
         **not** itself a data type — it is a placeholder that resolves to an :py:class:`~._ObjectDataTypeDef` either
@@ -166,7 +169,7 @@ class DataType(metaclass=DataTypeMeta):
         return _ReferenceDataTypeDef(name)
 
     @classmethod
-    def from_name(cls, name):
+    def from_name(cls, name: str) -> _DataTypeDef:
         """
         Get the data type from its name.
 
@@ -183,7 +186,7 @@ class DataType(metaclass=DataTypeMeta):
         return dt
 
     @classmethod
-    def from_type(cls, python_type):
+    def from_type(cls, python_type: Any) -> _DataTypeDef:
         """
         Get the supported data type constant for the specified Python type/type hint. If the type or typehint can not be
         mapped to a supported data type, then a :py:exc:`ValueError` exception will be raised. This function will not
@@ -225,17 +228,17 @@ class DataType(metaclass=DataTypeMeta):
             if origin_python_type in (list, tuple, set):
                 if hasattr(python_type, "__args__") and origin_python_type is not tuple:
                     valuetype = cls.from_type(python_type.__args__[0])
-                    return maintype(valuetype)
+                    return maintype(valuetype)  # type: ignore[operator]
             if origin_python_type is dict:
                 if hasattr(python_type, "__args__"):
                     key_type = cls.from_type(python_type.__args__[0])
                     value_type = cls.from_type(python_type.__args__[1])
-                    return maintype(key_type, value_type)
+                    return maintype(key_type, value_type)  # type: ignore[operator]
             return maintype
         raise ValueError("can not map python type {0!r} to a compatible data type".format(python_type.__name__))
 
     @classmethod
-    def from_value(cls, python_value):
+    def from_value(cls, python_value: Any) -> _DataTypeDef:
         """
         Get the supported data type constant for the specified Python value. If the value can not be mapped to a
         supported data type, then a :py:exc:`TypeError` exception will be raised. This function will not return
@@ -272,7 +275,7 @@ class DataType(metaclass=DataTypeMeta):
         raise TypeError("can not map python type {0!r} to a compatible data type".format(type(python_value).__name__))
 
     @classmethod
-    def is_compatible(cls, dt1, dt2):
+    def is_compatible(cls, dt1: _DataTypeDef, dt2: _DataTypeDef) -> bool:
         """
         Check if two data type definitions are compatible without any kind of conversion. This evaluates to ``True``
         when one or both are :py:attr:`.UNDEFINED` or both types are the same. In the case of compound data types (such
@@ -298,6 +301,7 @@ class DataType(metaclass=DataTypeMeta):
                 if not cls.is_compatible(dt1.return_type, dt2.return_type):
                     return False
                 if dt1.argument_types != _DATA_TYPE_UNDEFINED and dt2.argument_types != _DATA_TYPE_UNDEFINED:
+                    assert isinstance(dt1.argument_types, tuple) and isinstance(dt2.argument_types, tuple)
                     if len(dt1.argument_types) != len(dt2.argument_types):
                         return False
                     if not all(cls.is_compatible(arg1_dt, arg2_dt) for (arg1_dt, arg2_dt) in zip(dt1.argument_types, dt2.argument_types)):
@@ -327,7 +331,7 @@ class DataType(metaclass=DataTypeMeta):
         return False
 
     @classmethod
-    def is_definition(cls, value):
+    def is_definition(cls, value: Any) -> bool:
         """
         Check if *value* is a data type definition.
 

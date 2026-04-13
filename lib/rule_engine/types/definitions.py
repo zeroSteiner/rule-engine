@@ -30,11 +30,13 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from __future__ import annotations
+
 import collections
 import collections.abc
-import datetime
-import decimal
 import threading
+from collections.abc import Mapping, Sequence
+from typing import Any, Callable, cast
 
 from .. import errors
 
@@ -45,42 +47,53 @@ NoneType = type(None)
 
 class _DataTypeDef(object):
     __slots__ = ('name', 'python_type', 'is_scalar', 'iterable_type')
-    def __init__(self, name, python_type):
+    name: str
+    python_type: type
+    is_scalar: bool
+    def __init__(self, name: str, python_type: type) -> None:
         self.name = name
         self.python_type = python_type
         self.is_scalar = True
-        if '__call__' in dir(self) and self.__call__.__doc__:
+        if '__call__' in dir(self) and self.__call__.__doc__:  # type: ignore[operator]
             # patch the call docs into the top-level class for Sphinx
-            self.__class__.__doc__ = self.__call__.__doc__
+            self.__class__.__doc__ = self.__call__.__doc__  # type: ignore[operator]
 
     @property
-    def is_iterable(self):
+    def is_iterable(self) -> bool:
         return getattr(self, 'iterable_type', None) is not None
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False
         return self.name == other.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} name={} python_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__)
 
     @property
-    def is_compound(self):
+    def is_compound(self) -> bool:
         return not self.is_scalar
 
 class _UndefinedDataTypeDef(_DataTypeDef):
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'UNDEFINED'
 
-_DATA_TYPE_UNDEFINED = _UndefinedDataTypeDef('UNDEFINED', errors.UNDEFINED)
+_DATA_TYPE_UNDEFINED = _UndefinedDataTypeDef('UNDEFINED', cast(type, errors.UNDEFINED))
 
 class _CollectionDataTypeDef(_DataTypeDef):
     __slots__ = ('value_type', 'value_type_nullable')
-    def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
+    value_type: _DataTypeDef
+    value_type_nullable: bool
+    def __init__(
+            self,
+            name: str,
+            python_type: type,
+            value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            value_type_nullable: bool = True
+    ) -> None:
         # check these three classes individually instead of using Collection which isn't available before Python v3.6
         if not issubclass(python_type, collections.abc.Container):
             raise TypeError('the specified python_type is not a container')
@@ -94,10 +107,10 @@ class _CollectionDataTypeDef(_DataTypeDef):
         self.value_type_nullable = value_type_nullable
 
     @property
-    def iterable_type(self):
+    def iterable_type(self) -> _DataTypeDef:  # type: ignore[override]
         return self.value_type
 
-    def __call__(self, value_type, value_type_nullable=True):
+    def __call__(self, value_type: _DataTypeDef, value_type_nullable: bool = True) -> _CollectionDataTypeDef:
         """
         :param value_type: The type of the members.
         :param bool value_type_nullable: Whether or not members are allowed to be :py:attr:`.NULL`.
@@ -109,7 +122,7 @@ class _CollectionDataTypeDef(_DataTypeDef):
                 value_type_nullable=value_type_nullable
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} name={} python_type={} value_type={} >".format(
                 self.__class__.__name__,
                 self.name,
@@ -117,29 +130,46 @@ class _CollectionDataTypeDef(_DataTypeDef):
                 self.value_type.name
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not super().__eq__(other):
             return False
+        assert isinstance(other, _CollectionDataTypeDef)
         return all((
                 self.value_type == other.value_type,
                 self.value_type_nullable == other.value_type_nullable
         ))
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar, hash((self.value_type, self.value_type_nullable))))
 
 class _ArrayDataTypeDef(_CollectionDataTypeDef):
     pass
 
 class _SetDataTypeDef(_CollectionDataTypeDef):
-    def __init__(self, name, python_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
+    def __init__(
+            self,
+            name: str,
+            python_type: type,
+            value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            value_type_nullable: bool = True
+    ) -> None:
         if isinstance(value_type, _ObjectDataTypeDef):
             raise errors.EngineError('OBJECT values may not be used as SET members')
         super(_SetDataTypeDef, self).__init__(name, python_type, value_type=value_type, value_type_nullable=value_type_nullable)
 
 class _MappingDataTypeDef(_DataTypeDef):
     __slots__ = ('key_type', 'value_type', 'value_type_nullable')
-    def __init__(self, name, python_type, key_type=_DATA_TYPE_UNDEFINED, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
+    key_type: _DataTypeDef
+    value_type: _DataTypeDef
+    value_type_nullable: bool
+    def __init__(
+            self,
+            name: str,
+            python_type: type,
+            key_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            value_type_nullable: bool = True
+    ) -> None:
         if not issubclass(python_type, collections.abc.Mapping):
             raise TypeError('the specified python_type is not a mapping')
         super(_MappingDataTypeDef, self).__init__(name, python_type)
@@ -153,10 +183,15 @@ class _MappingDataTypeDef(_DataTypeDef):
         self.value_type_nullable = value_type_nullable
 
     @property
-    def iterable_type(self):
+    def iterable_type(self) -> _DataTypeDef:  # type: ignore[override]
         return self.key_type
 
-    def __call__(self, key_type, value_type=_DATA_TYPE_UNDEFINED, value_type_nullable=True):
+    def __call__(
+            self,
+            key_type: _DataTypeDef,
+            value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            value_type_nullable: bool = True
+    ) -> _MappingDataTypeDef:
         """
         :param key_type: The type of the mapping keys.
         :param value_type: The type of the mapping values.
@@ -170,7 +205,7 @@ class _MappingDataTypeDef(_DataTypeDef):
                 value_type_nullable=value_type_nullable
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} name={} python_type={} key_type={} value_type={} >".format(
                 self.__class__.__name__,
                 self.name,
@@ -179,21 +214,34 @@ class _MappingDataTypeDef(_DataTypeDef):
                 self.value_type.name
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not super().__eq__(other):
             return False
+        assert isinstance(other, _MappingDataTypeDef)
         return all((
                 self.key_type == other.key_type,
                 self.value_type == other.value_type,
                 self.value_type_nullable == other.value_type_nullable
         ))
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar, hash((self.key_type, self.value_type, self.value_type_nullable))))
 
 class _FunctionDataTypeDef(_DataTypeDef):
     __slots__ = ('value_name', 'return_type', 'argument_types', 'minimum_arguments')
-    def __init__(self, name, python_type, value_name=None, return_type=_DATA_TYPE_UNDEFINED, argument_types=_DATA_TYPE_UNDEFINED, minimum_arguments=None):
+    value_name: str | None
+    return_type: _DataTypeDef
+    argument_types: tuple[_DataTypeDef, ...] | _DataTypeDef
+    minimum_arguments: int | _DataTypeDef
+    def __init__(
+            self,
+            name: str,
+            python_type: type,
+            value_name: str | None = None,
+            return_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            argument_types: tuple[_DataTypeDef, ...] | _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            minimum_arguments: int | _DataTypeDef | None = None
+    ) -> None:
         super(_FunctionDataTypeDef, self).__init__(name, python_type)
         self.value_name = value_name
         self.return_type = return_type
@@ -206,12 +254,18 @@ class _FunctionDataTypeDef(_DataTypeDef):
             if minimum_arguments is None:
                 # if arguments are specified, assume that they're all required by default
                 minimum_arguments = len(argument_types)
-            if len(argument_types) < minimum_arguments:
+            if len(argument_types) < minimum_arguments:  # type: ignore[operator]
                 raise ValueError('minimum_arguments can not be greater than the length of argument_types')
         self.argument_types = argument_types
         self.minimum_arguments = minimum_arguments
 
-    def __call__(self, name, return_type=_DATA_TYPE_UNDEFINED, argument_types=_DATA_TYPE_UNDEFINED, minimum_arguments=None):
+    def __call__(
+            self,
+            name: str,
+            return_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            argument_types: tuple[_DataTypeDef, ...] | _DataTypeDef = _DATA_TYPE_UNDEFINED,
+            minimum_arguments: int | _DataTypeDef | None = None
+    ) -> _FunctionDataTypeDef:
         """
         .. versionadded:: 4.0.0
 
@@ -231,7 +285,7 @@ class _FunctionDataTypeDef(_DataTypeDef):
                 argument_types=argument_types,
                 minimum_arguments=minimum_arguments
         )
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} name={} python_type={} return_type={} >".format(
                 self.__class__.__name__,
                 self.name,
@@ -239,16 +293,17 @@ class _FunctionDataTypeDef(_DataTypeDef):
                 self.return_type.name
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not super().__eq__(other):
             return False
+        assert isinstance(other, _FunctionDataTypeDef)
         return all((
                 self.return_type == other.return_type,
                 self.argument_types == other.argument_types,
                 self.minimum_arguments == other.minimum_arguments
         ))
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar, hash((self.return_type, self.argument_types, self.minimum_arguments))))
 
 class _ReferenceDataTypeDef(_DataTypeDef):
@@ -260,22 +315,22 @@ class _ReferenceDataTypeDef(_DataTypeDef):
     .. versionadded:: 5.0.0
     """
     __slots__ = ()
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         super(_ReferenceDataTypeDef, self).__init__(name, object)
         self.is_scalar = False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} name={} (unresolved forward reference) >".format(self.__class__.__name__, self.name)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, _ReferenceDataTypeDef):
             return False
         return self.name == other.name
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(('REFERENCE', self.name))
 
-def _substitute_self_references(definition, target):
+def _substitute_self_references(definition: _DataTypeDef, target: _ObjectDataTypeDef) -> _DataTypeDef:
     """
     Walk a data type *definition* and replace any :py:class:`_ReferenceDataTypeDef` whose name matches *target.name*
     with *target*. Cross-name references are left intact for later resolution. Nested :py:class:`_ObjectDataTypeDef`
@@ -312,8 +367,9 @@ def _substitute_self_references(definition, target):
     if isinstance(definition, _FunctionDataTypeDef):
         new_return_type = _substitute_self_references(definition.return_type, target)
         if definition.argument_types is _DATA_TYPE_UNDEFINED:
-            new_argument_types = definition.argument_types
+            new_argument_types: tuple[_DataTypeDef, ...] | _DataTypeDef = definition.argument_types
         else:
+            assert isinstance(definition.argument_types, tuple)
             new_argument_types = tuple(_substitute_self_references(arg_type, target) for arg_type in definition.argument_types)
         if new_return_type is definition.return_type and new_argument_types is definition.argument_types:
             return definition
@@ -338,7 +394,17 @@ class _ObjectDataTypeDef(_DataTypeDef):
     .. versionadded:: 5.0.0
     """
     __slots__ = ('attributes', 'attributes_nullable', 'accessor')
-    def __init__(self, name, python_type=object, attributes=None, accessor=None, attributes_nullable=None):
+    attributes: dict[str, _DataTypeDef]
+    attributes_nullable: dict[str, bool]
+    accessor: Callable[[Any, str], Any]
+    def __init__(
+            self,
+            name: str,
+            python_type: type = object,
+            attributes: Mapping[str, _DataTypeDef] | None = None,
+            accessor: Callable[[Any, str], Any] | None = None,
+            attributes_nullable: Mapping[str, bool] | None = None
+    ) -> None:
         super(_ObjectDataTypeDef, self).__init__(name, python_type)
         self.is_scalar = False
         self.attributes = dict(attributes) if attributes else {}
@@ -349,7 +415,13 @@ class _ObjectDataTypeDef(_DataTypeDef):
         for attr_name, attr_type in list(self.attributes.items()):
             self.attributes[attr_name] = _substitute_self_references(attr_type, self)
 
-    def __call__(self, name, attributes=None, accessor=None, attributes_nullable=None):
+    def __call__(
+            self,
+            name: str,
+            attributes: Mapping[str, _DataTypeDef] | None = None,
+            accessor: Callable[[Any, str], Any] | None = None,
+            attributes_nullable: Mapping[str, bool] | None = None
+    ) -> _ObjectDataTypeDef:
         """
         .. versionadded:: 5.0.0
 
@@ -370,17 +442,17 @@ class _ObjectDataTypeDef(_DataTypeDef):
                 attributes_nullable=attributes_nullable
         )
 
-    def is_attributes_nullable(self, attribute_name):
+    def is_attributes_nullable(self, attribute_name: str) -> bool:
         return self.attributes_nullable.get(attribute_name, True)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} name={} attributes=[{}] >".format(
                 self.__class__.__name__,
                 self.name,
                 ', '.join(self.attributes.keys())
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, _ObjectDataTypeDef):
             return False
         if self.name != other.name:
@@ -406,7 +478,7 @@ class _ObjectDataTypeDef(_DataTypeDef):
         finally:
             stack.discard(key)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # nominal hashing only: hashing the attribute schema would infinite-loop on self-references and provides no
         # benefit over name-based hashing since equality requires a full structural match anyway
         return hash(('OBJECT', self.name))

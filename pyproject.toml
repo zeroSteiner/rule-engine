@@ -39,6 +39,7 @@ Homepage = "https://github.com/zeroSteiner/rule-engine"
 dev = [
     "coverage",
     "graphviz",
+    "invoke",
     "ipython>=9.0; python_version >= '3.11'",
     "sphinx",
     "sphinx-rtd-theme",

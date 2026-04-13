@@ -31,10 +31,12 @@
 #
 
 import collections
+import copy
 import dataclasses
 import datetime
 import decimal
 import os
+import pickle
 import re
 import sys
 import types
@@ -580,6 +582,89 @@ class EngineDatetimeRuleTests(unittest.TestCase):
 	def test_subtract_timedelta_from_datetime(self):
 		rule = engine.Rule("d'2022-06-12' - t'P1D' == d'2022-06-11'")
 		self.assertTrue(rule.evaluate({}))
+
+class ContextSerializationTests(unittest.TestCase):
+	def test_context_pickle_default(self):
+		context = engine.Context()
+		context2 = pickle.loads(pickle.dumps(context))
+		self.assertEqual(context2.regex_flags, 0)
+		self.assertIsInstance(context2.default_value, type(errors.UNDEFINED))
+		self.assertTrue(context2.mapping_attribute_lookup)
+
+	def test_context_pickle_custom_params(self):
+		context = engine.Context(
+			regex_flags=re.IGNORECASE,
+			default_timezone='utc',
+			default_value=None,
+			mapping_attribute_lookup=False
+		)
+		context2 = pickle.loads(pickle.dumps(context))
+		self.assertEqual(context2.regex_flags, re.IGNORECASE)
+		self.assertEqual(context2.default_timezone, dateutil.tz.tzutc())
+		self.assertIsNone(context2.default_value)
+		self.assertFalse(context2.mapping_attribute_lookup)
+
+	def test_context_pickle_with_type_resolver_dict(self):
+		context = engine.Context(type_resolver={'name': ast.DataType.STRING})
+		context2 = pickle.loads(pickle.dumps(context))
+		self.assertEqual(context2.resolve_type('name'), ast.DataType.STRING)
+
+	def test_context_pickle_with_named_resolver(self):
+		context = engine.Context(resolver=engine.resolve_attribute)
+		context2 = pickle.loads(pickle.dumps(context))
+		thing = collections.namedtuple('Thing', ('name',))('test')
+		self.assertEqual(context2.resolve(thing, 'name'), 'test')
+
+	def test_context_pickle_preserves_symbols(self):
+		context = engine.Context()
+		engine.Rule('name == "test"', context=context)
+		self.assertIn('name', context.symbols)
+		context2 = pickle.loads(pickle.dumps(context))
+		self.assertEqual(context2.symbols, context.symbols)
+
+	def test_context_pickle_warned_state(self):
+		context = engine.Context()
+		context._mapping_fallback_warned = True
+		context2 = pickle.loads(pickle.dumps(context))
+		self.assertTrue(context2._mapping_fallback_warned)
+
+	def test_context_pickle_builtins_functional(self):
+		context = engine.Context()
+		context2 = pickle.loads(pickle.dumps(context))
+		rule = engine.Rule('$now != null', context=context2)
+		self.assertTrue(rule.matches({}))
+		result = engine.Rule('$now', context=context2).evaluate({})
+		self.assertIsInstance(result, datetime.datetime)
+
+	def test_rule_pickle(self):
+		rule = engine.Rule('name == "test"')
+		rule2 = pickle.loads(pickle.dumps(rule))
+		self.assertTrue(rule2.matches({'name': 'test'}))
+		self.assertFalse(rule2.matches({'name': 'other'}))
+
+	def test_rule_pickle_with_type_resolver(self):
+		context = engine.Context(type_resolver={'name': ast.DataType.STRING})
+		rule = engine.Rule('name == "test"', context=context)
+		rule2 = pickle.loads(pickle.dumps(rule))
+		self.assertTrue(rule2.matches({'name': 'test'}))
+		self.assertFalse(rule2.matches({'name': 'other'}))
+
+	def test_rule_pickle_text_preserved(self):
+		rule = engine.Rule('name == "test"')
+		rule2 = pickle.loads(pickle.dumps(rule))
+		self.assertEqual(rule2.text, rule.text)
+
+	def test_context_pickle_lambda_resolver_raises(self):
+		context = engine.Context(resolver=lambda thing, name: thing[name])
+		with self.assertRaises((AttributeError, pickle.PicklingError)):
+			pickle.dumps(context)
+
+	def test_context_copy(self):
+		context = engine.Context(default_timezone='utc')
+		context2 = copy.deepcopy(context)
+		self.assertEqual(context2.default_timezone, dateutil.tz.tzutc())
+		rule = engine.Rule('name == "test"', context=context2)
+		self.assertTrue(rule.matches({'name': 'test'}))
 
 if __name__ == '__main__':
 	unittest.main()

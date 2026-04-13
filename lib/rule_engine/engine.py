@@ -55,6 +55,9 @@ def _tls_getter(thread_local, key, _builtins):
 	# a function stub to be used with functools.partial for retrieving thread-local values
 	return getattr(thread_local.storage, key)
 
+def _default_type_resolver(_):
+	return ast.DataType.UNDEFINED
+
 def resolve_attribute(thing, name):
 	"""
 	A replacement resolver function for looking up symbols as members of *thing*. This is effectively the same as
@@ -501,12 +504,44 @@ class Context(object):
 		"""The *decimal_context* parameter from :py:meth:`~__init__`"""
 		if isinstance(type_resolver, collections.abc.Mapping):
 			type_resolver = type_resolver_from_dict(type_resolver)
-		self.__type_resolver = type_resolver or (lambda _: ast.DataType.UNDEFINED)
+		self.__type_resolver = type_resolver or _default_type_resolver
 		self.__resolver = resolver or resolve_item
 		self.mapping_attribute_lookup = mapping_attribute_lookup
 		"""The *mapping_attribute_lookup* parameter from :py:meth:`~__init__`."""
 		self._mapping_fallback_lock = threading.Lock()
 		self._mapping_fallback_warned = False
+
+	def __getstate__(self):
+		return {
+			'regex_flags': self.regex_flags,
+			'symbols': self.symbols,
+			'default_timezone': self.default_timezone,
+			'default_value': self.default_value,
+			'decimal_context': self.decimal_context,
+			'mapping_attribute_lookup': self.mapping_attribute_lookup,
+			'_mapping_fallback_warned': self._mapping_fallback_warned,
+			'_Context__type_resolver': self.__type_resolver,
+			'_Context__resolver': self.__resolver,
+		}
+
+	def __setstate__(self, state):
+		self.regex_flags = state['regex_flags']
+		self.symbols = state['symbols']
+		self.default_timezone = state['default_timezone']
+		self.default_value = state['default_value']
+		self.decimal_context = state['decimal_context']
+		self.mapping_attribute_lookup = state['mapping_attribute_lookup']
+		self._mapping_fallback_warned = state['_mapping_fallback_warned']
+		self.__type_resolver = state['_Context__type_resolver']
+		self.__resolver = state['_Context__resolver']
+		# recreate transient objects that can not be pickled
+		self._thread_local = threading.local()
+		self._mapping_fallback_lock = threading.Lock()
+		self.builtins = builtins.Builtins.from_defaults(
+			values={'re_groups': builtins.BuiltinValueGenerator(functools.partial(_tls_getter, self._thread_local, 'regex_groups'))},
+			value_types={'re_groups': ast.DataType.ARRAY(ast.DataType.STRING)},
+			timezone=self.default_timezone
+		)
 
 	@contextlib.contextmanager
 	def assignments(self, *assignments):
@@ -624,6 +659,14 @@ class Rule(object):
 		self.text = text
 		self.context = context
 		self.statement = self.parser.parse(text, context)
+
+	def __getstate__(self):
+		return {'text': self.text, 'context': self.context}
+
+	def __setstate__(self, state):
+		self.text = state['text']
+		self.context = state['context']
+		self.statement = self.parser.parse(self.text, self.context)
 
 	def __repr__(self):
 		return "<{0} text={1!r} >".format(self.__class__.__name__, self.text)

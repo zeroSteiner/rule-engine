@@ -61,6 +61,15 @@ def _builtin_random(boundary=None):
 		return random.randint(0, int(boundary))
 	return random.random()
 
+def _builtin_now(builtins):
+	return datetime.datetime.now(tz=builtins.timezone)
+
+def _builtin_today(builtins):
+	return _builtin_now(builtins).replace(hour=0, minute=0, second=0, microsecond=0)
+
+def _builtin_parse_datetime_generator(builtins):
+	return functools.partial(_builtin_parse_datetime, builtins)
+
 def _builtin_range(start, stop=None, step=None):
 	if not types.is_integer_number(start):
 		raise errors.FunctionCallError('argument #1 (start) must be an integer number')
@@ -156,7 +165,7 @@ class Builtins(collections.abc.Mapping):
 	@classmethod
 	def from_defaults(cls, values=None, **kwargs):
 		"""Initialize a :py:class:`Builtins` instance with a set of default values."""
-		now = BuiltinValueGenerator(lambda builtins: datetime.datetime.now(tz=builtins.timezone))
+		now = BuiltinValueGenerator(_builtin_now)
 		# there may be errors here if the decimal.Context precision exceeds what is provided by the math constants
 		default_values = {
 			# mathematical constants
@@ -164,7 +173,7 @@ class Builtins(collections.abc.Mapping):
 			'pi': decimal.Decimal(repr(math.pi)),
 			# timestamps
 			'now': now,
-			'today': BuiltinValueGenerator(lambda builtins: now(builtins).replace(hour=0, minute=0, second=0, microsecond=0)),
+			'today': BuiltinValueGenerator(_builtin_today),
 			# functions
 			'abs': abs,
 			'any': any,
@@ -174,7 +183,7 @@ class Builtins(collections.abc.Mapping):
 			'max': max,
 			'min': min,
 			'filter': _builtin_filter,
-			'parse_datetime': BuiltinValueGenerator(lambda builtins: functools.partial(_builtin_parse_datetime, builtins)),
+			'parse_datetime': BuiltinValueGenerator(_builtin_parse_datetime_generator),
 			'parse_float': parse_float,
 			'parse_timedelta': parse_timedelta,
 			'random': _builtin_random,

@@ -52,7 +52,9 @@ except ImportError:
 else:
     has_development_dependencies = True
 
-def main():
+from typing import Any
+
+def main() -> None:
     parser = argparse.ArgumentParser(description='Rule Engine: Debug REPL', conflict_handler='resolve')
     parser.add_argument(
             '--debug',
@@ -83,8 +85,8 @@ def main():
     else:
         color_scheme = 'neutral'
 
-    context = engine.Context()
-    thing = None
+    context: engine.Context = engine.Context()
+    thing: Any = None
     if arguments.edit_console or arguments.edit_file:
         console = code.InteractiveConsole({
                 'context': context,
@@ -92,22 +94,24 @@ def main():
         })
         if arguments.edit_file:
             print('executing: ' + arguments.edit_file.name)
-            console.runcode(code.compile_command(
+            compiled = code.compile_command(
                     arguments.edit_file.read(),
                     filename=arguments.edit_file.name,
                     symbol='exec'
-            ))
+            )
+            assert compiled is not None
+            console.runcode(compiled)
             context = console.locals['context']
             thing = console.locals['thing']
         if arguments.edit_console:
-            namespace = {'context': context, 'thing': thing}
+            namespace: dict[str, Any] = {'context': context, 'thing': thing}
             print("Starting IPython shell...")
             print("Edit the \'context\' and \'thing\' objects as necessary")
             embed(colors=color_scheme, user_ns=namespace)
             context = namespace.get('context', context)
             thing = namespace.get('thing', thing)
     debugging = arguments.debug
-    session = PromptSession()
+    session: PromptSession[str] = PromptSession()
     color_tb = ultratb.FormattedTB(theme_name=color_scheme)
     if color_scheme == 'nocolor':
         exc_name_color = ''

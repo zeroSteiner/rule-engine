@@ -36,11 +36,11 @@ import os
 from . import __version__
 from . import engine
 
-def _print_written(file_path):
+def _print_written(file_path: str) -> None:
     size = os.stat(file_path).st_size
     print("wrote {:,} bytes to {}".format(size, file_path))
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description='Rule Engine: Debug AST', conflict_handler='resolve')
     parser.add_argument('output', help='output files')
     parser.add_argument('-t', '--text', dest='rule_text', help='the rule text to debug')

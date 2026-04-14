@@ -38,25 +38,27 @@ import decimal
 import functools
 import threading
 import warnings
+from typing import Any, Callable, Iterator
 
 from .. import ast  # noqa: F401 — must be imported before builtins to avoid a circular import
 from .. import builtins
 from .. import errors
 from .. import types
 from ..suggestions import suggest_symbol
+from ..types import _DataTypeDef
 
 from ._attribute_resolver import _AttributeResolver
 
 import dateutil.tz
 
-def _tls_getter(thread_local, key, _builtins):
+def _tls_getter(thread_local: threading.local, key: str, _builtins: Any) -> Any:
     # a function stub to be used with functools.partial for retrieving thread-local values
     return getattr(thread_local.storage, key)
 
-def _default_type_resolver(_):
+def _default_type_resolver(_: str) -> _DataTypeDef:
     return types.DataType.UNDEFINED
 
-def resolve_attribute(thing, name):
+def resolve_attribute(thing: Any, name: str) -> Any:
     """
     A replacement resolver function for looking up symbols as members of *thing*. This is effectively the same as
     ``thing.name``. The *thing* object can be a :py:func:`~collections.namedtuple`, a custom Python class or any other
@@ -74,7 +76,7 @@ def resolve_attribute(thing, name):
         raise errors.SymbolResolutionError(name, thing=thing, suggestion=suggest_symbol(name, dir(thing)))
     return getattr(thing, name)
 
-def resolve_item(thing, name):
+def resolve_item(thing: Any, name: str) -> Any:
     """
     A resolver function for looking up symbols as items from an object (*thing*) which supports the
     :py:class:`~collections.abc.Mapping` interface, such as a dictionary. This is effectively the same as
@@ -90,12 +92,12 @@ def resolve_item(thing, name):
         raise errors.SymbolResolutionError(name, thing=thing, suggestion=suggest_symbol(name, thing.keys()))
     return thing[name]
 
-def _type_resolver(type_map, name):
+def _type_resolver(type_map: dict[str, _DataTypeDef], name: str) -> _DataTypeDef:
     if name not in type_map:
         raise errors.SymbolResolutionError(name, suggestion=suggest_symbol(name, type_map.keys()))
     return type_map[name]
 
-def type_resolver_from_dict(dictionary):
+def type_resolver_from_dict(dictionary: collections.abc.Mapping[str, Any]) -> Callable[[str], _DataTypeDef]:
     """
     Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a dictionary. If
     any of the values within the dictionary are not of a compatible data type, a :py:exc:`TypeError` will be raised.
@@ -117,11 +119,13 @@ class _ThreadLocalStorage(object):
     states are kept isolated.
     """
     __slots__ = ('assignment_scopes', 'regex_groups')
-    def __init__(self):
+    assignment_scopes: 'collections.deque[dict[str, ast.Assignment]]'
+    regex_groups: tuple[str, ...] | None
+    def __init__(self) -> None:
         self.assignment_scopes = collections.deque()
         self.regex_groups = None
 
-    def reset(self):
+    def reset(self) -> None:
         self.assignment_scopes.clear()
         self.regex_groups = None
 
@@ -133,14 +137,14 @@ class Context(object):
     def __init__(
                     self,
                     *,
-                    regex_flags=0,
-                    resolver=None,
-                    type_resolver=None,
-                    default_timezone='local',
-                    default_value=errors.UNDEFINED,
-                    decimal_context=None,
-                    mapping_attribute_lookup=True
-    ):
+                    regex_flags: int = 0,
+                    resolver: Callable[[Any, str], Any] | None = None,
+                    type_resolver: Callable[[str], _DataTypeDef] | collections.abc.Mapping[str, Any] | None = None,
+                    default_timezone: str | datetime.tzinfo = 'local',
+                    default_value: Any = errors.UNDEFINED,
+                    decimal_context: decimal.Context | None = None,
+                    mapping_attribute_lookup: bool = True
+    ) -> None:
         """
         :param int regex_flags: The flags to provide to functions in the :py:mod:`re` module when calling either the
                 :py:func:`~re.match` or :py:func:`~re.search` functions for comparison expressions.
@@ -178,7 +182,7 @@ class Context(object):
         """
         self.regex_flags = regex_flags
         """The *regex_flags* parameter from :py:meth:`~__init__`"""
-        self.symbols = set()
+        self.symbols: set[str] = set()
         """
         The symbols that are referred to by the rule. Some or all of these will need to be resolved at evaluation time.
         This attribute can be used after a rule is generated to ensure that all symbols are valid before it is
@@ -216,7 +220,7 @@ class Context(object):
         self._mapping_fallback_lock = threading.Lock()
         self._mapping_fallback_warned = False
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, Any]:
         return {
                 'regex_flags': self.regex_flags,
                 'symbols': self.symbols,
@@ -229,7 +233,7 @@ class Context(object):
                 '_Context__resolver': self.__resolver,
         }
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict[str, Any]) -> None:
         self.regex_flags = state['regex_flags']
         self.symbols = state['symbols']
         self.default_timezone = state['default_timezone']
@@ -249,7 +253,7 @@ class Context(object):
         )
 
     @contextlib.contextmanager
-    def assignments(self, *assignments):
+    def assignments(self, *assignments: 'ast.Assignment') -> Iterator[None]:
         """
         Add the specified assignments to a thread-specific scope. This is used when an assignment originates from an
         expression.
@@ -264,12 +268,14 @@ class Context(object):
             self._tls.assignment_scopes.pop()
 
     @property
-    def _tls(self):
+    def _tls(self) -> _ThreadLocalStorage:
         if not hasattr(self._thread_local, 'storage'):
             self._thread_local.storage = _ThreadLocalStorage()
-        return self._thread_local.storage
+        storage = self._thread_local.storage
+        assert isinstance(storage, _ThreadLocalStorage)
+        return storage
 
-    def resolve(self, thing, name, scope=None):
+    def resolve(self, thing: Any, name: str, scope: str | None = None) -> Any:
         """
         The method to use for resolving symbols names to values. This function must return a compatible value for the
         specified symbol name. When a *scope* is defined, this function handles the resolution itself, however when the
@@ -295,7 +301,7 @@ class Context(object):
         raise errors.SymbolResolutionError(name, symbol_scope=scope, thing=thing)
 
     __resolve_attribute = _AttributeResolver()
-    def resolve_attribute(self, thing, object_, name):
+    def resolve_attribute(self, thing: Any, object_: Any, name: str) -> Any:
         """
         The method to use for resolving attributes from values. This function must return a compatible value for the
         specified attribute name.
@@ -311,7 +317,7 @@ class Context(object):
         return self.__resolve_attribute(thing, object_, name)
     resolve_attribute_type = __resolve_attribute.resolve_type
 
-    def _warn_mapping_fallback(self, attribute_name):
+    def _warn_mapping_fallback(self, attribute_name: str) -> None:
         with self._mapping_fallback_lock:
             if self._mapping_fallback_warned:
                 return
@@ -324,7 +330,7 @@ class Context(object):
         ).format(attribute_name)
         warnings.warn(errors.MappingAttributeLookupDeprecation(message), stacklevel=2)
 
-    def resolve_type(self, name, scope=None):
+    def resolve_type(self, name: str, scope: str | None = None) -> _DataTypeDef:
         """
         A method for providing type hints while the rule is being generated. This can be used to ensure that all symbol
         names are valid and that the types are appropriate for the operations being performed. It must then return one
@@ -339,5 +345,6 @@ class Context(object):
             return self.builtins.resolve_type(name)
         for assignments in self._tls.assignment_scopes:
             if name in assignments:
-                return assignments[name].value_type
+                value_type = assignments[name].value_type
+                return value_type if value_type is not None else types.DataType.UNDEFINED
         return self.__type_resolver(name)

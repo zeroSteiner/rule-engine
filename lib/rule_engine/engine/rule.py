@@ -31,22 +31,26 @@
 #
 
 import decimal
+from typing import Any, Iterable, Iterator, TYPE_CHECKING
 
 from .. import errors
 from .. import parser
 from .context import Context
+
+if TYPE_CHECKING:
+    import graphviz
 
 class Rule(object):
     """
     A rule which parses a string with a logical expression and can then evaluate an arbitrary object for whether or not
     it matches based on the constraints of the expression.
     """
-    parser = parser.Parser()
+    parser: parser.Parser = parser.Parser()
     """
     The :py:class:`~rule_engine.parser.Parser` instance that will be used for parsing the rule text into a compatible
     abstract syntax tree (AST) for evaluation.
     """
-    def __init__(self, text, context=None):
+    def __init__(self, text: str, context: Context | None = None) -> None:
         """
         :param str text: The text of the logical expression.
         :param context: The context to use for evaluating the expression on arbitrary objects. This can be used to
@@ -59,21 +63,21 @@ class Rule(object):
         self.context = context
         self.statement = self.parser.parse(text, context)
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, Any]:
         return {'text': self.text, 'context': self.context}
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict[str, Any]) -> None:
         self.text = state['text']
         self.context = state['context']
         self.statement = self.parser.parse(self.text, self.context)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} text={1!r} >".format(self.__class__.__name__, self.text)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text
 
-    def filter(self, things):
+    def filter(self, things: Iterable[Any]) -> Iterator[Any]:
         """
         A convenience function for iterating over *things* and yielding each member that :py:meth:`.matches` return True
         for.
@@ -83,7 +87,7 @@ class Rule(object):
         yield from (thing for thing in things if self.matches(thing))
 
     @classmethod
-    def is_valid(cls, text, context=None):
+    def is_valid(cls, text: str, context: Context | None = None) -> bool:
         """
         Test whether or not the rule is syntactically correct. This verifies the grammar is well structured and that
         there are no type compatibility issues regarding literals or symbols with known types (see
@@ -101,7 +105,7 @@ class Rule(object):
             return False
         return True
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         """
         Evaluate the rule against the specified *thing* and return the value. This can be used to, for example, apply
         the symbol resolver.
@@ -114,7 +118,7 @@ class Rule(object):
         with decimal.localcontext(self.context.decimal_context):
             return self.statement.evaluate(thing)
 
-    def matches(self, thing):
+    def matches(self, thing: Any) -> bool:
         """
         Evaluate the rule against the specified *thing*. This will either return whether *thing* matches, or an
         exception will be raised.
@@ -125,7 +129,7 @@ class Rule(object):
         """
         return bool(self.evaluate(thing))
 
-    def to_graphviz(self):
+    def to_graphviz(self) -> 'graphviz.Digraph':
         """
         Generate a diagram of the parsed rule's AST using GraphViz.
 
@@ -138,7 +142,7 @@ class Rule(object):
         return digraph
 
 class DebugRule(Rule):
-    parser = None
-    def __init__(self, *args, **kwargs):
+    parser: parser.Parser  # set per-instance in __init__ (overrides the class-level attribute on Rule)
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.parser = parser.Parser(debug=True)
         super(DebugRule, self).__init__(*args, **kwargs)

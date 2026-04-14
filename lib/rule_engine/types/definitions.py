@@ -36,7 +36,7 @@ import collections
 import collections.abc
 import threading
 from collections.abc import Mapping, Sequence
-from typing import Any, Callable, cast
+from typing import Any, Callable, ClassVar, cast
 
 from .. import errors
 
@@ -330,14 +330,30 @@ class _ReferenceDataTypeDef(_DataTypeDef):
     def __hash__(self) -> int:
         return hash(('REFERENCE', self.name))
 
+class _SelfReferenceDataTypeDef(_ReferenceDataTypeDef):
+    """
+    A sentinel forward-reference meaning "the enclosing :py:class:`_ObjectDataTypeDef` schema". Used via
+    :py:attr:`~_ObjectDataTypeDef.self` and resolved during :py:meth:`_ObjectDataTypeDef.__init__` regardless of its
+    name. Exists so schemas can self-reference without repeating their own name.
+
+    .. versionadded:: 5.0.0
+    """
+    __slots__ = ()
+    def __init__(self) -> None:
+        super(_SelfReferenceDataTypeDef, self).__init__('__self__')
+
+    def __repr__(self) -> str:
+        return "<{} (self reference placeholder) >".format(self.__class__.__name__)
+
 def _substitute_self_references(definition: _DataTypeDef, target: _ObjectDataTypeDef) -> _DataTypeDef:
     """
     Walk a data type *definition* and replace any :py:class:`_ReferenceDataTypeDef` whose name matches *target.name*
-    with *target*. Cross-name references are left intact for later resolution. Nested :py:class:`_ObjectDataTypeDef`
-    schemas are not descended into — their own ``__init__`` already resolved self references within their scope.
+    (or any :py:class:`_SelfReferenceDataTypeDef` sentinel) with *target*. Cross-name references are left intact for
+    later resolution. Nested :py:class:`_ObjectDataTypeDef` schemas are not descended into — their own ``__init__``
+    already resolved self references within their scope.
     """
     if isinstance(definition, _ReferenceDataTypeDef):
-        if definition.name == target.name:
+        if isinstance(definition, _SelfReferenceDataTypeDef) or definition.name == target.name:
             return target
         return definition
     if isinstance(definition, _ObjectDataTypeDef):
@@ -397,6 +413,9 @@ class _ObjectDataTypeDef(_DataTypeDef):
     attributes: dict[str, _DataTypeDef]
     attributes_nullable: dict[str, bool]
     accessor: Callable[[Any, str], Any]
+    # class attribute (not in __slots__) — set after class definition below; a sentinel used inside attribute
+    # schemas to self-reference the enclosing OBJECT without repeating its name
+    self: ClassVar[_SelfReferenceDataTypeDef]
     def __init__(
             self,
             name: str,
@@ -427,8 +446,9 @@ class _ObjectDataTypeDef(_DataTypeDef):
 
         :param str name: The name of the object schema.
         :param dict attributes: A mapping of attribute names to their data type definitions. A
-                :py:func:`~.DataType.reference` placeholder with the same ``name`` resolves to the new type itself,
-                enabling self-referential schemas.
+                :py:meth:`~_ObjectDataTypeDef.reference` placeholder with the same ``name`` (or the
+                :py:attr:`~_ObjectDataTypeDef.self` sentinel) resolves to the new type itself, enabling
+                self-referential schemas.
         :param accessor: A callable of the form ``accessor(value, attribute_name)`` used to fetch an attribute's
                 value at evaluation time. Defaults to :py:func:`getattr`.
         :param dict attributes_nullable: A mapping of attribute names to a ``bool`` indicating whether the attribute
@@ -441,6 +461,23 @@ class _ObjectDataTypeDef(_DataTypeDef):
                 accessor=accessor,
                 attributes_nullable=attributes_nullable
         )
+
+    @staticmethod
+    def reference(name: str) -> _ReferenceDataTypeDef:
+        """
+        Construct a forward-reference placeholder for use inside an :py:class:`_ObjectDataTypeDef` schema. This is
+        **not** itself a data type — it is a placeholder that resolves to an :py:class:`_ObjectDataTypeDef` either at
+        construction time (for self references within the same schema) or at rule parse time (for cross-type
+        references) via a :py:class:`~rule_engine.engine.Context`'s ``type_resolver``.
+
+        For self-references within a schema, prefer the :py:attr:`~_ObjectDataTypeDef.self` sentinel, which avoids
+        repeating the enclosing schema's name.
+
+        .. versionadded:: 5.0.0
+
+        :param str name: The name of the referenced OBJECT schema.
+        """
+        return _ReferenceDataTypeDef(name)
 
     def is_attributes_nullable(self, attribute_name: str) -> bool:
         return self.attributes_nullable.get(attribute_name, True)
@@ -482,3 +519,7 @@ class _ObjectDataTypeDef(_DataTypeDef):
         # nominal hashing only: hashing the attribute schema would infinite-loop on self-references and provides no
         # benefit over name-based hashing since equality requires a full structural match anyway
         return hash(('OBJECT', self.name))
+
+# Sentinel used inside OBJECT attribute schemas to denote "the enclosing OBJECT schema". Attached as a class attribute
+# so it is available via ``DataType.OBJECT.self`` without depending on any particular OBJECT instance.
+_ObjectDataTypeDef.self = _SelfReferenceDataTypeDef()

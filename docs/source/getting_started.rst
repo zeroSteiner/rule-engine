@@ -297,7 +297,8 @@ Continuing the comic book example, suppose the data is backed by Python objects 
        nemesis: 'Hero' = None  # self-referential
 
 Define the corresponding ``OBJECT`` type and place it in the ``type_resolver``. Use
-:py:meth:`~.DataType.reference` for the self-referential ``nemesis`` attribute:
+:py:attr:`~.DataType.OBJECT.self` as a shorthand for the self-referential ``nemesis`` attribute (or
+:py:meth:`~.DataType.OBJECT.reference` by name for cross-type references):
 
 .. code-block:: python
 
@@ -305,7 +306,7 @@ Define the corresponding ``OBJECT`` type and place it in the ``type_resolver``. 
        'name': rule_engine.DataType.STRING,
        'publisher': rule_engine.DataType.STRING,
        'first_appearance': rule_engine.DataType.DATETIME,
-       'nemesis': rule_engine.DataType.reference('Hero'),
+       'nemesis': rule_engine.DataType.OBJECT.self,
    })
 
    context = rule_engine.Context(type_resolver={

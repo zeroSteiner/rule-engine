@@ -188,7 +188,7 @@ class ObjectTypeTests(unittest.TestCase):
         return types.DataType.OBJECT('Person', attributes={
                 'name': types.DataType.STRING,
                 'rank': types.DataType.STRING,
-                'manager': types.DataType.reference('Person'),
+                'manager': types.DataType.OBJECT.reference('Person'),
         }, **kwargs)
 
     def _context(self, **extra_types):
@@ -228,11 +228,11 @@ class ObjectTypeTests(unittest.TestCase):
     def test_object_rule_cross_type_mutual_reference(self):
         Person = types.DataType.OBJECT('Person', attributes={
                 'name': types.DataType.STRING,
-                'employer': types.DataType.reference('Company'),
+                'employer': types.DataType.OBJECT.reference('Company'),
         })
         Company = types.DataType.OBJECT('Company', attributes={
                 'name': types.DataType.STRING,
-                'ceo': types.DataType.reference('Person'),
+                'ceo': types.DataType.OBJECT.reference('Person'),
         })
         context = engine.Context(type_resolver={'employee': Person, 'Person': Person, 'Company': Company})
         rule = engine.Rule('employee.employer.ceo.name == "Palpatine"', context=context)
@@ -254,7 +254,7 @@ class ObjectTypeTests(unittest.TestCase):
 
     def test_object_rule_unresolved_cross_reference(self):
         Person = types.DataType.OBJECT('Person', attributes={
-                'employer': types.DataType.reference('Company'),
+                'employer': types.DataType.OBJECT.reference('Company'),
                 'name': types.DataType.STRING,
         })
         context = engine.Context(type_resolver={'employee': Person, 'Person': Person})
@@ -263,7 +263,7 @@ class ObjectTypeTests(unittest.TestCase):
 
     def test_object_rule_reference_resolves_to_non_object(self):
         Person = types.DataType.OBJECT('Person', attributes={
-                'employer': types.DataType.reference('Company'),
+                'employer': types.DataType.OBJECT.reference('Company'),
         })
         context = engine.Context(type_resolver={
                 'employee': Person,
@@ -275,7 +275,7 @@ class ObjectTypeTests(unittest.TestCase):
 
     def test_object_rule_reference_name_mismatch(self):
         Person = types.DataType.OBJECT('Person', attributes={
-                'employer': types.DataType.reference('Company'),
+                'employer': types.DataType.OBJECT.reference('Company'),
         })
         Corporation = types.DataType.OBJECT('Corporation', attributes={'name': types.DataType.STRING})
         context = engine.Context(type_resolver={
@@ -298,7 +298,7 @@ class ObjectTypeTests(unittest.TestCase):
     def test_object_rule_array_of_reference(self):
         Person = self._person_type()
         context = engine.Context(type_resolver={
-                'crew': types.DataType.ARRAY(types.DataType.reference('Person')),
+                'crew': types.DataType.ARRAY(types.DataType.OBJECT.reference('Person')),
                 'Person': Person,
         })
         rule = engine.Rule('crew[0].name == "Han"', context=context)
@@ -316,7 +316,7 @@ class ObjectTypeTests(unittest.TestCase):
     def test_object_rule_mapping_of_reference(self):
         Person = self._person_type()
         context = engine.Context(type_resolver={
-                'roster': types.DataType.MAPPING(types.DataType.STRING, value_type=types.DataType.reference('Person')),
+                'roster': types.DataType.MAPPING(types.DataType.STRING, value_type=types.DataType.OBJECT.reference('Person')),
                 'Person': Person,
         })
         rule = engine.Rule('roster["alice"].name == "Alice"', context=context)
@@ -392,7 +392,7 @@ class ObjectTypeTests(unittest.TestCase):
     def test_object_rule_comprehension_over_array_of_reference(self):
         Person = self._person_type()
         context = engine.Context(type_resolver={
-                'crew': types.DataType.ARRAY(types.DataType.reference('Person')),
+                'crew': types.DataType.ARRAY(types.DataType.OBJECT.reference('Person')),
                 'Person': Person,
         })
         rule = engine.Rule('[m for m in crew if m.name == "Han"]', context=context)

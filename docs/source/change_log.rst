@@ -26,7 +26,9 @@ Version 5.0.0
 * Added the new :py:attr:`~rule_engine.types.DataType.OBJECT` compound data type for user-defined schemas with named,
   typed attributes. See the :ref:`OBJECT section<data-types>` in the Data Types page for details.
 
-    * Use :py:meth:`~rule_engine.types.DataType.reference` for self-referential and mutually-recursive schemas
+    * Use :py:meth:`~rule_engine.types.DataType.OBJECT.reference` (or the
+      :py:attr:`~rule_engine.types.DataType.OBJECT.self` shorthand sentinel) for self-referential and mutually-recursive
+      schemas
     * Attribute access is validated at parse time against the declared schema
     * Item access (``obj["name"]``) and containment checks (``"name" in obj``) on ``OBJECT`` values are rejected at
       parse time

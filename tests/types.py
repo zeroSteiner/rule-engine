@@ -331,7 +331,7 @@ class ObjectDataTypeTests(unittest.TestCase):
         return DataType.OBJECT('Hero', attributes={
                 'name': DataType.STRING,
                 'first_appearance': DataType.DATETIME,
-                'nemesis': DataType.reference('Hero'),
+                'nemesis': DataType.OBJECT.reference('Hero'),
         })
 
     def test_object_bare_repr_and_member_registration(self):
@@ -369,15 +369,29 @@ class ObjectDataTypeTests(unittest.TestCase):
         Hero = self._build_hero()
         self.assertIs(Hero.attributes['nemesis'], Hero)
 
+    def test_object_self_sentinel(self):
+        Hero = DataType.OBJECT('Hero', attributes={
+                'name': DataType.STRING,
+                'nemesis': DataType.OBJECT.self,
+                'sidekicks': DataType.ARRAY(DataType.OBJECT.self),
+        })
+        self.assertIs(Hero.attributes['nemesis'], Hero)
+        self.assertIs(Hero.attributes['sidekicks'].value_type, Hero)
+
+    def test_object_self_sentinel_uses_reserved_name(self):
+        # the sentinel carries a reserved name so users don't collide with it
+        self.assertEqual(DataType.OBJECT.self.name, '__self__')
+        self.assertIsInstance(DataType.OBJECT.self, types._ReferenceDataTypeDef)
+
     def test_object_self_reference_inside_array(self):
         Hero = DataType.OBJECT('Hero', attributes={
-                'sidekicks': DataType.ARRAY(DataType.reference('Hero')),
+                'sidekicks': DataType.ARRAY(DataType.OBJECT.reference('Hero')),
         })
         self.assertIs(Hero.attributes['sidekicks'].value_type, Hero)
 
     def test_object_self_reference_inside_mapping(self):
         Hero = DataType.OBJECT('Hero', attributes={
-                'known_aliases': DataType.MAPPING(DataType.STRING, value_type=DataType.reference('Hero')),
+                'known_aliases': DataType.MAPPING(DataType.STRING, value_type=DataType.OBJECT.reference('Hero')),
         })
         self.assertIs(Hero.attributes['known_aliases'].value_type, Hero)
 
@@ -385,8 +399,8 @@ class ObjectDataTypeTests(unittest.TestCase):
         Hero = DataType.OBJECT('Hero', attributes={
                 'promote': DataType.FUNCTION(
                         'promote',
-                        return_type=DataType.reference('Hero'),
-                        argument_types=(DataType.reference('Hero'),)
+                        return_type=DataType.OBJECT.reference('Hero'),
+                        argument_types=(DataType.OBJECT.reference('Hero'),)
                 ),
         })
         self.assertIs(Hero.attributes['promote'].return_type, Hero)
@@ -394,7 +408,7 @@ class ObjectDataTypeTests(unittest.TestCase):
 
     def test_object_cross_reference_left_unresolved(self):
         Person = DataType.OBJECT('Person', attributes={
-                'employer': DataType.reference('Company'),
+                'employer': DataType.OBJECT.reference('Company'),
         })
         self.assertIsInstance(Person.attributes['employer'], types._ReferenceDataTypeDef)
         self.assertEqual(Person.attributes['employer'].name, 'Company')
@@ -463,10 +477,10 @@ class ObjectDataTypeTests(unittest.TestCase):
 
     def test_object_is_compatible_with_reference(self):
         Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
-        self.assertTrue(DataType.is_compatible(Hero, DataType.reference('Hero')))
-        self.assertTrue(DataType.is_compatible(DataType.reference('Hero'), Hero))
+        self.assertTrue(DataType.is_compatible(Hero, DataType.OBJECT.reference('Hero')))
+        self.assertTrue(DataType.is_compatible(DataType.OBJECT.reference('Hero'), Hero))
         # even mismatching reference names are optimistically compatible; real check happens at parse time
-        self.assertTrue(DataType.is_compatible(Hero, DataType.reference('Wookiee')))
+        self.assertTrue(DataType.is_compatible(Hero, DataType.OBJECT.reference('Wookiee')))
 
     def test_object_is_compatible_with_scalar(self):
         Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
@@ -532,22 +546,22 @@ class ObjectDataTypeTests(unittest.TestCase):
         self.assertIs(Hero.accessor, dict_getter)
 
     def test_reference_is_definition(self):
-        ref = DataType.reference('Hero')
+        ref = DataType.OBJECT.reference('Hero')
         self.assertTrue(DataType.is_definition(ref))
         self.assertFalse(ref.is_scalar)
         self.assertTrue(ref.is_compound)
 
     def test_reference_equality_and_hash(self):
-        a = DataType.reference('Hero')
-        b = DataType.reference('Hero')
-        c = DataType.reference('Wookiee')
+        a = DataType.OBJECT.reference('Hero')
+        b = DataType.OBJECT.reference('Hero')
+        c = DataType.OBJECT.reference('Wookiee')
         self.assertEqual(a, b)
         self.assertEqual(hash(a), hash(b))
         self.assertNotEqual(a, c)
         self.assertNotEqual(a, 'Hero')
 
     def test_reference_repr(self):
-        ref = DataType.reference('Hero')
+        ref = DataType.OBJECT.reference('Hero')
         self.assertRegex(repr(ref), r'name=Hero')
         self.assertIn('unresolved', repr(ref))
 
@@ -555,12 +569,12 @@ class ObjectDataTypeTests(unittest.TestCase):
         # SET(reference('Self')) gets resolved during _ObjectDataTypeDef.__init__ which triggers SET's OBJECT rejection
         with self.assertRaises(errors.EngineError):
             DataType.OBJECT('Hero', attributes={
-                    'allies': DataType.SET(DataType.reference('Hero')),
+                    'allies': DataType.SET(DataType.OBJECT.reference('Hero')),
             })
 
     def test_substitute_self_references_noop_on_unrelated_reference(self):
         Person = DataType.OBJECT('Person', attributes={
-                'manager': DataType.ARRAY(DataType.reference('Manager')),
+                'manager': DataType.ARRAY(DataType.OBJECT.reference('Manager')),
         })
         # cross-reference is left intact since the name doesn't match
         self.assertIsInstance(Person.attributes['manager'].value_type, types._ReferenceDataTypeDef)
@@ -590,7 +604,7 @@ class ObjectDataTypeTests(unittest.TestCase):
     def test_object_schema_with_function_undefined_arguments(self):
         # exercises the argument_types is UNDEFINED branch in _substitute_self_references
         Hero = DataType.OBJECT('Hero', attributes={
-                'describe': DataType.FUNCTION('describe', return_type=DataType.reference('Hero')),
+                'describe': DataType.FUNCTION('describe', return_type=DataType.OBJECT.reference('Hero')),
         })
         self.assertIs(Hero.attributes['describe'].return_type, Hero)
         self.assertIs(Hero.attributes['describe'].argument_types, DataType.UNDEFINED)
@@ -606,7 +620,7 @@ class ObjectDataTypeTests(unittest.TestCase):
         Inner = DataType.OBJECT('Inner', attributes={'name': DataType.STRING})
         Outer = DataType.OBJECT('Outer', attributes={
                 'inner': Inner,
-                'self_ref': DataType.reference('Outer'),
+                'self_ref': DataType.OBJECT.reference('Outer'),
         })
         # nested OBJECT is not descended into (its own __init__ handled its scope)
         self.assertIs(Outer.attributes['inner'], Inner)

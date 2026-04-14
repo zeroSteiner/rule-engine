@@ -154,20 +154,6 @@ class DataType(metaclass=DataTypeMeta):
     Undefined values. This constant can be used to indicate that a particular symbol is valid, but it's data type is
     currently unknown.
     """
-    @staticmethod
-    def reference(name: str) -> _ReferenceDataTypeDef:
-        """
-        Construct a forward-reference placeholder for use inside an :py:class:`~._ObjectDataTypeDef` schema. This is
-        **not** itself a data type — it is a placeholder that resolves to an :py:class:`~._ObjectDataTypeDef` either
-        at construction time (for self references within the same schema) or at rule parse time (for cross-type
-        references) via a :py:class:`~rule_engine.engine.Context`'s ``type_resolver``.
-
-        .. versionadded:: 5.0.0
-
-        :param str name: The name of the referenced OBJECT schema.
-        """
-        return _ReferenceDataTypeDef(name)
-
     @classmethod
     def from_name(cls, name: str) -> _DataTypeDef:
         """

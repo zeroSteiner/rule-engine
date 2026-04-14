@@ -99,14 +99,15 @@ backing stores (dictionaries, database rows, etc.):
 Forward References and Recursion
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use :py:meth:`DataType.reference` to create a forward-reference placeholder inside an attribute schema.
-Self-references are resolved automatically at construction:
+Use :py:meth:`DataType.OBJECT.reference` to create a forward-reference placeholder inside an attribute schema.
+Self-references are resolved automatically at construction. For self-references, :py:attr:`DataType.OBJECT.self` is
+a shorthand sentinel that avoids repeating the enclosing schema's name:
 
 .. code-block:: python
 
    Hero = rule_engine.DataType.OBJECT('Hero', attributes={
        'name': rule_engine.DataType.STRING,
-       'nemesis': rule_engine.DataType.reference('Hero'),  # resolved to Hero
+       'nemesis': rule_engine.DataType.OBJECT.self,  # resolved to Hero
    })
 
 For mutually-recursive types, place both types in the ``type_resolver`` dict and the references will be resolved lazily
@@ -116,11 +117,11 @@ at rule parse time:
 
    Person = rule_engine.DataType.OBJECT('Person', attributes={
        'name': rule_engine.DataType.STRING,
-       'employer': rule_engine.DataType.reference('Company'),
+       'employer': rule_engine.DataType.OBJECT.reference('Company'),
    })
    Company = rule_engine.DataType.OBJECT('Company', attributes={
        'name': rule_engine.DataType.STRING,
-       'ceo': rule_engine.DataType.reference('Person'),
+       'ceo': rule_engine.DataType.OBJECT.reference('Person'),
    })
 
    context = rule_engine.Context(type_resolver={

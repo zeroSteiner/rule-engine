@@ -32,7 +32,7 @@
 
 import functools
 import re
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from typing import Any
 
 
@@ -90,7 +90,7 @@ def _suggest(word: str, options: Sequence[str]) -> str | None:
         return None
     return sorted(options, key=functools.partial(jaro_winkler_similarity, word))[0]
 
-def suggest_symbol(word: str, options: Sequence[str]) -> str | None:
+def suggest_symbol(word: str, options: Iterable[str]) -> str | None:
     """
     Select the best match for *word* from a list of value *options*. Values that are not suitable symbol names will be
     filtered out of *options*. If no match is found, this function will return None.

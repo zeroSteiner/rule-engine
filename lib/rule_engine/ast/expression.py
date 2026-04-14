@@ -35,12 +35,13 @@ import collections.abc
 import datetime
 import functools
 import operator
+from typing import TYPE_CHECKING, Any, Callable, Iterable
 
 from .. import builtins as _builtins
 from .. import errors
 from ..suggestions import suggest_symbol
 from ..types import DataType, coerce_value, is_numeric
-from ..types import _ObjectDataTypeDef
+from ..types import _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef, _ObjectDataTypeDef
 
 from .base import (
         Assignment,
@@ -52,12 +53,22 @@ from .base import (
 )
 from .literal import BooleanExpression, FloatExpression, NullExpression, TimedeltaExpression
 
+if TYPE_CHECKING:
+    from ..engine.context import Context
+
 ################################################################################
 # Miscellaneous Expressions
 ################################################################################
 class ComprehensionExpression(ExpressionBase):
-    result_type = DataType.ARRAY
-    def __init__(self, context, result, variable, iterable, condition=None):
+    result_type: _DataTypeDef = DataType.ARRAY
+    def __init__(
+            self,
+            context: 'Context',
+            result: ExpressionBase,
+            variable: str,
+            iterable: ExpressionBase,
+            condition: ExpressionBase | None = None
+    ) -> None:
         self.context = context
         self.result = result
         self.variable = variable
@@ -66,23 +77,37 @@ class ComprehensionExpression(ExpressionBase):
         self.result_type = DataType.ARRAY(self.result.result_type)
 
     @classmethod
-    def build(cls, context, result, variable, iterable, condition=None):
-        iterable = iterable.build()
-        if iterable.result_type is not DataType.UNDEFINED and not iterable.result_type.is_iterable:
+    def build(  # type: ignore[override]
+            cls,
+            context: 'Context',
+            result: ExpressionBase,
+            variable: str,
+            iterable: ExpressionBase,
+            condition: ExpressionBase | None = None
+    ) -> ExpressionBase:
+        iterable_built = iterable.build()
+        assert isinstance(iterable_built, ExpressionBase)
+        if iterable_built.result_type is not DataType.UNDEFINED and not iterable_built.result_type.is_iterable:
             raise errors.EvaluationError('data type mismatch (comprehension requires an iterable)')
-        resolved_iterable_type = _resolve_type(iterable.result_type, context)
+        resolved_iterable_type = _resolve_type(iterable_built.result_type, context)
         assignment = Assignment(variable, value_type=getattr(resolved_iterable_type, 'iterable_type', DataType.UNDEFINED))
         with context.assignments(assignment):
             if condition is not None:
-                condition = condition.build()
-            result = result.build()
-        return cls(context, result, variable, iterable, condition=condition).reduce()
+                condition_built = condition.build()
+                assert isinstance(condition_built, ExpressionBase)
+                condition = condition_built
+            result_built = result.build()
+            assert isinstance(result_built, ExpressionBase)
+            result = result_built
+        reduced = cls(context, result, variable, iterable_built, condition=condition).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} iterable={1!r} result={2!r} condition={3!r} >".format(self.__class__.__name__, self.iterable, self.result, self.condition)
 
-    def evaluate(self, thing):
-        output_array = collections.deque()
+    def evaluate(self, thing: Any) -> Any:
+        output_array: 'collections.deque[Any]' = collections.deque()
         input_iterable = self.iterable.evaluate(thing)
         if not DataType.from_value(input_iterable).is_iterable:
             raise errors.EvaluationError('data type mismatch (comprehension requires an iterable)')
@@ -93,7 +118,7 @@ class ComprehensionExpression(ExpressionBase):
                     output_array.append(self.result.evaluate(thing))
         return tuple(output_array)
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         digraph.node(str(id(self)), "{}\nvariable={!r}".format(self.__class__.__name__, self.variable))
         self.result.to_graphviz(digraph, *args, **kwargs)
         digraph.edge(str(id(self)), str(id(self.result)), label='result')
@@ -106,8 +131,8 @@ class ComprehensionExpression(ExpressionBase):
 class ContainsExpression(ExpressionBase):
     """An expression used to test whether an item exists within a container."""
     __slots__ = ('container', 'member')
-    result_type = DataType.BOOLEAN
-    def __init__(self, context, container, member):
+    result_type: _DataTypeDef = DataType.BOOLEAN
+    def __init__(self, context: 'Context', container: ExpressionBase, member: ExpressionBase) -> None:
         if container.result_type == DataType.BYTES or container.result_type == DataType.STRING:
             if member.result_type != DataType.UNDEFINED and member.result_type != container.result_type:
                 raise errors.EvaluationError('data type mismatch')
@@ -120,13 +145,19 @@ class ContainsExpression(ExpressionBase):
         self.container = container
 
     @classmethod
-    def build(cls, context, container, member):
-        return cls(context, container.build(), member.build()).reduce()
+    def build(cls, context: 'Context', container: ExpressionBase, member: ExpressionBase) -> ExpressionBase:  # type: ignore[override]
+        container_built = container.build()
+        assert isinstance(container_built, ExpressionBase)
+        member_built = member.build()
+        assert isinstance(member_built, ExpressionBase)
+        reduced = cls(context, container_built, member_built).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} container={1!r} member={2!r} >".format(self.__class__.__name__, self.container, self.member)
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> bool:
         container_value = self.container.evaluate(thing)
         container_value_type = DataType.from_value(container_value)
         member_value = self.member.evaluate(thing)
@@ -135,12 +166,12 @@ class ContainsExpression(ExpressionBase):
                 raise errors.EvaluationError('data type mismatch')
         return bool(member_value in container_value)
 
-    def reduce(self):
+    def reduce(self) -> ExpressionBase:
         if not _is_reduced(self.container, self.member):
             return self
         return BooleanExpression(self.context, self.evaluate(None))
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         super(ContainsExpression, self).to_graphviz(digraph, *args, **kwargs)
         self.container.to_graphviz(digraph, *args, **kwargs)
         self.member.to_graphviz(digraph, *args, **kwargs)
@@ -150,7 +181,7 @@ class ContainsExpression(ExpressionBase):
 class GetAttributeExpression(ExpressionBase):
     """A class representing an expression in which *name* is retrieved as an attribute of *object*."""
     __slots__ = ('name', 'object', 'safe', '_object_type')
-    def __init__(self, context, object_, name, safe=False):
+    def __init__(self, context: 'Context', object_: ExpressionBase, name: str, safe: bool = False) -> None:
         """
         :param context: The context to use for evaluating the expression.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -195,13 +226,17 @@ class GetAttributeExpression(ExpressionBase):
         self.safe = safe
 
     @classmethod
-    def build(cls, context, object_, name, safe=False):
-        return cls(context, object_.build(), name, safe=safe).reduce()
+    def build(cls, context: 'Context', object_: ExpressionBase, name: str, safe: bool = False) -> ExpressionBase:  # type: ignore[override]
+        object_built = object_.build()
+        assert isinstance(object_built, ExpressionBase)
+        reduced = cls(context, object_built, name, safe=safe).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         resolved_obj = self.object.evaluate(thing)
         if resolved_obj is None and self.safe:
             return resolved_obj
@@ -248,7 +283,7 @@ class GetAttributeExpression(ExpressionBase):
             value = default_value
         return self._new_value(value, verify_type=False)
 
-    def reduce(self):
+    def reduce(self) -> ExpressionBase:
         if not _is_reduced(self.object):
             return self
         literal = LiteralExpressionBase.from_value(self.context, self.evaluate(None))
@@ -256,7 +291,7 @@ class GetAttributeExpression(ExpressionBase):
             literal.result_type = self.result_type
         return literal
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         digraph.node(str(id(self)), "{}\nname={!r}".format(self.__class__.__name__, self.name))
         self.object.to_graphviz(digraph, *args, **kwargs)
         digraph.edge(str(id(self)), str(id(self.object)))
@@ -264,7 +299,7 @@ class GetAttributeExpression(ExpressionBase):
 class GetItemExpression(ExpressionBase):
     """A class representing an expression in which an *item* is retrieved from a container *object*."""
     __slots__ = ('container', 'item', 'safe')
-    def __init__(self, context, container, item, safe=False):
+    def __init__(self, context: 'Context', container: ExpressionBase, item: ExpressionBase, safe: bool = False) -> None:
         """
         :param context: The context to use for evaluating the expression.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -309,13 +344,19 @@ class GetItemExpression(ExpressionBase):
         self.safe = safe
 
     @classmethod
-    def build(cls, context, container, item, safe=False):
-        return cls(context, container.build(), item.build(), safe=safe).reduce()
+    def build(cls, context: 'Context', container: ExpressionBase, item: ExpressionBase, safe: bool = False) -> ExpressionBase:  # type: ignore[override]
+        container_built = container.build()
+        assert isinstance(container_built, ExpressionBase)
+        item_built = item.build()
+        assert isinstance(item_built, ExpressionBase)
+        reduced = cls(context, container_built, item_built, safe=safe).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} container={1!r} item={2!r} >".format(self.__class__.__name__, self.container, self.item)
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         resolved_obj = self.container.evaluate(thing)
         if resolved_obj is None:
             if self.safe:
@@ -334,7 +375,7 @@ class GetItemExpression(ExpressionBase):
             raise errors.LookupError(resolved_obj, resolved_item)
         return self._new_value(value, verify_type=False)
 
-    def reduce(self):
+    def reduce(self) -> ExpressionBase:
         if isinstance(self.container.result_type, DataType.MAPPING.__class__):
             if self.safe and not DataType.is_compatible(self.item.result_type, self.container.result_type.key_type):
                 return NullExpression(self.context)
@@ -342,7 +383,7 @@ class GetItemExpression(ExpressionBase):
             return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
         return self
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         super(GetItemExpression, self).to_graphviz(digraph, *args, **kwargs)
         self.container.to_graphviz(digraph, *args, **kwargs)
         self.item.to_graphviz(digraph, *args, **kwargs)
@@ -352,7 +393,13 @@ class GetItemExpression(ExpressionBase):
 class GetSliceExpression(ExpressionBase):
     """A class representing an expression in which a range of items is retrieved from a container *object*."""
     __slots__ = ('container', 'start', 'stop', 'safe')
-    def __init__(self, context, container, start=None, stop=None, safe=False):
+    def __init__(
+            self,
+            context: 'Context',
+            container: ExpressionBase,
+            start: ExpressionBase | None = None,
+            stop: ExpressionBase | None = None, safe: bool = False
+    ) -> None:
         """
         :param context: The context to use for evaluating the expression.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -384,17 +431,32 @@ class GetSliceExpression(ExpressionBase):
         self.safe = safe
 
     @classmethod
-    def build(cls, context, container, start=None, stop=None, safe=False):
+    def build(  # type: ignore[override]
+            cls,
+            context: 'Context',
+            container: ExpressionBase,
+            start: ExpressionBase | None = None,
+            stop: ExpressionBase | None = None,
+            safe: bool = False
+    ) -> ExpressionBase:
         if start is not None:
-            start = start.build()
+            start_built = start.build()
+            assert isinstance(start_built, ExpressionBase)
+            start = start_built
         if stop is not None:
-            stop = stop.build()
-        return cls(context, container.build(), start=start, stop=stop, safe=safe).reduce()
+            stop_built = stop.build()
+            assert isinstance(stop_built, ExpressionBase)
+            stop = stop_built
+        container_built = container.build()
+        assert isinstance(container_built, ExpressionBase)
+        reduced = cls(context, container_built, start=start, stop=stop, safe=safe).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} container={1!r} start={2!r} stop={3!r} >".format(self.__class__.__name__, self.container, self.start, self.stop)
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         resolved_obj = self.container.evaluate(thing)
         if resolved_obj is None:
             if self.safe:
@@ -412,12 +474,12 @@ class GetSliceExpression(ExpressionBase):
         value = operator.getitem(resolved_obj, slice(resolved_start, resolved_stop))
         return coerce_value(value, verify_type=False)
 
-    def reduce(self):
+    def reduce(self) -> ExpressionBase:
         if not _is_reduced(self.container, self.start, self.stop):
             return self
         return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         super(GetSliceExpression, self).to_graphviz(digraph, *args, **kwargs)
         self.container.to_graphviz(digraph, *args, **kwargs)
         self.start.to_graphviz(digraph, *args, **kwargs)
@@ -432,7 +494,7 @@ class SymbolExpression(ExpressionBase):
     :py:class:`~rule_engine.engine.Context` object.
     """
     __slots__ = ('name', 'result_type', 'scope')
-    def __init__(self, context, name, scope=None):
+    def __init__(self, context: 'Context', name: str, scope: str | None = None) -> None:
         """
         :param context: The context to use for evaluating the expression.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -448,10 +510,10 @@ class SymbolExpression(ExpressionBase):
             self.result_type = type_hint
         self.scope = scope
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} name={1!r} >".format(self.__class__.__name__, self.name)
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         try:
             value = self.context.resolve(thing, self.name, scope=self.scope)
         except errors.SymbolResolutionError:
@@ -478,6 +540,8 @@ class SymbolExpression(ExpressionBase):
         if DataType.is_compatible(value_type, self.result_type):
             if self.result_type.is_scalar:
                 return value
+            assert isinstance(self.result_type, (_CollectionDataTypeDef, _MappingDataTypeDef))
+            assert isinstance(value_type, (_CollectionDataTypeDef, _MappingDataTypeDef))
             if self.result_type.value_type == DataType.UNDEFINED:
                 return value
             if value_type.value_type == DataType.UNDEFINED:
@@ -493,37 +557,50 @@ class SymbolExpression(ExpressionBase):
 
         raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         digraph.node(str(id(self)), "{}\nname={!r}".format(self.__class__.__name__, self.name))
 
 class FunctionCallExpression(ExpressionBase):
     __slots__ = ('function', 'arguments',)
-    def __init__(self, context, function, arguments):
+    arguments: tuple[ExpressionBase, ...]
+    def __init__(self, context: 'Context', function: ExpressionBase, arguments: Iterable[ExpressionBase]) -> None:
         self.context = context
         self.function = function
+        argument_tuple: tuple[ExpressionBase, ...] = tuple(arguments)
         if self.function.result_type != DataType.UNDEFINED:
             function_type = self.function.result_type
-            self._validate_function(function_type, arguments)
+            self._validate_function(function_type, argument_tuple)
+            assert isinstance(function_type, _FunctionDataTypeDef)
             self.result_type = function_type.return_type
-        self.arguments = arguments
+        self.arguments = argument_tuple
 
     @classmethod
-    def build(cls, context, function, arguments):
-        return cls(context, function.build(), tuple(argument.build() for argument in arguments)).reduce()
+    def build(cls, context: 'Context', function: ExpressionBase, arguments: Iterable[ExpressionBase]) -> ExpressionBase:  # type: ignore[override]
+        function_built = function.build()
+        assert isinstance(function_built, ExpressionBase)
+        built_args: list[ExpressionBase] = []
+        for argument in arguments:
+            argument_built = argument.build()
+            assert isinstance(argument_built, ExpressionBase)
+            built_args.append(argument_built)
+        reduced = cls(context, function_built, tuple(built_args)).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def reduce(self):
+    def reduce(self) -> ExpressionBase:
         if not _is_reduced(self.function, *self.arguments):
             return self
         return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         function = self.function.evaluate(thing)
         if not callable(function):
             raise errors.EvaluationError('data type mismatch (not a callable value)')
         arguments = tuple(argument.evaluate(thing) for argument in self.arguments)
-        function_name = '<unknown>'
+        function_name: str | None = '<unknown>'
         if self.function.result_type != DataType.UNDEFINED:
             function_type = self.function.result_type
+            assert isinstance(function_type, _FunctionDataTypeDef)
             function_name = function_type.value_name
             self._validate_function(function_type, arguments)
         elif hasattr(function, '__name__'):
@@ -540,16 +617,18 @@ class FunctionCallExpression(ExpressionBase):
             raise errors.FunctionCallError('function call failed (data type mismatch on returned value)', function_name=function_name)
         return result
 
-    def _validate_function(self, function_type, arguments):
-        if not isinstance(function_type, DataType.FUNCTION.__class__):
+    def _validate_function(self, function_type: _DataTypeDef, arguments: 'tuple[Any, ...]') -> None:
+        if not isinstance(function_type, _FunctionDataTypeDef):
             raise errors.EvaluationError('data type mismatch (not a callable value)')
         if function_type.minimum_arguments is not DataType.UNDEFINED:
+            assert isinstance(function_type.minimum_arguments, int)
             if len(arguments) < function_type.minimum_arguments:
                 raise errors.FunctionCallError(
                         "expected at least {} positional arguments".format(function_type.minimum_arguments),
                         function_name=function_type.value_name
                 )
         if function_type.argument_types is not DataType.UNDEFINED:
+            assert isinstance(function_type.argument_types, tuple)
             if len(arguments) > len(function_type.argument_types):
                 raise errors.FunctionCallError(
                         "expected at most {} positional arguments".format(len(function_type.argument_types)),
@@ -566,7 +645,7 @@ class FunctionCallExpression(ExpressionBase):
                             function_name=function_type.value_name
                     )
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         super(FunctionCallExpression, self).to_graphviz(digraph, *args, **kwargs)
         self.function.to_graphviz(digraph, *args, **kwargs)
         digraph.edge(str(id(self)), str(id(self.function)), label='function')
@@ -579,7 +658,7 @@ class TernaryExpression(ExpressionBase):
     A class for representing ternary expressions from the grammar text. These involve evaluating :py:attr:`.condition`
     before evaluating either :py:attr:`.case_true` or :py:attr:`.case_false` based on the results.
     """
-    def __init__(self, context, condition, case_true, case_false):
+    def __init__(self, context: 'Context', condition: ExpressionBase, case_true: ExpressionBase, case_false: ExpressionBase) -> None:
         """
         :param context: The context to use for evaluating the expression.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -599,20 +678,31 @@ class TernaryExpression(ExpressionBase):
         # todo: the other compound types should be checked here as well.
 
     @classmethod
-    def build(cls, context, condition, case_true, case_false):
-        return cls(context, condition.build(), case_true.build(), case_false.build()).reduce()
+    def build(cls, context: 'Context', condition: ExpressionBase, case_true: ExpressionBase, case_false: ExpressionBase) -> ExpressionBase:  # type: ignore[override]
+        condition_built = condition.build()
+        assert isinstance(condition_built, ExpressionBase)
+        case_true_built = case_true.build()
+        assert isinstance(case_true_built, ExpressionBase)
+        case_false_built = case_false.build()
+        assert isinstance(case_false_built, ExpressionBase)
+        reduced = cls(context, condition_built, case_true_built, case_false_built).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         case = (self.case_true if self.condition.evaluate(thing) else self.case_false)
         return case.evaluate(thing)
 
-    def reduce(self):
+    def reduce(self) -> ExpressionBase:
         if not _is_reduced(self.condition):
             return self
+        assert isinstance(self.condition, LiteralExpressionBase)
         reduced_condition = bool(self.condition.value)
-        return self.case_true.reduce() if reduced_condition else self.case_false.reduce()
+        reduced = self.case_true.reduce() if reduced_condition else self.case_false.reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         super(TernaryExpression, self).to_graphviz(digraph, *args, **kwargs)
         self.condition.to_graphviz(digraph, *args, **kwargs)
         self.case_true.to_graphviz(digraph, *args, **kwargs)
@@ -625,7 +715,7 @@ class UnaryExpression(ExpressionBase):
     """
     A class for representing unary expressions from the grammar text. These involve a single operator on the left side.
     """
-    def __init__(self, context, type_, right):
+    def __init__(self, context: 'Context', type_: str, right: ExpressionBase) -> None:
         """
         :param context: The context to use for evaluating the expression.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -646,21 +736,25 @@ class UnaryExpression(ExpressionBase):
         self.right = right
 
     @classmethod
-    def build(cls, context, type_, right):
-        return cls(context, type_, right.build()).reduce()
+    def build(cls, context: 'Context', type_: str, right: ExpressionBase) -> ExpressionBase:  # type: ignore[override]
+        right_built = right.build()
+        assert isinstance(right_built, ExpressionBase)
+        reduced = cls(context, type_, right_built).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} type={!r} >".format(self.__class__.__name__, self.type)
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         return self._evaluator(thing)
 
-    def __op(self, op, thing):
+    def __op(self, op: Callable[[Any], Any], thing: Any) -> Any:
         return op(self.right.evaluate(thing))
 
     _op_not = functools.partialmethod(__op, operator.not_)
 
-    def __op_arithmetic(self, op, thing):
+    def __op_arithmetic(self, op: Callable[[Any], Any], thing: Any) -> Any:
         right = self.right.evaluate(thing)
         if not is_numeric(right) and not isinstance(right, datetime.timedelta):
             raise errors.EvaluationError('data type mismatch (not a numeric or timedelta value)')
@@ -668,7 +762,7 @@ class UnaryExpression(ExpressionBase):
 
     _op_uminus = functools.partialmethod(__op_arithmetic, operator.neg)
 
-    def reduce(self):
+    def reduce(self) -> ExpressionBase:
         type_ = self.type.lower()
         if not _is_reduced(self.right):
             return self
@@ -680,8 +774,9 @@ class UnaryExpression(ExpressionBase):
             elif isinstance(self.right, TimedeltaExpression):
                 return TimedeltaExpression(self.context, self.evaluate(None))
             raise errors.EvaluationError('data type mismatch (not a float or timedelta expression)')
+        raise errors.EngineError('unsupported unary expression type')
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type.lower()))
         self.right.to_graphviz(digraph, *args, **kwargs)
         digraph.edge(str(id(self)), str(id(self.right)))

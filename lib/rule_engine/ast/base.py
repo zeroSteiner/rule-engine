@@ -31,32 +31,36 @@
 #
 
 import datetime
+from typing import TYPE_CHECKING, Any, Iterable
 
 from .. import errors
 from ..types import *
-from ..types import _ObjectDataTypeDef, _ReferenceDataTypeDef
+from ..types import _DataTypeDef, _ObjectDataTypeDef, _ReferenceDataTypeDef
 
-def _assert_is_bytes(*values):
+if TYPE_CHECKING:
+    from ..engine.context import Context
+
+def _assert_is_bytes(*values: Any) -> None:
     if not all(map(isinstance, values, [bytes])):
         raise errors.EvaluationError('data type mismatch (not a bytes value)')
 
-def _assert_is_integer_number(*values):
+def _assert_is_integer_number(*values: Any) -> None:
     if not all(map(is_integer_number, values)):
         raise errors.EvaluationError('data type mismatch (not an integer number)')
 
-def _assert_is_natural_number(*values):
+def _assert_is_natural_number(*values: Any) -> None:
     if not all(map(is_natural_number, values)):
         raise errors.EvaluationError('data type mismatch (not a natural number)')
 
-def _assert_is_numeric(*values):
+def _assert_is_numeric(*values: Any) -> None:
     if not all(map(is_numeric, values)):
         raise errors.EvaluationError('data type mismatch (not a numeric value)')
 
-def _assert_is_string(*values):
+def _assert_is_string(*values: Any) -> None:
     if not all(map(isinstance, values, [str])):
         raise errors.EvaluationError('data type mismatch (not a string value)')
 
-def _is_reduced(*values):
+def _is_reduced(*values: Any) -> bool:
     """
     Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of its
     members are reduced literals. A value that causes this to evaluate to True for is able to be evaluated without a
@@ -64,13 +68,13 @@ def _is_reduced(*values):
     """
     return all((isinstance(value, LiteralExpressionBase) and value.is_reduced) for value in values)
 
-def _iterable_member_value_type(value):
+def _iterable_member_value_type(value: Iterable[Any]) -> _DataTypeDef:
     value = (
             member.result_type if isinstance(member, ExpressionBase) else member for member in value
     )
     return iterable_member_value_type(value)
 
-def _resolve_type(definition, context):
+def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
     """
     Resolve any :py:class:`~rule_engine.types._ReferenceDataTypeDef` placeholders inside *definition* via the
     *context*'s :py:meth:`~rule_engine.engine.Context.resolve_type` callback. Returns a new definition with the
@@ -122,9 +126,11 @@ def _resolve_type(definition, context):
         )
     if isinstance(definition, DataType.FUNCTION.__class__):
         new_return_type = _resolve_type(definition.return_type, context)
+        new_argument_types: tuple[_DataTypeDef, ...] | _DataTypeDef
         if definition.argument_types is DataType.UNDEFINED:
             new_argument_types = definition.argument_types
         else:
+            assert isinstance(definition.argument_types, tuple)
             new_argument_types = tuple(_resolve_type(arg, context) for arg in definition.argument_types)
         if new_return_type is definition.return_type and new_argument_types is definition.argument_types:
             return definition
@@ -141,7 +147,10 @@ def _resolve_type(definition, context):
 class Assignment(object):
     """An internal assignment whereby a symbol is populated with a value of the specified type."""
     __slots__ = ('name', 'value', 'value_type')
-    def __init__(self, name, *, value=errors.UNDEFINED, value_type=None):
+    name: str
+    value: Any
+    value_type: _DataTypeDef | None
+    def __init__(self, name: str, *, value: Any = errors.UNDEFINED, value_type: _DataTypeDef | None = None) -> None:
         """
         :param str name: The symbol name that the assignment is defining.
         :param value: The value of the assignment.
@@ -154,18 +163,18 @@ class Assignment(object):
             value_type = DataType.from_value(value)
         self.value_type = value_type
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} name={!r} value={!r} value_type={!r} >".format(self.__class__.__name__, self.name, self.value, self.value_type)
 
 class ASTNodeBase(object):
-    def to_graphviz(self, digraph):
+    def to_graphviz(self, digraph: Any) -> None:
         digraph.node(str(id(self)), self.__class__.__name__)
 
     @classmethod
-    def build(cls, *args, **kwargs):
+    def build(cls, *args: Any, **kwargs: Any) -> 'ASTNodeBase':
         return cls(*args, **kwargs).reduce()
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         """
         Evaluate this AST node and all applicable children nodes.
 
@@ -174,7 +183,7 @@ class ASTNodeBase(object):
         """
         raise NotImplementedError()
 
-    def reduce(self):
+    def reduce(self) -> 'ASTNodeBase':
         """
         Reduce this expression into a smaller subset of nodes. If the expression can not be reduced, then return an
         instance of itself, otherwise return a reduced :py:class:`.ExpressionBase` to replace it.
@@ -186,13 +195,14 @@ class ASTNodeBase(object):
 
 class Comment(ASTNodeBase):
     __slots__ = ('value',)
-    def __init__(self, value):
+    value: Any
+    def __init__(self, value: Any) -> None:
         self.value = value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} {1!r}>".format(self.__class__.__name__, self.value)
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         digraph.node(str(id(self)), "{}\n{!r}".format(self.__class__.__name__, self.value))
 
 ################################################################################
@@ -200,12 +210,13 @@ class Comment(ASTNodeBase):
 ################################################################################
 class ExpressionBase(ASTNodeBase):
     __slots__ = ('context',)
-    result_type = DataType.UNDEFINED
+    context: 'Context'
+    result_type: _DataTypeDef = DataType.UNDEFINED
     """The data type of the result of successful evaluation."""
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} >".format(self.__class__.__name__)
 
-    def _new_value(self, *args, **kwargs):
+    def _new_value(self, *args: Any, **kwargs: Any) -> Any:
         # perform a context aware load of value
         value = coerce_value(*args, **kwargs)
         if isinstance(value, datetime.datetime) and value.tzinfo is None:
@@ -215,8 +226,9 @@ class ExpressionBase(ASTNodeBase):
 class LiteralExpressionBase(ExpressionBase):
     """A base class for representing literal values from the grammar text."""
     __slots__ = ('value',)
-    is_reduced = True
-    def __init__(self, context, value):
+    value: Any
+    is_reduced: bool = True
+    def __init__(self, context: 'Context', value: Any) -> None:
         """
         :param context: The context to use for evaluating the expression.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -227,11 +239,11 @@ class LiteralExpressionBase(ExpressionBase):
             raise TypeError("__init__ argument 2 must be {}, not {}".format(self.result_type.python_type.__name__, type(value).__name__))
         self.value = value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{0} value={1!r} >".format(self.__class__.__name__, self.value)
 
     @classmethod
-    def from_value(cls, context, value):
+    def from_value(cls, context: 'Context', value: Any) -> 'LiteralExpressionBase':
         """
         Create a Literal Expression instance to represent the specified *value*.
 
@@ -257,10 +269,10 @@ class LiteralExpressionBase(ExpressionBase):
             value = coerce_value(value)
         return subclass(context, value)
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         return self.value
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         if self.result_type.is_compound:
             digraph.node(str(id(self)), self.__class__.__name__)
         else:
@@ -269,7 +281,10 @@ class LiteralExpressionBase(ExpressionBase):
 class Statement(ASTNodeBase):
     """A class representing the top level statement of the grammar text."""
     __slots__ = ('context', 'expression', 'comment')
-    def __init__(self, context, expression, comment=None):
+    context: 'Context'
+    expression: ExpressionBase
+    comment: Comment | None
+    def __init__(self, context: 'Context', expression: ExpressionBase, comment: Comment | None = None) -> None:
         """
         :param context: The context to use for evaluating the statement.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -281,13 +296,17 @@ class Statement(ASTNodeBase):
         self.comment = comment
 
     @classmethod
-    def build(cls, context, expression, **kwargs):
-        return cls(context, expression.build(), **kwargs).reduce()
+    def build(cls, context: 'Context', expression: ExpressionBase, **kwargs: Any) -> 'Statement':  # type: ignore[override]
+        built = expression.build()
+        assert isinstance(built, ExpressionBase)
+        reduced = cls(context, built, **kwargs).reduce()
+        assert isinstance(reduced, Statement)
+        return reduced
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         return self.expression.evaluate(thing)
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         super(Statement, self).to_graphviz(digraph, *args, **kwargs)
         self.expression.to_graphviz(digraph, *args, **kwargs)
         digraph.edge(str(id(self)), str(id(self.expression)))

@@ -34,9 +34,11 @@ import datetime
 import functools
 import operator
 import re
+from typing import TYPE_CHECKING, Any, Callable
 
 from .. import errors
 from ..types import DataType, coerce_value
+from ..types import _DataTypeDef
 
 from .base import (
         ExpressionBase,
@@ -49,6 +51,9 @@ from .base import (
 )
 from .literal import StringExpression
 
+if TYPE_CHECKING:
+    from ..engine.context import Context
+
 ################################################################################
 # Binary Expressions
 ################################################################################
@@ -57,14 +62,14 @@ class BinaryExpressionBase(ExpressionBase):
     A base class for representing complex expressions composed of a left side and a right side, separated by an
     operator.
     """
-    compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.SET, DataType.STRING)
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.SET, DataType.STRING)
     """
     A tuple containing the compatible data types that the left and right expressions must return. This can for example
     be used to indicate that arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but not
     :py:attr:`~.DataType.STRING` values.
     """
-    result_type = DataType.BOOLEAN
-    def __init__(self, context, type_, left, right):
+    result_type: _DataTypeDef = DataType.BOOLEAN
+    def __init__(self, context: 'Context', type_: str, left: ExpressionBase, right: ExpressionBase) -> None:
         """
         :param context: The context to use for evaluating the expression.
         :type context: :py:class:`~rule_engine.engine.Context`
@@ -78,37 +83,44 @@ class BinaryExpressionBase(ExpressionBase):
         self.context = context
         type_ = type_.lower()
         self.type = type_
-        self._evaluator = getattr(self, '_op_' + type_, None)
-        if self._evaluator is None:
+        evaluator = getattr(self, '_op_' + type_, None)
+        if evaluator is None:
             raise errors.EngineError('unsupported operator: ' + type_)
+        self._evaluator: Callable[[Any], Any] = evaluator
         self._assert_type_is_compatible(left)
         self.left = left
         self._assert_type_is_compatible(right)
         self.right = right
 
     @classmethod
-    def build(cls, context, type_, left, right):
-        return cls(context, type_, left.build(), right.build()).reduce()
+    def build(cls, context: 'Context', type_: str, left: ExpressionBase, right: ExpressionBase) -> ExpressionBase:  # type: ignore[override]
+        left_built = left.build()
+        assert isinstance(left_built, ExpressionBase)
+        right_built = right.build()
+        assert isinstance(right_built, ExpressionBase)
+        reduced = cls(context, type_, left_built, right_built).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
 
-    def _assert_type_is_compatible(self, value):
+    def _assert_type_is_compatible(self, value: ExpressionBase) -> None:
         if value.result_type == DataType.UNDEFINED:
             return
         if any(DataType.is_compatible(dt, value.result_type) for dt in self.compatible_types):
             return
         raise errors.EvaluationError('data type mismatch')
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} type={!r} >".format(self.__class__.__name__, self.type)
 
-    def evaluate(self, thing):
+    def evaluate(self, thing: Any) -> Any:
         return self._evaluator(thing)
 
-    def reduce(self):
+    def reduce(self) -> ExpressionBase:
         if not _is_reduced(self.left, self.right):
             return self
         return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
 
-    def to_graphviz(self, digraph, *args, **kwargs):
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
         digraph.node(str(id(self)), "{}\ntype={!r}".format(self.__class__.__name__, self.type))
         self.left.to_graphviz(digraph, *args, **kwargs)
         self.right.to_graphviz(digraph, *args, **kwargs)
@@ -117,10 +129,10 @@ class BinaryExpressionBase(ExpressionBase):
 
 class AddExpression(BinaryExpressionBase):
     """A class for representing addition expressions from the grammar text."""
-    compatible_types = (DataType.BYTES, DataType.FLOAT, DataType.STRING, DataType.DATETIME, DataType.TIMEDELTA)
-    result_type = DataType.UNDEFINED
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.BYTES, DataType.FLOAT, DataType.STRING, DataType.DATETIME, DataType.TIMEDELTA)
+    result_type: _DataTypeDef = DataType.UNDEFINED
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(AddExpression, self).__init__(*args, **kwargs)
         if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
             if self.left.result_type == DataType.DATETIME:
@@ -136,7 +148,7 @@ class AddExpression(BinaryExpressionBase):
             else:
                 self.result_type = self.left.result_type
 
-    def _op_add(self, thing):
+    def _op_add(self, thing: Any) -> Any:
         left_value = self.left.evaluate(thing)
         right_value = self.right.evaluate(thing)
         if isinstance(left_value, datetime.datetime):
@@ -159,10 +171,10 @@ class SubtractExpression(BinaryExpressionBase):
 
     .. versionadded:: 3.5.0
     """
-    compatible_types = (DataType.FLOAT, DataType.DATETIME, DataType.TIMEDELTA)
-    result_type = DataType.UNDEFINED
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.FLOAT, DataType.DATETIME, DataType.TIMEDELTA)
+    result_type: _DataTypeDef = DataType.UNDEFINED
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(SubtractExpression, self).__init__(*args, **kwargs)
         if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
             if self.left.result_type == DataType.DATETIME:
@@ -181,7 +193,7 @@ class SubtractExpression(BinaryExpressionBase):
             else:
                 self.result_type = self.left.result_type
 
-    def _op_sub(self, thing):
+    def _op_sub(self, thing: Any) -> Any:
         left_value = self.left.evaluate(thing)
         right_value = self.right.evaluate(thing)
         if isinstance(left_value, datetime.datetime):
@@ -196,9 +208,9 @@ class SubtractExpression(BinaryExpressionBase):
 
 class ArithmeticExpression(BinaryExpressionBase):
     """A class for representing arithmetic expressions from the grammar text such as multiplication and division."""
-    compatible_types = (DataType.FLOAT,)
-    result_type = DataType.FLOAT
-    def __op_arithmetic(self, op, thing):
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.FLOAT,)
+    result_type: _DataTypeDef = DataType.FLOAT
+    def __op_arithmetic(self, op: Callable[[Any, Any], Any], thing: Any) -> Any:
         left_value = self.left.evaluate(thing)
         _assert_is_numeric(left_value)
         right_value = self.right.evaluate(thing)
@@ -221,9 +233,9 @@ class BitwiseExpression(BinaryExpressionBase):
     """
     A class for representing bitwise arithmetic expressions from the grammar text such as XOR and shifting operations.
     """
-    compatible_types = (DataType.FLOAT, DataType.SET)
-    result_type = DataType.UNDEFINED
-    def __init__(self, *args, **kwargs):
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.FLOAT, DataType.SET)
+    result_type: _DataTypeDef = DataType.UNDEFINED
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(BitwiseExpression, self).__init__(*args, **kwargs)
         # don't use DataType.is_compatible, because for sets the member type isn't important
         if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
@@ -240,7 +252,7 @@ class BitwiseExpression(BinaryExpressionBase):
         if isinstance(self.left.result_type, DataType.SET.__class__) or isinstance(self.right.result_type, DataType.SET.__class__):
             self.result_type = DataType.SET  # this discards the member type info
 
-    def _op_bitwise(self, op, thing):
+    def _op_bitwise(self, op: Callable[[Any, Any], Any], thing: Any) -> Any:
         left = self.left.evaluate(thing)
         if DataType.from_value(left) == DataType.FLOAT:
             return self._op_bitwise_float(op, thing, left)
@@ -248,13 +260,13 @@ class BitwiseExpression(BinaryExpressionBase):
             return self._op_bitwise_set(op, thing, left)
         raise errors.EvaluationError('data type mismatch')
 
-    def _op_bitwise_float(self, op, thing, left):
+    def _op_bitwise_float(self, op: Callable[[Any, Any], Any], thing: Any, left: Any) -> Any:
         _assert_is_natural_number(left)
         right = self.right.evaluate(thing)
         _assert_is_natural_number(right)
         return coerce_value(op(int(left), int(right)))
 
-    def _op_bitwise_set(self, op, thing, left):
+    def _op_bitwise_set(self, op: Callable[[Any, Any], Any], thing: Any, left: Any) -> Any:
         right = self.right.evaluate(thing)
         if not DataType.is_compatible(DataType.from_value(right), DataType.SET):
             raise errors.EvaluationError('data type mismatch')
@@ -265,19 +277,19 @@ class BitwiseExpression(BinaryExpressionBase):
     _op_bwxor = functools.partialmethod(_op_bitwise, operator.xor)
 
 class BitwiseShiftExpression(BitwiseExpression):
-    compatible_types = (DataType.FLOAT,)
-    result_type = DataType.FLOAT
-    def _op_bitwise_shift(self, *args, **kwargs):
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.FLOAT,)
+    result_type: _DataTypeDef = DataType.FLOAT
+    def _op_bitwise_shift(self, *args: Any, **kwargs: Any) -> Any:
         return self._op_bitwise(*args, **kwargs)
     _op_bwlsh = functools.partialmethod(_op_bitwise_shift, operator.lshift)
     _op_bwrsh = functools.partialmethod(_op_bitwise_shift, operator.rshift)
 
 class LogicExpression(BinaryExpressionBase):
     """A class for representing logical expressions from the grammar text such as "and" and "or"."""
-    def _op_and(self, thing):
+    def _op_and(self, thing: Any) -> bool:
         return bool(self.left.evaluate(thing) and self.right.evaluate(thing))
 
-    def _op_or(self, thing):
+    def _op_or(self, thing: Any) -> bool:
         return bool(self.left.evaluate(thing) or self.right.evaluate(thing))
 
 ################################################################################
@@ -285,15 +297,15 @@ class LogicExpression(BinaryExpressionBase):
 ################################################################################
 class ComparisonExpression(BinaryExpressionBase):
     """A class for representing comparison expressions from the grammar text such as equality checks."""
-    compatible_types = BinaryExpressionBase.compatible_types + (DataType.OBJECT,)
-    def _op_eq(self, thing):
+    compatible_types: tuple[_DataTypeDef, ...] = BinaryExpressionBase.compatible_types + (DataType.OBJECT,)
+    def _op_eq(self, thing: Any) -> bool:
         left_value = self.left.evaluate(thing)
         right_value = self.right.evaluate(thing)
         if type(left_value) is not type(right_value):
             return False
         return operator.eq(left_value, right_value)
 
-    def _op_ne(self, thing):
+    def _op_ne(self, thing: Any) -> bool:
         left_value = self.left.evaluate(thing)
         right_value = self.right.evaluate(thing)
         if type(left_value) is not type(right_value):
@@ -305,19 +317,19 @@ class ArithmeticComparisonExpression(ComparisonExpression):
     A class for representing arithmetic comparison expressions from the grammar text such as less-than-or-equal-to and
     greater-than.
     """
-    compatible_types = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.NULL, DataType.STRING)
-    def __init__(self, *args, **kwargs):
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.NULL, DataType.STRING)
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(ArithmeticComparisonExpression, self).__init__(*args, **kwargs)
         if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
             if self.left.result_type != self.right.result_type:
                 raise errors.EvaluationError('data type mismatch')
 
-    def __op_arithmetic(self, op, thing):
+    def __op_arithmetic(self, op: Callable[[Any, Any], Any], thing: Any) -> Any:
         left_value = self.left.evaluate(thing)
         right_value = self.right.evaluate(thing)
         return self.__op_arithmetic_values(op, left_value, right_value)
 
-    def __op_arithmetic_arrays(self, op, left_value, right_value):
+    def __op_arithmetic_arrays(self, op: Callable[[Any, Any], Any], left_value: Any, right_value: Any) -> Any:
         for subleft_value, subright_value in zip(left_value, right_value):
             if self.__op_arithmetic_values(operator.ne, subleft_value, subright_value):
                 return self.__op_arithmetic_values(op, subleft_value, subright_value)
@@ -325,7 +337,7 @@ class ArithmeticComparisonExpression(ComparisonExpression):
             return self.__op_arithmetic_values(op, len(left_value), len(right_value))
         return op in (operator.ge, operator.le)
 
-    def __op_arithmetic_values(self, op, left_value, right_value):
+    def __op_arithmetic_values(self, op: Callable[[Any, Any], Any], left_value: Any, right_value: Any) -> Any:
         if left_value is None and right_value is None:
             return op in (operator.ge, operator.le)
         elif isinstance(left_value, tuple) and isinstance(right_value, tuple):
@@ -344,20 +356,20 @@ class FuzzyComparisonExpression(ComparisonExpression):
     A class for representing regular expression comparison expressions from the grammar text such as search and does not
     match.
     """
-    compatible_types = (DataType.NULL, DataType.STRING)
-    def __init__(self, *args, **kwargs):
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.NULL, DataType.STRING)
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(FuzzyComparisonExpression, self).__init__(*args, **kwargs)
         if isinstance(self.right, StringExpression):
             self._right = self._compile_regex(self.right.evaluate(None))
 
-    def _compile_regex(self, regex):
+    def _compile_regex(self, regex: str) -> re.Pattern[str]:
         try:
             result = re.compile(regex, flags=self.context.regex_flags)
         except re.error as error:
             raise errors.RegexSyntaxError('invalid regular expression', error=error, value=regex) from None
         return result
 
-    def __op_regex(self, regex_function, modifier, thing):
+    def __op_regex(self, regex_function: str, modifier: Callable[[Any, Any], Any], thing: Any) -> Any:
         left = self.left.evaluate(thing)
         if not isinstance(left, str) and left is not None:
             raise errors.EvaluationError('data type mismatch')

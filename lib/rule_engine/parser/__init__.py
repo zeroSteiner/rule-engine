@@ -35,6 +35,7 @@ import codecs
 import collections
 import types as pytypes
 import re
+from typing import Any
 
 from .. import ast
 from .. import errors
@@ -43,7 +44,7 @@ from .utilities import timedelta_regex
 
 literal_eval = pyast.literal_eval
 
-def _repl_byte_escape(match):
+def _repl_byte_escape(match: re.Match[bytes]) -> bytes:
     token = match.group(1)
     if token[0] == ord('x'):  # x
         return bytes([int(token[1:], 16)])
@@ -59,7 +60,14 @@ def _repl_byte_escape(match):
 
 class _DeferredAstNode(object):
     __slots__ = ('cls', 'args', 'kwargs', 'method')
-    def __init__(self, cls, *, args, kwargs=None, method='build'):
+    def __init__(
+            self,
+            cls: type[ast.ASTNodeBase],
+            *,
+            args: tuple[Any, ...],
+            kwargs: dict[str, Any] | None = None,
+            method: str = 'build'
+    ) -> None:
         if not issubclass(cls, ast.ASTNodeBase):
             raise TypeError('cls is not a subclass of AstNodeBase')
         self.cls = cls
@@ -67,7 +75,7 @@ class _DeferredAstNode(object):
         self.kwargs = kwargs or {}
         self.method = method
 
-    def build(self):
+    def build(self) -> Any:
         constructor = getattr(self.cls, self.method)
         return constructor(*self.args, **self.kwargs)
 
@@ -179,7 +187,7 @@ class Parser(ParserBase):
     ))
 
     @classmethod
-    def get_token_regex(cls, token_name):
+    def get_token_regex(cls, token_name: str) -> str:
         """
         Return the regex that is used by the specified token.
 
@@ -189,86 +197,86 @@ class Parser(ParserBase):
         obj = getattr(cls, 't_' + token_name, None)
         if isinstance(obj, str):
             return obj
-        elif isinstance(obj, pytypes.FunctionType):
+        elif isinstance(obj, pytypes.FunctionType) and isinstance(obj.__doc__, str):
             return obj.__doc__
         raise ValueError('unknown token: ' + token_name)
 
-    def t_POW(self, t):
+    def t_POW(self, t: Any) -> Any:
         r'\*\*?'
         if t.value == '*':
             t.type = 'MUL'
         return t
 
-    def t_FDIV(self, t):
+    def t_FDIV(self, t: Any) -> Any:
         r'\/\/?'
         if t.value == '/':
             t.type = 'TDIV'
         return t
 
-    def t_LT(self, t):
+    def t_LT(self, t: Any) -> Any:
         r'<([=<])?'
         t.type = {'<': 'LT', '<=': 'LE', '<<': 'BWLSH'}[t.value]
         return t
 
-    def t_GT(self, t):
+    def t_GT(self, t: Any) -> Any:
         r'>([=>])?'
         t.type = {'>': 'GT', '>=': 'GE', '>>': 'BWRSH'}[t.value]
         return t
 
-    def t_EQ_FZS(self, t):
+    def t_EQ_FZS(self, t: Any) -> Any:
         r'=~~?'
         if t.value == '=~':
             t.type = 'EQ_FZM'
         return t
 
-    def t_NE_FZS(self, t):
+    def t_NE_FZS(self, t: Any) -> Any:
         r'!~~?'
         if t.value == '!~':
             t.type = 'NE_FZM'
         return t
 
-    def t_BYTES(self, t):
+    def t_BYTES(self, t: Any) -> Any:
         r'b(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
         t.value = t.value[1:]
         return t
 
-    def t_DATETIME(self, t):
+    def t_DATETIME(self, t: Any) -> Any:
         r'd(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
         t.value = t.value[2:-1]
         return t
 
-    def t_TIMEDELTA(self, t):
+    def t_TIMEDELTA(self, t: Any) -> Any:
         r't(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
         t.value = t.value[2:-1]
         return t
 
-    def t_STRING(self, t):
+    def t_STRING(self, t: Any) -> Any:
         r'[rs]?(?P<quote>["\'])([^\\\n]|(\\.))*?(?P=quote)'
         return t
 
-    def t_SYMBOL(self, t):
+    def t_SYMBOL(self, t: Any) -> Any:
         r'\$?[a-zA-Z_][a-zA-Z0-9_]*'
         if t.value in ('elif', 'else', 'while'):
             raise errors.RuleSyntaxError("syntax error (the {} keyword is reserved for future use)".format(t.value))
         t.type = self.reserved_words.get(t.value, 'SYMBOL')
         return t
 
-    def t_COMMENT(self, t):
+    def t_COMMENT(self, t: Any) -> Any:
         r'\#.*$'
         return t
 
-    def t_newline(self, t):
+    def t_newline(self, t: Any) -> None:
         r'\n+'
         t.lexer.lineno += t.value.count("\n")
 
-    def t_error(self, t):
+    def t_error(self, t: Any) -> None:
         raise errors.RuleSyntaxError("syntax error (illegal character {0!r})".format(t.value[0]), t)
 
     # Parsing Rules
-    def p_error(self, token):
+    def p_error(self, token: Any) -> None:
         raise errors.RuleSyntaxError('syntax error', token)
 
-    def p_statement_expr(self, p):
+    def p_statement_expr(self, p: Any) -> None:
         """
         statement : expression
                   | expression COMMENT
@@ -278,7 +286,7 @@ class Parser(ParserBase):
             kwargs['comment'] = ast.Comment(p[2][1:].strip())
         p[0] = _DeferredAstNode(ast.Statement, args=(self.context, p[1]), kwargs=kwargs)
 
-    def p_expression_getattr(self, p):
+    def p_expression_getattr(self, p: Any) -> None:
         """
         object : object ATTR SYMBOL
                | object ATTR_SAFE SYMBOL
@@ -286,20 +294,20 @@ class Parser(ParserBase):
         op_name = self.op_names.get(p[2])
         p[0] = _DeferredAstNode(ast.GetAttributeExpression, args=(self.context, p[1], p[3]), kwargs={'safe': op_name == 'ATTR_SAFE'})
 
-    def p_expression_object(self, p):
+    def p_expression_object(self, p: Any) -> None:
         """
         expression : object
         """
         p[0] = p[1]
 
-    def p_expression_ternary(self, p):
+    def p_expression_ternary(self, p: Any) -> None:
         """
         expression : expression QMARK expression COLON expression
         """
         condition, _, case_true, _, case_false = p[1:6]
         p[0] = _DeferredAstNode(ast.TernaryExpression, args=(self.context, condition, case_true, case_false))
 
-    def p_expression_arithmetic(self, p):
+    def p_expression_arithmetic(self, p: Any) -> None:
         """
         expression : expression MOD    expression
                            | expression MUL    expression
@@ -311,7 +319,7 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.ArithmeticExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_add(self, p):
+    def p_expression_add(self, p: Any) -> None:
         """
         expression : expression ADD    expression
         """
@@ -319,7 +327,7 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.AddExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_sub(self, p):
+    def p_expression_sub(self, p: Any) -> None:
         """
         expression : expression SUB    expression
         """
@@ -327,7 +335,7 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.SubtractExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_bitwise(self, p):
+    def p_expression_bitwise(self, p: Any) -> None:
         """
         expression : expression BWAND  expression
                            | expression BWOR   expression
@@ -337,7 +345,7 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.BitwiseExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_bitwise_shift(self, p):
+    def p_expression_bitwise_shift(self, p: Any) -> None:
         """
         expression : expression BWLSH  expression
                            | expression BWRSH  expression
@@ -346,7 +354,7 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.BitwiseShiftExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_contains(self, p):
+    def p_expression_contains(self, p: Any) -> None:
         """
         expression : expression IN     expression
                            | expression NOT IN expression
@@ -359,7 +367,7 @@ class Parser(ParserBase):
             p[0] = _DeferredAstNode(ast.ContainsExpression, args=(self.context, container, member))
             p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, 'NOT', p[0]))
 
-    def p_expression_comparison(self, p):
+    def p_expression_comparison(self, p: Any) -> None:
         """
         expression : expression EQ     expression
                            | expression NE     expression
@@ -368,7 +376,7 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.ComparisonExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_arithmetic_comparison(self, p):
+    def p_expression_arithmetic_comparison(self, p: Any) -> None:
         """
         expression : expression GT     expression
                            | expression GE     expression
@@ -379,7 +387,7 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.ArithmeticComparisonExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_fuzzy_comparison(self, p):
+    def p_expression_fuzzy_comparison(self, p: Any) -> None:
         """
         expression : expression EQ_FZM expression
                            | expression EQ_FZS expression
@@ -390,7 +398,7 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.FuzzyComparisonExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_logic(self, p):
+    def p_expression_logic(self, p: Any) -> None:
         """
         expression : expression AND    expression
                            | expression OR     expression
@@ -399,15 +407,15 @@ class Parser(ParserBase):
         op_name = self.op_names[op]
         p[0] = _DeferredAstNode(ast.LogicExpression, args=(self.context, op_name, left, right))
 
-    def p_expression_group(self, p):
+    def p_expression_group(self, p: Any) -> None:
         'object : LPAREN expression RPAREN'
         p[0] = p[2]
 
-    def p_expression_negate(self, p):
+    def p_expression_negate(self, p: Any) -> None:
         'expression : NOT expression'
         p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, 'NOT', p[2]))
 
-    def p_expression_symbol(self, p):
+    def p_expression_symbol(self, p: Any) -> None:
         'object : SYMBOL'
         name = p[1]
         scope = None
@@ -416,20 +424,20 @@ class Parser(ParserBase):
             name = name[1:]
         p[0] = _DeferredAstNode(ast.SymbolExpression, args=(self.context, name), kwargs={'scope': scope})
 
-    def p_expression_uminus(self, p):
+    def p_expression_uminus(self, p: Any) -> None:
         'expression : SUB expression %prec UMINUS'
         names = {'-': 'UMINUS'}
         p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, names[p[1]], p[2]))
 
     # Literal expressions
-    def p_expression_boolean(self, p):
+    def p_expression_boolean(self, p: Any) -> None:
         """
         expression : TRUE
                            | FALSE
         """
         p[0] = _DeferredAstNode(ast.BooleanExpression, args=(self.context, p[1] == 'true'))
 
-    def p_expression_bytes(self, p):
+    def p_expression_bytes(self, p: Any) -> None:
         'object : BYTES'
         value = p[1][1:-1]
         try:
@@ -444,15 +452,15 @@ class Parser(ParserBase):
         value = re.sub(br'\\(.)', _repl_byte_escape, value)
         p[0] = _DeferredAstNode(ast.BytesExpression, args=(self.context, value))
 
-    def p_expression_datetime(self, p):
+    def p_expression_datetime(self, p: Any) -> None:
         'object : DATETIME'
         p[0] = _DeferredAstNode(ast.DatetimeExpression, args=(self.context, p[1]), method='from_string')
 
-    def p_expression_timedelta(self, p):
+    def p_expression_timedelta(self, p: Any) -> None:
         'object : TIMEDELTA'
         p[0] = _DeferredAstNode(ast.TimedeltaExpression, args=(self.context, p[1]), method='from_string')
 
-    def p_expression_float(self, p):
+    def p_expression_float(self, p: Any) -> None:
         """
         expression : FLOAT
                            | FLOAT_NAN
@@ -461,19 +469,19 @@ class Parser(ParserBase):
         str_val = p[1]
         p[0] = _DeferredAstNode(ast.FloatExpression, args=(self.context, str_val), method='from_string')
 
-    def p_expression_null(self, p):
+    def p_expression_null(self, p: Any) -> None:
         'object : NULL'
         # null is an object because of the safe operator
         p[0] = _DeferredAstNode(ast.NullExpression, args=(self.context,))
 
-    def p_expression_set(self, p):
+    def p_expression_set(self, p: Any) -> None:
         """
         object : LBRACE ary_members RBRACE
                    | LBRACE ary_members COMMA RBRACE
         """
         p[0] = _DeferredAstNode(ast.SetExpression, args=(self.context, tuple(p[2])))
 
-    def p_expression_string(self, p):
+    def p_expression_string(self, p: Any) -> None:
         'object : STRING'
         literal = p[1]
         prefix = literal[0] if literal[0] in ('r', 's') else None
@@ -493,7 +501,7 @@ class Parser(ParserBase):
                 raise errors.StringSyntaxError('invalid string literal', literal[1:-1]) from None
         p[0] = _DeferredAstNode(ast.StringExpression, args=(self.context, value))
 
-    def p_expression_array(self, p):
+    def p_expression_array(self, p: Any) -> None:
         """
         object : LBRACKET RBRACKET
                    | LBRACKET ary_members RBRACKET
@@ -504,7 +512,7 @@ class Parser(ParserBase):
         else:
             p[0] = _DeferredAstNode(ast.ArrayExpression, args=(self.context, tuple(p[2])))
 
-    def p_expression_array_comprehension(self, p):
+    def p_expression_array_comprehension(self, p: Any) -> None:
         """
         object : LBRACKET expression FOR SYMBOL IN expression RBRACKET
                    | LBRACKET expression FOR SYMBOL IN expression IF expression RBRACKET
@@ -514,20 +522,20 @@ class Parser(ParserBase):
             condition = p[8]
         p[0] = _DeferredAstNode(ast.ComprehensionExpression, args=(self.context, p[2], p[4], p[6]), kwargs={'condition': condition})
 
-    def p_expression_array_members(self, p):
+    def p_expression_array_members(self, p: Any) -> None:
         """
         ary_members : expression
                                 | ary_members COMMA expression
         """
         if len(p) == 2:
-            deque = collections.deque()
+            deque: collections.deque[Any] = collections.deque()
             deque.append(p[1])
         else:
             deque = p[1]
             deque.append(p[3])
         p[0] = deque
 
-    def p_expression_mapping(self, p):
+    def p_expression_mapping(self, p: Any) -> None:
         """
         object : LBRACE RBRACE
                    | LBRACE map_members RBRACE
@@ -538,27 +546,27 @@ class Parser(ParserBase):
         else:
             p[0] = _DeferredAstNode(ast.MappingExpression, args=(self.context, tuple(p[2])))
 
-    def p_expression_mapping_member(self, p):
+    def p_expression_mapping_member(self, p: Any) -> None:
         """
         map_member : expression COLON expression
         """
         p[0] = (p[1], p[3])
 
-    def p_expression_mapping_members(self, p):
+    def p_expression_mapping_members(self, p: Any) -> None:
         """
         map_members : map_member
                                 | map_members COMMA map_member
         """
         return self.p_expression_array_members(p)
 
-    def p_expression_getitem(self, p):
+    def p_expression_getitem(self, p: Any) -> None:
         """
         object : object LBRACKET expression RBRACKET
         """
         container, lbracket, item = p[1:4]
         p[0] = _DeferredAstNode(ast.GetItemExpression, args=(self.context, container, item), kwargs={'safe': lbracket == '&['})
 
-    def p_expression_getslice(self, p):
+    def p_expression_getslice(self, p: Any) -> None:
         """
         object : object LBRACKET COLON RBRACKET
                | object LBRACKET COLON expression RBRACKET
@@ -580,12 +588,13 @@ class Parser(ParserBase):
             raise errors.RuleSyntaxError('invalid get slice expression')
         p[0] = _DeferredAstNode(ast.GetSliceExpression, args=(self.context, container, start, stop), kwargs={'safe': safe})
 
-    def p_expression_function_call(self, p):
+    def p_expression_function_call(self, p: Any) -> None:
         """
         object : expression LPAREN RPAREN
                | expression LPAREN ary_members RPAREN
         """
         function = p[1]
+        arguments: collections.deque[Any]
         if len(p) == 4:
             arguments = collections.deque()
         elif len(p) == 5:

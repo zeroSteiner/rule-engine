@@ -52,7 +52,7 @@ timedelta_regex = (
         r')?'
 )
 
-def parse_datetime(string, default_timezone):
+def parse_datetime(string: str, default_timezone: datetime.tzinfo) -> datetime.datetime:
     """
     Parse a timestamp string. If the timestamp does not specify a timezone, *default_timezone* is used.
 
@@ -68,7 +68,7 @@ def parse_datetime(string, default_timezone):
         dt = dt.replace(tzinfo=default_timezone)
     return dt
 
-def parse_float(string):
+def parse_float(string: str) -> decimal.Decimal:
     """
     Parse a literal string representing a floating point value.
 
@@ -86,7 +86,7 @@ def parse_float(string):
         raise errors.FloatSyntaxError('invalid floating point literal', string) from None
     return val
 
-def parse_timedelta(string):
+def parse_timedelta(string: str) -> datetime.timedelta:
     """
     Parse a literal string representing a time period in the ISO-8601 duration format.
 
@@ -100,11 +100,10 @@ def parse_timedelta(string):
     if not match:
         raise errors.TimedeltaSyntaxError('invalid timedelta string', string)
 
-    groups = match.groupdict()
-    for key, val in groups.items():
-        if val is None:
-            val = "0n"
-        groups[key] = float(val[:-1].replace(',', '.'))
+    groups: dict[str, float] = {
+            key: float((val if val is not None else "0n")[:-1].replace(',', '.'))
+            for key, val in match.groupdict().items()
+    }
 
     return datetime.timedelta(
             weeks=groups['weeks'],

@@ -31,35 +31,40 @@
 #
 
 import threading
+from typing import TYPE_CHECKING, Any
 
 from .._vendor.ply import lex, yacc
+
+if TYPE_CHECKING:
+    from ..engine.context import Context
+    from ..ast import Statement
 
 class ParserBase(object):
     """
     A base class for parser objects to inherit from. This does not provide any
     grammar related definitions.
     """
-    precedence = ()
+    precedence: tuple[tuple[str, ...], ...] = ()
     """The precedence for operators."""
-    tokens = ()
-    reserved_words = {}
+    tokens: tuple[str, ...] = ()
+    reserved_words: dict[str, str] = {}
     """
     A mapping of literal words which are reserved to their corresponding grammar
     names.
     """
     __mutex = threading.Lock()
-    def __init__(self, debug=False):
+    def __init__(self, debug: bool = False) -> None:
         """
         :param bool debug: Whether or not to enable debugging features when
                 using the ply API.
         """
         self.debug = debug
-        self.context = None
+        self.context: 'Context | None' = None
         # Build the lexer and parser
         self._lexer = lex.lex(module=self, debug=self.debug)
         self._parser = yacc.yacc(module=self, debug=self.debug, write_tables=self.debug)
 
-    def parse(self, text, context, **kwargs):
+    def parse(self, text: str, context: 'Context', **kwargs: Any) -> 'Statement':
         """
         Parse the specified text in an abstract syntax tree of nodes that can later be evaluated. This is done in two
         phases. First, the syntax is parsed and a tree of deferred / uninitialized AST nodes are constructed. Next each

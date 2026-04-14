@@ -65,6 +65,13 @@ ignore_errors = true
 module = ["graphviz", "invoke.*"]
 ignore_missing_imports = true
 
+[tool.coverage.run]
+source = ["lib/rule_engine"]
+omit = ["lib/rule_engine/_vendor/*"]
+
+[tool.coverage.report]
+show_missing = true
+
 [tool.setuptools]
 package-dir = {"" = "lib"}
 

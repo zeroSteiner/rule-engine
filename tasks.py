@@ -23,10 +23,14 @@ def docs(c):
     c.run('uv run sphinx-build -b html -a -E -v docs/source docs/html')
 
 
-@task
-def tests(c):
+@task(help={'coverage': 'Measure test coverage and print a report.'})
+def tests(c, coverage=False):
     """Run unit tests."""
-    c.run('uv run python -m unittest -v', pty=True)
+    if coverage:
+        c.run('uv run coverage run -m unittest -v', pty=True)
+        c.run('uv run coverage report')
+    else:
+        c.run('uv run python -m unittest -v', pty=True)
 
 @task
 def typechecks(c):

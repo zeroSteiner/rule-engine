@@ -28,7 +28,7 @@ Classes
 
 .. autoclass:: DataType
    :members:
-   :exclude-members: ARRAY, MAPPING, SET
+   :exclude-members: ARRAY, MAPPING, SET, UNDEFINED
    :show-inheritance:
 
    .. automethod:: ARRAY
@@ -53,8 +53,6 @@ Classes
       :annotation:
 
    .. automethod:: OBJECT
-
-   .. automethod:: reference
 
    .. automethod:: SET
 

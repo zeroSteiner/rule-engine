@@ -37,6 +37,7 @@ import decimal
 import functools
 import math
 import random
+from typing import Any, Callable, Iterable, Iterator, Mapping
 
 from . import errors
 from . import types
@@ -44,32 +45,32 @@ from .parser.utilities import parse_datetime, parse_float, parse_timedelta
 
 import dateutil.tz
 
-def _builtin_filter(function, iterable):
+def _builtin_filter(function: Callable[[Any], Any], iterable: Iterable[Any]) -> tuple[Any, ...]:
     return tuple(filter(function, iterable))
 
-def _builtin_map(function, iterable):
+def _builtin_map(function: Callable[[Any], Any], iterable: Iterable[Any]) -> tuple[Any, ...]:
     return tuple(map(function, iterable))
 
-def _builtin_parse_datetime(builtins, string):
+def _builtin_parse_datetime(builtins: 'Builtins', string: str) -> datetime.datetime:
     return parse_datetime(string, builtins.timezone)
 
-def _builtin_random(boundary=None):
+def _builtin_random(boundary: Any = None) -> Any:
     if boundary:
         if not types.is_natural_number(boundary):
             raise errors.FunctionCallError('argument #1 (boundary) must be a natural number')
         return random.randint(0, int(boundary))
     return random.random()
 
-def _builtin_now(builtins):
+def _builtin_now(builtins: 'Builtins') -> datetime.datetime:
     return datetime.datetime.now(tz=builtins.timezone)
 
-def _builtin_today(builtins):
+def _builtin_today(builtins: 'Builtins') -> datetime.datetime:
     return _builtin_now(builtins).replace(hour=0, minute=0, second=0, microsecond=0)
 
-def _builtin_parse_datetime_generator(builtins):
+def _builtin_parse_datetime_generator(builtins: 'Builtins') -> 'functools.partial[datetime.datetime]':
     return functools.partial(_builtin_parse_datetime, builtins)
 
-def _builtin_range(start, stop=None, step=None):
+def _builtin_range(start: Any, stop: Any = None, step: Any = None) -> list[int]:
     if not types.is_integer_number(start):
         raise errors.FunctionCallError('argument #1 (start) must be an integer number')
     if stop:
@@ -82,7 +83,7 @@ def _builtin_range(start, stop=None, step=None):
         return list(range(int(start), int(stop)))
     return list(range(int(start)))
 
-def _builtins_split(string, sep=None, maxsplit=None):
+def _builtins_split(string: str, sep: str | None = None, maxsplit: Any = None) -> tuple[str, ...]:
     if maxsplit is None:
         maxsplit = -1
     elif types.is_natural_number(maxsplit):
@@ -100,10 +101,11 @@ class BuiltinValueGenerator(object):
     .. versionadded:: 4.0.0
     """
     __slots__ = ('callable',)
-    def __init__(self, callable):
+    callable: Callable[['Builtins'], Any]
+    def __init__(self, callable: Callable[['Builtins'], Any]) -> None:
         self.callable = callable
 
-    def __call__(self, builtins):
+    def __call__(self, builtins: 'Builtins') -> Any:
         return self.callable(builtins)
 
 class Builtins(collections.abc.Mapping):
@@ -113,7 +115,13 @@ class Builtins(collections.abc.Mapping):
     """
     scope_name = 'built-in'
     """The identity name of the scope for builtin symbols."""
-    def __init__(self, values, namespace=None, timezone=None, value_types=None):
+    def __init__(
+            self,
+            values: Mapping[str, Any],
+            namespace: str | None = None,
+            timezone: datetime.tzinfo | None = None,
+            value_types: Mapping[str, 'types._DataTypeDef'] | None = None
+    ) -> None:
         """
         :param dict values: A mapping of string keys to be used as symbol names with values of either Python literals or
                 a function which will be called when the symbol is accessed. When using a function, it will be passed a
@@ -131,7 +139,7 @@ class Builtins(collections.abc.Mapping):
         self.namespace = namespace
         self.timezone = timezone or dateutil.tz.tzlocal()
 
-    def resolve_type(self, name):
+    def resolve_type(self, name: str) -> 'types._DataTypeDef':
         """
         The method to use for resolving the data type of a builtin symbol.
 
@@ -140,10 +148,10 @@ class Builtins(collections.abc.Mapping):
         """
         return self.__value_types.get(name, types.DataType.UNDEFINED)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} namespace={!r} keys={!r} timezone={!r} >".format(self.__class__.__name__, self.namespace, tuple(self.keys()), self.timezone)
 
-    def __getitem__(self, name):
+    def __getitem__(self, name: str) -> Any:
         value = self.__values[name]
         if isinstance(value, collections.abc.Mapping):
             if self.namespace is None:
@@ -155,14 +163,14 @@ class Builtins(collections.abc.Mapping):
             value = value(self)
         return value
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self.__values)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__values)
 
     @classmethod
-    def from_defaults(cls, values=None, **kwargs):
+    def from_defaults(cls, values: Mapping[str, Any] | None = None, **kwargs: Any) -> 'Builtins':
         """Initialize a :py:class:`Builtins` instance with a set of default values."""
         now = BuiltinValueGenerator(_builtin_now)
         # there may be errors here if the decimal.Context precision exceeds what is provided by the math constants

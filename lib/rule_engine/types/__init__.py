@@ -42,6 +42,7 @@ from .datatype import iterable_member_value_type
 from .definitions import NoneType
 from .definitions import _ArrayDataTypeDef
 from .definitions import _CollectionDataTypeDef
+from .definitions import _DataTypeDef
 from .definitions import _FunctionDataTypeDef
 from .definitions import _MappingDataTypeDef
 from .definitions import _ObjectDataTypeDef

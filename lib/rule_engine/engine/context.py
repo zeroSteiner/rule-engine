@@ -157,6 +157,36 @@ def type_resolver_from_dataclass(cls: type) -> Callable[[str], _DataTypeDef]:
     _collect_object_types(root, type_map, set())
     return functools.partial(_type_resolver, type_map)
 
+def type_resolver_from_sqlalchemy(cls: type) -> Callable[[str], _DataTypeDef]:
+    """
+    Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a
+    SQLAlchemy ORM mapped class. The class's top-level columns and relationships become resolvable symbols
+    and every transitively-reachable :py:attr:`~rule_engine.types.DataType.OBJECT` schema is registered by
+    its OBJECT name so that cross-type references in mutually-recursive relationship graphs resolve at parse
+    time.
+
+    The companion :py:meth:`~rule_engine.types.DataType.OBJECT.from_sqlalchemy` is used internally to derive
+    the schema; see its documentation for the column → :py:class:`~rule_engine.types.DataType` mapping and
+    how relationships are expanded into nested OBJECT types.
+
+    SQLAlchemy is an *optional* dependency; the import is deferred until this function is actually called.
+
+    .. versionadded:: 5.0.0
+
+    :param type cls: A SQLAlchemy ORM mapped class.
+    :return: The callback function.
+    :rtype: function
+    """
+    if not hasattr(cls, '__mapper__'):
+        raise TypeError(
+                'type_resolver_from_sqlalchemy argument 1 must be a SQLAlchemy mapped class, not '
+                + type(cls).__name__
+        )
+    root = types.DataType.OBJECT.from_sqlalchemy(cls.__name__, cls)
+    type_map: dict[str, _DataTypeDef] = dict(root.attributes)
+    _collect_object_types(root, type_map, set())
+    return functools.partial(_type_resolver, type_map)
+
 class _ThreadLocalStorage(object):
     """
     An object whose attributes are required to be tracked separately among multiple threads. This is to guarantee that

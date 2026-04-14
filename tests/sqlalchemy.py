@@ -34,6 +34,9 @@ import datetime
 import enum
 import unittest
 
+import rule_engine
+import rule_engine.engine as engine
+import rule_engine.errors as errors
 import rule_engine.types as types
 
 try:
@@ -44,7 +47,7 @@ try:
 except ImportError:
     _HAS_SQLALCHEMY = False
 
-__all__ = ('SqlAlchemyObjectTests',)
+__all__ = ('SqlAlchemyObjectTests', 'SqlAlchemyTypeResolverTests')
 
 DataType = types.DataType
 
@@ -218,6 +221,57 @@ class SqlAlchemyObjectTests(unittest.TestCase):
         alpha_ref = gamma_type.attributes['alpha']
         self.assertIsInstance(alpha_ref, types._ReferenceDataTypeDef)
         self.assertEqual(alpha_ref.name, 'Alpha')
+
+
+@unittest.skipUnless(_HAS_SQLALCHEMY, 'sqlalchemy is not installed')
+class SqlAlchemyTypeResolverTests(unittest.TestCase):
+    def test_type_resolver_from_sqlalchemy(self):
+        type_resolver = rule_engine.type_resolver_from_sqlalchemy(_Hero)
+        self.assertTrue(callable(type_resolver))
+        self.assertIs(type_resolver('name'), DataType.STRING)
+        self.assertIs(type_resolver('active'), DataType.BOOLEAN)
+        with self.assertRaises(errors.SymbolResolutionError):
+            type_resolver('doesnotexist')
+
+    def test_type_resolver_from_sqlalchemy_evaluates_rule(self):
+        context = engine.Context(
+                resolver=engine.resolve_attribute,
+                type_resolver=rule_engine.type_resolver_from_sqlalchemy(_Hero)
+        )
+        hero = _Hero(
+                id=1,
+                name='Batman',
+                alias='Bruce Wayne',
+                publisher=_Publisher.DC,
+                first_appearance=datetime.datetime(1939, 5, 1),
+                active=True,
+                profile={}
+        )
+        self.assertTrue(engine.Rule('name == "Batman" and active', context=context).matches(hero))
+        self.assertFalse(engine.Rule('name == "Joker"', context=context).matches(hero))
+
+    def test_type_resolver_from_sqlalchemy_mutual_recursion(self):
+        # Author.books -> [Book], Book.author -> Author; the Book.author reference must close at
+        # parse time via the type_resolver registering both OBJECT schemas.
+        type_resolver = rule_engine.type_resolver_from_sqlalchemy(_Author)
+        author_type = type_resolver('_Author')
+        book_type = type_resolver('_Book')
+        self.assertIsInstance(author_type, types._ObjectDataTypeDef)
+        self.assertIsInstance(book_type, types._ObjectDataTypeDef)
+
+        context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
+        # parsing this rule requires traversing Author -> books -> Book -> author -> Author
+        engine.Rule('books.length > 0', context=context)
+
+    def test_type_resolver_from_sqlalchemy_rejects_non_mapped(self):
+        class NotMapped:
+            id: int
+
+        with self.assertRaisesRegex(
+                TypeError,
+                r'^type_resolver_from_sqlalchemy argument 1 must be a SQLAlchemy mapped class'
+        ):
+            rule_engine.type_resolver_from_sqlalchemy(NotMapped)
 
 
 if __name__ == '__main__':

@@ -38,6 +38,11 @@ Version 5.0.0
       :py:func:`~rule_engine.engine.type_resolver_from_dataclass` for deriving ``OBJECT`` schemas and *type_resolvers*
       automatically from Python :py:func:`~dataclasses.dataclass` definitions, including nullability for
       :py:class:`~typing.Optional` fields and self / mutually-recursive references (closes :issue:`55`)
+    * Added :py:meth:`~rule_engine.types.DataType.OBJECT.from_sqlalchemy` and
+      :py:func:`~rule_engine.engine.type_resolver_from_sqlalchemy` for deriving ``OBJECT`` schemas and *type_resolvers*
+      from SQLAlchemy ORM mapped classes. Columns, relationships, and cycles between mutually-related classes are
+      all expanded automatically. SQLAlchemy is an optional dependency; the import is deferred until these entry
+      points are called
 
 * Added :py:class:`~rule_engine.errors.ObjectAttributeError`, a subclass of
   :py:class:`~rule_engine.errors.AttributeResolutionError`, raised when an attribute is not found in an ``OBJECT``

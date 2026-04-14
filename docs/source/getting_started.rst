@@ -455,6 +455,51 @@ automatically, and ``list[Other]`` / ``dict[str, Other]`` style containers are w
 inside compound types are also expanded. See :ref:`the OBJECT documentation<getting-started-object-data-types>` for
 details on the resulting schema's behavior.
 
+.. _getting-started-types-from-sqlalchemy:
+
+Defining Types From A SQLAlchemy Model
+""""""""""""""""""""""""""""""""""""""
+
+.. versionadded:: 5.0.0
+
+Projects that already use `SQLAlchemy <https://www.sqlalchemy.org/>`_ can feed a mapped class into
+:py:func:`~engine.type_resolver_from_sqlalchemy` to obtain a type resolver without restating the schema.
+SQLAlchemy is **not** a runtime dependency of Rule Engine; install it separately
+(``pip install "sqlalchemy>=2.0"``) only if you intend to call this helper.
+
+.. code-block:: python
+
+   import datetime
+   from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+   import rule_engine
+
+   class Base(DeclarativeBase):
+       pass
+
+   class Hero(Base):
+       __tablename__ = 'heroes'
+       id: Mapped[int] = mapped_column(primary_key=True)
+       name: Mapped[str]
+       alias: Mapped[str | None]
+       first_appearance: Mapped[datetime.datetime]
+       active: Mapped[bool]
+
+   context = rule_engine.Context(
+       resolver=rule_engine.resolve_attribute,
+       type_resolver=rule_engine.type_resolver_from_sqlalchemy(Hero),
+   )
+
+   rule = rule_engine.Rule('name == "Batman" and active', context=context)
+   batman = Hero(id=1, name='Batman', alias='Bruce Wayne',
+                 first_appearance=datetime.datetime(1939, 5, 1), active=True)
+   rule.matches(batman)  # => True
+
+Column nullability (``column.nullable``) is copied through, ``Mapped[T | None]`` is honored, and mapped
+relationships expand into nested ``OBJECT`` schemas (with ``uselist`` collections wrapped in
+:py:attr:`~rule_engine.types.DataType.ARRAY`). Self-references and cycles between mutually related classes
+resolve at parse time because every reachable schema is registered by name on the resulting resolver. See the
+:ref:`OBJECT documentation<getting-started-object-data-types>` for the full column-to-type mapping and limits.
+
 .. _changing-builtin-symbols:
 
 Changing Builtin Symbols

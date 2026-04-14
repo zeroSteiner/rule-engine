@@ -171,6 +171,58 @@ For the common case of building a :py:class:`~rule_engine.engine.Context` direct
 dataclass's own attributes and whose nested ``OBJECT`` types are reachable by name. See
 :ref:`getting-started-types-from-dataclass` for an end-to-end example.
 
+From a SQLAlchemy Model
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Projects that already model their data with `SQLAlchemy <https://www.sqlalchemy.org/>`_ can derive a schema directly
+from a mapped class using :py:meth:`DataType.OBJECT.from_sqlalchemy`. SQLAlchemy is an *optional* dependency; it is
+only needed when this entry point is actually invoked. Install it with ``pip install "sqlalchemy>=2.0"``.
+
+.. code-block:: python
+
+   import datetime
+   from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+   import rule_engine
+
+   class Base(DeclarativeBase):
+       pass
+
+   class Hero(Base):
+       __tablename__ = 'heroes'
+       id: Mapped[int] = mapped_column(primary_key=True)
+       name: Mapped[str]
+       alias: Mapped[str | None]
+       first_appearance: Mapped[datetime.datetime]
+       active: Mapped[bool]
+
+   HeroType = rule_engine.DataType.OBJECT.from_sqlalchemy('Hero', Hero)
+
+The walker reads ``column.type.python_type`` for each mapped column and threads it through
+:py:meth:`DataType.from_type`. Column nullability (``column.nullable``) is copied through to
+:py:attr:`~rule_engine.types.definitions._ObjectDataTypeDef.attributes_nullable`.
+:py:class:`~sqlalchemy.Enum` columns become ``STRING``; columns whose ``python_type`` raises
+:py:exc:`NotImplementedError` (certain dialect-specific types) fall back to :py:attr:`~DataType.UNDEFINED` so the
+attribute remains selectable without type-checking.
+
+Relationships expand automatically:
+
+- ``uselist`` collections (``one-to-many`` / ``many-to-many``) become :py:attr:`DataType.ARRAY` wrapped around the
+  target class's ``OBJECT`` and are always non-nullable on the parent (an empty list represents "no items").
+- Scalar relationships (``many-to-one`` / ``one-to-one``) become a nested ``OBJECT`` whose nullability is derived
+  from the local foreign-key columns.
+- Self-references and cycles are detected during the walk: a relationship back to the root class becomes
+  :py:attr:`DataType.OBJECT.self`; a relationship back to another ancestor on the build stack becomes a
+  :py:meth:`DataType.OBJECT.reference` placeholder that resolves at rule parse time via the
+  :py:class:`~rule_engine.engine.Context` ``type_resolver``.
+
+For the common case of building a :py:class:`~rule_engine.engine.Context` directly from a mapped class, the
+:py:func:`~rule_engine.engine.type_resolver_from_sqlalchemy` helper produces a resolver whose top-level symbols
+are the root class's columns and relationships and whose nested ``OBJECT`` schemas are reachable by name. See
+:ref:`getting-started-types-from-sqlalchemy` for an end-to-end example.
+
+Polymorphic / inherited mappings, hybrid properties, and ``column_property`` aggregates are out of scope; only
+``mapper.columns`` and ``mapper.relationships`` are walked.
+
 Restrictions
 ^^^^^^^^^^^^
 

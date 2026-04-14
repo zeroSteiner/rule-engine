@@ -442,6 +442,48 @@ def _resolve_sqlalchemy_column_type(column: Any) -> _DataTypeDef:
         return DataType.UNDEFINED
     return DataType.from_type(python_type)
 
+def _resolve_sqlalchemy_relationship_type(
+        relationship: Any,
+        current_cls: type,
+        seen: dict[type, str]
+) -> _DataTypeDef:
+    """
+    Translate a SQLAlchemy :py:class:`~sqlalchemy.orm.RelationshipProperty` into a :py:class:`_DataTypeDef`,
+    recursing into the target mapped class. Collections (``uselist=True``) are wrapped in
+    :py:attr:`DataType.ARRAY`. Back-references and cycles are handled via the *seen* stack: a relationship
+    targeting the enclosing class emits the :py:attr:`_ObjectDataTypeDef.self` sentinel; a relationship
+    targeting an ancestor class on the build stack emits an unresolved
+    :py:class:`_ReferenceDataTypeDef` that the caller must resolve through the
+    :py:class:`~rule_engine.engine.Context` ``type_resolver``.
+    """
+    # deferred to avoid the definitions.py -> datatype.py import cycle
+    from .datatype import DataType
+    target_cls = relationship.mapper.class_
+    target: _DataTypeDef
+    if target_cls is current_cls:
+        target = _ObjectDataTypeDef.self
+    elif target_cls in seen:
+        target = _ReferenceDataTypeDef(seen[target_cls])
+    else:
+        target = _build_object_from_sqlalchemy(target_cls, target_cls.__name__, accessor=None, _seen=seen)
+    if relationship.uselist:
+        return cast(_DataTypeDef, DataType.ARRAY(target))
+    return target
+
+def _sqlalchemy_relationship_is_nullable(relationship: Any) -> bool:
+    """
+    Determine whether a SQLAlchemy relationship attribute may be :py:attr:`DataType.NULL`. Collections
+    (``uselist=True``) are never nullable — the empty list is the "no items" state. Scalar relationships
+    (``uselist=False``) are nullable iff any of their local foreign-key columns are nullable. When the local
+    columns are not introspectable, default to nullable since the caller can always set a non-null value.
+    """
+    if relationship.uselist:
+        return False
+    local_columns = getattr(relationship, 'local_columns', None)
+    if not local_columns:
+        return True
+    return any(bool(col.nullable) for col in local_columns)
+
 def _build_object_from_sqlalchemy(
         cls: type,
         name: str,
@@ -458,6 +500,9 @@ def _build_object_from_sqlalchemy(
     for column in mapper.columns:
         attributes[column.key] = _resolve_sqlalchemy_column_type(column)
         attributes_nullable[column.key] = bool(column.nullable)
+    for relationship in mapper.relationships:
+        attributes[relationship.key] = _resolve_sqlalchemy_relationship_type(relationship, cls, seen)
+        attributes_nullable[relationship.key] = _sqlalchemy_relationship_is_nullable(relationship)
     return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
 
 def _unwrap_optional(annotation: Any) -> tuple[Any, bool]:
@@ -663,6 +708,13 @@ class _ObjectDataTypeDef(_DataTypeDef):
         Columns whose ``python_type`` raises :py:exc:`NotImplementedError` (e.g. :py:class:`~sqlalchemy.JSON`) are
         recorded as :py:attr:`DataType.UNDEFINED` so the attribute is selectable without parse-time type checking.
         :py:class:`~sqlalchemy.Enum` columns are surfaced as :py:attr:`DataType.STRING`.
+
+        Relationships declared on *cls* are expanded into nested :py:class:`_ObjectDataTypeDef` schemas.
+        Collection relationships (``uselist=True``) are wrapped in :py:attr:`DataType.ARRAY`. Back-references
+        to the enclosing class resolve to :py:attr:`~_ObjectDataTypeDef.self`; references to a class already
+        on the build stack (mutual recursion across more than two classes) become unresolved
+        :py:meth:`~_ObjectDataTypeDef.reference` placeholders that the caller must resolve via the
+        :py:class:`~rule_engine.engine.Context` ``type_resolver``.
 
         SQLAlchemy is an *optional* dependency. The library imports cleanly without it; ``import sqlalchemy`` is
         deferred until this method is actually called and propagates :py:exc:`ImportError` if SQLAlchemy is not

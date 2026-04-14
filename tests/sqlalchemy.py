@@ -38,7 +38,8 @@ import rule_engine.types as types
 
 try:
     import sqlalchemy
-    from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+    from sqlalchemy import ForeignKey
+    from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
     _HAS_SQLALCHEMY = True
 except ImportError:
     _HAS_SQLALCHEMY = False
@@ -82,6 +83,47 @@ if _HAS_SQLALCHEMY:
         __tablename__ = 'with_opaques'
         id: Mapped[int] = mapped_column(primary_key=True)
         blob = mapped_column(_OpaqueType, nullable=False)
+
+    # One-to-many + many-to-one pair used to exercise recursive relationships
+    class _Author(_Base):
+        __tablename__ = 'authors'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
+        books: Mapped[list['_Book']] = relationship(back_populates='author')
+
+    class _Book(_Base):
+        __tablename__ = 'books'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        title: Mapped[str]
+        author_id: Mapped[int | None] = mapped_column(ForeignKey('authors.id'))
+        author: Mapped['_Author | None'] = relationship(back_populates='books')
+
+    # Self-referential adjacency list
+    class _Category(_Base):
+        __tablename__ = 'categories'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        name: Mapped[str]
+        parent_id: Mapped[int | None] = mapped_column(ForeignKey('categories.id'))
+        parent: Mapped['_Category | None'] = relationship(remote_side=[id])
+
+    # Three-way cycle to exercise OBJECT.reference placeholders for non-root ancestors
+    class _Alpha(_Base):
+        __tablename__ = 'alphas'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        beta_id: Mapped[int | None] = mapped_column(ForeignKey('betas.id'))
+        beta: Mapped['_Beta | None'] = relationship(foreign_keys=[beta_id])
+
+    class _Beta(_Base):
+        __tablename__ = 'betas'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        gamma_id: Mapped[int | None] = mapped_column(ForeignKey('gammas.id'))
+        gamma: Mapped['_Gamma | None'] = relationship(foreign_keys=[gamma_id])
+
+    class _Gamma(_Base):
+        __tablename__ = 'gammas'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        alpha_id: Mapped[int | None] = mapped_column(ForeignKey('alphas.id'))
+        alpha: Mapped['_Alpha | None'] = relationship(foreign_keys=[alpha_id])
 
 
 @unittest.skipUnless(_HAS_SQLALCHEMY, 'sqlalchemy is not installed')
@@ -133,6 +175,49 @@ class SqlAlchemyObjectTests(unittest.TestCase):
                 r'^from_sqlalchemy argument 2 must be a SQLAlchemy mapped class'
         ):
             DataType.OBJECT.from_sqlalchemy('X', NotMapped)
+
+    def test_object_from_sqlalchemy_one_to_many_relationship(self):
+        schema = DataType.OBJECT.from_sqlalchemy('Author', _Author)
+        books_type = schema.attributes['books']
+        self.assertIsInstance(books_type, types._ArrayDataTypeDef)
+        book_type = books_type.value_type
+        self.assertIsInstance(book_type, types._ObjectDataTypeDef)
+        # nested classes default their OBJECT name to target_cls.__name__
+        self.assertEqual(book_type.name, '_Book')
+        self.assertIs(book_type.attributes['title'], DataType.STRING)
+        # Book.author back-references Author (the root); left as a placeholder for later parse-time resolution
+        author_back_ref = book_type.attributes['author']
+        self.assertIsInstance(author_back_ref, types._ReferenceDataTypeDef)
+        self.assertEqual(author_back_ref.name, 'Author')
+        # collection relationships are not nullable (empty list = "no items")
+        self.assertFalse(schema.is_attributes_nullable('books'))
+
+    def test_object_from_sqlalchemy_many_to_one_relationship(self):
+        schema = DataType.OBJECT.from_sqlalchemy('Book', _Book)
+        author_type = schema.attributes['author']
+        self.assertIsInstance(author_type, types._ObjectDataTypeDef)
+        self.assertEqual(author_type.name, '_Author')
+        # Book.author_id is nullable, so the scalar relationship is nullable
+        self.assertTrue(schema.is_attributes_nullable('author'))
+
+    def test_object_from_sqlalchemy_self_reference(self):
+        schema = DataType.OBJECT.from_sqlalchemy('Category', _Category)
+        # parent relationship loops back to the root class
+        self.assertIs(schema.attributes['parent'], schema)
+        self.assertTrue(schema.is_attributes_nullable('parent'))
+
+    def test_object_from_sqlalchemy_forward_reference_on_deep_cycle(self):
+        # Alpha -> Beta -> Gamma -> Alpha forms a 3-way cycle. The Gamma.alpha relationship is to the
+        # build-stack ancestor Alpha (not the class currently being expanded — that's Gamma), so it
+        # must surface as an unresolved reference that the type_resolver will close later.
+        schema = DataType.OBJECT.from_sqlalchemy('Alpha', _Alpha)
+        beta_type = schema.attributes['beta']
+        self.assertIsInstance(beta_type, types._ObjectDataTypeDef)
+        gamma_type = beta_type.attributes['gamma']
+        self.assertIsInstance(gamma_type, types._ObjectDataTypeDef)
+        alpha_ref = gamma_type.attributes['alpha']
+        self.assertIsInstance(alpha_ref, types._ReferenceDataTypeDef)
+        self.assertEqual(alpha_ref.name, 'Alpha')
 
 
 if __name__ == '__main__':

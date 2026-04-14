@@ -485,6 +485,17 @@ class EngineTests(unittest.TestCase):
         with self.assertRaisesRegex(TypeError, r'^type_resolver_from_dataclass argument 1 must be a dataclass'):
             engine.type_resolver_from_dataclass(NotADataclass)
 
+    def test_engine_type_resolver_from_dataclass_non_strict(self):
+        import uuid
+        @dataclasses.dataclass
+        class HeroWithId:
+            name: str
+            identifier: uuid.UUID
+
+        type_resolver = engine.type_resolver_from_dataclass(HeroWithId, strict=False)
+        self.assertIs(type_resolver('name'), types.DataType.STRING)
+        self.assertIs(type_resolver('identifier'), types.DataType.UNDEFINED)
+
 @dataclasses.dataclass
 class _ResolverFlatHero:
     name: str

@@ -33,6 +33,7 @@
 import datetime
 import enum
 import unittest
+import uuid
 
 import rule_engine
 import rule_engine.engine as engine
@@ -86,6 +87,20 @@ if _HAS_SQLALCHEMY:
         __tablename__ = 'with_opaques'
         id: Mapped[int] = mapped_column(primary_key=True)
         blob = mapped_column(_OpaqueType, nullable=False)
+
+    class _UuidType(sqlalchemy.types.TypeDecorator):
+        """A column type whose ``python_type`` is introspectable but unmappable by Rule Engine."""
+        impl = sqlalchemy.String
+        cache_ok = True
+
+        @property
+        def python_type(self):
+            return uuid.UUID
+
+    class _WithUuid(_Base):
+        __tablename__ = 'with_uuids'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        external_id = mapped_column(_UuidType, nullable=False)
 
     # One-to-many + many-to-one pair used to exercise recursive relationships
     class _Author(_Base):
@@ -158,10 +173,24 @@ class SqlAlchemyObjectTests(unittest.TestCase):
         schema = DataType.OBJECT.from_sqlalchemy('Hero', _Hero)
         self.assertEqual(schema.attributes['profile'], DataType.MAPPING(DataType.UNDEFINED, DataType.UNDEFINED))
 
-    def test_object_from_sqlalchemy_unsupported_python_type(self):
-        # column types whose python_type raises NotImplementedError fall back to UNDEFINED
-        schema = DataType.OBJECT.from_sqlalchemy('WithOpaque', _WithOpaque)
+    def test_object_from_sqlalchemy_unsupported_python_type_strict(self):
+        # by default (strict=True), an opaque column type raises ValueError
+        with self.assertRaisesRegex(ValueError, r"can not map column 'blob' to a compatible data type"):
+            DataType.OBJECT.from_sqlalchemy('WithOpaque', _WithOpaque)
+
+    def test_object_from_sqlalchemy_unsupported_python_type_non_strict(self):
+        # with strict=False, an opaque column type falls back to UNDEFINED
+        schema = DataType.OBJECT.from_sqlalchemy('WithOpaque', _WithOpaque, strict=False)
         self.assertIs(schema.attributes['blob'], DataType.UNDEFINED)
+
+    def test_object_from_sqlalchemy_unmappable_python_type_strict(self):
+        # a column whose python_type is known but not mappable (e.g. uuid.UUID) also raises under strict
+        with self.assertRaises((TypeError, ValueError)):
+            DataType.OBJECT.from_sqlalchemy('WithUuid', _WithUuid)
+
+    def test_object_from_sqlalchemy_unmappable_python_type_non_strict(self):
+        schema = DataType.OBJECT.from_sqlalchemy('WithUuid', _WithUuid, strict=False)
+        self.assertIs(schema.attributes['external_id'], DataType.UNDEFINED)
 
     def test_object_from_sqlalchemy_custom_accessor(self):
         def dict_getter(obj, name):
@@ -262,6 +291,11 @@ class SqlAlchemyTypeResolverTests(unittest.TestCase):
         context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
         # parsing this rule requires traversing Author -> books -> Book -> author -> Author
         engine.Rule('books.length > 0', context=context)
+
+    def test_type_resolver_from_sqlalchemy_non_strict(self):
+        # strict=False threads through to from_sqlalchemy so opaque columns resolve to UNDEFINED
+        type_resolver = rule_engine.type_resolver_from_sqlalchemy(_WithOpaque, strict=False)
+        self.assertIs(type_resolver('blob'), DataType.UNDEFINED)
 
     def test_type_resolver_from_sqlalchemy_rejects_non_mapped(self):
         class NotMapped:

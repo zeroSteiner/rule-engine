@@ -801,6 +801,27 @@ class ObjectDataTypeTests(unittest.TestCase):
         self.assertIsInstance(nested, types._ObjectDataTypeDef)
         self.assertEqual(nested.name, 'Address')
 
+    def test_object_from_dataclass_unsupported_type_strict(self):
+        import uuid
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            identifier: uuid.UUID
+
+        with self.assertRaises((TypeError, ValueError)):
+            DataType.OBJECT.from_dataclass('Hero', Hero)
+
+    def test_object_from_dataclass_unsupported_type_non_strict(self):
+        import uuid
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            identifier: uuid.UUID
+
+        result = DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        self.assertIs(result.attributes['identifier'], DataType.UNDEFINED)
+
 inf = float('inf')
 nan = float('nan')
 

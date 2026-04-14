@@ -165,6 +165,10 @@ The derived schema reflects three behaviors automatically:
   :py:meth:`DataType.OBJECT.reference` placeholders that resolve at rule parse time when both schemas are reachable
   through the :py:class:`~rule_engine.engine.Context` ``type_resolver``.
 
+By default (``strict=True``) a field whose annotation cannot be mapped to a Rule Engine data type raises
+:py:exc:`ValueError` so the schema mistake is caught early. Pass ``strict=False`` to instead map the offending
+field to :py:attr:`~DataType.UNDEFINED`, leaving it selectable but not type-checked at parse time.
+
 For the common case of building a :py:class:`~rule_engine.engine.Context` directly from a dataclass, the
 :py:func:`~rule_engine.engine.type_resolver_from_dataclass` helper produces a resolver whose top-level fields are the
 dataclass's own attributes and whose nested ``OBJECT`` types are reachable by name. See
@@ -198,9 +202,11 @@ only needed when this entry point is actually invoked. Install it with ``pip ins
 
 The walker reads ``column.type.python_type`` for each mapped column and threads it through
 :py:meth:`DataType.from_type`. Column nullability (``column.nullable``) is copied through to the schema's
-per-attribute nullability map. :py:class:`~sqlalchemy.Enum` columns become ``STRING``; columns whose ``python_type``
-raises :py:exc:`NotImplementedError` (certain dialect-specific types) fall back to :py:attr:`~DataType.UNDEFINED`
-so the attribute remains selectable without type-checking.
+per-attribute nullability map. :py:class:`~sqlalchemy.Enum` columns become ``STRING``. By default (``strict=True``) a
+column whose ``python_type`` raises :py:exc:`NotImplementedError` or resolves to a Python type Rule Engine cannot map
+(e.g. :py:class:`~uuid.UUID`) raises :py:exc:`ValueError`. Pass ``strict=False`` to instead map those columns to
+:py:attr:`~DataType.UNDEFINED`; this is usually the right choice for schemas that include :py:class:`~sqlalchemy.JSON`
+columns or dialect-specific types whose values can not be statically described.
 
 Relationships expand automatically:
 

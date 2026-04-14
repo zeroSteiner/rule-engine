@@ -131,7 +131,7 @@ def _collect_object_types(definition: _DataTypeDef, type_map: dict[str, _DataTyp
         _collect_object_types(definition.value_type, type_map, seen)
         return
 
-def type_resolver_from_dataclass(cls: type) -> Callable[[str], _DataTypeDef]:
+def type_resolver_from_dataclass(cls: type, *, strict: bool = True) -> Callable[[str], _DataTypeDef]:
     """
     Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a Python
     :py:func:`~dataclasses.dataclass`. The dataclass's top-level fields become resolvable symbols (so a rule may
@@ -147,17 +147,21 @@ def type_resolver_from_dataclass(cls: type) -> Callable[[str], _DataTypeDef]:
     .. versionadded:: 5.0.0
 
     :param type cls: A class decorated with :py:func:`~dataclasses.dataclass`.
+    :param bool strict: Forwarded to :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass`. When ``True``
+            (the default), a field annotated with a type that cannot be mapped to a Rule Engine data type raises
+            :py:exc:`ValueError`. When ``False``, such fields fall back to
+            :py:attr:`~rule_engine.types.DataType.UNDEFINED`.
     :return: The callback function.
     :rtype: function
     """
     if not dataclasses.is_dataclass(cls):
         raise TypeError('type_resolver_from_dataclass argument 1 must be a dataclass, not ' + type(cls).__name__)
-    root = types.DataType.OBJECT.from_dataclass(cls.__name__, cls)
+    root = types.DataType.OBJECT.from_dataclass(cls.__name__, cls, strict=strict)
     type_map: dict[str, _DataTypeDef] = dict(root.attributes)
     _collect_object_types(root, type_map, set())
     return functools.partial(_type_resolver, type_map)
 
-def type_resolver_from_sqlalchemy(cls: type) -> Callable[[str], _DataTypeDef]:
+def type_resolver_from_sqlalchemy(cls: type, *, strict: bool = True) -> Callable[[str], _DataTypeDef]:
     """
     Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a
     SQLAlchemy ORM mapped class. The class's top-level columns and relationships become resolvable symbols
@@ -174,6 +178,10 @@ def type_resolver_from_sqlalchemy(cls: type) -> Callable[[str], _DataTypeDef]:
     .. versionadded:: 5.0.0
 
     :param type cls: A SQLAlchemy ORM mapped class.
+    :param bool strict: Forwarded to :py:meth:`~rule_engine.types.DataType.OBJECT.from_sqlalchemy`. When ``True``
+            (the default), a column whose ``python_type`` raises :py:exc:`NotImplementedError` or cannot be mapped
+            to a Rule Engine data type raises :py:exc:`ValueError`. When ``False``, such columns fall back to
+            :py:attr:`~rule_engine.types.DataType.UNDEFINED`.
     :return: The callback function.
     :rtype: function
     """
@@ -182,7 +190,7 @@ def type_resolver_from_sqlalchemy(cls: type) -> Callable[[str], _DataTypeDef]:
                 'type_resolver_from_sqlalchemy argument 1 must be a SQLAlchemy mapped class, not '
                 + type(cls).__name__
         )
-    root = types.DataType.OBJECT.from_sqlalchemy(cls.__name__, cls)
+    root = types.DataType.OBJECT.from_sqlalchemy(cls.__name__, cls, strict=strict)
     type_map: dict[str, _DataTypeDef] = dict(root.attributes)
     _collect_object_types(root, type_map, set())
     return functools.partial(_type_resolver, type_map)

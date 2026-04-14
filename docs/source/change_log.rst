@@ -43,6 +43,10 @@ Version 5.0.0
       from SQLAlchemy ORM mapped classes. Columns, relationships, and cycles between mutually-related classes are
       all expanded automatically. SQLAlchemy is an optional dependency; the import is deferred until these entry
       points are called
+    * The ``from_dataclass`` and ``from_sqlalchemy`` entry points (and their ``type_resolver_from_*`` companions)
+      accept a ``strict`` keyword argument. The default ``strict=True`` raises :py:exc:`ValueError` on any
+      field / column whose type cannot be mapped to a Rule Engine data type; ``strict=False`` falls back to
+      :py:attr:`~rule_engine.types.DataType.UNDEFINED`
 
 * Added :py:class:`~rule_engine.errors.ObjectAttributeError`, a subclass of
   :py:class:`~rule_engine.errors.AttributeResolutionError`, raised when an attribute is not found in an ``OBJECT``

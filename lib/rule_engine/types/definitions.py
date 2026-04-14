@@ -367,13 +367,19 @@ def _resolve_forward_ref(annotation: Any, owner_cls: type) -> Any:
             return annotation
     return annotation
 
-def _resolve_dataclass_field_type(annotation: Any, current_cls: type, seen: dict[type, str]) -> _DataTypeDef:
+def _resolve_dataclass_field_type(
+        annotation: Any,
+        current_cls: type,
+        seen: dict[type, str],
+        strict: bool
+) -> _DataTypeDef:
     """
     Translate a dataclass field annotation into a :py:class:`_DataTypeDef`, recursing into nested dataclasses.
     *current_cls* is the dataclass whose schema is being built right now (used to emit
     :py:class:`_SelfReferenceDataTypeDef` for direct self-references). *seen* maps each ancestor dataclass on the
     build stack to the OBJECT name it will be registered under (used to emit unresolved references for mutual
-    recursion).
+    recursion). When *strict* is ``False``, annotations that cannot be mapped to a Rule Engine type fall back to
+    :py:attr:`DataType.UNDEFINED` instead of raising :py:exc:`ValueError`.
     """
     # deferred to avoid the definitions.py -> datatype.py import cycle
     from .datatype import DataType
@@ -383,7 +389,7 @@ def _resolve_dataclass_field_type(annotation: Any, current_cls: type, seen: dict
             return _ObjectDataTypeDef.self
         if annotation in seen:
             return _ReferenceDataTypeDef(seen[annotation])
-        return _build_object_from_dataclass(annotation, annotation.__name__, accessor=None, _seen=seen)
+        return _build_object_from_dataclass(annotation, annotation.__name__, accessor=None, _seen=seen, strict=strict)
 
     origin = typing.get_origin(annotation)
     args = typing.get_args(annotation)
@@ -395,20 +401,26 @@ def _resolve_dataclass_field_type(annotation: Any, current_cls: type, seen: dict
         if contains_dataclass:
             origin_type = DataType.from_type(origin)
             if origin_type is DataType.ARRAY:
-                return DataType.ARRAY(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen))
+                return DataType.ARRAY(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict))
             if origin_type is DataType.SET:
-                return DataType.SET(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen))
+                return DataType.SET(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict))
             if origin_type is DataType.MAPPING:
-                key_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen)
-                value_type = _resolve_dataclass_field_type(resolved_args[1], current_cls, seen)
+                key_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict)
+                value_type = _resolve_dataclass_field_type(resolved_args[1], current_cls, seen, strict)
                 return cast(_MappingDataTypeDef, DataType.MAPPING(key_type, value_type))
-    return DataType.from_type(annotation)
+    try:
+        return DataType.from_type(annotation)
+    except (TypeError, ValueError):
+        if strict:
+            raise
+        return DataType.UNDEFINED
 
 def _build_object_from_dataclass(
         cls: type,
         name: str,
         *,
         accessor: Callable[[Any, str], Any] | None,
+        strict: bool,
         _seen: dict[type, str]
 ) -> _ObjectDataTypeDef:
     seen = dict(_seen)
@@ -419,15 +431,17 @@ def _build_object_from_dataclass(
     for field in dataclasses.fields(cls):
         annotation = type_hints.get(field.name, field.type)
         unwrapped, is_nullable = _unwrap_optional(annotation)
-        attributes[field.name] = _resolve_dataclass_field_type(unwrapped, cls, seen)
+        attributes[field.name] = _resolve_dataclass_field_type(unwrapped, cls, seen, strict)
         attributes_nullable[field.name] = is_nullable
     return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
 
-def _resolve_sqlalchemy_column_type(column: Any) -> _DataTypeDef:
+def _resolve_sqlalchemy_column_type(column: Any, strict: bool) -> _DataTypeDef:
     """
     Translate a SQLAlchemy column's :py:class:`~sqlalchemy.types.TypeEngine` into a :py:class:`_DataTypeDef`.
-    Falls back to :py:attr:`DataType.UNDEFINED` for column types whose ``python_type`` raises
-    :py:exc:`NotImplementedError` (e.g. :py:class:`~sqlalchemy.JSON` and dialect-specific types).
+    When *strict* is ``False``, column types whose ``python_type`` raises :py:exc:`NotImplementedError`
+    (e.g. :py:class:`~sqlalchemy.JSON` and dialect-specific types) and column types whose Python type cannot be
+    mapped to a Rule Engine type fall back to :py:attr:`DataType.UNDEFINED` instead of raising
+    :py:exc:`ValueError`.
     """
     import sqlalchemy
     # deferred to avoid the definitions.py -> datatype.py import cycle
@@ -440,13 +454,25 @@ def _resolve_sqlalchemy_column_type(column: Any) -> _DataTypeDef:
     try:
         python_type = column_type.python_type
     except NotImplementedError:
+        if strict:
+            raise ValueError(
+                "can not map column {0!r} to a compatible data type: python_type is not implemented".format(
+                    column.key
+                )
+            )
         return DataType.UNDEFINED
-    return DataType.from_type(python_type)
+    try:
+        return DataType.from_type(python_type)
+    except (TypeError, ValueError):
+        if strict:
+            raise
+        return DataType.UNDEFINED
 
 def _resolve_sqlalchemy_relationship_type(
         relationship: Any,
         current_cls: type,
-        seen: dict[type, str]
+        seen: dict[type, str],
+        strict: bool
 ) -> _DataTypeDef:
     """
     Translate a SQLAlchemy :py:class:`~sqlalchemy.orm.RelationshipProperty` into a :py:class:`_DataTypeDef`,
@@ -466,7 +492,9 @@ def _resolve_sqlalchemy_relationship_type(
     elif target_cls in seen:
         target = _ReferenceDataTypeDef(seen[target_cls])
     else:
-        target = _build_object_from_sqlalchemy(target_cls, target_cls.__name__, accessor=None, _seen=seen)
+        target = _build_object_from_sqlalchemy(
+            target_cls, target_cls.__name__, accessor=None, _seen=seen, strict=strict
+        )
     if relationship.uselist:
         return cast(_DataTypeDef, DataType.ARRAY(target))
     return target
@@ -490,7 +518,8 @@ def _build_object_from_sqlalchemy(
         name: str,
         *,
         accessor: Callable[[Any, str], Any] | None,
-        _seen: dict[type, str]
+        _seen: dict[type, str],
+        strict: bool
 ) -> _ObjectDataTypeDef:
     import sqlalchemy
     seen = dict(_seen)
@@ -499,10 +528,10 @@ def _build_object_from_sqlalchemy(
     attributes: dict[str, _DataTypeDef] = {}
     attributes_nullable: dict[str, bool] = {}
     for column in mapper.columns:
-        attributes[column.key] = _resolve_sqlalchemy_column_type(column)
+        attributes[column.key] = _resolve_sqlalchemy_column_type(column, strict)
         attributes_nullable[column.key] = bool(column.nullable)
     for relationship in mapper.relationships:
-        attributes[relationship.key] = _resolve_sqlalchemy_relationship_type(relationship, cls, seen)
+        attributes[relationship.key] = _resolve_sqlalchemy_relationship_type(relationship, cls, seen, strict)
         attributes_nullable[relationship.key] = _sqlalchemy_relationship_is_nullable(relationship)
     return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
 
@@ -665,7 +694,8 @@ class _ObjectDataTypeDef(_DataTypeDef):
             name: str,
             cls: type,
             *,
-            accessor: Callable[[Any, str], Any] | None = None
+            accessor: Callable[[Any, str], Any] | None = None,
+            strict: bool = True
     ) -> _ObjectDataTypeDef:
         """
         Build an :py:attr:`~rule_engine.types.DataType.OBJECT` schema from a Python
@@ -688,18 +718,22 @@ class _ObjectDataTypeDef(_DataTypeDef):
         :param str name: The name of the resulting OBJECT schema.
         :param type cls: A class decorated with :py:func:`~dataclasses.dataclass`.
         :param accessor: An optional accessor callable forwarded to the new schema. Defaults to :py:func:`getattr`,
-                which matches normal dataclass attribute access.
+            which matches normal dataclass attribute access.
+        :param bool strict: When ``True`` (the default), a field annotated with a type that cannot be mapped to a
+            Rule Engine data type raises :py:exc:`ValueError`. When ``False``, such fields fall back to
+            :py:attr:`DataType.UNDEFINED` so the attribute remains selectable without parse-time type checking.
         """
         if not dataclasses.is_dataclass(cls):
             raise TypeError('from_dataclass argument 2 must be a dataclass, not ' + type(cls).__name__)
-        return _build_object_from_dataclass(cls, name, accessor=accessor, _seen={})
+        return _build_object_from_dataclass(cls, name, accessor=accessor, _seen={}, strict=strict)
 
     @staticmethod
     def from_sqlalchemy(
             name: str,
             cls: type,
             *,
-            accessor: Callable[[Any, str], Any] | None = None
+            accessor: Callable[[Any, str], Any] | None = None,
+            strict: bool = True
     ) -> _ObjectDataTypeDef:
         """
         Build an :py:attr:`~rule_engine.types.DataType.OBJECT` schema from a SQLAlchemy ORM mapped class. Each
@@ -707,9 +741,11 @@ class _ObjectDataTypeDef(_DataTypeDef):
         column's :py:meth:`~sqlalchemy.types.TypeEngine.python_type` via :py:meth:`DataType.from_type`. Column
         nullability is taken directly from :py:attr:`~sqlalchemy.Column.nullable`.
 
-        Columns whose ``python_type`` raises :py:exc:`NotImplementedError` (e.g. :py:class:`~sqlalchemy.JSON`) are
-        recorded as :py:attr:`DataType.UNDEFINED` so the attribute is selectable without parse-time type checking.
-        :py:class:`~sqlalchemy.Enum` columns are surfaced as :py:attr:`DataType.STRING`.
+        By default (``strict=True``) a column whose ``python_type`` raises :py:exc:`NotImplementedError`
+        (e.g. :py:class:`~sqlalchemy.JSON`) or resolves to a Python type Rule Engine cannot map raises
+        :py:exc:`ValueError`; pass ``strict=False`` to record such columns as :py:attr:`DataType.UNDEFINED` so
+        they remain selectable without parse-time type checking. :py:class:`~sqlalchemy.Enum` columns are
+        surfaced as :py:attr:`DataType.STRING`.
 
         Relationships declared on *cls* are expanded into nested OBJECT schemas. Collection relationships
         (``uselist=True``) are wrapped in :py:attr:`DataType.ARRAY`. Back-references to the enclosing class
@@ -728,10 +764,16 @@ class _ObjectDataTypeDef(_DataTypeDef):
         :param type cls: A SQLAlchemy ORM mapped class.
         :param accessor: An optional accessor callable forwarded to the new schema. Defaults to :py:func:`getattr`,
                 which matches normal attribute access on a mapped instance.
+        :param bool strict: When ``True`` (the default), a column whose ``python_type`` raises
+                :py:exc:`NotImplementedError` or cannot be mapped to a Rule Engine data type raises
+                :py:exc:`ValueError`. When ``False``, such columns fall back to :py:attr:`DataType.UNDEFINED` so
+                the attribute remains selectable without parse-time type checking. This is useful for dialect-
+                specific column types (e.g. :py:class:`~sqlalchemy.JSON`) whose values can not be statically
+                described.
         """
         if not hasattr(cls, '__mapper__'):
             raise TypeError('from_sqlalchemy argument 2 must be a SQLAlchemy mapped class, not ' + type(cls).__name__)
-        return _build_object_from_sqlalchemy(cls, name, accessor=accessor, _seen={})
+        return _build_object_from_sqlalchemy(cls, name, accessor=accessor, _seen={}, strict=strict)
 
     def is_attributes_nullable(self, attribute_name: str) -> bool:
         return self.attributes_nullable.get(attribute_name, True)

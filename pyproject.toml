@@ -49,6 +49,7 @@ dev = [
     "mypy",
     "sphinx",
     "sphinx-rtd-theme",
+    "sqlalchemy>=2.0",
     "types-python-dateutil",
 ]
 
@@ -62,7 +63,7 @@ module = ["rule_engine._vendor.*", "rule_engine.parser.parsetab"]
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = ["graphviz", "invoke.*"]
+module = ["graphviz", "invoke.*", "sqlalchemy", "sqlalchemy.*"]
 ignore_missing_imports = true
 
 [tool.coverage.run]

@@ -422,6 +422,44 @@ def _build_object_from_dataclass(
         attributes_nullable[field.name] = is_nullable
     return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
 
+def _resolve_sqlalchemy_column_type(column: Any) -> _DataTypeDef:
+    """
+    Translate a SQLAlchemy column's :py:class:`~sqlalchemy.types.TypeEngine` into a :py:class:`_DataTypeDef`.
+    Falls back to :py:attr:`DataType.UNDEFINED` for column types whose ``python_type`` raises
+    :py:exc:`NotImplementedError` (e.g. :py:class:`~sqlalchemy.JSON` and dialect-specific types).
+    """
+    import sqlalchemy
+    # deferred to avoid the definitions.py -> datatype.py import cycle
+    from .datatype import DataType
+    column_type = column.type
+    # Enum columns expose their member class via ``python_type``; Rule Engine has no enum data type, so they are
+    # surfaced as STRING values matching how enum members typically serialize on the wire
+    if isinstance(column_type, sqlalchemy.Enum):
+        return DataType.STRING
+    try:
+        python_type = column_type.python_type
+    except NotImplementedError:
+        return DataType.UNDEFINED
+    return DataType.from_type(python_type)
+
+def _build_object_from_sqlalchemy(
+        cls: type,
+        name: str,
+        *,
+        accessor: Callable[[Any, str], Any] | None,
+        _seen: dict[type, str]
+) -> _ObjectDataTypeDef:
+    import sqlalchemy
+    seen = dict(_seen)
+    seen[cls] = name
+    mapper: Any = sqlalchemy.inspect(cls)
+    attributes: dict[str, _DataTypeDef] = {}
+    attributes_nullable: dict[str, bool] = {}
+    for column in mapper.columns:
+        attributes[column.key] = _resolve_sqlalchemy_column_type(column)
+        attributes_nullable[column.key] = bool(column.nullable)
+    return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
+
 def _unwrap_optional(annotation: Any) -> tuple[Any, bool]:
     """
     Strip a single ``None`` member from a :py:data:`typing.Union` (or PEP 604 ``X | Y``) annotation. Returns
@@ -608,6 +646,38 @@ class _ObjectDataTypeDef(_DataTypeDef):
         if not dataclasses.is_dataclass(cls):
             raise TypeError('from_dataclass argument 2 must be a dataclass, not ' + type(cls).__name__)
         return _build_object_from_dataclass(cls, name, accessor=accessor, _seen={})
+
+    @staticmethod
+    def from_sqlalchemy(
+            name: str,
+            cls: type,
+            *,
+            accessor: Callable[[Any, str], Any] | None = None
+    ) -> _ObjectDataTypeDef:
+        """
+        Build an :py:class:`_ObjectDataTypeDef` from a SQLAlchemy ORM mapped class. Each mapped column of *cls*
+        becomes an attribute in the resulting OBJECT schema, with its type derived from the column's
+        :py:meth:`~sqlalchemy.types.TypeEngine.python_type` via :py:meth:`DataType.from_type`. Column nullability
+        is taken directly from :py:attr:`~sqlalchemy.Column.nullable`.
+
+        Columns whose ``python_type`` raises :py:exc:`NotImplementedError` (e.g. :py:class:`~sqlalchemy.JSON`) are
+        recorded as :py:attr:`DataType.UNDEFINED` so the attribute is selectable without parse-time type checking.
+        :py:class:`~sqlalchemy.Enum` columns are surfaced as :py:attr:`DataType.STRING`.
+
+        SQLAlchemy is an *optional* dependency. The library imports cleanly without it; ``import sqlalchemy`` is
+        deferred until this method is actually called and propagates :py:exc:`ImportError` if SQLAlchemy is not
+        installed.
+
+        .. versionadded:: 5.0.0
+
+        :param str name: The name of the resulting OBJECT schema.
+        :param type cls: A SQLAlchemy ORM mapped class.
+        :param accessor: An optional accessor callable forwarded to :py:class:`_ObjectDataTypeDef`. Defaults to
+                :py:func:`getattr`, which matches normal attribute access on a mapped instance.
+        """
+        if not hasattr(cls, '__mapper__'):
+            raise TypeError('from_sqlalchemy argument 2 must be a SQLAlchemy mapped class, not ' + type(cls).__name__)
+        return _build_object_from_sqlalchemy(cls, name, accessor=accessor, _seen={})
 
     def is_attributes_nullable(self, attribute_name: str) -> bool:
         return self.attributes_nullable.get(attribute_name, True)

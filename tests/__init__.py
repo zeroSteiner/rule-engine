@@ -36,6 +36,7 @@ from .engine import *
 from .errors import *
 from .issues import *
 from .parser import *
+from .sqlalchemy import *
 from .suggestions import *
 from .thread_safety import *
 from .types import *

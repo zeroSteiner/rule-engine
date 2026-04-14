@@ -24,6 +24,11 @@ def docs(c):
 
 
 @task
+def tests(c):
+    """Run unit tests."""
+    c.run('uv run python -m unittest -v', pty=True)
+
+@task
 def typechecks(c):
     """Run mypy static type checks."""
     c.run('uv run mypy')

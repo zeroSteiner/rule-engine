@@ -34,6 +34,10 @@ Version 5.0.0
       parse time
     * ``SET(OBJECT(...))`` is rejected at construction; use ``ARRAY(OBJECT(...))`` instead
     * A custom *accessor* callable can be specified per ``OBJECT`` type (default: :py:func:`getattr`)
+    * Added :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` and
+      :py:func:`~rule_engine.engine.type_resolver_from_dataclass` for deriving ``OBJECT`` schemas and *type_resolvers*
+      automatically from Python :py:func:`~dataclasses.dataclass` definitions, including nullability for
+      :py:class:`~typing.Optional` fields and self / mutually-recursive references (closes :issue:`55`)
 
 * Added :py:class:`~rule_engine.errors.ObjectAttributeError`, a subclass of
   :py:class:`~rule_engine.errors.AttributeResolutionError`, raised when an attribute is not found in an ``OBJECT``

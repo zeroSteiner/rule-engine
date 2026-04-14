@@ -131,6 +131,46 @@ at rule parse time:
    })
    rule = rule_engine.Rule('employee.employer.ceo.name == "Palpatine"', context=context)
 
+From a Dataclass
+^^^^^^^^^^^^^^^^
+
+When the source data is already modeled as a Python :py:func:`~dataclasses.dataclass`, the schema can be derived
+directly from the field annotations using :py:meth:`DataType.OBJECT.from_dataclass`:
+
+.. code-block:: python
+
+   import dataclasses
+   import datetime
+   import typing
+   import rule_engine
+
+   @dataclasses.dataclass
+   class Hero:
+       name: str
+       publisher: str
+       first_appearance: datetime.datetime
+       sidekick: typing.Optional[str] = None
+
+   HeroType = rule_engine.DataType.OBJECT.from_dataclass('Hero', Hero)
+
+The derived schema reflects three behaviors automatically:
+
+- **Optional / nullability**: a field annotated as :py:class:`~typing.Optional` (or ``T | None``) is unwrapped to ``T``
+  and marked nullable in :py:attr:`~rule_engine.types.definitions._ObjectDataTypeDef.attributes_nullable`. Non-Optional
+  fields are explicitly marked non-nullable.
+- **Nested dataclasses**: a field whose annotation is itself a dataclass becomes a nested ``OBJECT`` (recursively).
+  Generic containers (e.g. ``list[Address]``, ``dict[str, Address]``) are walked so nested dataclasses inside
+  ``ARRAY``, ``SET``, and ``MAPPING`` types are also expanded.
+- **Self and mutual recursion**: a field whose annotation refers back to the enclosing dataclass becomes
+  :py:attr:`DataType.OBJECT.self`; cycles between sibling dataclasses produce
+  :py:meth:`DataType.OBJECT.reference` placeholders that resolve at rule parse time when both schemas are reachable
+  through the :py:class:`~rule_engine.engine.Context` ``type_resolver``.
+
+For the common case of building a :py:class:`~rule_engine.engine.Context` directly from a dataclass, the
+:py:func:`~rule_engine.engine.type_resolver_from_dataclass` helper produces a resolver whose top-level fields are the
+dataclass's own attributes and whose nested ``OBJECT`` types are reachable by name. See
+:ref:`getting-started-types-from-dataclass` for an end-to-end example.
+
 Restrictions
 ^^^^^^^^^^^^
 

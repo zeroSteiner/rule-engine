@@ -414,6 +414,47 @@ function will be used automatically.
        })
    )
 
+.. _getting-started-types-from-dataclass:
+
+Defining Types From A Dataclass
+"""""""""""""""""""""""""""""""
+
+.. versionadded:: 5.0.0
+
+When the source data is modeled as a :py:func:`~dataclasses.dataclass`, the
+:py:func:`~engine.type_resolver_from_dataclass` helper builds a *type_resolver* directly from the field annotations.
+The dataclass's fields become the top-level resolvable symbols, and any nested dataclasses (including self- and
+mutually-recursive references) are reachable through attribute access on the resolved ``OBJECT``.
+
+.. code-block:: python
+
+   import dataclasses
+   import datetime
+   import typing
+   import rule_engine
+
+   @dataclasses.dataclass
+   class Hero:
+       name: str
+       publisher: str
+       first_appearance: datetime.datetime
+       sidekick: typing.Optional[str] = None
+
+   context = rule_engine.Context(
+       resolver=rule_engine.resolve_attribute,
+       type_resolver=rule_engine.type_resolver_from_dataclass(Hero),
+   )
+
+   rule = rule_engine.Rule('name == "Batman" and sidekick == "Robin"', context=context)
+   batman = Hero('Batman', 'DC', datetime.datetime(1939, 5, 1), sidekick='Robin')
+   rule.matches(batman)  # => True
+
+:py:class:`~typing.Optional` annotations (and the PEP 604 ``T | None`` form) are unwrapped so the attribute carries the
+underlying type and is marked nullable. Fields whose annotation is itself a dataclass become nested ``OBJECT`` types
+automatically, and ``list[Other]`` / ``dict[str, Other]`` style containers are walked so nested dataclass schemas
+inside compound types are also expanded. See :ref:`the OBJECT documentation<getting-started-object-data-types>` for
+details on the resulting schema's behavior.
+
 .. _changing-builtin-symbols:
 
 Changing Builtin Symbols

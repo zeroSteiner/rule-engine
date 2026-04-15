@@ -682,6 +682,40 @@ class ObjectDataTypeTests(unittest.TestCase):
         self.assertIs(result.attributes['name'], DataType.STRING)
         self.assertIs(result.attributes['age'], DataType.FLOAT)
 
+    def test_object_from_dataclass_optional_typing(self):
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            alias: typing.Optional[str]
+            sidekick: typing.Union[str, None]
+
+        result = DataType.OBJECT.from_dataclass('Hero', Hero)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        self.assertIs(result.attributes['alias'], DataType.STRING)
+        self.assertIs(result.attributes['sidekick'], DataType.STRING)
+        self.assertFalse(result.is_attributes_nullable('name'))
+        self.assertTrue(result.is_attributes_nullable('alias'))
+        self.assertTrue(result.is_attributes_nullable('sidekick'))
+
+    def test_object_from_dataclass_optional_pep604(self):
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            alias: str | None
+
+        result = DataType.OBJECT.from_dataclass('Hero', Hero)
+        self.assertIs(result.attributes['alias'], DataType.STRING)
+        self.assertFalse(result.is_attributes_nullable('name'))
+        self.assertTrue(result.is_attributes_nullable('alias'))
+
+    def test_object_from_dataclass_rejects_unsupported_union(self):
+        @dataclasses.dataclass
+        class Bad:
+            value: typing.Union[str, int]
+
+        with self.assertRaises((TypeError, ValueError)):
+            DataType.OBJECT.from_dataclass('Bad', Bad)
+
 inf = float('inf')
 nan = float('nan')
 

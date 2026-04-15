@@ -35,6 +35,8 @@ from __future__ import annotations
 import collections
 import collections.abc
 import threading
+import types as pytypes
+import typing
 from collections.abc import Mapping, Sequence
 from typing import Any, Callable, ClassVar, cast
 
@@ -345,6 +347,25 @@ class _SelfReferenceDataTypeDef(_ReferenceDataTypeDef):
     def __repr__(self) -> str:
         return "<{} (self reference placeholder) >".format(self.__class__.__name__)
 
+def _unwrap_optional(annotation: Any) -> tuple[Any, bool]:
+    """
+    Strip a single ``None`` member from a :py:data:`typing.Union` (or PEP 604 ``X | Y``) annotation. Returns
+    ``(unwrapped, is_nullable)``. If the annotation is not a Union containing ``None``, the input is returned with
+    ``is_nullable=False``. Unions of more than one non-``None`` type are left intact (and ``is_nullable=True`` is
+    reported); ``DataType.from_type`` will reject them downstream since Rule Engine has no union type.
+    """
+    origin = typing.get_origin(annotation)
+    is_union = origin is typing.Union or origin is pytypes.UnionType
+    if not is_union:
+        return annotation, False
+    args = typing.get_args(annotation)
+    non_none = tuple(arg for arg in args if arg is not NoneType)
+    if len(non_none) == len(args):
+        return annotation, False
+    if len(non_none) == 1:
+        return non_none[0], True
+    return annotation, True
+
 def _substitute_self_references(definition: _DataTypeDef, target: _ObjectDataTypeDef) -> _DataTypeDef:
     """
     Walk a data type *definition* and replace any :py:class:`_ReferenceDataTypeDef` whose name matches *target.name*
@@ -492,6 +513,10 @@ class _ObjectDataTypeDef(_DataTypeDef):
         :py:meth:`DataType.from_type`. Stringified annotations (e.g. from ``from __future__ import annotations``) are
         resolved using :py:func:`typing.get_type_hints`.
 
+        Fields annotated with :py:data:`typing.Optional` (or the PEP 604 ``T | None`` form) are unwrapped to their
+        non-``None`` type, and the corresponding attribute is recorded as nullable. Non-Optional fields are recorded
+        as non-nullable.
+
         .. versionadded:: 5.0.0
 
         :param str name: The name of the resulting OBJECT schema.
@@ -507,10 +532,13 @@ class _ObjectDataTypeDef(_DataTypeDef):
             raise TypeError('from_dataclass argument 2 must be a dataclass, not ' + type(cls).__name__)
         type_hints = typing.get_type_hints(cls)
         attributes: dict[str, _DataTypeDef] = {}
+        attributes_nullable: dict[str, bool] = {}
         for field in dataclasses.fields(cls):
             annotation = type_hints.get(field.name, field.type)
-            attributes[field.name] = DataType.from_type(annotation)
-        return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor)
+            unwrapped, is_nullable = _unwrap_optional(annotation)
+            attributes[field.name] = DataType.from_type(unwrapped)
+            attributes_nullable[field.name] = is_nullable
+        return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
 
     def is_attributes_nullable(self, attribute_name: str) -> bool:
         return self.attributes_nullable.get(attribute_name, True)

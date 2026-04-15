@@ -34,7 +34,7 @@ import decimal
 from typing import Any, Iterable, Iterator, TYPE_CHECKING
 
 from .. import errors
-from .. import parser
+from ..parser import Parser
 from .context import Context
 
 if TYPE_CHECKING:
@@ -45,7 +45,7 @@ class Rule(object):
     A rule which parses a string with a logical expression and can then evaluate an arbitrary object for whether or not
     it matches based on the constraints of the expression.
     """
-    parser: parser.Parser = parser.Parser()
+    parser: Parser = Parser()
     """
     The :py:class:`~rule_engine.parser.Parser` instance that will be used for parsing the rule text into a compatible
     abstract syntax tree (AST) for evaluation.
@@ -142,7 +142,7 @@ class Rule(object):
         return digraph
 
 class DebugRule(Rule):
-    parser: parser.Parser  # set per-instance in __init__ (overrides the class-level attribute on Rule)
+    parser: Parser  # set per-instance in __init__ (overrides the class-level attribute on Rule)
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.parser = parser.Parser(debug=True)
+        self.parser = Parser(debug=True)
         super(DebugRule, self).__init__(*args, **kwargs)

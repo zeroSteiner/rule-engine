@@ -34,6 +34,7 @@ __version__ = '5.0.0a2'
 
 from .engine import resolve_attribute
 from .engine import resolve_item
+from .engine import type_resolver_from_dataclass
 from .engine import type_resolver_from_dict
 from .engine import Context
 from .engine import Rule
@@ -57,5 +58,6 @@ __all__ = (
     'SymbolResolutionError',
     'resolve_attribute',
     'resolve_item',
+    'type_resolver_from_dataclass',
     'type_resolver_from_dict',
 )

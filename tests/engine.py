@@ -446,6 +446,60 @@ class EngineTests(unittest.TestCase):
         with self.assertRaises(errors.SymbolResolutionError):
             type_resolver('doesnotexist')
 
+    def test_engine_type_resolver_from_dataclass(self):
+        type_resolver = engine.type_resolver_from_dataclass(_ResolverFlatHero)
+        self.assertTrue(callable(type_resolver))
+        self.assertIs(type_resolver('name'), types.DataType.STRING)
+        self.assertIs(type_resolver('age'), types.DataType.FLOAT)
+        with self.assertRaises(errors.SymbolResolutionError):
+            type_resolver('doesnotexist')
+
+    def test_engine_type_resolver_from_dataclass_evaluates_rule(self):
+        context = engine.Context(
+                resolver=engine.resolve_attribute,
+                type_resolver=engine.type_resolver_from_dataclass(_ResolverFlatHero)
+        )
+        hero = _ResolverFlatHero(name='Batman', age=85)
+        self.assertTrue(engine.Rule('name == "Batman" and age > 50', context=context).matches(hero))
+        self.assertFalse(engine.Rule('name == "Joker"', context=context).matches(hero))
+
+    def test_engine_type_resolver_from_dataclass_mutual_recursion(self):
+        type_resolver = engine.type_resolver_from_dataclass(_ResolverPerson)
+        # both types must be reachable so the cross-reference inside Company resolves at parse time
+        person = type_resolver('_ResolverPerson')
+        company = type_resolver('_ResolverCompany')
+        self.assertIsInstance(person, types._ObjectDataTypeDef)
+        self.assertIsInstance(company, types._ObjectDataTypeDef)
+
+        context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
+        rule = engine.Rule('employer.ceo.name == "Alice"', context=context)
+        alice = _ResolverPerson(name='Alice', employer=None)
+        acme = _ResolverCompany(name='ACME', ceo=alice)
+        alice.employer = acme
+        self.assertTrue(rule.matches(alice))
+
+    def test_engine_type_resolver_from_dataclass_rejects_non_dataclass(self):
+        class NotADataclass:
+            name: str
+
+        with self.assertRaisesRegex(TypeError, r'^type_resolver_from_dataclass argument 1 must be a dataclass'):
+            engine.type_resolver_from_dataclass(NotADataclass)
+
+@dataclasses.dataclass
+class _ResolverFlatHero:
+    name: str
+    age: int
+
+@dataclasses.dataclass
+class _ResolverPerson:
+    name: str
+    employer: '_ResolverCompany'
+
+@dataclasses.dataclass
+class _ResolverCompany:
+    name: str
+    ceo: _ResolverPerson
+
 class EngineRuleTests(unittest.TestCase):
     rule_text = 'first_name == "Luke" and email =~ ".*@rebels.org$"'
     true_item = {'first_name': 'Luke', 'last_name': 'Skywalker', 'email': 'luke@rebels.org'}

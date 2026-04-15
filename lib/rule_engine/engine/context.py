@@ -33,6 +33,7 @@
 import collections
 import collections.abc
 import contextlib
+import dataclasses
 import datetime
 import decimal
 import functools
@@ -110,6 +111,50 @@ def type_resolver_from_dict(dictionary: collections.abc.Mapping[str, Any]) -> Ca
     :rtype: function
     """
     type_map = {key: value if types.DataType.is_definition(value) else types.DataType.from_value(value) for key, value in dictionary.items()}
+    return functools.partial(_type_resolver, type_map)
+
+def _collect_object_types(definition: _DataTypeDef, type_map: dict[str, _DataTypeDef], seen: set[str]) -> None:
+    if isinstance(definition, types._ObjectDataTypeDef):
+        if definition.name in seen:
+            return
+        seen.add(definition.name)
+        # don't overwrite an entry that was set earlier (e.g. a top-level field whose name happens to match)
+        type_map.setdefault(definition.name, definition)
+        for attr_type in definition.attributes.values():
+            _collect_object_types(attr_type, type_map, seen)
+        return
+    if isinstance(definition, types._MappingDataTypeDef):
+        _collect_object_types(definition.key_type, type_map, seen)
+        _collect_object_types(definition.value_type, type_map, seen)
+        return
+    if isinstance(definition, types._CollectionDataTypeDef):
+        _collect_object_types(definition.value_type, type_map, seen)
+        return
+
+def type_resolver_from_dataclass(cls: type) -> Callable[[str], _DataTypeDef]:
+    """
+    Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a Python
+    :py:func:`~dataclasses.dataclass`. The dataclass's top-level fields become resolvable symbols (so a rule may
+    reference them by name) and every transitively-reachable :py:attr:`~rule_engine.types.DataType.OBJECT` schema
+    is registered by its OBJECT name so that cross-type references in mutually-recursive schemas resolve at parse
+    time.
+
+    The companion :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` is used internally to derive the
+    schema; see its documentation for the supported annotation forms (primitives, generics, ``Optional``, nested
+    dataclasses and self/mutual recursion). The nullability of fields is lost in the conversion, so the resulting type
+    resolver will treat all fields as required.
+
+    .. versionadded:: 5.0.0
+
+    :param type cls: A class decorated with :py:func:`~dataclasses.dataclass`.
+    :return: The callback function.
+    :rtype: function
+    """
+    if not dataclasses.is_dataclass(cls):
+        raise TypeError('type_resolver_from_dataclass argument 1 must be a dataclass, not ' + type(cls).__name__)
+    root = types.DataType.OBJECT.from_dataclass(cls.__name__, cls)
+    type_map: dict[str, _DataTypeDef] = dict(root.attributes)
+    _collect_object_types(root, type_map, set())
     return functools.partial(_type_resolver, type_map)
 
 class _ThreadLocalStorage(object):

@@ -322,6 +322,31 @@ class MetaDataTypeTests(unittest.TestCase):
         self.assertEqual(DataType['STRING'], DataType.STRING)
         self.assertEqual(DataType['UNDEFINED'], DataType.UNDEFINED)
 
+@dataclasses.dataclass
+class _SelfRefHero:
+    name: str
+    nemesis: typing.Optional['_SelfRefHero'] = None
+
+@dataclasses.dataclass
+class _ArraySelfRefHero:
+    name: str
+    sidekicks: list['_ArraySelfRefHero'] = dataclasses.field(default_factory=list)
+
+@dataclasses.dataclass
+class _MappingSelfRefHero:
+    name: str
+    allies: dict[str, '_MappingSelfRefHero'] = dataclasses.field(default_factory=dict)
+
+@dataclasses.dataclass
+class _MutualPerson:
+    name: str
+    employer: '_MutualCompany'
+
+@dataclasses.dataclass
+class _MutualCompany:
+    name: str
+    ceo: _MutualPerson
+
 class ObjectDataTypeTests(unittest.TestCase):
     class _HeroDataclass(object):
         def __init__(self, name, first_appearance):
@@ -715,6 +740,66 @@ class ObjectDataTypeTests(unittest.TestCase):
 
         with self.assertRaises((TypeError, ValueError)):
             DataType.OBJECT.from_dataclass('Bad', Bad)
+
+    def test_object_from_dataclass_nested(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        @dataclasses.dataclass
+        class Person:
+            name: str
+            address: Address
+
+        result = DataType.OBJECT.from_dataclass('Person', Person)
+        nested = result.attributes['address']
+        self.assertIsInstance(nested, types._ObjectDataTypeDef)
+        self.assertEqual(nested.name, 'Address')
+        self.assertIs(nested.attributes['city'], DataType.STRING)
+
+    def test_object_from_dataclass_self_reference(self):
+        result = DataType.OBJECT.from_dataclass('Hero', _SelfRefHero)
+        self.assertIs(result.attributes['nemesis'], result)
+
+    def test_object_from_dataclass_self_reference_in_array(self):
+        result = DataType.OBJECT.from_dataclass('Hero', _ArraySelfRefHero)
+        self.assertIsInstance(result.attributes['sidekicks'], types._ArrayDataTypeDef)
+        self.assertIs(result.attributes['sidekicks'].value_type, result)
+
+    def test_object_from_dataclass_self_reference_in_mapping(self):
+        result = DataType.OBJECT.from_dataclass('Hero', _MappingSelfRefHero)
+        allies = result.attributes['allies']
+        self.assertIsInstance(allies, types._MappingDataTypeDef)
+        self.assertIs(allies.key_type, DataType.STRING)
+        self.assertIs(allies.value_type, result)
+
+    def test_object_from_dataclass_mutual_recursion(self):
+        result = DataType.OBJECT.from_dataclass('Person', _MutualPerson)
+        company = result.attributes['employer']
+        self.assertIsInstance(company, types._ObjectDataTypeDef)
+        self.assertEqual(company.name, '_MutualCompany')
+        # the deeper Person reference inside Company is left unresolved for the
+        # type_resolver to fill in at parse time; the placeholder carries the
+        # *root* OBJECT name supplied by the caller, not the dataclass class name
+        ceo_ref = company.attributes['ceo']
+        self.assertIsInstance(ceo_ref, types._ReferenceDataTypeDef)
+        self.assertEqual(ceo_ref.name, 'Person')
+
+    def test_object_from_dataclass_optional_nested(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        @dataclasses.dataclass
+        class Person:
+            name: str
+            address: typing.Optional[Address]
+
+        result = DataType.OBJECT.from_dataclass('Person', Person)
+        self.assertTrue(result.is_attributes_nullable('address'))
+        nested = result.attributes['address']
+        self.assertIsInstance(nested, types._ObjectDataTypeDef)
+        self.assertEqual(nested.name, 'Address')
 
 inf = float('inf')
 nan = float('nan')

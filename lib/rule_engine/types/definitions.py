@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import collections
 import collections.abc
+import dataclasses
 import threading
 import types as pytypes
 import typing
@@ -347,6 +348,60 @@ class _SelfReferenceDataTypeDef(_ReferenceDataTypeDef):
     def __repr__(self) -> str:
         return "<{} (self reference placeholder) >".format(self.__class__.__name__)
 
+def _resolve_dataclass_field_type(annotation: Any, current_cls: type, seen: dict[type, str]) -> _DataTypeDef:
+    """
+    Translate a dataclass field annotation into a :py:class:`_DataTypeDef`, recursing into nested dataclasses.
+    *current_cls* is the dataclass whose schema is being built right now (used to emit
+    :py:class:`_SelfReferenceDataTypeDef` for direct self-references). *seen* maps each ancestor dataclass on the
+    build stack to the OBJECT name it will be registered under (used to emit unresolved references for mutual
+    recursion).
+    """
+    # deferred to avoid the definitions.py -> datatype.py import cycle
+    from .datatype import DataType
+    if isinstance(annotation, type) and dataclasses.is_dataclass(annotation):
+        if annotation is current_cls:
+            return _ObjectDataTypeDef.self
+        if annotation in seen:
+            return _ReferenceDataTypeDef(seen[annotation])
+        return _build_object_from_dataclass(annotation, annotation.__name__, accessor=None, _seen=seen)
+
+    origin = typing.get_origin(annotation)
+    args = typing.get_args(annotation)
+    if origin is not None and args:
+        contains_dataclass = any(
+            isinstance(arg, type) and dataclasses.is_dataclass(arg) for arg in args
+        )
+        if contains_dataclass:
+            origin_type = DataType.from_type(origin)
+            if origin_type is DataType.ARRAY:
+                return DataType.ARRAY(_resolve_dataclass_field_type(args[0], current_cls, seen))
+            if origin_type is DataType.SET:
+                return DataType.SET(_resolve_dataclass_field_type(args[0], current_cls, seen))
+            if origin_type is DataType.MAPPING:
+                key_type = _resolve_dataclass_field_type(args[0], current_cls, seen)
+                value_type = _resolve_dataclass_field_type(args[1], current_cls, seen)
+                return cast(_MappingDataTypeDef, DataType.MAPPING(key_type, value_type))
+    return DataType.from_type(annotation)
+
+def _build_object_from_dataclass(
+        cls: type,
+        name: str,
+        *,
+        accessor: Callable[[Any, str], Any] | None,
+        _seen: dict[type, str]
+) -> _ObjectDataTypeDef:
+    seen = dict(_seen)
+    seen[cls] = name
+    type_hints = typing.get_type_hints(cls)
+    attributes: dict[str, _DataTypeDef] = {}
+    attributes_nullable: dict[str, bool] = {}
+    for field in dataclasses.fields(cls):
+        annotation = type_hints.get(field.name, field.type)
+        unwrapped, is_nullable = _unwrap_optional(annotation)
+        attributes[field.name] = _resolve_dataclass_field_type(unwrapped, cls, seen)
+        attributes_nullable[field.name] = is_nullable
+    return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
+
 def _unwrap_optional(annotation: Any) -> tuple[Any, bool]:
     """
     Strip a single ``None`` member from a :py:data:`typing.Union` (or PEP 604 ``X | Y``) annotation. Returns
@@ -517,6 +572,12 @@ class _ObjectDataTypeDef(_DataTypeDef):
         non-``None`` type, and the corresponding attribute is recorded as nullable. Non-Optional fields are recorded
         as non-nullable.
 
+        Fields whose annotation is itself a dataclass (or contains one inside a ``list``/``set``/``dict`` generic)
+        produce nested :py:class:`_ObjectDataTypeDef` schemas. Self-references resolve to the enclosing schema via
+        the :py:attr:`~_ObjectDataTypeDef.self` sentinel; references to a dataclass already on the build stack
+        (mutual recursion) become unresolved :py:meth:`~_ObjectDataTypeDef.reference` placeholders that the caller
+        must resolve via the :py:class:`~rule_engine.engine.Context` ``type_resolver``.
+
         .. versionadded:: 5.0.0
 
         :param str name: The name of the resulting OBJECT schema.
@@ -524,21 +585,9 @@ class _ObjectDataTypeDef(_DataTypeDef):
         :param accessor: An optional accessor callable forwarded to :py:class:`_ObjectDataTypeDef`. Defaults to
                 :py:func:`getattr`, which matches normal dataclass attribute access.
         """
-        import dataclasses
-        import typing
-        # deferred to avoid the definitions.py -> datatype.py import cycle
-        from .datatype import DataType
         if not dataclasses.is_dataclass(cls):
             raise TypeError('from_dataclass argument 2 must be a dataclass, not ' + type(cls).__name__)
-        type_hints = typing.get_type_hints(cls)
-        attributes: dict[str, _DataTypeDef] = {}
-        attributes_nullable: dict[str, bool] = {}
-        for field in dataclasses.fields(cls):
-            annotation = type_hints.get(field.name, field.type)
-            unwrapped, is_nullable = _unwrap_optional(annotation)
-            attributes[field.name] = DataType.from_type(unwrapped)
-            attributes_nullable[field.name] = is_nullable
-        return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
+        return _build_object_from_dataclass(cls, name, accessor=accessor, _seen={})
 
     def is_attributes_nullable(self, attribute_name: str) -> bool:
         return self.attributes_nullable.get(attribute_name, True)

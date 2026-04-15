@@ -479,6 +479,39 @@ class _ObjectDataTypeDef(_DataTypeDef):
         """
         return _ReferenceDataTypeDef(name)
 
+    @staticmethod
+    def from_dataclass(
+            name: str,
+            cls: type,
+            *,
+            accessor: Callable[[Any, str], Any] | None = None
+    ) -> _ObjectDataTypeDef:
+        """
+        Build an :py:class:`_ObjectDataTypeDef` from a Python :py:func:`~dataclasses.dataclass`. Each field of *cls*
+        becomes an attribute in the resulting OBJECT schema, with its type derived from the field annotation via
+        :py:meth:`DataType.from_type`. Stringified annotations (e.g. from ``from __future__ import annotations``) are
+        resolved using :py:func:`typing.get_type_hints`.
+
+        .. versionadded:: 5.0.0
+
+        :param str name: The name of the resulting OBJECT schema.
+        :param type cls: A class decorated with :py:func:`~dataclasses.dataclass`.
+        :param accessor: An optional accessor callable forwarded to :py:class:`_ObjectDataTypeDef`. Defaults to
+                :py:func:`getattr`, which matches normal dataclass attribute access.
+        """
+        import dataclasses
+        import typing
+        # deferred to avoid the definitions.py -> datatype.py import cycle
+        from .datatype import DataType
+        if not dataclasses.is_dataclass(cls):
+            raise TypeError('from_dataclass argument 2 must be a dataclass, not ' + type(cls).__name__)
+        type_hints = typing.get_type_hints(cls)
+        attributes: dict[str, _DataTypeDef] = {}
+        for field in dataclasses.fields(cls):
+            annotation = type_hints.get(field.name, field.type)
+            attributes[field.name] = DataType.from_type(annotation)
+        return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor)
+
     def is_attributes_nullable(self, attribute_name: str) -> bool:
         return self.attributes_nullable.get(attribute_name, True)
 

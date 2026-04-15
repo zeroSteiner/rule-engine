@@ -31,6 +31,7 @@
 #
 
 import collections
+import dataclasses
 import datetime
 import sys
 import typing
@@ -625,6 +626,61 @@ class ObjectDataTypeTests(unittest.TestCase):
         # nested OBJECT is not descended into (its own __init__ handled its scope)
         self.assertIs(Outer.attributes['inner'], Inner)
         self.assertIs(Outer.attributes['self_ref'], Outer)
+
+    def test_object_from_dataclass_flat(self):
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            age: int
+            first_appearance: datetime.datetime
+
+        Wookiee = DataType.OBJECT.from_dataclass('Hero', Hero)
+        self.assertEqual(Wookiee.name, 'Hero')
+        self.assertIs(Wookiee.attributes['name'], DataType.STRING)
+        self.assertIs(Wookiee.attributes['age'], DataType.FLOAT)
+        self.assertIs(Wookiee.attributes['first_appearance'], DataType.DATETIME)
+        self.assertIs(Wookiee.accessor, getattr)
+
+    def test_object_from_dataclass_with_generics(self):
+        @dataclasses.dataclass
+        class Roster:
+            heroes: list[str]
+            scores: dict[str, int]
+            tags: set[str]
+
+        result = DataType.OBJECT.from_dataclass('Roster', Roster)
+        self.assertEqual(result.attributes['heroes'], DataType.ARRAY(DataType.STRING))
+        self.assertEqual(result.attributes['scores'], DataType.MAPPING(DataType.STRING, DataType.FLOAT))
+        self.assertEqual(result.attributes['tags'], DataType.SET(DataType.STRING))
+
+    def test_object_from_dataclass_custom_accessor(self):
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+
+        def dict_getter(obj, name):
+            return obj[name]
+
+        result = DataType.OBJECT.from_dataclass('Hero', Hero, accessor=dict_getter)
+        self.assertIs(result.accessor, dict_getter)
+
+    def test_object_from_dataclass_rejects_non_dataclass(self):
+        class NotADataclass:
+            name: str
+
+        with self.assertRaisesRegex(TypeError, r'^from_dataclass argument 2 must be a dataclass'):
+            DataType.OBJECT.from_dataclass('Hero', NotADataclass)
+
+    def test_object_from_dataclass_resolves_stringified_annotations(self):
+        # exercise typing.get_type_hints for fields whose annotations are strings (e.g. PEP 563)
+        @dataclasses.dataclass
+        class Hero:
+            name: 'str'
+            age: 'int'
+
+        result = DataType.OBJECT.from_dataclass('Hero', Hero)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        self.assertIs(result.attributes['age'], DataType.FLOAT)
 
 inf = float('inf')
 nan = float('nan')

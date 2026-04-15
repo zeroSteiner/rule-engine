@@ -35,6 +35,7 @@ from __future__ import annotations
 import collections
 import collections.abc
 import dataclasses
+import sys
 import threading
 import types as pytypes
 import typing
@@ -348,6 +349,23 @@ class _SelfReferenceDataTypeDef(_ReferenceDataTypeDef):
     def __repr__(self) -> str:
         return "<{} (self reference placeholder) >".format(self.__class__.__name__)
 
+def _resolve_forward_ref(annotation: Any, owner_cls: type) -> Any:
+    """
+    Resolve a string or :py:class:`typing.ForwardRef` annotation against *owner_cls*'s module globals. On
+    Python 3.10, :py:func:`typing.get_type_hints` does not recurse into PEP 585 generic aliases like
+    ``list['X']`` to resolve string args, so this is needed to evaluate them ourselves.
+    """
+    if isinstance(annotation, typing.ForwardRef):
+        annotation = annotation.__forward_arg__
+    if isinstance(annotation, str):
+        module = sys.modules.get(owner_cls.__module__)
+        globalns = getattr(module, '__dict__', {})
+        try:
+            return eval(annotation, globalns)
+        except Exception:
+            return annotation
+    return annotation
+
 def _resolve_dataclass_field_type(annotation: Any, current_cls: type, seen: dict[type, str]) -> _DataTypeDef:
     """
     Translate a dataclass field annotation into a :py:class:`_DataTypeDef`, recursing into nested dataclasses.
@@ -358,6 +376,7 @@ def _resolve_dataclass_field_type(annotation: Any, current_cls: type, seen: dict
     """
     # deferred to avoid the definitions.py -> datatype.py import cycle
     from .datatype import DataType
+    annotation = _resolve_forward_ref(annotation, current_cls)
     if isinstance(annotation, type) and dataclasses.is_dataclass(annotation):
         if annotation is current_cls:
             return _ObjectDataTypeDef.self
@@ -368,18 +387,19 @@ def _resolve_dataclass_field_type(annotation: Any, current_cls: type, seen: dict
     origin = typing.get_origin(annotation)
     args = typing.get_args(annotation)
     if origin is not None and args:
+        resolved_args = tuple(_resolve_forward_ref(arg, current_cls) for arg in args)
         contains_dataclass = any(
-            isinstance(arg, type) and dataclasses.is_dataclass(arg) for arg in args
+            isinstance(arg, type) and dataclasses.is_dataclass(arg) for arg in resolved_args
         )
         if contains_dataclass:
             origin_type = DataType.from_type(origin)
             if origin_type is DataType.ARRAY:
-                return DataType.ARRAY(_resolve_dataclass_field_type(args[0], current_cls, seen))
+                return DataType.ARRAY(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen))
             if origin_type is DataType.SET:
-                return DataType.SET(_resolve_dataclass_field_type(args[0], current_cls, seen))
+                return DataType.SET(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen))
             if origin_type is DataType.MAPPING:
-                key_type = _resolve_dataclass_field_type(args[0], current_cls, seen)
-                value_type = _resolve_dataclass_field_type(args[1], current_cls, seen)
+                key_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen)
+                value_type = _resolve_dataclass_field_type(resolved_args[1], current_cls, seen)
                 return cast(_MappingDataTypeDef, DataType.MAPPING(key_type, value_type))
     return DataType.from_type(annotation)
 

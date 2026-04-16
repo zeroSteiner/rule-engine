@@ -640,7 +640,9 @@ class _ObjectDataTypeDef(_DataTypeDef):
         self.accessor = accessor if accessor is not None else getattr
         # resolve self-references in the attribute schema now that self exists; cross-name references are left intact
         # and will be resolved lazily at rule parse time via Context.resolve_type
-        for attr_name, attr_type in list(self.attributes.items()):
+        for attr_name, attr_type in self.attributes.items():
+            if not isinstance(attr_type, _DataTypeDef):
+                raise TypeError("object {0} attribute {1!r} has an invalid type: {2!r}".format(self.name, attr_name, attr_type))
             self.attributes[attr_name] = _substitute_self_references(attr_type, self)
 
     def __call__(

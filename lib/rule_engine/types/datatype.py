@@ -37,7 +37,6 @@ from typing import Any
 
 from .definitions import (
         _ArrayDataTypeDef,
-        _CollectionDataTypeDef,
         _DATA_TYPE_UNDEFINED,
         _DataTypeDef,
         _FunctionDataTypeDef,

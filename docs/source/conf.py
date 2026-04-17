@@ -7,8 +7,15 @@
 # http://www.sphinx-doc.org/en/stable/config
 
 import datetime
+import importlib
 import os
 import sys
+
+from docutils import nodes
+from docutils.parsers.rst import Directive
+from docutils.statemachine import ViewList
+from sphinx.util.docstrings import prepare_docstring
+from sphinx.util.nodes import nested_parse_with_titles
 
 # -- Path setup --------------------------------------------------------------
 _prj_root = os.path.dirname(__file__)
@@ -168,8 +175,42 @@ intersphinx_mapping = {
     'python': ("https://docs.python.org/{version.major}.{version.minor}".format(version=sys.version_info), None)
 }
 
+class EmbedDocstring(Directive):
+    """
+    Render the ``__doc__`` of a Python object in place, walking a dotted path through the module tree and then
+    through attribute/instance access. Used to attach live docstrings to ``.. py:method::`` / ``.. py:attribute::``
+    entries for ``DataType.OBJECT.*`` where autodoc can't follow attribute access through a ``__slots__`` instance.
+    """
+    required_arguments = 1
+    has_content = False
+
+    def run(self):
+        path = self.arguments[0]
+        parts = path.split('.')
+        module = None
+        attr_parts: list[str] = []
+        for i in range(len(parts), 0, -1):
+            try:
+                module = importlib.import_module('.'.join(parts[:i]))
+                attr_parts = parts[i:]
+                break
+            except ImportError:
+                continue
+        if module is None:
+            raise self.error(f'embed-docstring: could not import any module prefix of {path!r}')
+        obj: object = module
+        for name in attr_parts:
+            obj = getattr(obj, name)
+        doc = getattr(obj, '__doc__', None) or ''
+        lines = prepare_docstring(doc)
+        source = ViewList(lines, source=path)
+        container = nodes.container()
+        nested_parse_with_titles(self.state, source, container)
+        return container.children
+
 def setup(app):
     app.add_css_file('theme_overrides.css')
+    app.add_directive('embed-docstring', EmbedDocstring)
 
 def linkcode_resolve(domain, info):
     if domain != 'py':

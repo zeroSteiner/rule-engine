@@ -336,9 +336,10 @@ class _ReferenceDataTypeDef(_DataTypeDef):
 
 class _SelfReferenceDataTypeDef(_ReferenceDataTypeDef):
     """
-    A sentinel forward-reference meaning "the enclosing :py:class:`_ObjectDataTypeDef` schema". Used via
-    :py:attr:`~_ObjectDataTypeDef.self` and resolved during :py:meth:`_ObjectDataTypeDef.__init__` regardless of its
-    name. Exists so schemas can self-reference without repeating their own name.
+    Sentinel value for use inside an :py:attr:`~rule_engine.types.DataType.OBJECT` attribute schema to denote
+    "the enclosing ``OBJECT`` schema", resolved automatically when the schema is constructed. Prefer this over
+    :py:meth:`~rule_engine.types.DataType.OBJECT.reference` for self-references, since it avoids repeating the
+    schema's own name.
 
     .. versionadded:: 5.0.0
     """
@@ -625,9 +626,9 @@ class _ObjectDataTypeDef(_DataTypeDef):
 
         :param str name: The name of the object schema.
         :param dict attributes: A mapping of attribute names to their data type definitions. A
-                :py:meth:`~_ObjectDataTypeDef.reference` placeholder with the same ``name`` (or the
-                :py:attr:`~_ObjectDataTypeDef.self` sentinel) resolves to the new type itself, enabling
-                self-referential schemas.
+                :py:meth:`~rule_engine.types.DataType.OBJECT.reference` placeholder with the same ``name`` (or the
+                :py:attr:`~rule_engine.types.DataType.OBJECT.self` sentinel) resolves to the new type itself,
+                enabling self-referential schemas.
         :param accessor: A callable of the form ``accessor(value, attribute_name)`` used to fetch an attribute's
                 value at evaluation time. Defaults to :py:func:`getattr`.
         :param dict attributes_nullable: A mapping of attribute names to a ``bool`` indicating whether the attribute
@@ -644,13 +645,14 @@ class _ObjectDataTypeDef(_DataTypeDef):
     @staticmethod
     def reference(name: str) -> _ReferenceDataTypeDef:
         """
-        Construct a forward-reference placeholder for use inside an :py:class:`_ObjectDataTypeDef` schema. This is
-        **not** itself a data type — it is a placeholder that resolves to an :py:class:`_ObjectDataTypeDef` either at
-        construction time (for self references within the same schema) or at rule parse time (for cross-type
-        references) via a :py:class:`~rule_engine.engine.Context`'s ``type_resolver``.
+        Construct a forward-reference placeholder for use inside an :py:attr:`~rule_engine.types.DataType.OBJECT`
+        schema. This is **not** itself a data type — it is a placeholder that resolves to an
+        :py:attr:`~rule_engine.types.DataType.OBJECT` either at construction time (for self references within the
+        same schema) or at rule parse time (for cross-type references) via a
+        :py:class:`~rule_engine.engine.Context`'s ``type_resolver``.
 
-        For self-references within a schema, prefer the :py:attr:`~_ObjectDataTypeDef.self` sentinel, which avoids
-        repeating the enclosing schema's name.
+        For self-references within a schema, prefer the :py:attr:`~rule_engine.types.DataType.OBJECT.self` sentinel,
+        which avoids repeating the enclosing schema's name.
 
         .. versionadded:: 5.0.0
 
@@ -666,27 +668,27 @@ class _ObjectDataTypeDef(_DataTypeDef):
             accessor: Callable[[Any, str], Any] | None = None
     ) -> _ObjectDataTypeDef:
         """
-        Build an :py:class:`_ObjectDataTypeDef` from a Python :py:func:`~dataclasses.dataclass`. Each field of *cls*
-        becomes an attribute in the resulting OBJECT schema, with its type derived from the field annotation via
-        :py:meth:`DataType.from_type`. Stringified annotations (e.g. from ``from __future__ import annotations``) are
-        resolved using :py:func:`typing.get_type_hints`.
+        Build an :py:attr:`~rule_engine.types.DataType.OBJECT` schema from a Python
+        :py:func:`~dataclasses.dataclass`. Each field of *cls* becomes an attribute in the resulting OBJECT schema,
+        with its type derived from the field annotation via :py:meth:`DataType.from_type`. Stringified annotations
+        (e.g. from ``from __future__ import annotations``) are resolved using :py:func:`typing.get_type_hints`.
 
         Fields annotated with :py:data:`typing.Optional` (or the PEP 604 ``T | None`` form) are unwrapped to their
         non-``None`` type, and the corresponding attribute is recorded as nullable. Non-Optional fields are recorded
         as non-nullable.
 
         Fields whose annotation is itself a dataclass (or contains one inside a ``list``/``set``/``dict`` generic)
-        produce nested :py:class:`_ObjectDataTypeDef` schemas. Self-references resolve to the enclosing schema via
-        the :py:attr:`~_ObjectDataTypeDef.self` sentinel; references to a dataclass already on the build stack
-        (mutual recursion) become unresolved :py:meth:`~_ObjectDataTypeDef.reference` placeholders that the caller
-        must resolve via the :py:class:`~rule_engine.engine.Context` ``type_resolver``.
+        produce nested OBJECT schemas. Self-references resolve to the enclosing schema via the
+        :py:attr:`~rule_engine.types.DataType.OBJECT.self` sentinel; references to a dataclass already on the build
+        stack (mutual recursion) become unresolved :py:meth:`~rule_engine.types.DataType.OBJECT.reference`
+        placeholders that the caller must resolve via the :py:class:`~rule_engine.engine.Context` ``type_resolver``.
 
         .. versionadded:: 5.0.0
 
         :param str name: The name of the resulting OBJECT schema.
         :param type cls: A class decorated with :py:func:`~dataclasses.dataclass`.
-        :param accessor: An optional accessor callable forwarded to :py:class:`_ObjectDataTypeDef`. Defaults to
-                :py:func:`getattr`, which matches normal dataclass attribute access.
+        :param accessor: An optional accessor callable forwarded to the new schema. Defaults to :py:func:`getattr`,
+                which matches normal dataclass attribute access.
         """
         if not dataclasses.is_dataclass(cls):
             raise TypeError('from_dataclass argument 2 must be a dataclass, not ' + type(cls).__name__)
@@ -700,20 +702,20 @@ class _ObjectDataTypeDef(_DataTypeDef):
             accessor: Callable[[Any, str], Any] | None = None
     ) -> _ObjectDataTypeDef:
         """
-        Build an :py:class:`_ObjectDataTypeDef` from a SQLAlchemy ORM mapped class. Each mapped column of *cls*
-        becomes an attribute in the resulting OBJECT schema, with its type derived from the column's
-        :py:meth:`~sqlalchemy.types.TypeEngine.python_type` via :py:meth:`DataType.from_type`. Column nullability
-        is taken directly from :py:attr:`~sqlalchemy.Column.nullable`.
+        Build an :py:attr:`~rule_engine.types.DataType.OBJECT` schema from a SQLAlchemy ORM mapped class. Each
+        mapped column of *cls* becomes an attribute in the resulting OBJECT schema, with its type derived from the
+        column's :py:meth:`~sqlalchemy.types.TypeEngine.python_type` via :py:meth:`DataType.from_type`. Column
+        nullability is taken directly from :py:attr:`~sqlalchemy.Column.nullable`.
 
         Columns whose ``python_type`` raises :py:exc:`NotImplementedError` (e.g. :py:class:`~sqlalchemy.JSON`) are
         recorded as :py:attr:`DataType.UNDEFINED` so the attribute is selectable without parse-time type checking.
         :py:class:`~sqlalchemy.Enum` columns are surfaced as :py:attr:`DataType.STRING`.
 
-        Relationships declared on *cls* are expanded into nested :py:class:`_ObjectDataTypeDef` schemas.
-        Collection relationships (``uselist=True``) are wrapped in :py:attr:`DataType.ARRAY`. Back-references
-        to the enclosing class resolve to :py:attr:`~_ObjectDataTypeDef.self`; references to a class already
-        on the build stack (mutual recursion across more than two classes) become unresolved
-        :py:meth:`~_ObjectDataTypeDef.reference` placeholders that the caller must resolve via the
+        Relationships declared on *cls* are expanded into nested OBJECT schemas. Collection relationships
+        (``uselist=True``) are wrapped in :py:attr:`DataType.ARRAY`. Back-references to the enclosing class
+        resolve to :py:attr:`~rule_engine.types.DataType.OBJECT.self`; references to a class already on the build
+        stack (mutual recursion across more than two classes) become unresolved
+        :py:meth:`~rule_engine.types.DataType.OBJECT.reference` placeholders that the caller must resolve via the
         :py:class:`~rule_engine.engine.Context` ``type_resolver``.
 
         SQLAlchemy is an *optional* dependency. The library imports cleanly without it; ``import sqlalchemy`` is
@@ -724,8 +726,8 @@ class _ObjectDataTypeDef(_DataTypeDef):
 
         :param str name: The name of the resulting OBJECT schema.
         :param type cls: A SQLAlchemy ORM mapped class.
-        :param accessor: An optional accessor callable forwarded to :py:class:`_ObjectDataTypeDef`. Defaults to
-                :py:func:`getattr`, which matches normal attribute access on a mapped instance.
+        :param accessor: An optional accessor callable forwarded to the new schema. Defaults to :py:func:`getattr`,
+                which matches normal attribute access on a mapped instance.
         """
         if not hasattr(cls, '__mapper__'):
             raise TypeError('from_sqlalchemy argument 2 must be a SQLAlchemy mapped class, not ' + type(cls).__name__)

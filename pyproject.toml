@@ -47,7 +47,7 @@ dev = [
     "invoke",
     "ipython>=9.0; python_version >= '3.11'",
     "mypy",
-    "sphinx",
+    "sphinx>=9.1; python_version >= '3.12'",
     "sphinx-rtd-theme",
     "sqlalchemy>=2.0",
     "types-python-dateutil",

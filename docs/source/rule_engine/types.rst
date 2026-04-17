@@ -54,6 +54,25 @@ Classes
 
    .. automethod:: OBJECT
 
+   .. py:method:: DataType.OBJECT.from_dataclass(name, cls, *, accessor=None)
+      :staticmethod:
+
+      .. embed-docstring:: rule_engine.types.definitions._ObjectDataTypeDef.from_dataclass
+
+   .. py:method:: DataType.OBJECT.from_sqlalchemy(name, cls, *, accessor=None)
+      :staticmethod:
+
+      .. embed-docstring:: rule_engine.types.definitions._ObjectDataTypeDef.from_sqlalchemy
+
+   .. py:method:: DataType.OBJECT.reference(name)
+      :staticmethod:
+
+      .. embed-docstring:: rule_engine.types.definitions._ObjectDataTypeDef.reference
+
+   .. py:attribute:: DataType.OBJECT.self
+
+      .. embed-docstring:: rule_engine.types.definitions._SelfReferenceDataTypeDef
+
    .. automethod:: SET
 
    .. autoattribute:: STRING

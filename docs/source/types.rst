@@ -156,8 +156,7 @@ directly from the field annotations using :py:meth:`DataType.OBJECT.from_datacla
 The derived schema reflects three behaviors automatically:
 
 - **Optional / nullability**: a field annotated as :py:class:`~typing.Optional` (or ``T | None``) is unwrapped to ``T``
-  and marked nullable in :py:attr:`~rule_engine.types.definitions._ObjectDataTypeDef.attributes_nullable`. Non-Optional
-  fields are explicitly marked non-nullable.
+  and recorded as a nullable attribute on the resulting schema. Non-Optional fields are explicitly marked non-nullable.
 - **Nested dataclasses**: a field whose annotation is itself a dataclass becomes a nested ``OBJECT`` (recursively).
   Generic containers (e.g. ``list[Address]``, ``dict[str, Address]``) are walked so nested dataclasses inside
   ``ARRAY``, ``SET``, and ``MAPPING`` types are also expanded.
@@ -198,11 +197,10 @@ only needed when this entry point is actually invoked. Install it with ``pip ins
    HeroType = rule_engine.DataType.OBJECT.from_sqlalchemy('Hero', Hero)
 
 The walker reads ``column.type.python_type`` for each mapped column and threads it through
-:py:meth:`DataType.from_type`. Column nullability (``column.nullable``) is copied through to
-:py:attr:`~rule_engine.types.definitions._ObjectDataTypeDef.attributes_nullable`.
-:py:class:`~sqlalchemy.Enum` columns become ``STRING``; columns whose ``python_type`` raises
-:py:exc:`NotImplementedError` (certain dialect-specific types) fall back to :py:attr:`~DataType.UNDEFINED` so the
-attribute remains selectable without type-checking.
+:py:meth:`DataType.from_type`. Column nullability (``column.nullable``) is copied through to the schema's
+per-attribute nullability map. :py:class:`~sqlalchemy.Enum` columns become ``STRING``; columns whose ``python_type``
+raises :py:exc:`NotImplementedError` (certain dialect-specific types) fall back to :py:attr:`~DataType.UNDEFINED`
+so the attribute remains selectable without type-checking.
 
 Relationships expand automatically:
 

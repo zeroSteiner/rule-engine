@@ -79,6 +79,20 @@ class _DeferredAstNode(object):
         constructor = getattr(self.cls, self.method)
         return constructor(*self.args, **self.kwargs)
 
+class _ImplicitIter(object):
+    """
+    A parser-only placeholder representing one or more pending implicit iterations produced by
+    the ``a[*]`` shorthand. A marker is lifted into one or more nested
+    :py:class:`~rule_engine.ast.ComprehensionExpression` nodes when it reaches a boolean-test
+    boundary (comparison, ``in``, logical operator, function call, ternary, or statement root).
+    """
+    __slots__ = ('loops', 'inner')
+    def __init__(self, loops: list[tuple[Any, str]], inner: Any) -> None:
+        # loops is a list of (source_expression, variable_name) tuples ordered outermost-first.
+        self.loops = loops
+        # inner is a _DeferredAstNode chain rooted at a reference to the innermost loop variable.
+        self.inner = inner
+
 class Parser(ParserBase):
     """
     The parser class for the rule grammar. This class contains many ply specific
@@ -276,6 +290,65 @@ class Parser(ParserBase):
     def p_error(self, token: Any) -> None:
         raise errors.RuleSyntaxError('syntax error', token)
 
+    # Implicit-comprehension ([*]) helpers
+    # ------------------------------------
+    # The [*] shorthand (see issue #38) desugars to one or more
+    # :py:class:`~rule_engine.ast.ComprehensionExpression` nodes at parse time. A
+    # :py:class:`_ImplicitIter` marker flows through the grammar reductions; non-boundary rules
+    # update its pending inner expression while boundary rules (comparisons, ``in``, logical
+    # operators, function calls, the ternary operator, and the statement root) wrap the marker
+    # in nested comprehensions, outermost-first.
+    def _implicit_iter_var(self) -> str:
+        counter = getattr(self, '_implicit_iter_counter', 0)
+        self._implicit_iter_counter = counter + 1
+        # The leading '$$' guarantees the name cannot collide with any user-entered symbol
+        # (a SYMBOL token allows at most a single leading '$').
+        return '$$it{0}'.format(counter)
+
+    def _implicit_iter_coalesce(self, *children: Any) -> tuple[list[tuple[Any, str]], list[Any]]:
+        """Merge markers found in *children* into a single list of loops and return the
+        children with each marker replaced by its pending ``inner`` expression. Loops from
+        earlier children are ordered before loops from later children."""
+        loops: list[tuple[Any, str]] = []
+        resolved: list[Any] = []
+        for child in children:
+            if isinstance(child, _ImplicitIter):
+                loops.extend(child.loops)
+                resolved.append(child.inner)
+            else:
+                resolved.append(child)
+        return loops, resolved
+
+    def _implicit_iter_wrap(self, loops: list[tuple[Any, str]], condition: Any) -> Any:
+        """Wrap *condition* in nested ``ComprehensionExpression`` nodes, producing the
+        outermost comprehension. *loops* is ordered outermost-first; the first comprehension
+        built here corresponds to the innermost loop."""
+        for source, var_name in reversed(loops):
+            result = _DeferredAstNode(ast.SymbolExpression, args=(self.context, var_name), kwargs={'scope': None})
+            condition = _DeferredAstNode(
+                    ast.ComprehensionExpression,
+                    args=(self.context, result, var_name, source),
+                    kwargs={'condition': condition},
+            )
+        return condition
+
+    def _implicit_iter_resolve(self, node: Any) -> Any:
+        """If *node* is an ``_ImplicitIter`` marker with no enclosing boundary, lift it into
+        nested unconditional comprehensions that *map* the source(s) onto the pending ``inner``
+        expression (as opposed to filtering, which is what happens at a boolean-test boundary).
+        Used at the statement root, inside explicit comprehension sub-expressions, and inside
+        function-call arguments so the resulting AST never contains raw markers."""
+        if not isinstance(node, _ImplicitIter):
+            return node
+        result = node.inner
+        for source, var_name in reversed(node.loops):
+            result = _DeferredAstNode(
+                    ast.ComprehensionExpression,
+                    args=(self.context, result, var_name, source),
+                    kwargs={'condition': None},
+            )
+        return result
+
     def p_statement_expr(self, p: Any) -> None:
         """
         statement : expression
@@ -284,7 +357,7 @@ class Parser(ParserBase):
         kwargs = {}
         if len(p) == 3:
             kwargs['comment'] = ast.Comment(p[2][1:].strip())
-        p[0] = _DeferredAstNode(ast.Statement, args=(self.context, p[1]), kwargs=kwargs)
+        p[0] = _DeferredAstNode(ast.Statement, args=(self.context, self._implicit_iter_resolve(p[1])), kwargs=kwargs)
 
     def p_expression_getattr(self, p: Any) -> None:
         """
@@ -292,7 +365,17 @@ class Parser(ParserBase):
                | object ATTR_SAFE SYMBOL
         """
         op_name = self.op_names.get(p[2])
-        p[0] = _DeferredAstNode(ast.GetAttributeExpression, args=(self.context, p[1], p[3]), kwargs={'safe': op_name == 'ATTR_SAFE'})
+        target = p[1]
+        safe = op_name == 'ATTR_SAFE'
+        if isinstance(target, _ImplicitIter):
+            target.inner = _DeferredAstNode(
+                    ast.GetAttributeExpression,
+                    args=(self.context, target.inner, p[3]),
+                    kwargs={'safe': safe},
+            )
+            p[0] = target
+        else:
+            p[0] = _DeferredAstNode(ast.GetAttributeExpression, args=(self.context, target, p[3]), kwargs={'safe': safe})
 
     def p_expression_object(self, p: Any) -> None:
         """
@@ -305,6 +388,11 @@ class Parser(ParserBase):
         expression : expression QMARK expression COLON expression
         """
         condition, _, case_true, _, case_false = p[1:6]
+        # The ternary operator is a lift boundary on every branch so each branch is evaluated
+        # as a self-contained expression.
+        condition = self._implicit_iter_resolve(condition)
+        case_true = self._implicit_iter_resolve(case_true)
+        case_false = self._implicit_iter_resolve(case_false)
         p[0] = _DeferredAstNode(ast.TernaryExpression, args=(self.context, condition, case_true, case_false))
 
     def p_expression_arithmetic(self, p: Any) -> None:
@@ -317,7 +405,12 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
-        p[0] = _DeferredAstNode(ast.ArithmeticExpression, args=(self.context, op_name, left, right))
+        loops, (left, right) = self._implicit_iter_coalesce(left, right)
+        expr = _DeferredAstNode(ast.ArithmeticExpression, args=(self.context, op_name, left, right))
+        if loops:
+            p[0] = _ImplicitIter(loops=loops, inner=expr)
+        else:
+            p[0] = expr
 
     def p_expression_add(self, p: Any) -> None:
         """
@@ -325,7 +418,12 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
-        p[0] = _DeferredAstNode(ast.AddExpression, args=(self.context, op_name, left, right))
+        loops, (left, right) = self._implicit_iter_coalesce(left, right)
+        expr = _DeferredAstNode(ast.AddExpression, args=(self.context, op_name, left, right))
+        if loops:
+            p[0] = _ImplicitIter(loops=loops, inner=expr)
+        else:
+            p[0] = expr
 
     def p_expression_sub(self, p: Any) -> None:
         """
@@ -333,7 +431,12 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
-        p[0] = _DeferredAstNode(ast.SubtractExpression, args=(self.context, op_name, left, right))
+        loops, (left, right) = self._implicit_iter_coalesce(left, right)
+        expr = _DeferredAstNode(ast.SubtractExpression, args=(self.context, op_name, left, right))
+        if loops:
+            p[0] = _ImplicitIter(loops=loops, inner=expr)
+        else:
+            p[0] = expr
 
     def p_expression_bitwise(self, p: Any) -> None:
         """
@@ -343,7 +446,12 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
-        p[0] = _DeferredAstNode(ast.BitwiseExpression, args=(self.context, op_name, left, right))
+        loops, (left, right) = self._implicit_iter_coalesce(left, right)
+        expr = _DeferredAstNode(ast.BitwiseExpression, args=(self.context, op_name, left, right))
+        if loops:
+            p[0] = _ImplicitIter(loops=loops, inner=expr)
+        else:
+            p[0] = expr
 
     def p_expression_bitwise_shift(self, p: Any) -> None:
         """
@@ -352,7 +460,12 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
-        p[0] = _DeferredAstNode(ast.BitwiseShiftExpression, args=(self.context, op_name, left, right))
+        loops, (left, right) = self._implicit_iter_coalesce(left, right)
+        expr = _DeferredAstNode(ast.BitwiseShiftExpression, args=(self.context, op_name, left, right))
+        if loops:
+            p[0] = _ImplicitIter(loops=loops, inner=expr)
+        else:
+            p[0] = expr
 
     def p_expression_contains(self, p: Any) -> None:
         """
@@ -361,11 +474,15 @@ class Parser(ParserBase):
         """
         if len(p) == 4:
             member, _, container = p[1:4]
-            p[0] = _DeferredAstNode(ast.ContainsExpression, args=(self.context, container, member))
+            negate = False
         else:
             member, _, _, container = p[1:5]
-            p[0] = _DeferredAstNode(ast.ContainsExpression, args=(self.context, container, member))
-            p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, 'NOT', p[0]))
+            negate = True
+        loops, (member, container) = self._implicit_iter_coalesce(member, container)
+        expr: Any = _DeferredAstNode(ast.ContainsExpression, args=(self.context, container, member))
+        if negate:
+            expr = _DeferredAstNode(ast.UnaryExpression, args=(self.context, 'NOT', expr))
+        p[0] = self._implicit_iter_wrap(loops, expr) if loops else expr
 
     def p_expression_comparison(self, p: Any) -> None:
         """
@@ -374,7 +491,9 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
-        p[0] = _DeferredAstNode(ast.ComparisonExpression, args=(self.context, op_name, left, right))
+        loops, (left, right) = self._implicit_iter_coalesce(left, right)
+        expr = _DeferredAstNode(ast.ComparisonExpression, args=(self.context, op_name, left, right))
+        p[0] = self._implicit_iter_wrap(loops, expr) if loops else expr
 
     def p_expression_arithmetic_comparison(self, p: Any) -> None:
         """
@@ -385,7 +504,9 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
-        p[0] = _DeferredAstNode(ast.ArithmeticComparisonExpression, args=(self.context, op_name, left, right))
+        loops, (left, right) = self._implicit_iter_coalesce(left, right)
+        expr = _DeferredAstNode(ast.ArithmeticComparisonExpression, args=(self.context, op_name, left, right))
+        p[0] = self._implicit_iter_wrap(loops, expr) if loops else expr
 
     def p_expression_fuzzy_comparison(self, p: Any) -> None:
         """
@@ -396,7 +517,9 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
-        p[0] = _DeferredAstNode(ast.FuzzyComparisonExpression, args=(self.context, op_name, left, right))
+        loops, (left, right) = self._implicit_iter_coalesce(left, right)
+        expr = _DeferredAstNode(ast.FuzzyComparisonExpression, args=(self.context, op_name, left, right))
+        p[0] = self._implicit_iter_wrap(loops, expr) if loops else expr
 
     def p_expression_logic(self, p: Any) -> None:
         """
@@ -405,15 +528,22 @@ class Parser(ParserBase):
         """
         left, op, right = p[1:4]
         op_name = self.op_names[op]
+        # Logical operators are a lift boundary; each side is scoped independently so the
+        # shorthand never crosses ``and``/``or``.
+        left = self._implicit_iter_resolve(left)
+        right = self._implicit_iter_resolve(right)
         p[0] = _DeferredAstNode(ast.LogicExpression, args=(self.context, op_name, left, right))
 
     def p_expression_group(self, p: Any) -> None:
         'object : LPAREN expression RPAREN'
+        # Parentheses are transparent: markers inside them continue to propagate outward.
         p[0] = p[2]
 
     def p_expression_negate(self, p: Any) -> None:
         'expression : NOT expression'
-        p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, 'NOT', p[2]))
+        # NOT is a boolean-producing boundary; resolve the operand's markers before negating.
+        operand = self._implicit_iter_resolve(p[2])
+        p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, 'NOT', operand))
 
     def p_expression_symbol(self, p: Any) -> None:
         'object : SYMBOL'
@@ -427,7 +557,12 @@ class Parser(ParserBase):
     def p_expression_uminus(self, p: Any) -> None:
         'expression : SUB expression %prec UMINUS'
         names = {'-': 'UMINUS'}
-        p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, names[p[1]], p[2]))
+        operand = p[2]
+        if isinstance(operand, _ImplicitIter):
+            operand.inner = _DeferredAstNode(ast.UnaryExpression, args=(self.context, names[p[1]], operand.inner))
+            p[0] = operand
+        else:
+            p[0] = _DeferredAstNode(ast.UnaryExpression, args=(self.context, names[p[1]], operand))
 
     # Literal expressions
     def p_expression_boolean(self, p: Any) -> None:
@@ -479,7 +614,8 @@ class Parser(ParserBase):
         object : LBRACE ary_members RBRACE
                    | LBRACE ary_members COMMA RBRACE
         """
-        p[0] = _DeferredAstNode(ast.SetExpression, args=(self.context, tuple(p[2])))
+        members = tuple(self._implicit_iter_resolve(m) for m in p[2])
+        p[0] = _DeferredAstNode(ast.SetExpression, args=(self.context, members))
 
     def p_expression_string(self, p: Any) -> None:
         'object : STRING'
@@ -510,17 +646,22 @@ class Parser(ParserBase):
         if len(p) < 4:
             p[0] = _DeferredAstNode(ast.ArrayExpression, args=(self.context, tuple()))
         else:
-            p[0] = _DeferredAstNode(ast.ArrayExpression, args=(self.context, tuple(p[2])))
+            members = tuple(self._implicit_iter_resolve(m) for m in p[2])
+            p[0] = _DeferredAstNode(ast.ArrayExpression, args=(self.context, members))
 
     def p_expression_array_comprehension(self, p: Any) -> None:
         """
         object : LBRACKET expression FOR SYMBOL IN expression RBRACKET
                    | LBRACKET expression FOR SYMBOL IN expression IF expression RBRACKET
         """
+        # An explicit comprehension is a lift boundary on each sub-expression so its clauses
+        # cannot be tangled with the implicit-iteration shorthand.
+        result = self._implicit_iter_resolve(p[2])
+        iterable = self._implicit_iter_resolve(p[6])
         condition = None
         if len(p) == 10:
-            condition = p[8]
-        p[0] = _DeferredAstNode(ast.ComprehensionExpression, args=(self.context, p[2], p[4], p[6]), kwargs={'condition': condition})
+            condition = self._implicit_iter_resolve(p[8])
+        p[0] = _DeferredAstNode(ast.ComprehensionExpression, args=(self.context, result, p[4], iterable), kwargs={'condition': condition})
 
     def p_expression_array_members(self, p: Any) -> None:
         """
@@ -550,7 +691,7 @@ class Parser(ParserBase):
         """
         map_member : expression COLON expression
         """
-        p[0] = (p[1], p[3])
+        p[0] = (self._implicit_iter_resolve(p[1]), self._implicit_iter_resolve(p[3]))
 
     def p_expression_mapping_members(self, p: Any) -> None:
         """
@@ -564,7 +705,37 @@ class Parser(ParserBase):
         object : object LBRACKET expression RBRACKET
         """
         container, lbracket, item = p[1:4]
-        p[0] = _DeferredAstNode(ast.GetItemExpression, args=(self.context, container, item), kwargs={'safe': lbracket == '&['})
+        safe = lbracket == '&['
+        # The item subscript must not carry an unresolved marker; it'd be ambiguous whether the
+        # iteration is over the container or feeding into the index. Resolve it here.
+        item = self._implicit_iter_resolve(item)
+        if isinstance(container, _ImplicitIter):
+            container.inner = _DeferredAstNode(
+                    ast.GetItemExpression,
+                    args=(self.context, container.inner, item),
+                    kwargs={'safe': safe},
+            )
+            p[0] = container
+        else:
+            p[0] = _DeferredAstNode(ast.GetItemExpression, args=(self.context, container, item), kwargs={'safe': safe})
+
+    def p_expression_implicit_iter(self, p: Any) -> None:
+        """
+        object : object LBRACKET MUL RBRACKET
+        """
+        # ``a[*]`` starts or deepens an implicit iteration. When the LHS is already a marker,
+        # we open a new nested loop whose source is the marker's pending ``inner`` expression
+        # (referencing the previous loop variable), then reset the marker's inner to a symbol
+        # reference on the fresh variable.
+        source = p[1]
+        var_name = self._implicit_iter_var()
+        inner_ref = _DeferredAstNode(ast.SymbolExpression, args=(self.context, var_name), kwargs={'scope': None})
+        if isinstance(source, _ImplicitIter):
+            source.loops.append((source.inner, var_name))
+            source.inner = inner_ref
+            p[0] = source
+        else:
+            p[0] = _ImplicitIter(loops=[(source, var_name)], inner=inner_ref)
 
     def p_expression_getslice(self, p: Any) -> None:
         """
@@ -586,7 +757,19 @@ class Parser(ParserBase):
             start, _, stop = p[3:6]
         else:
             raise errors.RuleSyntaxError('invalid get slice expression')
-        p[0] = _DeferredAstNode(ast.GetSliceExpression, args=(self.context, container, start, stop), kwargs={'safe': safe})
+        if start is not None:
+            start = self._implicit_iter_resolve(start)
+        if stop is not None:
+            stop = self._implicit_iter_resolve(stop)
+        if isinstance(container, _ImplicitIter):
+            container.inner = _DeferredAstNode(
+                    ast.GetSliceExpression,
+                    args=(self.context, container.inner, start, stop),
+                    kwargs={'safe': safe},
+            )
+            p[0] = container
+        else:
+            p[0] = _DeferredAstNode(ast.GetSliceExpression, args=(self.context, container, start, stop), kwargs={'safe': safe})
 
     def p_expression_function_call(self, p: Any) -> None:
         """
@@ -601,4 +784,9 @@ class Parser(ParserBase):
             arguments = p[3]
         else:
             raise errors.RuleSyntaxError('invalid function call expression')
+        # Function calls are a lift boundary: each argument is resolved independently so the
+        # function sees a concrete value (or an explicit comprehension) rather than a raw
+        # marker. The callee itself is resolved too so e.g. ``a[*](x)`` doesn't slip through.
+        function = self._implicit_iter_resolve(function)
+        arguments = collections.deque(self._implicit_iter_resolve(arg) for arg in arguments)
         p[0] = _DeferredAstNode(ast.FunctionCallExpression, args=(self.context, function, arguments))

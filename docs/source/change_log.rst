@@ -21,6 +21,9 @@ Version 5.0.0
   ``coerce_value``); import them from ``rule_engine`` or ``rule_engine.types`` directly
 * Migrated the development workflow and CI from pipenv to `uv <https://docs.astral.sh/uv/>`_
 * Added support for raw STRING literals using the ``r`` prefix (e.g. ``r'\w+'``)
+* Added implicit-iteration shorthand via the ``[*]`` subscript as an alternative to explicit array comprehensions. A
+  ``[*]`` desugars at parse time into one or more :py:class:`~rule_engine.ast.ComprehensionExpression` nodes scoped to
+  the smallest enclosing boolean-producing expression (closes :issue:`38`)
 * Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy
   removes an external install requirement and silences third-party vulnerability reports targeting it
 * Added the new :py:attr:`~rule_engine.types.DataType.OBJECT` compound data type for user-defined schemas with named,

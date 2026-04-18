@@ -93,6 +93,84 @@ class ParserTests(ParserTestsBase):
             self.assertIsInstance(expression.result, ast.SymbolExpression)
             self.assertEqual(expression.result.name, 'member')
 
+    def test_parser_implicit_iter_single(self):
+        # ``a[*].b == 1`` is shorthand for ``[v for v in a if v.b == 1]``.
+        expression = self.assertStatementType('a[*].b == 1', ast.ComprehensionExpression).expression
+        self.assertIsNotNone(expression.condition)
+        self.assertIsInstance(expression.iterable, ast.SymbolExpression)
+        self.assertEqual(expression.iterable.name, 'a')
+        self.assertIsInstance(expression.result, ast.SymbolExpression)
+        # The synthetic variable references the same name used by result and by the condition's
+        # embedded attribute access.
+        self.assertEqual(expression.result.name, expression.variable)
+        self.assertIsInstance(expression.condition, ast.ComparisonExpression)
+        self.assertIsInstance(expression.condition.left, ast.GetAttributeExpression)
+        self.assertEqual(expression.condition.left.name, 'b')
+
+    def test_parser_implicit_iter_nested(self):
+        # ``a[*].b[*].c == 1`` desugars to a nested comprehension where the outer comprehension's
+        # condition is the inner comprehension (truthy iff non-empty).
+        expression = self.assertStatementType('a[*].b[*].c == 1', ast.ComprehensionExpression).expression
+        self.assertIsInstance(expression.iterable, ast.SymbolExpression)
+        self.assertEqual(expression.iterable.name, 'a')
+        inner = expression.condition
+        self.assertIsInstance(inner, ast.ComprehensionExpression)
+        # Inner iterable is an attribute access on the outer loop variable.
+        self.assertIsInstance(inner.iterable, ast.GetAttributeExpression)
+        self.assertEqual(inner.iterable.name, 'b')
+        # Innermost condition is the comparison.
+        self.assertIsInstance(inner.condition, ast.ComparisonExpression)
+
+    def test_parser_implicit_iter_bare(self):
+        # ``a[*]`` with no enclosing boundary is an unconditional map, equivalent to
+        # ``[v for v in a]``.
+        expression = self.assertStatementType('a[*]', ast.ComprehensionExpression).expression
+        self.assertIsNone(expression.condition)
+        self.assertIsInstance(expression.iterable, ast.SymbolExpression)
+        self.assertEqual(expression.iterable.name, 'a')
+
+    def test_parser_implicit_iter_bare_chain(self):
+        # ``a[*].b`` with no comparison is a map producing the ``.b`` of each element.
+        expression = self.assertStatementType('a[*].b', ast.ComprehensionExpression).expression
+        self.assertIsNone(expression.condition)
+        self.assertIsInstance(expression.result, ast.GetAttributeExpression)
+        self.assertEqual(expression.result.name, 'b')
+
+    def test_parser_implicit_iter_propagates_through_arithmetic(self):
+        # Arithmetic should propagate the marker so the comparison is what lifts it.
+        expression = self.assertStatementType('a[*].b + 1 == 2', ast.ComprehensionExpression).expression
+        self.assertIsInstance(expression.condition, ast.ComparisonExpression)
+        # The left side of the comparison is an AddExpression built on the loop variable.
+        self.assertIsInstance(expression.condition.left, ast.AddExpression)
+
+    def test_parser_implicit_iter_scope_does_not_cross_and(self):
+        # ``a[*].b == 1 and c > 3`` keeps the shorthand scope on the left comparison only.
+        expression = self.assertStatementType('a[*].b == 1 and c > 3', ast.LogicExpression).expression
+        self.assertIsInstance(expression.left, ast.ComprehensionExpression)
+        self.assertIsInstance(expression.right, ast.ArithmeticComparisonExpression)
+
+    def test_parser_implicit_iter_inside_explicit_comprehension(self):
+        # ``[v for v in a[*].b]`` resolves the marker on the iterable into a map.
+        expression = self.assertStatementType('[v for v in a[*].b]', ast.ComprehensionExpression).expression
+        self.assertIsInstance(expression.iterable, ast.ComprehensionExpression)
+
+    def test_parser_implicit_iter_star_inside_multiplication_unaffected(self):
+        # ``a * b`` must still parse as multiplication; the ``*`` shorthand only applies between
+        # bare brackets.
+        expression = self.assertStatementType('a * b', ast.ArithmeticExpression).expression
+        self.assertEqual(expression.type, 'mul')
+        # And multiplication inside a subscript is still multiplication.
+        expression = self.assertStatementType('a[b * c]', ast.GetItemExpression).expression
+        self.assertIsInstance(expression.item, ast.ArithmeticExpression)
+
+    def test_parser_implicit_iter_comment_still_works(self):
+        # ``#`` must still be a line-comment prefix; the ``[*]`` shorthand does not affect that.
+        # Using ``a + b`` rather than constants prevents constant folding so the AST keeps the
+        # AddExpression node.
+        statement = self.assertStatementType('a + b # see issue 38', ast.AddExpression)
+        self.assertIsInstance(statement.comment, ast.Comment)
+        self.assertEqual(statement.comment.value, 'see issue 38')
+
     def test_parser_comprehension_expressions_errors(self):
         # test non-iterables raise an exception
         with self.assertRaises(errors.EvaluationError):

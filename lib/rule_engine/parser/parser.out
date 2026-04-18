@@ -65,12 +65,13 @@ Rule 59    map_member -> expression COLON expression
 Rule 60    map_members -> map_member
 Rule 61    map_members -> map_members COMMA map_member
 Rule 62    object -> object LBRACKET expression RBRACKET
-Rule 63    object -> object LBRACKET COLON RBRACKET
-Rule 64    object -> object LBRACKET COLON expression RBRACKET
-Rule 65    object -> object LBRACKET expression COLON RBRACKET
-Rule 66    object -> object LBRACKET expression COLON expression RBRACKET
-Rule 67    object -> expression LPAREN RPAREN
-Rule 68    object -> expression LPAREN ary_members RPAREN
+Rule 63    object -> object LBRACKET MUL RBRACKET
+Rule 64    object -> object LBRACKET COLON RBRACKET
+Rule 65    object -> object LBRACKET COLON expression RBRACKET
+Rule 66    object -> object LBRACKET expression COLON RBRACKET
+Rule 67    object -> object LBRACKET expression COLON expression RBRACKET
+Rule 68    object -> expression LPAREN RPAREN
+Rule 69    object -> expression LPAREN ary_members RPAREN
 
 Terminals, with rules where they appear
 
@@ -84,7 +85,7 @@ BWOR                 : 15
 BWRSH                : 18
 BWXOR                : 16
 BYTES                : 39
-COLON                : 6 59 63 64 65 66
+COLON                : 6 59 64 65 66 67
 COMMA                : 47 51 55 58 61
 COMMENT              : 2
 DATETIME             : 40
@@ -102,12 +103,12 @@ GT                   : 23
 IF                   : 53
 IN                   : 19 20 52 53
 LBRACE               : 46 47 56 57 58
-LBRACKET             : 49 50 51 52 53 62 63 64 65 66
+LBRACKET             : 49 50 51 52 53 62 63 64 65 66 67
 LE                   : 26
-LPAREN               : 33 67 68
+LPAREN               : 33 68 69
 LT                   : 25
 MOD                  : 7
-MUL                  : 8
+MUL                  : 8 63
 NE                   : 22
 NE_FZM               : 29
 NE_FZS               : 30
@@ -117,8 +118,8 @@ OR                   : 32
 POW                  : 11
 QMARK                : 6
 RBRACE               : 46 47 56 57 58
-RBRACKET             : 49 50 51 52 53 62 63 64 65 66
-RPAREN               : 33 67 68
+RBRACKET             : 49 50 51 52 53 62 63 64 65 66 67
+RPAREN               : 33 68 69
 STRING               : 48
 SUB                  : 13 36
 SYMBOL               : 3 4 35 52 53
@@ -129,11 +130,11 @@ error                :
 
 Nonterminals, with rules where they appear
 
-ary_members          : 46 47 50 51 55 68
-expression           : 1 2 6 6 6 7 7 8 8 9 9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 21 21 22 22 23 23 24 24 25 25 26 26 27 27 28 28 29 29 30 30 31 31 32 32 33 34 36 52 52 53 53 53 54 55 59 59 62 64 65 66 66 67 68
+ary_members          : 46 47 50 51 55 69
+expression           : 1 2 6 6 6 7 7 8 8 9 9 10 10 11 11 12 12 13 13 14 14 15 15 16 16 17 17 18 18 19 19 20 20 21 21 22 22 23 23 24 24 25 25 26 26 27 27 28 28 29 29 30 30 31 31 32 32 33 34 36 52 52 53 53 53 54 55 59 59 62 65 66 67 67 68 69
 map_member           : 60 61
 map_members          : 57 58 61
-object               : 3 4 5 62 63 64 65 66
+object               : 3 4 5 62 63 64 65 66 67
 statement            : 0
 
 Parsing method: LALR
@@ -198,12 +199,13 @@ state 0
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -263,8 +265,8 @@ state 2
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     $end            reduce using rule 1 (statement -> expression .)
     COMMENT         shift and go to state 20
@@ -304,10 +306,11 @@ state 3
     (3) object -> object . ATTR SYMBOL
     (4) object -> object . ATTR_SAFE SYMBOL
     (62) object -> object . LBRACKET expression RBRACKET
-    (63) object -> object . LBRACKET COLON RBRACKET
-    (64) object -> object . LBRACKET COLON expression RBRACKET
-    (65) object -> object . LBRACKET expression COLON RBRACKET
-    (66) object -> object . LBRACKET expression COLON expression RBRACKET
+    (63) object -> object . LBRACKET MUL RBRACKET
+    (64) object -> object . LBRACKET COLON RBRACKET
+    (65) object -> object . LBRACKET COLON expression RBRACKET
+    (66) object -> object . LBRACKET expression COLON RBRACKET
+    (67) object -> object . LBRACKET expression COLON expression RBRACKET
 
     COMMENT         reduce using rule 5 (expression -> object .)
     QMARK           reduce using rule 5 (expression -> object .)
@@ -409,12 +412,13 @@ state 4
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -494,12 +498,13 @@ state 5
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -840,12 +845,13 @@ state 12
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -1118,12 +1124,13 @@ state 17
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     RBRACE          shift and go to state 56
     NOT             shift and go to state 5
@@ -1259,12 +1266,13 @@ state 19
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     RBRACKET        shift and go to state 60
     NOT             shift and go to state 5
@@ -1353,12 +1361,13 @@ state 21
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -1438,12 +1447,13 @@ state 22
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -1523,12 +1533,13 @@ state 23
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -1608,12 +1619,13 @@ state 24
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -1693,12 +1705,13 @@ state 25
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -1778,12 +1791,13 @@ state 26
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -1863,12 +1877,13 @@ state 27
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -1948,12 +1963,13 @@ state 28
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2033,12 +2049,13 @@ state 29
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2118,12 +2135,13 @@ state 30
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2203,12 +2221,13 @@ state 31
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2288,12 +2307,13 @@ state 32
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2373,12 +2393,13 @@ state 33
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2458,12 +2479,13 @@ state 34
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2550,12 +2572,13 @@ state 36
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2635,12 +2658,13 @@ state 37
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2720,12 +2744,13 @@ state 38
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2805,12 +2830,13 @@ state 39
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2890,12 +2916,13 @@ state 40
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -2975,12 +3002,13 @@ state 41
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -3060,12 +3088,13 @@ state 42
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -3145,12 +3174,13 @@ state 43
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -3230,12 +3260,13 @@ state 44
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -3315,12 +3346,13 @@ state 45
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -3400,12 +3432,13 @@ state 46
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -3485,12 +3518,13 @@ state 47
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -3514,8 +3548,8 @@ state 47
 
 state 48
 
-    (67) object -> expression LPAREN . RPAREN
-    (68) object -> expression LPAREN . ary_members RPAREN
+    (68) object -> expression LPAREN . RPAREN
+    (69) object -> expression LPAREN . ary_members RPAREN
     (54) ary_members -> . expression
     (55) ary_members -> . ary_members COMMA expression
     (5) expression -> . object
@@ -3573,12 +3607,13 @@ state 48
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     RPAREN          shift and go to state 91
     NOT             shift and go to state 5
@@ -3619,10 +3654,11 @@ state 50
 state 51
 
     (62) object -> object LBRACKET . expression RBRACKET
-    (63) object -> object LBRACKET . COLON RBRACKET
-    (64) object -> object LBRACKET . COLON expression RBRACKET
-    (65) object -> object LBRACKET . expression COLON RBRACKET
-    (66) object -> object LBRACKET . expression COLON expression RBRACKET
+    (63) object -> object LBRACKET . MUL RBRACKET
+    (64) object -> object LBRACKET . COLON RBRACKET
+    (65) object -> object LBRACKET . COLON expression RBRACKET
+    (66) object -> object LBRACKET . expression COLON RBRACKET
+    (67) object -> object LBRACKET . expression COLON expression RBRACKET
     (5) expression -> . object
     (6) expression -> . expression QMARK expression COLON expression
     (7) expression -> . expression MOD expression
@@ -3678,14 +3714,16 @@ state 51
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
-    COLON           shift and go to state 96
+    MUL             shift and go to state 96
+    COLON           shift and go to state 97
     NOT             shift and go to state 5
     SUB             shift and go to state 4
     TRUE            shift and go to state 6
@@ -3736,8 +3774,8 @@ state 52
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 36 (expression -> SUB expression .)
     QMARK           reduce using rule 36 (expression -> SUB expression .)
@@ -3837,8 +3875,8 @@ state 53
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 34 (expression -> NOT expression .)
     QMARK           reduce using rule 34 (expression -> NOT expression .)
@@ -3938,10 +3976,10 @@ state 54
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    RPAREN          shift and go to state 97
+    RPAREN          shift and go to state 98
     QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
@@ -3978,8 +4016,8 @@ state 55
     (47) object -> LBRACE ary_members . COMMA RBRACE
     (55) ary_members -> ary_members . COMMA expression
 
-    RBRACE          shift and go to state 98
-    COMMA           shift and go to state 99
+    RBRACE          shift and go to state 99
+    COMMA           shift and go to state 100
 
 
 state 56
@@ -4034,8 +4072,8 @@ state 57
     (58) object -> LBRACE map_members . COMMA RBRACE
     (61) map_members -> map_members . COMMA map_member
 
-    RBRACE          shift and go to state 100
-    COMMA           shift and go to state 101
+    RBRACE          shift and go to state 101
+    COMMA           shift and go to state 102
 
 
 state 58
@@ -4069,8 +4107,8 @@ state 58
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
     (59) map_member -> expression . COLON expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     RBRACE          reduce using rule 54 (ary_members -> expression .)
     COMMA           reduce using rule 54 (ary_members -> expression .)
@@ -4101,7 +4139,7 @@ state 58
     NE_FZS          shift and go to state 45
     AND             shift and go to state 46
     OR              shift and go to state 47
-    COLON           shift and go to state 102
+    COLON           shift and go to state 103
     LPAREN          shift and go to state 48
 
 
@@ -4165,8 +4203,8 @@ state 61
     (51) object -> LBRACKET ary_members . COMMA RBRACKET
     (55) ary_members -> ary_members . COMMA expression
 
-    RBRACKET        shift and go to state 103
-    COMMA           shift and go to state 104
+    RBRACKET        shift and go to state 104
+    COMMA           shift and go to state 105
 
 
 state 62
@@ -4201,10 +4239,10 @@ state 62
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    FOR             shift and go to state 105
+    FOR             shift and go to state 106
     RBRACKET        reduce using rule 54 (ary_members -> expression .)
     COMMA           reduce using rule 54 (ary_members -> expression .)
     QMARK           shift and go to state 21
@@ -4267,10 +4305,10 @@ state 63
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    COLON           shift and go to state 106
+    COLON           shift and go to state 107
     QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
@@ -4331,8 +4369,8 @@ state 64
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 7 (expression -> expression MOD expression .)
     QMARK           reduce using rule 7 (expression -> expression MOD expression .)
@@ -4432,8 +4470,8 @@ state 65
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 8 (expression -> expression MUL expression .)
     QMARK           reduce using rule 8 (expression -> expression MUL expression .)
@@ -4533,8 +4571,8 @@ state 66
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 9 (expression -> expression FDIV expression .)
     QMARK           reduce using rule 9 (expression -> expression FDIV expression .)
@@ -4634,8 +4672,8 @@ state 67
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 10 (expression -> expression TDIV expression .)
     QMARK           reduce using rule 10 (expression -> expression TDIV expression .)
@@ -4735,8 +4773,8 @@ state 68
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 11 (expression -> expression POW expression .)
     QMARK           reduce using rule 11 (expression -> expression POW expression .)
@@ -4836,8 +4874,8 @@ state 69
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 12 (expression -> expression ADD expression .)
     QMARK           reduce using rule 12 (expression -> expression ADD expression .)
@@ -4937,8 +4975,8 @@ state 70
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 13 (expression -> expression SUB expression .)
     QMARK           reduce using rule 13 (expression -> expression SUB expression .)
@@ -5038,8 +5076,8 @@ state 71
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 14 (expression -> expression BWAND expression .)
     QMARK           reduce using rule 14 (expression -> expression BWAND expression .)
@@ -5139,8 +5177,8 @@ state 72
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 15 (expression -> expression BWOR expression .)
     QMARK           reduce using rule 15 (expression -> expression BWOR expression .)
@@ -5240,8 +5278,8 @@ state 73
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 16 (expression -> expression BWXOR expression .)
     QMARK           reduce using rule 16 (expression -> expression BWXOR expression .)
@@ -5341,8 +5379,8 @@ state 74
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 17 (expression -> expression BWLSH expression .)
     QMARK           reduce using rule 17 (expression -> expression BWLSH expression .)
@@ -5442,8 +5480,8 @@ state 75
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 18 (expression -> expression BWRSH expression .)
     QMARK           reduce using rule 18 (expression -> expression BWRSH expression .)
@@ -5543,8 +5581,8 @@ state 76
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 19 (expression -> expression IN expression .)
     QMARK           reduce using rule 19 (expression -> expression IN expression .)
@@ -5672,12 +5710,13 @@ state 77
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -5696,7 +5735,7 @@ state 77
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    expression                     shift and go to state 107
+    expression                     shift and go to state 108
     object                         shift and go to state 3
 
 state 78
@@ -5729,8 +5768,8 @@ state 78
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 21 (expression -> expression EQ expression .)
     QMARK           reduce using rule 21 (expression -> expression EQ expression .)
@@ -5830,8 +5869,8 @@ state 79
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 22 (expression -> expression NE expression .)
     QMARK           reduce using rule 22 (expression -> expression NE expression .)
@@ -5931,8 +5970,8 @@ state 80
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 23 (expression -> expression GT expression .)
     QMARK           reduce using rule 23 (expression -> expression GT expression .)
@@ -6032,8 +6071,8 @@ state 81
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 24 (expression -> expression GE expression .)
     QMARK           reduce using rule 24 (expression -> expression GE expression .)
@@ -6133,8 +6172,8 @@ state 82
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 25 (expression -> expression LT expression .)
     QMARK           reduce using rule 25 (expression -> expression LT expression .)
@@ -6234,8 +6273,8 @@ state 83
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 26 (expression -> expression LE expression .)
     QMARK           reduce using rule 26 (expression -> expression LE expression .)
@@ -6335,8 +6374,8 @@ state 84
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 27 (expression -> expression EQ_FZM expression .)
     QMARK           reduce using rule 27 (expression -> expression EQ_FZM expression .)
@@ -6436,8 +6475,8 @@ state 85
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 28 (expression -> expression EQ_FZS expression .)
     QMARK           reduce using rule 28 (expression -> expression EQ_FZS expression .)
@@ -6537,8 +6576,8 @@ state 86
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 29 (expression -> expression NE_FZM expression .)
     QMARK           reduce using rule 29 (expression -> expression NE_FZM expression .)
@@ -6638,8 +6677,8 @@ state 87
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 30 (expression -> expression NE_FZS expression .)
     QMARK           reduce using rule 30 (expression -> expression NE_FZS expression .)
@@ -6739,8 +6778,8 @@ state 88
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 31 (expression -> expression AND expression .)
     QMARK           reduce using rule 31 (expression -> expression AND expression .)
@@ -6840,8 +6879,8 @@ state 89
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 32 (expression -> expression OR expression .)
     QMARK           reduce using rule 32 (expression -> expression OR expression .)
@@ -6941,8 +6980,8 @@ state 90
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     RPAREN          reduce using rule 54 (ary_members -> expression .)
     COMMA           reduce using rule 54 (ary_members -> expression .)
@@ -6978,57 +7017,57 @@ state 90
 
 state 91
 
-    (67) object -> expression LPAREN RPAREN .
+    (68) object -> expression LPAREN RPAREN .
 
-    ATTR            reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    ATTR_SAFE       reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    LBRACKET        reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    COMMENT         reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    QMARK           reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    MOD             reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    MUL             reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    FDIV            reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    TDIV            reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    POW             reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    ADD             reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    SUB             reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    BWAND           reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    BWOR            reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    BWXOR           reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    BWLSH           reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    BWRSH           reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    IN              reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    NOT             reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    EQ              reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    NE              reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    GT              reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    GE              reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    LT              reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    LE              reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    EQ_FZM          reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    EQ_FZS          reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    NE_FZM          reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    NE_FZS          reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    AND             reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    OR              reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    LPAREN          reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    $end            reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    RPAREN          reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    COLON           reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    RBRACE          reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    COMMA           reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    FOR             reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    RBRACKET        reduce using rule 67 (object -> expression LPAREN RPAREN .)
-    IF              reduce using rule 67 (object -> expression LPAREN RPAREN .)
+    ATTR            reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    ATTR_SAFE       reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    LBRACKET        reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    COMMENT         reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    QMARK           reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    MOD             reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    MUL             reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    FDIV            reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    TDIV            reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    POW             reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    ADD             reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    SUB             reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    BWAND           reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    BWOR            reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    BWXOR           reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    BWLSH           reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    BWRSH           reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    IN              reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    NOT             reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    EQ              reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    NE              reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    GT              reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    GE              reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    LT              reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    LE              reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    EQ_FZM          reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    EQ_FZS          reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    NE_FZM          reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    NE_FZS          reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    AND             reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    OR              reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    LPAREN          reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    $end            reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    RPAREN          reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    COLON           reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    RBRACE          reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    COMMA           reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    FOR             reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    RBRACKET        reduce using rule 68 (object -> expression LPAREN RPAREN .)
+    IF              reduce using rule 68 (object -> expression LPAREN RPAREN .)
 
 
 state 92
 
-    (68) object -> expression LPAREN ary_members . RPAREN
+    (69) object -> expression LPAREN ary_members . RPAREN
     (55) ary_members -> ary_members . COMMA expression
 
-    RPAREN          shift and go to state 108
-    COMMA           shift and go to state 109
+    RPAREN          shift and go to state 109
+    COMMA           shift and go to state 110
 
 
 state 93
@@ -7126,8 +7165,8 @@ state 94
 state 95
 
     (62) object -> object LBRACKET expression . RBRACKET
-    (65) object -> object LBRACKET expression . COLON RBRACKET
-    (66) object -> object LBRACKET expression . COLON expression RBRACKET
+    (66) object -> object LBRACKET expression . COLON RBRACKET
+    (67) object -> object LBRACKET expression . COLON expression RBRACKET
     (6) expression -> expression . QMARK expression COLON expression
     (7) expression -> expression . MOD expression
     (8) expression -> expression . MUL expression
@@ -7155,11 +7194,11 @@ state 95
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    RBRACKET        shift and go to state 110
-    COLON           shift and go to state 111
+    RBRACKET        shift and go to state 111
+    COLON           shift and go to state 112
     QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
@@ -7192,8 +7231,15 @@ state 95
 
 state 96
 
-    (63) object -> object LBRACKET COLON . RBRACKET
-    (64) object -> object LBRACKET COLON . expression RBRACKET
+    (63) object -> object LBRACKET MUL . RBRACKET
+
+    RBRACKET        shift and go to state 113
+
+
+state 97
+
+    (64) object -> object LBRACKET COLON . RBRACKET
+    (65) object -> object LBRACKET COLON . expression RBRACKET
     (5) expression -> . object
     (6) expression -> . expression QMARK expression COLON expression
     (7) expression -> . expression MOD expression
@@ -7249,14 +7295,15 @@ state 96
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
-    RBRACKET        shift and go to state 112
+    RBRACKET        shift and go to state 114
     NOT             shift and go to state 5
     SUB             shift and go to state 4
     TRUE            shift and go to state 6
@@ -7275,9 +7322,9 @@ state 96
     LBRACKET        shift and go to state 19
 
     object                         shift and go to state 3
-    expression                     shift and go to state 113
+    expression                     shift and go to state 115
 
-state 97
+state 98
 
     (33) object -> LPAREN expression RPAREN .
 
@@ -7323,7 +7370,7 @@ state 97
     IF              reduce using rule 33 (object -> LPAREN expression RPAREN .)
 
 
-state 98
+state 99
 
     (46) object -> LBRACE ary_members RBRACE .
 
@@ -7369,7 +7416,7 @@ state 98
     IF              reduce using rule 46 (object -> LBRACE ary_members RBRACE .)
 
 
-state 99
+state 100
 
     (47) object -> LBRACE ary_members COMMA . RBRACE
     (55) ary_members -> ary_members COMMA . expression
@@ -7428,14 +7475,15 @@ state 99
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
-    RBRACE          shift and go to state 114
+    RBRACE          shift and go to state 116
     NOT             shift and go to state 5
     SUB             shift and go to state 4
     TRUE            shift and go to state 6
@@ -7453,10 +7501,10 @@ state 99
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    expression                     shift and go to state 115
+    expression                     shift and go to state 117
     object                         shift and go to state 3
 
-state 100
+state 101
 
     (57) object -> LBRACE map_members RBRACE .
 
@@ -7502,7 +7550,7 @@ state 100
     IF              reduce using rule 57 (object -> LBRACE map_members RBRACE .)
 
 
-state 101
+state 102
 
     (58) object -> LBRACE map_members COMMA . RBRACE
     (61) map_members -> map_members COMMA . map_member
@@ -7562,14 +7610,15 @@ state 101
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
-    RBRACE          shift and go to state 116
+    RBRACE          shift and go to state 118
     NOT             shift and go to state 5
     SUB             shift and go to state 4
     TRUE            shift and go to state 6
@@ -7587,11 +7636,11 @@ state 101
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    map_member                     shift and go to state 117
-    expression                     shift and go to state 118
+    map_member                     shift and go to state 119
+    expression                     shift and go to state 120
     object                         shift and go to state 3
 
-state 102
+state 103
 
     (59) map_member -> expression COLON . expression
     (5) expression -> . object
@@ -7649,12 +7698,13 @@ state 102
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -7673,10 +7723,10 @@ state 102
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    expression                     shift and go to state 119
+    expression                     shift and go to state 121
     object                         shift and go to state 3
 
-state 103
+state 104
 
     (50) object -> LBRACKET ary_members RBRACKET .
 
@@ -7722,7 +7772,7 @@ state 103
     IF              reduce using rule 50 (object -> LBRACKET ary_members RBRACKET .)
 
 
-state 104
+state 105
 
     (51) object -> LBRACKET ary_members COMMA . RBRACKET
     (55) ary_members -> ary_members COMMA . expression
@@ -7781,14 +7831,15 @@ state 104
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
-    RBRACKET        shift and go to state 120
+    RBRACKET        shift and go to state 122
     NOT             shift and go to state 5
     SUB             shift and go to state 4
     TRUE            shift and go to state 6
@@ -7806,18 +7857,18 @@ state 104
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    expression                     shift and go to state 115
+    expression                     shift and go to state 117
     object                         shift and go to state 3
 
-state 105
+state 106
 
     (52) object -> LBRACKET expression FOR . SYMBOL IN expression RBRACKET
     (53) object -> LBRACKET expression FOR . SYMBOL IN expression IF expression RBRACKET
 
-    SYMBOL          shift and go to state 121
+    SYMBOL          shift and go to state 123
 
 
-state 106
+state 107
 
     (6) expression -> expression QMARK expression COLON . expression
     (5) expression -> . object
@@ -7875,12 +7926,13 @@ state 106
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -7899,10 +7951,10 @@ state 106
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    expression                     shift and go to state 122
+    expression                     shift and go to state 124
     object                         shift and go to state 3
 
-state 107
+state 108
 
     (20) expression -> expression NOT IN expression .
     (6) expression -> expression . QMARK expression COLON expression
@@ -7932,8 +7984,8 @@ state 107
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 20 (expression -> expression NOT IN expression .)
     QMARK           reduce using rule 20 (expression -> expression NOT IN expression .)
@@ -8003,53 +8055,53 @@ state 107
   ! OR              [ shift and go to state 47 ]
 
 
-state 108
-
-    (68) object -> expression LPAREN ary_members RPAREN .
-
-    ATTR            reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    ATTR_SAFE       reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    LBRACKET        reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    COMMENT         reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    QMARK           reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    MOD             reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    MUL             reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    FDIV            reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    TDIV            reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    POW             reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    ADD             reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    SUB             reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    BWAND           reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    BWOR            reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    BWXOR           reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    BWLSH           reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    BWRSH           reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    IN              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    NOT             reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    EQ              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    NE              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    GT              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    GE              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    LT              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    LE              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    EQ_FZM          reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    EQ_FZS          reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    NE_FZM          reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    NE_FZS          reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    AND             reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    OR              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    LPAREN          reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    $end            reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    RPAREN          reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    COLON           reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    RBRACE          reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    COMMA           reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    FOR             reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    RBRACKET        reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-    IF              reduce using rule 68 (object -> expression LPAREN ary_members RPAREN .)
-
-
 state 109
+
+    (69) object -> expression LPAREN ary_members RPAREN .
+
+    ATTR            reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    ATTR_SAFE       reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    LBRACKET        reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    COMMENT         reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    QMARK           reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    MOD             reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    MUL             reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    FDIV            reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    TDIV            reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    POW             reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    ADD             reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    SUB             reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    BWAND           reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    BWOR            reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    BWXOR           reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    BWLSH           reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    BWRSH           reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    IN              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    NOT             reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    EQ              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    NE              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    GT              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    GE              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    LT              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    LE              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    EQ_FZM          reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    EQ_FZS          reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    NE_FZM          reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    NE_FZS          reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    AND             reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    OR              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    LPAREN          reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    $end            reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    RPAREN          reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    COLON           reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    RBRACE          reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    COMMA           reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    FOR             reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    RBRACKET        reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+    IF              reduce using rule 69 (object -> expression LPAREN ary_members RPAREN .)
+
+
+state 110
 
     (55) ary_members -> ary_members COMMA . expression
     (5) expression -> . object
@@ -8107,12 +8159,13 @@ state 109
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -8131,10 +8184,10 @@ state 109
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    expression                     shift and go to state 115
+    expression                     shift and go to state 117
     object                         shift and go to state 3
 
-state 110
+state 111
 
     (62) object -> object LBRACKET expression RBRACKET .
 
@@ -8180,10 +8233,10 @@ state 110
     IF              reduce using rule 62 (object -> object LBRACKET expression RBRACKET .)
 
 
-state 111
+state 112
 
-    (65) object -> object LBRACKET expression COLON . RBRACKET
-    (66) object -> object LBRACKET expression COLON . expression RBRACKET
+    (66) object -> object LBRACKET expression COLON . RBRACKET
+    (67) object -> object LBRACKET expression COLON . expression RBRACKET
     (5) expression -> . object
     (6) expression -> . expression QMARK expression COLON expression
     (7) expression -> . expression MOD expression
@@ -8239,14 +8292,15 @@ state 111
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
-    RBRACKET        shift and go to state 124
+    RBRACKET        shift and go to state 126
     NOT             shift and go to state 5
     SUB             shift and go to state 4
     TRUE            shift and go to state 6
@@ -8265,57 +8319,103 @@ state 111
     LBRACKET        shift and go to state 19
 
     object                         shift and go to state 3
-    expression                     shift and go to state 123
-
-state 112
-
-    (63) object -> object LBRACKET COLON RBRACKET .
-
-    ATTR            reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    ATTR_SAFE       reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    LBRACKET        reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    COMMENT         reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    QMARK           reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    MOD             reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    MUL             reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    FDIV            reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    TDIV            reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    POW             reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    ADD             reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    SUB             reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    BWAND           reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    BWOR            reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    BWXOR           reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    BWLSH           reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    BWRSH           reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    IN              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    NOT             reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    EQ              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    NE              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    GT              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    GE              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    LT              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    LE              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    EQ_FZM          reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    EQ_FZS          reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    NE_FZM          reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    NE_FZS          reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    AND             reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    OR              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    LPAREN          reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    $end            reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    RPAREN          reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    COLON           reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    RBRACE          reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    COMMA           reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    FOR             reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    RBRACKET        reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-    IF              reduce using rule 63 (object -> object LBRACKET COLON RBRACKET .)
-
+    expression                     shift and go to state 125
 
 state 113
 
-    (64) object -> object LBRACKET COLON expression . RBRACKET
+    (63) object -> object LBRACKET MUL RBRACKET .
+
+    ATTR            reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    ATTR_SAFE       reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    LBRACKET        reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    COMMENT         reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    QMARK           reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    MOD             reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    MUL             reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    FDIV            reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    TDIV            reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    POW             reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    ADD             reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    SUB             reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    BWAND           reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    BWOR            reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    BWXOR           reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    BWLSH           reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    BWRSH           reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    IN              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    NOT             reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    EQ              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    NE              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    GT              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    GE              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    LT              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    LE              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    EQ_FZM          reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    EQ_FZS          reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    NE_FZM          reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    NE_FZS          reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    AND             reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    OR              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    LPAREN          reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    $end            reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    RPAREN          reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    COLON           reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    RBRACE          reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    COMMA           reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    FOR             reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    RBRACKET        reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+    IF              reduce using rule 63 (object -> object LBRACKET MUL RBRACKET .)
+
+
+state 114
+
+    (64) object -> object LBRACKET COLON RBRACKET .
+
+    ATTR            reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    ATTR_SAFE       reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    LBRACKET        reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    COMMENT         reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    QMARK           reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    MOD             reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    MUL             reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    FDIV            reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    TDIV            reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    POW             reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    ADD             reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    SUB             reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    BWAND           reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    BWOR            reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    BWXOR           reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    BWLSH           reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    BWRSH           reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    IN              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    NOT             reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    EQ              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    NE              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    GT              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    GE              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    LT              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    LE              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    EQ_FZM          reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    EQ_FZS          reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    NE_FZM          reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    NE_FZS          reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    AND             reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    OR              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    LPAREN          reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    $end            reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    RPAREN          reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    COLON           reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    RBRACE          reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    COMMA           reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    FOR             reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    RBRACKET        reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+    IF              reduce using rule 64 (object -> object LBRACKET COLON RBRACKET .)
+
+
+state 115
+
+    (65) object -> object LBRACKET COLON expression . RBRACKET
     (6) expression -> expression . QMARK expression COLON expression
     (7) expression -> expression . MOD expression
     (8) expression -> expression . MUL expression
@@ -8343,10 +8443,10 @@ state 113
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    RBRACKET        shift and go to state 125
+    RBRACKET        shift and go to state 127
     QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
@@ -8377,7 +8477,7 @@ state 113
     LPAREN          shift and go to state 48
 
 
-state 114
+state 116
 
     (47) object -> LBRACE ary_members COMMA RBRACE .
 
@@ -8423,7 +8523,7 @@ state 114
     IF              reduce using rule 47 (object -> LBRACE ary_members COMMA RBRACE .)
 
 
-state 115
+state 117
 
     (55) ary_members -> ary_members COMMA expression .
     (6) expression -> expression . QMARK expression COLON expression
@@ -8453,8 +8553,8 @@ state 115
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     RBRACE          reduce using rule 55 (ary_members -> ary_members COMMA expression .)
     COMMA           reduce using rule 55 (ary_members -> ary_members COMMA expression .)
@@ -8490,7 +8590,7 @@ state 115
     LPAREN          shift and go to state 48
 
 
-state 116
+state 118
 
     (58) object -> LBRACE map_members COMMA RBRACE .
 
@@ -8536,7 +8636,7 @@ state 116
     IF              reduce using rule 58 (object -> LBRACE map_members COMMA RBRACE .)
 
 
-state 117
+state 119
 
     (61) map_members -> map_members COMMA map_member .
 
@@ -8544,7 +8644,7 @@ state 117
     COMMA           reduce using rule 61 (map_members -> map_members COMMA map_member .)
 
 
-state 118
+state 120
 
     (59) map_member -> expression . COLON expression
     (6) expression -> expression . QMARK expression COLON expression
@@ -8574,10 +8674,10 @@ state 118
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    COLON           shift and go to state 102
+    COLON           shift and go to state 103
     QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
@@ -8608,7 +8708,7 @@ state 118
     LPAREN          shift and go to state 48
 
 
-state 119
+state 121
 
     (59) map_member -> expression COLON expression .
     (6) expression -> expression . QMARK expression COLON expression
@@ -8638,8 +8738,8 @@ state 119
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     RBRACE          reduce using rule 59 (map_member -> expression COLON expression .)
     COMMA           reduce using rule 59 (map_member -> expression COLON expression .)
@@ -8673,7 +8773,7 @@ state 119
     LPAREN          shift and go to state 48
 
 
-state 120
+state 122
 
     (51) object -> LBRACKET ary_members COMMA RBRACKET .
 
@@ -8719,15 +8819,15 @@ state 120
     IF              reduce using rule 51 (object -> LBRACKET ary_members COMMA RBRACKET .)
 
 
-state 121
+state 123
 
     (52) object -> LBRACKET expression FOR SYMBOL . IN expression RBRACKET
     (53) object -> LBRACKET expression FOR SYMBOL . IN expression IF expression RBRACKET
 
-    IN              shift and go to state 126
+    IN              shift and go to state 128
 
 
-state 122
+state 124
 
     (6) expression -> expression QMARK expression COLON expression .
     (6) expression -> expression . QMARK expression COLON expression
@@ -8757,8 +8857,8 @@ state 122
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
     COMMENT         reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
     $end            reduce using rule 6 (expression -> expression QMARK expression COLON expression .)
@@ -8828,9 +8928,9 @@ state 122
   ! LPAREN          [ reduce using rule 6 (expression -> expression QMARK expression COLON expression .) ]
 
 
-state 123
+state 125
 
-    (66) object -> object LBRACKET expression COLON expression . RBRACKET
+    (67) object -> object LBRACKET expression COLON expression . RBRACKET
     (6) expression -> expression . QMARK expression COLON expression
     (7) expression -> expression . MOD expression
     (8) expression -> expression . MUL expression
@@ -8858,10 +8958,10 @@ state 123
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    RBRACKET        shift and go to state 127
+    RBRACKET        shift and go to state 129
     QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
@@ -8892,99 +8992,99 @@ state 123
     LPAREN          shift and go to state 48
 
 
-state 124
-
-    (65) object -> object LBRACKET expression COLON RBRACKET .
-
-    ATTR            reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    ATTR_SAFE       reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    LBRACKET        reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    COMMENT         reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    QMARK           reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    MOD             reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    MUL             reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    FDIV            reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    TDIV            reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    POW             reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    ADD             reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    SUB             reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    BWAND           reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    BWOR            reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    BWXOR           reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    BWLSH           reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    BWRSH           reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    IN              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    NOT             reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    EQ              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    NE              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    GT              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    GE              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    LT              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    LE              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    EQ_FZM          reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    EQ_FZS          reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    NE_FZM          reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    NE_FZS          reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    AND             reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    OR              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    LPAREN          reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    $end            reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    RPAREN          reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    COLON           reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    RBRACE          reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    COMMA           reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    FOR             reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    RBRACKET        reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-    IF              reduce using rule 65 (object -> object LBRACKET expression COLON RBRACKET .)
-
-
-state 125
-
-    (64) object -> object LBRACKET COLON expression RBRACKET .
-
-    ATTR            reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    ATTR_SAFE       reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    LBRACKET        reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    COMMENT         reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    QMARK           reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    MOD             reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    MUL             reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    FDIV            reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    TDIV            reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    POW             reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    ADD             reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    SUB             reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    BWAND           reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    BWOR            reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    BWXOR           reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    BWLSH           reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    BWRSH           reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    IN              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    NOT             reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    EQ              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    NE              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    GT              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    GE              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    LT              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    LE              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    EQ_FZM          reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    EQ_FZS          reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    NE_FZM          reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    NE_FZS          reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    AND             reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    OR              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    LPAREN          reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    $end            reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    RPAREN          reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    COLON           reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    RBRACE          reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    COMMA           reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    FOR             reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    RBRACKET        reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-    IF              reduce using rule 64 (object -> object LBRACKET COLON expression RBRACKET .)
-
-
 state 126
+
+    (66) object -> object LBRACKET expression COLON RBRACKET .
+
+    ATTR            reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    ATTR_SAFE       reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    LBRACKET        reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    COMMENT         reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    QMARK           reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    MOD             reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    MUL             reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    FDIV            reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    TDIV            reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    POW             reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    ADD             reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    SUB             reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    BWAND           reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    BWOR            reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    BWXOR           reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    BWLSH           reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    BWRSH           reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    IN              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    NOT             reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    EQ              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    NE              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    GT              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    GE              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    LT              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    LE              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    EQ_FZM          reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    EQ_FZS          reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    NE_FZM          reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    NE_FZS          reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    AND             reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    OR              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    LPAREN          reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    $end            reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    RPAREN          reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    COLON           reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    RBRACE          reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    COMMA           reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    FOR             reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    RBRACKET        reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+    IF              reduce using rule 66 (object -> object LBRACKET expression COLON RBRACKET .)
+
+
+state 127
+
+    (65) object -> object LBRACKET COLON expression RBRACKET .
+
+    ATTR            reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    ATTR_SAFE       reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    LBRACKET        reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    COMMENT         reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    QMARK           reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    MOD             reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    MUL             reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    FDIV            reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    TDIV            reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    POW             reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    ADD             reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    SUB             reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    BWAND           reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    BWOR            reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    BWXOR           reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    BWLSH           reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    BWRSH           reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    IN              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    NOT             reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    EQ              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    NE              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    GT              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    GE              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    LT              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    LE              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    EQ_FZM          reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    EQ_FZS          reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    NE_FZM          reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    NE_FZS          reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    AND             reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    OR              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    LPAREN          reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    $end            reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    RPAREN          reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    COLON           reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    RBRACE          reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    COMMA           reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    FOR             reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    RBRACKET        reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+    IF              reduce using rule 65 (object -> object LBRACKET COLON expression RBRACKET .)
+
+
+state 128
 
     (52) object -> LBRACKET expression FOR SYMBOL IN . expression RBRACKET
     (53) object -> LBRACKET expression FOR SYMBOL IN . expression IF expression RBRACKET
@@ -9043,12 +9143,13 @@ state 126
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -9067,56 +9168,56 @@ state 126
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    expression                     shift and go to state 128
+    expression                     shift and go to state 130
     object                         shift and go to state 3
 
-state 127
+state 129
 
-    (66) object -> object LBRACKET expression COLON expression RBRACKET .
+    (67) object -> object LBRACKET expression COLON expression RBRACKET .
 
-    ATTR            reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    ATTR_SAFE       reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    LBRACKET        reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    COMMENT         reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    QMARK           reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    MOD             reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    MUL             reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    FDIV            reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    TDIV            reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    POW             reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    ADD             reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    SUB             reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    BWAND           reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    BWOR            reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    BWXOR           reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    BWLSH           reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    BWRSH           reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    IN              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    NOT             reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    EQ              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    NE              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    GT              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    GE              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    LT              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    LE              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    EQ_FZM          reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    EQ_FZS          reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    NE_FZM          reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    NE_FZS          reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    AND             reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    OR              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    LPAREN          reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    $end            reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    RPAREN          reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    COLON           reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    RBRACE          reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    COMMA           reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    FOR             reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    RBRACKET        reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
-    IF              reduce using rule 66 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    ATTR            reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    ATTR_SAFE       reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    LBRACKET        reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    COMMENT         reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    QMARK           reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    MOD             reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    MUL             reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    FDIV            reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    TDIV            reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    POW             reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    ADD             reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    SUB             reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    BWAND           reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    BWOR            reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    BWXOR           reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    BWLSH           reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    BWRSH           reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    IN              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    NOT             reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    EQ              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    NE              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    GT              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    GE              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    LT              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    LE              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    EQ_FZM          reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    EQ_FZS          reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    NE_FZM          reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    NE_FZS          reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    AND             reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    OR              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    LPAREN          reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    $end            reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    RPAREN          reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    COLON           reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    RBRACE          reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    COMMA           reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    FOR             reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    RBRACKET        reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
+    IF              reduce using rule 67 (object -> object LBRACKET expression COLON expression RBRACKET .)
 
 
-state 128
+state 130
 
     (52) object -> LBRACKET expression FOR SYMBOL IN expression . RBRACKET
     (53) object -> LBRACKET expression FOR SYMBOL IN expression . IF expression RBRACKET
@@ -9147,11 +9248,11 @@ state 128
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    RBRACKET        shift and go to state 129
-    IF              shift and go to state 130
+    RBRACKET        shift and go to state 131
+    IF              shift and go to state 132
     QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
@@ -9182,7 +9283,7 @@ state 128
     LPAREN          shift and go to state 48
 
 
-state 129
+state 131
 
     (52) object -> LBRACKET expression FOR SYMBOL IN expression RBRACKET .
 
@@ -9228,7 +9329,7 @@ state 129
     IF              reduce using rule 52 (object -> LBRACKET expression FOR SYMBOL IN expression RBRACKET .)
 
 
-state 130
+state 132
 
     (53) object -> LBRACKET expression FOR SYMBOL IN expression IF . expression RBRACKET
     (5) expression -> . object
@@ -9286,12 +9387,13 @@ state 130
     (57) object -> . LBRACE map_members RBRACE
     (58) object -> . LBRACE map_members COMMA RBRACE
     (62) object -> . object LBRACKET expression RBRACKET
-    (63) object -> . object LBRACKET COLON RBRACKET
-    (64) object -> . object LBRACKET COLON expression RBRACKET
-    (65) object -> . object LBRACKET expression COLON RBRACKET
-    (66) object -> . object LBRACKET expression COLON expression RBRACKET
-    (67) object -> . expression LPAREN RPAREN
-    (68) object -> . expression LPAREN ary_members RPAREN
+    (63) object -> . object LBRACKET MUL RBRACKET
+    (64) object -> . object LBRACKET COLON RBRACKET
+    (65) object -> . object LBRACKET COLON expression RBRACKET
+    (66) object -> . object LBRACKET expression COLON RBRACKET
+    (67) object -> . object LBRACKET expression COLON expression RBRACKET
+    (68) object -> . expression LPAREN RPAREN
+    (69) object -> . expression LPAREN ary_members RPAREN
 
     NOT             shift and go to state 5
     SUB             shift and go to state 4
@@ -9310,10 +9412,10 @@ state 130
     STRING          shift and go to state 18
     LBRACKET        shift and go to state 19
 
-    expression                     shift and go to state 131
+    expression                     shift and go to state 133
     object                         shift and go to state 3
 
-state 131
+state 133
 
     (53) object -> LBRACKET expression FOR SYMBOL IN expression IF expression . RBRACKET
     (6) expression -> expression . QMARK expression COLON expression
@@ -9343,10 +9445,10 @@ state 131
     (30) expression -> expression . NE_FZS expression
     (31) expression -> expression . AND expression
     (32) expression -> expression . OR expression
-    (67) object -> expression . LPAREN RPAREN
-    (68) object -> expression . LPAREN ary_members RPAREN
+    (68) object -> expression . LPAREN RPAREN
+    (69) object -> expression . LPAREN ary_members RPAREN
 
-    RBRACKET        shift and go to state 132
+    RBRACKET        shift and go to state 134
     QMARK           shift and go to state 21
     MOD             shift and go to state 22
     MUL             shift and go to state 23
@@ -9377,7 +9479,7 @@ state 131
     LPAREN          shift and go to state 48
 
 
-state 132
+state 134
 
     (53) object -> LBRACKET expression FOR SYMBOL IN expression IF expression RBRACKET .
 

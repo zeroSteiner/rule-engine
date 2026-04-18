@@ -192,6 +192,26 @@ One limitation to the array comprehension syntax when compared to Python's list 
 assignment may not contain more than one value. There is currently no support for unpacking multiple values like Python
 does, (e.g. ``[ v for k,v in my_dict.items() if test(k) ]``.
 
+Implicit Iteration
+""""""""""""""""""
+As an alternative to writing an explicit array comprehension, the ``[*]`` subscript can be used as a shorthand to
+iterate over an array while traversing into it. A ``[*]`` inside a larger expression places a pending iteration over
+the array to its left; the iteration is *lifted* into a comprehension when the expression reaches a boolean-producing
+boundary (a comparison, ``in``, a logical operator, the ternary operator, a function call, or the statement root).
+This makes it straightforward to express "does at least one element along this path satisfy the condition" without
+writing a nested comprehension by hand.
+
+For example, ``items[*].name == "Yes"`` is equivalent to ``[v for v in items if v.name == "Yes"]`` and evaluates to a
+non-empty (and therefore truthy) array iff at least one ``items`` element has a ``name`` of ``"Yes"``. Multiple ``[*]``
+subscripts may be chained to traverse nested arrays. The expression
+``items[*].subitems[*].value == "Yes"`` is equivalent to
+``[v for v in items if [w for w in v.subitems if w.value == "Yes"]]``.
+
+The scope of each ``[*]`` is the smallest enclosing boolean-producing expression, so logical operators like ``and`` and
+``or`` do not tangle the shorthand on either side. ``a[*].b == 1 and c > 3`` evaluates the left and right comparisons
+independently. Outside of a boolean-producing expression, ``[*]`` simply maps the pending attribute or subscript access
+over the array: ``a[*].b`` is equivalent to ``[v.b for v in a]``.
+
 Ternary Operators
 """""""""""""""""
 The ternary operator can be used in place of a traditional "if-then-else" statement. Like other languages the question

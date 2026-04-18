@@ -87,6 +87,43 @@ class GitHubIssueTests(unittest.TestCase):
         rule = engine.Rule('a / b ** 2')
         self.assertEqual(rule.evaluate({'a': 8, 'b': 4}), 0.5)
 
+    def test_number_38(self):
+        thing = {
+                'event': {
+                        'title': '1 computer made a problem',
+                        'items': [{
+                                'type': 'EVENT',
+                                'computerinfo': {'resources': [
+                                        {'userassigments': 'data1'},
+                                        {'companyassigned': 'Yes'},
+                                        {'otherdata': 'data2'},
+                                ]},
+                        }],
+                        'internaldata': [
+                                {'type': 'USER', 'details': {'firstName': 'first1'}},
+                                {'type': 'COMPUTER', 'details': {'fqdn': 'pc.example', 'lansite': 'Munich'}},
+                        ],
+                },
+        }
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', category=errors.MappingAttributeLookupDeprecation)
+            # The headline example from issue #38: truthy iff at least one item has at least
+            # one resource whose ``companyassigned`` value is ``Yes``.
+            rule = engine.Rule(
+                    'event.items[*]&["computerinfo"]&["resources"][*]&["companyassigned"] == "Yes"'
+            )
+            self.assertTrue(rule.matches(thing))
+            rule = engine.Rule(
+                    'event.items[*]&["computerinfo"]&["resources"][*]&["companyassigned"] == "No"'
+            )
+            self.assertFalse(rule.matches(thing))
+            # Combined with a sibling condition; the shorthand's scope must not cross ``and``.
+            rule = engine.Rule(
+                    'event.title =~ ".*made a problem$" '
+                    'and event.items[*]&["computerinfo"]&["resources"][*]&["companyassigned"] == "Yes"'
+            )
+            self.assertTrue(rule.matches(thing))
+
     def test_number_22(self):
         rules = ('object["timestamp"] > $now', 'object.timestamp > $now')
         for rule in rules:

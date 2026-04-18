@@ -33,6 +33,8 @@
 import collections
 import dataclasses
 import datetime
+import decimal
+import enum
 import sys
 import typing
 import unittest
@@ -40,9 +42,19 @@ import unittest
 import rule_engine.errors as errors
 import rule_engine.types as types
 
-__all__ = ('DataTypeTests', 'MetaDataTypeTests', 'ObjectDataTypeTests', 'ValueIsTests')
+__all__ = ('CoercionTests', 'DataTypeTests', 'MetaDataTypeTests', 'ObjectDataTypeTests', 'ValueIsTests')
 
 DataType = types.DataType
+
+class CoercionTests(unittest.TestCase):
+    def test_coerce_int_subclass_uses_int_value(self):
+        # int subclasses like IntEnum don't repr() as a plain number; coercion must still produce a usable Decimal
+        class Priority(enum.IntEnum):
+            HIGH = 9
+
+        value = types.coerce_value(Priority.HIGH)
+        self.assertEqual(value, decimal.Decimal(9))
+
 
 class DataTypeTests(unittest.TestCase):
     class _UnsupportedType(object):

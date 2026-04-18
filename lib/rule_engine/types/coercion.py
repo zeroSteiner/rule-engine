@@ -41,6 +41,10 @@ from .datatype import DataType
 def _to_decimal(value: Any) -> decimal.Decimal:
     if isinstance(value, decimal.Decimal):
         return value
+    if isinstance(value, int):
+        # int subclasses (e.g. IntEnum) don't necessarily repr() as a plain number; convert via int() so the
+        # Decimal constructor receives a value it can parse
+        return decimal.Decimal(int(value))
     return decimal.Decimal(repr(value))
 
 def coerce_value(value: Any, verify_type: bool = True) -> Any:

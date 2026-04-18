@@ -32,7 +32,7 @@ def tests(c, coverage=False):
     else:
         c.run('uv run python -m unittest -v', pty=True)
 
-@task
+@task(aliases=['checktypes'])
 def typechecks(c):
     """Run mypy static type checks."""
     c.run('uv run mypy')

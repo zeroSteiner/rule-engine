@@ -165,6 +165,16 @@ if _HAS_SQLALCHEMY:
         id: Mapped[int] = mapped_column(primary_key=True)
         tags = Column(sqlalchemy.ARRAY(String))
 
+    class _ArrayOpaque(_Base):
+        __tablename__ = 'array_opaques'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        blobs = Column(sqlalchemy.ARRAY(_OpaqueType))
+
+    class _ArrayUuid(_Base):
+        __tablename__ = 'array_uuids'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        external_ids = Column(sqlalchemy.ARRAY(_UuidType))
+
 
 @unittest.skipUnless(_HAS_SQLALCHEMY, 'sqlalchemy is not installed')
 class SqlAlchemyObjectTests(unittest.TestCase):
@@ -275,6 +285,28 @@ class SqlAlchemyObjectTests(unittest.TestCase):
         tags_type = schema.attributes['tags']
         self.assertIsInstance(tags_type, types._ArrayDataTypeDef)
         self.assertIs(tags_type.value_type, DataType.STRING)
+
+    def test_object_from_sqlalchemy_array_opaque_element_strict(self):
+        # ARRAY of a column type whose python_type raises NotImplementedError — strict raises
+        with self.assertRaisesRegex(ValueError, r"can not map column 'blobs' to a compatible data type"):
+            DataType.OBJECT.from_sqlalchemy('ArrayOpaque', _ArrayOpaque)
+
+    def test_object_from_sqlalchemy_array_opaque_element_non_strict(self):
+        schema = DataType.OBJECT.from_sqlalchemy('ArrayOpaque', _ArrayOpaque, strict=False)
+        blobs_type = schema.attributes['blobs']
+        self.assertIsInstance(blobs_type, types._ArrayDataTypeDef)
+        self.assertIs(blobs_type.value_type, DataType.UNDEFINED)
+
+    def test_object_from_sqlalchemy_array_unmappable_element_strict(self):
+        # ARRAY of a column type whose python_type is known but not mappable (uuid.UUID) — strict raises
+        with self.assertRaises((TypeError, ValueError)):
+            DataType.OBJECT.from_sqlalchemy('ArrayUuid', _ArrayUuid)
+
+    def test_object_from_sqlalchemy_array_unmappable_element_non_strict(self):
+        schema = DataType.OBJECT.from_sqlalchemy('ArrayUuid', _ArrayUuid, strict=False)
+        ids_type = schema.attributes['external_ids']
+        self.assertIsInstance(ids_type, types._ArrayDataTypeDef)
+        self.assertIs(ids_type.value_type, DataType.UNDEFINED)
 
     def test_object_from_sqlalchemy_skips_column_property(self):
         schema = DataType.OBJECT.from_sqlalchemy('WithColumnProperty', _WithColumnProperty)

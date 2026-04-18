@@ -68,7 +68,11 @@ ignore_missing_imports = true
 
 [tool.coverage.run]
 source = ["lib/rule_engine"]
-omit = ["lib/rule_engine/_vendor/*"]
+omit = [
+    "lib/rule_engine/_vendor/*",
+    "lib/rule_engine/debug_ast.py",
+    "lib/rule_engine/debug_repl.py",
+]
 
 [tool.coverage.report]
 show_missing = true

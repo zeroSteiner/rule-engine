@@ -225,7 +225,8 @@ are the root class's columns and relationships and whose nested ``OBJECT`` schem
 :ref:`getting-started-types-from-sqlalchemy` for an end-to-end example.
 
 Polymorphic / inherited mappings, hybrid properties, and ``column_property`` aggregates are out of scope; only
-``mapper.columns`` and ``mapper.relationships`` are walked.
+mapped :py:class:`~sqlalchemy.Column` entries and ``mapper.relationships`` are walked. ``column_property`` entries
+that surface in ``mapper.columns`` are silently skipped since they do not expose the metadata the walker needs.
 
 Restrictions
 ^^^^^^^^^^^^

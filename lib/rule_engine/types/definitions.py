@@ -528,6 +528,11 @@ def _build_object_from_sqlalchemy(
     attributes: dict[str, _DataTypeDef] = {}
     attributes_nullable: dict[str, bool] = {}
     for column in mapper.columns:
+        # column_property / expression-valued attributes show up in mapper.columns as Label / Comparator objects
+        # that don't expose .nullable or a usable .type; the walker treats them as out of scope (matching the
+        # docstring's stance on hybrid_property) and silently skips them
+        if not isinstance(column, sqlalchemy.Column):
+            continue
         attributes[column.key] = _resolve_sqlalchemy_column_type(column, strict)
         attributes_nullable[column.key] = bool(column.nullable)
     for relationship in mapper.relationships:

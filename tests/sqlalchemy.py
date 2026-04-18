@@ -42,8 +42,8 @@ import rule_engine.types as types
 
 try:
     import sqlalchemy
-    from sqlalchemy import ForeignKey
-    from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+    from sqlalchemy import Column, ForeignKey, Integer, String
+    from sqlalchemy.orm import DeclarativeBase, Mapped, column_property, mapped_column, relationship
     _HAS_SQLALCHEMY = True
 except ImportError:
     _HAS_SQLALCHEMY = False
@@ -143,6 +143,14 @@ if _HAS_SQLALCHEMY:
         alpha_id: Mapped[int | None] = mapped_column(ForeignKey('alphas.id'))
         alpha: Mapped['_Alpha | None'] = relationship(foreign_keys=[alpha_id])
 
+    # column_property lands in mapper.columns as a Label rather than a Column, so the walker must skip it
+    class _WithColumnProperty(_Base):
+        __tablename__ = 'with_column_properties'
+        id = Column(Integer, primary_key=True)
+        title = Column(String)
+        subtitle = Column(String, default='')
+        full_title = column_property(title + ' - ' + subtitle)
+
 
 @unittest.skipUnless(_HAS_SQLALCHEMY, 'sqlalchemy is not installed')
 class SqlAlchemyObjectTests(unittest.TestCase):
@@ -237,6 +245,13 @@ class SqlAlchemyObjectTests(unittest.TestCase):
         # parent relationship loops back to the root class
         self.assertIs(schema.attributes['parent'], schema)
         self.assertTrue(schema.is_attributes_nullable('parent'))
+
+    def test_object_from_sqlalchemy_skips_column_property(self):
+        schema = DataType.OBJECT.from_sqlalchemy('WithColumnProperty', _WithColumnProperty)
+        self.assertIn('title', schema.attributes)
+        self.assertIn('subtitle', schema.attributes)
+        # column_property entries don't expose .nullable and are out of scope for rule evaluation
+        self.assertNotIn('full_title', schema.attributes)
 
     def test_object_from_sqlalchemy_forward_reference_on_deep_cycle(self):
         # Alpha -> Beta -> Gamma -> Alpha forms a 3-way cycle. The Gamma.alpha relationship is to the

@@ -160,6 +160,11 @@ if _HAS_SQLALCHEMY:
         id: Mapped[int] = mapped_column(primary_key=True)
         priority: Mapped[_Priority]
 
+    class _Post(_Base):
+        __tablename__ = 'posts'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        tags = Column(sqlalchemy.ARRAY(String))
+
 
 @unittest.skipUnless(_HAS_SQLALCHEMY, 'sqlalchemy is not installed')
 class SqlAlchemyObjectTests(unittest.TestCase):
@@ -263,6 +268,13 @@ class SqlAlchemyObjectTests(unittest.TestCase):
         # parent relationship loops back to the root class
         self.assertIs(schema.attributes['parent'], schema)
         self.assertTrue(schema.is_attributes_nullable('parent'))
+
+    def test_object_from_sqlalchemy_typed_array_column(self):
+        # ARRAY columns preserve their element type; value_type reflects the mapped inner type
+        schema = DataType.OBJECT.from_sqlalchemy('Post', _Post)
+        tags_type = schema.attributes['tags']
+        self.assertIsInstance(tags_type, types._ArrayDataTypeDef)
+        self.assertIs(tags_type.value_type, DataType.STRING)
 
     def test_object_from_sqlalchemy_skips_column_property(self):
         schema = DataType.OBJECT.from_sqlalchemy('WithColumnProperty', _WithColumnProperty)

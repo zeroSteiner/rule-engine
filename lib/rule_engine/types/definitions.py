@@ -456,6 +456,27 @@ def _resolve_sqlalchemy_column_type(column: Any, strict: bool) -> _DataTypeDef:
         if enum_class is not None and issubclass(enum_class, int):
             return DataType.FLOAT
         return DataType.STRING
+    # ARRAY columns know their element type via column.type.item_type; fall back to UNDEFINED (or raise under
+    # strict) only when the element type is itself unmappable, otherwise rule authors lose parse-time checks
+    # against the members
+    if isinstance(column_type, sqlalchemy.ARRAY):
+        item_type = column_type.item_type
+        try:
+            item_python_type = item_type.python_type
+        except NotImplementedError:
+            if strict:
+                raise ValueError(
+                    "can not map column {0!r} to a compatible data type: element python_type is not implemented".format(
+                        column.key
+                    )
+                )
+            return cast(_DataTypeDef, DataType.ARRAY(DataType.UNDEFINED))
+        try:
+            return cast(_DataTypeDef, DataType.ARRAY(DataType.from_type(item_python_type)))
+        except (TypeError, ValueError):
+            if strict:
+                raise
+            return cast(_DataTypeDef, DataType.ARRAY(DataType.UNDEFINED))
     try:
         python_type = column_type.python_type
     except NotImplementedError:

@@ -448,8 +448,13 @@ def _resolve_sqlalchemy_column_type(column: Any, strict: bool) -> _DataTypeDef:
     from .datatype import DataType
     column_type = column.type
     # Enum columns expose their member class via ``python_type``; Rule Engine has no enum data type, so they are
-    # surfaced as STRING values matching how enum members typically serialize on the wire
+    # surfaced as STRING values matching how enum members typically serialize on the wire. IntEnum (and other
+    # int-subclass enums) store integer values at runtime, so they map to FLOAT to match how Rule Engine already
+    # represents numeric types.
     if isinstance(column_type, sqlalchemy.Enum):
+        enum_class = getattr(column_type, 'enum_class', None)
+        if enum_class is not None and issubclass(enum_class, int):
+            return DataType.FLOAT
         return DataType.STRING
     try:
         python_type = column_type.python_type

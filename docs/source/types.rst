@@ -202,7 +202,9 @@ only needed when this entry point is actually invoked. Install it with ``pip ins
 
 The walker reads ``column.type.python_type`` for each mapped column and threads it through
 :py:meth:`DataType.from_type`. Column nullability (``column.nullable``) is copied through to the schema's
-per-attribute nullability map. :py:class:`~sqlalchemy.Enum` columns become ``STRING``. By default (``strict=True``) a
+per-attribute nullability map. :py:class:`~sqlalchemy.Enum` columns become ``STRING`` unless the enum class is an
+:py:class:`int` subclass (such as :py:class:`~enum.IntEnum`), in which case they become ``FLOAT`` to match the
+integer values stored at runtime. By default (``strict=True``) a
 column whose ``python_type`` raises :py:exc:`NotImplementedError` or resolves to a Python type Rule Engine cannot map
 (e.g. :py:class:`~uuid.UUID`) raises :py:exc:`ValueError`. Pass ``strict=False`` to instead map those columns to
 :py:attr:`~DataType.UNDEFINED`; this is usually the right choice for schemas that include :py:class:`~sqlalchemy.JSON`

@@ -151,6 +151,15 @@ if _HAS_SQLALCHEMY:
         subtitle = Column(String, default='')
         full_title = column_property(title + ' - ' + subtitle)
 
+    class _Priority(enum.IntEnum):
+        LOW = 1
+        HIGH = 9
+
+    class _Task(_Base):
+        __tablename__ = 'tasks'
+        id: Mapped[int] = mapped_column(primary_key=True)
+        priority: Mapped[_Priority]
+
 
 @unittest.skipUnless(_HAS_SQLALCHEMY, 'sqlalchemy is not installed')
 class SqlAlchemyObjectTests(unittest.TestCase):
@@ -175,6 +184,15 @@ class SqlAlchemyObjectTests(unittest.TestCase):
     def test_object_from_sqlalchemy_enum_column(self):
         schema = DataType.OBJECT.from_sqlalchemy('Hero', _Hero)
         self.assertIs(schema.attributes['publisher'], DataType.STRING)
+
+    def test_object_from_sqlalchemy_int_enum_column(self):
+        # IntEnum members are ints at runtime, so the walker maps them to FLOAT rather than STRING
+        schema = DataType.OBJECT.from_sqlalchemy('Task', _Task)
+        self.assertIs(schema.attributes['priority'], DataType.FLOAT)
+        rule = rule_engine.Rule('obj.priority == 9', context=rule_engine.Context(
+            type_resolver=rule_engine.engine.type_resolver_from_dict({'obj': schema})
+        ))
+        self.assertTrue(rule.matches({'obj': _Task(id=1, priority=_Priority.HIGH)}))
 
     def test_object_from_sqlalchemy_json_column(self):
         # sqlalchemy.JSON reports python_type as dict, so it threads through DataType.from_type to MAPPING

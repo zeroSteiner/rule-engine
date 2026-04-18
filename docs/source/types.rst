@@ -206,11 +206,13 @@ per-attribute nullability map. :py:class:`~sqlalchemy.Enum` columns become ``STR
 :py:class:`int` subclass (such as :py:class:`~enum.IntEnum`), in which case they become ``FLOAT`` to match the
 integer values stored at runtime. :py:class:`~sqlalchemy.ARRAY` columns become ``ARRAY(T)`` where ``T`` is the
 mapped element type (``ARRAY(UNDEFINED)`` when the element type is itself unmappable under ``strict=False``).
+:py:class:`~sqlalchemy.JSON` columns report ``dict`` as their ``python_type`` and therefore map to
+``MAPPING(UNDEFINED, UNDEFINED)`` in both strict and non-strict mode; the nested keys and values remain untyped.
 By default (``strict=True``) a
 column whose ``python_type`` raises :py:exc:`NotImplementedError` or resolves to a Python type Rule Engine cannot map
 (e.g. :py:class:`~uuid.UUID`) raises :py:exc:`ValueError`. Pass ``strict=False`` to instead map those columns to
-:py:attr:`~DataType.UNDEFINED`; this is usually the right choice for schemas that include :py:class:`~sqlalchemy.JSON`
-columns or dialect-specific types whose values can not be statically described.
+:py:attr:`~DataType.UNDEFINED`; this is usually the right choice for schemas that include dialect-specific types
+whose values can not be statically described.
 
 Relationships expand automatically:
 

@@ -439,9 +439,8 @@ def _resolve_sqlalchemy_column_type(column: Any, strict: bool) -> _DataTypeDef:
     """
     Translate a SQLAlchemy column's :py:class:`~sqlalchemy.types.TypeEngine` into a :py:class:`_DataTypeDef`.
     When *strict* is ``False``, column types whose ``python_type`` raises :py:exc:`NotImplementedError`
-    (e.g. :py:class:`~sqlalchemy.JSON` and dialect-specific types) and column types whose Python type cannot be
-    mapped to a Rule Engine type fall back to :py:attr:`DataType.UNDEFINED` instead of raising
-    :py:exc:`ValueError`.
+    (typically dialect-specific types) and column types whose Python type cannot be mapped to a Rule Engine type
+    fall back to :py:attr:`DataType.UNDEFINED` instead of raising :py:exc:`ValueError`.
     """
     import sqlalchemy
     # deferred to avoid the definitions.py -> datatype.py import cycle
@@ -775,10 +774,13 @@ class _ObjectDataTypeDef(_DataTypeDef):
         nullability is taken directly from :py:attr:`~sqlalchemy.Column.nullable`.
 
         By default (``strict=True``) a column whose ``python_type`` raises :py:exc:`NotImplementedError`
-        (e.g. :py:class:`~sqlalchemy.JSON`) or resolves to a Python type Rule Engine cannot map raises
-        :py:exc:`ValueError`; pass ``strict=False`` to record such columns as :py:attr:`DataType.UNDEFINED` so
-        they remain selectable without parse-time type checking. :py:class:`~sqlalchemy.Enum` columns are
-        surfaced as :py:attr:`DataType.STRING`.
+        (typically dialect-specific types such as PostgreSQL ``CIDR`` or ``INET``) or resolves to a Python type
+        Rule Engine cannot map raises :py:exc:`ValueError`; pass ``strict=False`` to record such columns as
+        :py:attr:`DataType.UNDEFINED` so they remain selectable without parse-time type checking.
+        :py:class:`~sqlalchemy.Enum` columns are surfaced as :py:attr:`DataType.STRING` unless the enum class is
+        an :py:class:`int` subclass, in which case they become :py:attr:`DataType.FLOAT`.
+        :py:class:`~sqlalchemy.JSON` columns report ``dict`` as their ``python_type`` and therefore map to
+        :py:attr:`DataType.MAPPING` with untyped keys and values; the nested values remain untyped.
 
         Relationships declared on *cls* are expanded into nested OBJECT schemas. Collection relationships
         (``uselist=True``) are wrapped in :py:attr:`DataType.ARRAY`. Back-references to the enclosing class
@@ -801,8 +803,7 @@ class _ObjectDataTypeDef(_DataTypeDef):
                 :py:exc:`NotImplementedError` or cannot be mapped to a Rule Engine data type raises
                 :py:exc:`ValueError`. When ``False``, such columns fall back to :py:attr:`DataType.UNDEFINED` so
                 the attribute remains selectable without parse-time type checking. This is useful for dialect-
-                specific column types (e.g. :py:class:`~sqlalchemy.JSON`) whose values can not be statically
-                described.
+                specific column types whose values can not be statically described.
         """
         if not hasattr(cls, '__mapper__'):
             raise TypeError('from_sqlalchemy argument 2 must be a SQLAlchemy mapped class, not ' + type(cls).__name__)

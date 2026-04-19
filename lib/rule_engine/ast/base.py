@@ -102,6 +102,15 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
         return resolved
     if isinstance(definition, _ObjectDataTypeDef):
         return definition
+    if isinstance(definition, DataType.NULLABLE.__class__):
+        new_inner = _resolve_type(definition.inner_type, context)
+        if new_inner is definition.inner_type:
+            return definition
+        return definition.__class__(
+                definition.name,
+                definition.python_type,
+                inner_type=new_inner
+        )
     if isinstance(definition, DataType.ARRAY.__class__) or isinstance(definition, DataType.SET.__class__):
         new_value_type = _resolve_type(definition.value_type, context)
         if new_value_type is definition.value_type:
@@ -109,8 +118,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
         return definition.__class__(
                 definition.name,
                 definition.python_type,
-                value_type=new_value_type,
-                value_type_nullable=definition.value_type_nullable
+                value_type=new_value_type
         )
     if isinstance(definition, DataType.MAPPING.__class__):
         new_key_type = _resolve_type(definition.key_type, context)
@@ -121,8 +129,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
                 definition.name,
                 definition.python_type,
                 key_type=new_key_type,
-                value_type=new_value_type,
-                value_type_nullable=definition.value_type_nullable
+                value_type=new_value_type
         )
     if isinstance(definition, DataType.FUNCTION.__class__):
         new_return_type = _resolve_type(definition.return_type, context)

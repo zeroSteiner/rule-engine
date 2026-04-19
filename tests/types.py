@@ -69,7 +69,7 @@ class DataTypeTests(unittest.TestCase):
         self.assertIs(dt1.value_type, DataType.STRING)
         self.assertEqual(dt1, DataType.ARRAY(DataType.STRING))
         self.assertNotEqual(dt1, DataType.ARRAY)
-        self.assertNotEqual(dt1, DataType.ARRAY(DataType.STRING, value_type_nullable=False))
+        self.assertNotEqual(dt1, DataType.ARRAY(DataType.NULLABLE(DataType.STRING)))
 
     def test_data_type_equality_function(self):
         dt1 = DataType.FUNCTION('test', return_type=DataType.FLOAT, argument_types=(), minimum_arguments=0)
@@ -86,14 +86,37 @@ class DataTypeTests(unittest.TestCase):
         self.assertEqual(dt1, DataType.MAPPING(DataType.STRING))
         self.assertNotEqual(dt1, DataType.MAPPING)
         self.assertNotEqual(dt1, DataType.MAPPING(DataType.STRING, value_type=DataType.STRING))
-        self.assertNotEqual(dt1, DataType.MAPPING(DataType.STRING, value_type_nullable=False))
+        self.assertNotEqual(dt1, DataType.MAPPING(DataType.STRING, value_type=DataType.NULLABLE(DataType.STRING)))
 
     def test_data_type_equality_set(self):
         dt1 = DataType.SET(DataType.STRING)
         self.assertIs(dt1.value_type, DataType.STRING)
         self.assertEqual(dt1, DataType.SET(DataType.STRING))
         self.assertNotEqual(dt1, DataType.SET)
-        self.assertNotEqual(dt1, DataType.SET(DataType.STRING, value_type_nullable=False))
+        self.assertNotEqual(dt1, DataType.SET(DataType.NULLABLE(DataType.STRING)))
+
+    def test_data_type_value_type_nullable_kwarg_emits_deprecation(self):
+        for constructor in (DataType.ARRAY, DataType.SET):
+            with self.assertWarns(DeprecationWarning) as cm:
+                wrapped = constructor(DataType.STRING, value_type_nullable=True)
+            self.assertIn('value_type_nullable', str(cm.warning))
+            self.assertIn('DataType.NULLABLE', str(cm.warning))
+            self.assertIn('v6.0.0', str(cm.warning))
+            self.assertEqual(wrapped.value_type, DataType.NULLABLE(DataType.STRING))
+            self.assertTrue(wrapped.value_type_nullable)
+        with self.assertWarns(DeprecationWarning) as cm:
+            wrapped = DataType.MAPPING(DataType.STRING, DataType.STRING, value_type_nullable=True)
+        self.assertIn('value_type_nullable', str(cm.warning))
+        self.assertEqual(wrapped.value_type, DataType.NULLABLE(DataType.STRING))
+        self.assertTrue(wrapped.value_type_nullable)
+
+    def test_data_type_value_type_nullable_property_derived(self):
+        self.assertTrue(DataType.ARRAY(DataType.NULLABLE(DataType.STRING)).value_type_nullable)
+        self.assertFalse(DataType.ARRAY(DataType.STRING).value_type_nullable)
+        self.assertTrue(DataType.SET(DataType.NULLABLE(DataType.STRING)).value_type_nullable)
+        self.assertFalse(DataType.SET(DataType.STRING).value_type_nullable)
+        self.assertTrue(DataType.MAPPING(DataType.STRING, DataType.NULLABLE(DataType.STRING)).value_type_nullable)
+        self.assertFalse(DataType.MAPPING(DataType.STRING, DataType.STRING).value_type_nullable)
 
     def test_data_type_from_name(self):
         self.assertIs(DataType.from_name('ARRAY'), DataType.ARRAY)

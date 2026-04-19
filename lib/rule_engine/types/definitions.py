@@ -39,6 +39,7 @@ import sys
 import threading
 import types as pytypes
 import typing
+import warnings
 from collections.abc import Mapping, Sequence
 from typing import Any, Callable, ClassVar, cast
 
@@ -135,15 +136,14 @@ class _NullableDataTypeDef(_DataTypeDef):
         return hash((self.python_type, self.is_scalar, hash(self.inner_type)))
 
 class _CollectionDataTypeDef(_DataTypeDef):
-    __slots__ = ('value_type', 'value_type_nullable')
+    __slots__ = ('value_type',)
     value_type: _DataTypeDef
-    value_type_nullable: bool
     def __init__(
             self,
             name: str,
             python_type: type,
             value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
-            value_type_nullable: bool = True
+            value_type_nullable: bool | None = None
     ) -> None:
         # check these three classes individually instead of using Collection which isn't available before Python v3.6
         if not issubclass(python_type, collections.abc.Container):
@@ -154,23 +154,47 @@ class _CollectionDataTypeDef(_DataTypeDef):
             raise TypeError('the specified python_type is not a sized')
         super(_CollectionDataTypeDef, self).__init__(name, python_type)
         self.is_scalar = False
+        if value_type_nullable is not None:
+            warnings.warn(
+                    "The 'value_type_nullable' kwarg is deprecated and will be removed in v6.0.0; "
+                    "wrap nullable element types with DataType.NULLABLE(T) instead.",
+                    DeprecationWarning,
+                    stacklevel=2
+            )
+            if value_type_nullable:
+                value_type = _wrap_nullable(value_type)
         self.value_type = value_type
-        self.value_type_nullable = value_type_nullable
 
     @property
     def iterable_type(self) -> _DataTypeDef:  # type: ignore[override]
         return self.value_type
 
-    def __call__(self, value_type: _DataTypeDef, value_type_nullable: bool = True) -> _CollectionDataTypeDef:
+    @property
+    def value_type_nullable(self) -> bool:
+        return isinstance(self.value_type, _NullableDataTypeDef)
+
+    def __call__(self, value_type: _DataTypeDef, value_type_nullable: bool | None = None) -> _CollectionDataTypeDef:
         """
         :param value_type: The type of the members.
         :param bool value_type_nullable: Whether or not members are allowed to be :py:attr:`.NULL`.
+
+                .. deprecated:: 5.0.0
+                        Wrap nullable element types with :py:meth:`DataType.NULLABLE` instead; this kwarg will
+                        be removed in v6.0.0.
         """
+        if value_type_nullable is not None:
+            warnings.warn(
+                    "The 'value_type_nullable' kwarg is deprecated and will be removed in v6.0.0; "
+                    "wrap nullable element types with DataType.NULLABLE(T) instead.",
+                    DeprecationWarning,
+                    stacklevel=2
+            )
+            if value_type_nullable:
+                value_type = _wrap_nullable(value_type)
         return self.__class__(
                 self.name,
                 self.python_type,
-                value_type=value_type,
-                value_type_nullable=value_type_nullable
+                value_type=value_type
         )
 
     def __repr__(self) -> str:
@@ -185,13 +209,10 @@ class _CollectionDataTypeDef(_DataTypeDef):
         if not super().__eq__(other):
             return False
         assert isinstance(other, _CollectionDataTypeDef)
-        return all((
-                self.value_type == other.value_type,
-                self.value_type_nullable == other.value_type_nullable
-        ))
+        return self.value_type == other.value_type
 
     def __hash__(self) -> int:
-        return hash((self.python_type, self.is_scalar, hash((self.value_type, self.value_type_nullable))))
+        return hash((self.python_type, self.is_scalar, hash(self.value_type)))
 
 class _ArrayDataTypeDef(_CollectionDataTypeDef):
     pass
@@ -202,24 +223,23 @@ class _SetDataTypeDef(_CollectionDataTypeDef):
             name: str,
             python_type: type,
             value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
-            value_type_nullable: bool = True
+            value_type_nullable: bool | None = None
     ) -> None:
         if isinstance(value_type, _ObjectDataTypeDef):
             raise errors.EngineError('OBJECT values may not be used as SET members')
         super(_SetDataTypeDef, self).__init__(name, python_type, value_type=value_type, value_type_nullable=value_type_nullable)
 
 class _MappingDataTypeDef(_DataTypeDef):
-    __slots__ = ('key_type', 'value_type', 'value_type_nullable')
+    __slots__ = ('key_type', 'value_type')
     key_type: _DataTypeDef
     value_type: _DataTypeDef
-    value_type_nullable: bool
     def __init__(
             self,
             name: str,
             python_type: type,
             key_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
             value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
-            value_type_nullable: bool = True
+            value_type_nullable: bool | None = None
     ) -> None:
         if not issubclass(python_type, collections.abc.Mapping):
             raise TypeError('the specified python_type is not a mapping')
@@ -229,31 +249,55 @@ class _MappingDataTypeDef(_DataTypeDef):
         # Python tuple's while SET and MAPPING objects are set and dict instances, respectively which are not hashable.
         if key_type.is_compound and not isinstance(key_type, _ArrayDataTypeDef):
             raise errors.EngineError("the {} data type may not be used for mapping keys".format(key_type.name))
+        if value_type_nullable is not None:
+            warnings.warn(
+                    "The 'value_type_nullable' kwarg is deprecated and will be removed in v6.0.0; "
+                    "wrap nullable value types with DataType.NULLABLE(T) instead.",
+                    DeprecationWarning,
+                    stacklevel=2
+            )
+            if value_type_nullable:
+                value_type = _wrap_nullable(value_type)
         self.key_type = key_type
         self.value_type = value_type
-        self.value_type_nullable = value_type_nullable
 
     @property
     def iterable_type(self) -> _DataTypeDef:  # type: ignore[override]
         return self.key_type
 
+    @property
+    def value_type_nullable(self) -> bool:
+        return isinstance(self.value_type, _NullableDataTypeDef)
+
     def __call__(
             self,
             key_type: _DataTypeDef,
             value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
-            value_type_nullable: bool = True
+            value_type_nullable: bool | None = None
     ) -> _MappingDataTypeDef:
         """
         :param key_type: The type of the mapping keys.
         :param value_type: The type of the mapping values.
         :param bool value_type_nullable: Whether or not mapping values are allowed to be :py:attr:`.NULL`.
+
+                .. deprecated:: 5.0.0
+                        Wrap nullable value types with :py:meth:`DataType.NULLABLE` instead; this kwarg will
+                        be removed in v6.0.0.
         """
+        if value_type_nullable is not None:
+            warnings.warn(
+                    "The 'value_type_nullable' kwarg is deprecated and will be removed in v6.0.0; "
+                    "wrap nullable value types with DataType.NULLABLE(T) instead.",
+                    DeprecationWarning,
+                    stacklevel=2
+            )
+            if value_type_nullable:
+                value_type = _wrap_nullable(value_type)
         return self.__class__(
                 self.name,
                 self.python_type,
                 key_type=key_type,
-                value_type=value_type,
-                value_type_nullable=value_type_nullable
+                value_type=value_type
         )
 
     def __repr__(self) -> str:
@@ -271,12 +315,11 @@ class _MappingDataTypeDef(_DataTypeDef):
         assert isinstance(other, _MappingDataTypeDef)
         return all((
                 self.key_type == other.key_type,
-                self.value_type == other.value_type,
-                self.value_type_nullable == other.value_type_nullable
+                self.value_type == other.value_type
         ))
 
     def __hash__(self) -> int:
-        return hash((self.python_type, self.is_scalar, hash((self.key_type, self.value_type, self.value_type_nullable))))
+        return hash((self.python_type, self.is_scalar, hash((self.key_type, self.value_type))))
 
 class _FunctionDataTypeDef(_DataTypeDef):
     __slots__ = ('value_name', 'return_type', 'argument_types', 'minimum_arguments')
@@ -670,8 +713,7 @@ def _substitute_self_references(definition: _DataTypeDef, target: _ObjectDataTyp
         return definition.__class__(
                 definition.name,
                 definition.python_type,
-                value_type=new_value_type,
-                value_type_nullable=definition.value_type_nullable
+                value_type=new_value_type
         )
     if isinstance(definition, _MappingDataTypeDef):
         new_key_type = _substitute_self_references(definition.key_type, target)
@@ -682,8 +724,7 @@ def _substitute_self_references(definition: _DataTypeDef, target: _ObjectDataTyp
                 definition.name,
                 definition.python_type,
                 key_type=new_key_type,
-                value_type=new_value_type,
-                value_type_nullable=definition.value_type_nullable
+                value_type=new_value_type
         )
     if isinstance(definition, _FunctionDataTypeDef):
         new_return_type = _substitute_self_references(definition.return_type, target)

@@ -496,6 +496,28 @@ class EngineTests(unittest.TestCase):
         self.assertIs(type_resolver('name'), types.DataType.STRING)
         self.assertIs(type_resolver('identifier'), types.DataType.UNDEFINED)
 
+    def test_engine_type_resolver_from_dataclass_preserves_nullable(self):
+        type_resolver = engine.type_resolver_from_dataclass(_ResolverNullableHero)
+        self.assertEqual(type_resolver('name'), types.DataType.NULLABLE(types.DataType.STRING))
+        self.assertIs(type_resolver('age'), types.DataType.FLOAT)
+
+    def test_engine_type_resolver_from_dataclass_nullable_evaluates_rule(self):
+        context = engine.Context(
+                resolver=engine.resolve_attribute,
+                type_resolver=engine.type_resolver_from_dataclass(_ResolverNullableHero)
+        )
+        rule = engine.Rule('name == "Batman"', context=context)
+        self.assertTrue(rule.matches(_ResolverNullableHero(name='Batman', age=85)))
+        self.assertFalse(rule.matches(_ResolverNullableHero(name=None, age=85)))
+
+    def test_engine_type_resolver_from_dataclass_registers_nullable_nested_object(self):
+        type_resolver = engine.type_resolver_from_dataclass(_ResolverNullableCompany)
+        ceo = type_resolver('ceo')
+        self.assertIsInstance(ceo, types._NullableDataTypeDef)
+        self.assertIsInstance(ceo.inner_type, types._ObjectDataTypeDef)
+        # the Person OBJECT nested behind the NULLABLE wrapper is registered so cross-references resolve
+        self.assertIsInstance(type_resolver('_ResolverPerson'), types._ObjectDataTypeDef)
+
 @dataclasses.dataclass
 class _ResolverFlatHero:
     name: str
@@ -510,6 +532,16 @@ class _ResolverPerson:
 class _ResolverCompany:
     name: str
     ceo: _ResolverPerson
+
+@dataclasses.dataclass
+class _ResolverNullableHero:
+    name: str | None
+    age: int
+
+@dataclasses.dataclass
+class _ResolverNullableCompany:
+    name: str
+    ceo: _ResolverPerson | None = None
 
 class EngineRuleTests(unittest.TestCase):
     rule_text = 'first_name == "Luke" and email =~ ".*@rebels.org$"'

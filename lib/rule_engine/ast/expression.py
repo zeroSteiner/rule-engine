@@ -41,7 +41,7 @@ from .. import builtins as _builtins
 from .. import errors
 from ..suggestions import suggest_symbol
 from ..types import DataType, coerce_value, is_numeric
-from ..types import _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef, _ObjectDataTypeDef
+from ..types import _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef, _NullableDataTypeDef, _ObjectDataTypeDef
 
 from .base import (
         Assignment,
@@ -527,9 +527,17 @@ class SymbolExpression(ExpressionBase):
         if self.result_type == DataType.UNDEFINED:
             return value
 
+        # NULLABLE(T) is T-or-None at runtime; None is always valid, and any other value is checked against the
+        # unwrapped inner type
+        effective_type: _DataTypeDef = self.result_type
+        if isinstance(effective_type, _NullableDataTypeDef):
+            if value is None:
+                return value
+            effective_type = effective_type.inner_type
+
         # OBJECT values are opaque to DataType.from_value; trust the schema annotation and delegate attribute-level
         # type checking to GetAttributeExpression
-        if isinstance(self.result_type, _ObjectDataTypeDef):
+        if isinstance(effective_type, _ObjectDataTypeDef):
             return value
 
         # use DataType.from_value to raise a TypeError if value is not of a
@@ -537,18 +545,18 @@ class SymbolExpression(ExpressionBase):
         value_type = DataType.from_value(value)
 
         # if the type is the expected result type, return the value
-        if DataType.is_compatible(value_type, self.result_type):
-            if self.result_type.is_scalar:
+        if DataType.is_compatible(value_type, effective_type):
+            if effective_type.is_scalar:
                 return value
-            assert isinstance(self.result_type, (_CollectionDataTypeDef, _MappingDataTypeDef))
+            assert isinstance(effective_type, (_CollectionDataTypeDef, _MappingDataTypeDef))
             assert isinstance(value_type, (_CollectionDataTypeDef, _MappingDataTypeDef))
-            if self.result_type.value_type == DataType.UNDEFINED:
+            if effective_type.value_type == DataType.UNDEFINED:
                 return value
             if value_type.value_type == DataType.UNDEFINED:
                 return value
-            if self.result_type.value_type != DataType.NULL and not self.result_type.value_type_nullable and any(v is None for v in value):
+            if effective_type.value_type != DataType.NULL and not effective_type.value_type_nullable and any(v is None for v in value):
                 raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
-            if DataType.is_compatible(self.result_type.value_type, value_type.value_type):
+            if DataType.is_compatible(effective_type.value_type, value_type.value_type):
                 return value
 
         # if the type is null, return the value (treat null as a special case)

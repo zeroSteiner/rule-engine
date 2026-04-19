@@ -130,6 +130,9 @@ def _collect_object_types(definition: _DataTypeDef, type_map: dict[str, _DataTyp
     if isinstance(definition, types._CollectionDataTypeDef):
         _collect_object_types(definition.value_type, type_map, seen)
         return
+    if isinstance(definition, types._NullableDataTypeDef):
+        _collect_object_types(definition.inner_type, type_map, seen)
+        return
 
 def type_resolver_from_dataclass(cls: type, *, strict: bool = True) -> Callable[[str], _DataTypeDef]:
     """
@@ -141,8 +144,8 @@ def type_resolver_from_dataclass(cls: type, *, strict: bool = True) -> Callable[
 
     The companion :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` is used internally to derive the
     schema; see its documentation for the supported annotation forms (primitives, generics, ``Optional``, nested
-    dataclasses and self/mutual recursion). The nullability of fields is lost in the conversion, so the resulting type
-    resolver will treat all fields as required.
+    dataclasses and self/mutual recursion). Nullable fields (annotated ``Optional[T]`` or ``T | None``) surface as
+    :py:attr:`~rule_engine.types.DataType.NULLABLE` wrappers in the resolved symbol types.
 
     .. versionadded:: 5.0.0
 
@@ -171,7 +174,9 @@ def type_resolver_from_sqlalchemy(cls: type, *, strict: bool = True) -> Callable
 
     The companion :py:meth:`~rule_engine.types.DataType.OBJECT.from_sqlalchemy` is used internally to derive
     the schema; see its documentation for the column → :py:class:`~rule_engine.types.DataType` mapping and
-    how relationships are expanded into nested OBJECT types.
+    how relationships are expanded into nested OBJECT types. Columns with ``nullable=True`` and scalar
+    relationships whose local foreign-key columns are nullable surface as
+    :py:attr:`~rule_engine.types.DataType.NULLABLE` wrappers in the resolved symbol types.
 
     SQLAlchemy is an *optional* dependency; the import is deferred until this function is actually called.
 

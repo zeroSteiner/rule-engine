@@ -354,8 +354,34 @@ class SqlAlchemyTypeResolverTests(unittest.TestCase):
         self.assertTrue(callable(type_resolver))
         self.assertIs(type_resolver('name'), DataType.STRING)
         self.assertIs(type_resolver('active'), DataType.BOOLEAN)
+        # nullable columns surface as NULLABLE(T) rather than the bare inner type
+        self.assertEqual(type_resolver('alias'), DataType.NULLABLE(DataType.STRING))
         with self.assertRaises(errors.SymbolResolutionError):
             type_resolver('doesnotexist')
+
+    def test_type_resolver_from_sqlalchemy_nullable_evaluates_rule(self):
+        context = engine.Context(
+                resolver=engine.resolve_attribute,
+                type_resolver=rule_engine.type_resolver_from_sqlalchemy(_Hero)
+        )
+        rule = engine.Rule('alias == "Bruce Wayne"', context=context)
+        self.assertTrue(rule.matches(_Hero(
+                id=1, name='Batman', alias='Bruce Wayne', publisher=_Publisher.DC,
+                first_appearance=datetime.datetime(1939, 5, 1), active=True, profile={}
+        )))
+        self.assertFalse(rule.matches(_Hero(
+                id=2, name='Masked', alias=None, publisher=_Publisher.DC,
+                first_appearance=datetime.datetime(1940, 1, 1), active=True, profile={}
+        )))
+
+    def test_type_resolver_from_sqlalchemy_registers_nullable_nested_object(self):
+        # _Book.author is Mapped['_Author | None']; the NULLABLE wrapper must not prevent _Author from being
+        # collected into the type map so cross-references resolve at parse time
+        type_resolver = rule_engine.type_resolver_from_sqlalchemy(_Book)
+        author_field = type_resolver('author')
+        self.assertIsInstance(author_field, types._NullableDataTypeDef)
+        self.assertIsInstance(author_field.inner_type, types._ObjectDataTypeDef)
+        self.assertIsInstance(type_resolver('_Author'), types._ObjectDataTypeDef)
 
     def test_type_resolver_from_sqlalchemy_evaluates_rule(self):
         context = engine.Context(

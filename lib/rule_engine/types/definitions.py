@@ -462,6 +462,16 @@ def _resolve_dataclass_field_type(
             raise
         return DataType.UNDEFINED
 
+def _wrap_nullable(attr_type: _DataTypeDef) -> _DataTypeDef:
+    """Wrap *attr_type* in :py:class:`_NullableDataTypeDef` unless it is already nullable or a NULL."""
+    # deferred to avoid the definitions.py -> datatype.py import cycle
+    from .datatype import DataType
+    if isinstance(attr_type, _NullableDataTypeDef):
+        return attr_type
+    if attr_type == DataType.NULL:
+        return attr_type
+    return cast(_DataTypeDef, DataType.NULLABLE(attr_type))
+
 def _build_object_from_dataclass(
         cls: type,
         name: str,
@@ -474,13 +484,14 @@ def _build_object_from_dataclass(
     seen[cls] = name
     type_hints = typing.get_type_hints(cls)
     attributes: dict[str, _DataTypeDef] = {}
-    attributes_nullable: dict[str, bool] = {}
     for field in dataclasses.fields(cls):
         annotation = type_hints.get(field.name, field.type)
         unwrapped, is_nullable = _unwrap_optional(annotation)
-        attributes[field.name] = _resolve_dataclass_field_type(unwrapped, cls, seen, strict)
-        attributes_nullable[field.name] = is_nullable
-    return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
+        attr_type = _resolve_dataclass_field_type(unwrapped, cls, seen, strict)
+        if is_nullable:
+            attr_type = _wrap_nullable(attr_type)
+        attributes[field.name] = attr_type
+    return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor)
 
 def _resolve_sqlalchemy_column_type(column: Any, strict: bool) -> _DataTypeDef:
     """
@@ -598,19 +609,22 @@ def _build_object_from_sqlalchemy(
     seen[cls] = name
     mapper: Any = sqlalchemy.inspect(cls)
     attributes: dict[str, _DataTypeDef] = {}
-    attributes_nullable: dict[str, bool] = {}
     for column in mapper.columns:
         # column_property / expression-valued attributes show up in mapper.columns as Label / Comparator objects
         # that don't expose .nullable or a usable .type; the walker treats them as out of scope (matching the
         # docstring's stance on hybrid_property) and silently skips them
         if not isinstance(column, sqlalchemy.Column):
             continue
-        attributes[column.key] = _resolve_sqlalchemy_column_type(column, strict)
-        attributes_nullable[column.key] = bool(column.nullable)
+        attr_type = _resolve_sqlalchemy_column_type(column, strict)
+        if bool(column.nullable):
+            attr_type = _wrap_nullable(attr_type)
+        attributes[column.key] = attr_type
     for relationship in mapper.relationships:
-        attributes[relationship.key] = _resolve_sqlalchemy_relationship_type(relationship, cls, seen, strict)
-        attributes_nullable[relationship.key] = _sqlalchemy_relationship_is_nullable(relationship)
-    return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor, attributes_nullable=attributes_nullable)
+        attr_type = _resolve_sqlalchemy_relationship_type(relationship, cls, seen, strict)
+        if _sqlalchemy_relationship_is_nullable(relationship):
+            attr_type = _wrap_nullable(attr_type)
+        attributes[relationship.key] = attr_type
+    return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor)
 
 def _unwrap_optional(annotation: Any) -> tuple[Any, bool]:
     """
@@ -644,6 +658,11 @@ def _substitute_self_references(definition: _DataTypeDef, target: _ObjectDataTyp
         return definition
     if isinstance(definition, _ObjectDataTypeDef):
         return definition
+    if isinstance(definition, _NullableDataTypeDef):
+        new_inner = _substitute_self_references(definition.inner_type, target)
+        if new_inner is definition.inner_type:
+            return definition
+        return definition.__class__(definition.name, definition.python_type, inner_type=new_inner)
     if isinstance(definition, _CollectionDataTypeDef):
         new_value_type = _substitute_self_references(definition.value_type, target)
         if new_value_type is definition.value_type:
@@ -695,9 +714,8 @@ class _ObjectDataTypeDef(_DataTypeDef):
 
     .. versionadded:: 5.0.0
     """
-    __slots__ = ('attributes', 'attributes_nullable', 'accessor')
+    __slots__ = ('attributes', 'accessor')
     attributes: dict[str, _DataTypeDef]
-    attributes_nullable: dict[str, bool]
     accessor: Callable[[Any, str], Any]
     # class attribute (not in __slots__) — set after class definition below; a sentinel used inside attribute
     # schemas to self-reference the enclosing OBJECT without repeating its name
@@ -707,13 +725,11 @@ class _ObjectDataTypeDef(_DataTypeDef):
             name: str,
             python_type: type = object,
             attributes: Mapping[str, _DataTypeDef] | None = None,
-            accessor: Callable[[Any, str], Any] | None = None,
-            attributes_nullable: Mapping[str, bool] | None = None
+            accessor: Callable[[Any, str], Any] | None = None
     ) -> None:
         super(_ObjectDataTypeDef, self).__init__(name, python_type)
         self.is_scalar = False
         self.attributes = dict(attributes) if attributes else {}
-        self.attributes_nullable = dict(attributes_nullable) if attributes_nullable else {}
         self.accessor = accessor if accessor is not None else getattr
         # resolve self-references in the attribute schema now that self exists; cross-name references are left intact
         # and will be resolved lazily at rule parse time via Context.resolve_type
@@ -726,8 +742,7 @@ class _ObjectDataTypeDef(_DataTypeDef):
             self,
             name: str,
             attributes: Mapping[str, _DataTypeDef] | None = None,
-            accessor: Callable[[Any, str], Any] | None = None,
-            attributes_nullable: Mapping[str, bool] | None = None
+            accessor: Callable[[Any, str], Any] | None = None
     ) -> _ObjectDataTypeDef:
         """
         .. versionadded:: 5.0.0
@@ -739,15 +754,12 @@ class _ObjectDataTypeDef(_DataTypeDef):
                 enabling self-referential schemas.
         :param accessor: A callable of the form ``accessor(value, attribute_name)`` used to fetch an attribute's
                 value at evaluation time. Defaults to :py:func:`getattr`.
-        :param dict attributes_nullable: A mapping of attribute names to a ``bool`` indicating whether the attribute
-                value is allowed to be :py:attr:`.NULL`. Unspecified attributes default to ``True``.
         """
         return self.__class__(
                 name,
                 self.python_type,
                 attributes=attributes,
-                accessor=accessor,
-                attributes_nullable=attributes_nullable
+                accessor=accessor
         )
 
     @staticmethod
@@ -856,9 +868,6 @@ class _ObjectDataTypeDef(_DataTypeDef):
             raise TypeError('from_sqlalchemy argument 2 must be a SQLAlchemy mapped class, not ' + type(cls).__name__)
         return _build_object_from_sqlalchemy(cls, name, accessor=accessor, _seen={}, strict=strict)
 
-    def is_attributes_nullable(self, attribute_name: str) -> bool:
-        return self.attributes_nullable.get(attribute_name, True)
-
     def __repr__(self) -> str:
         return "<{} name={} attributes=[{}] >".format(
                 self.__class__.__name__,
@@ -885,8 +894,6 @@ class _ObjectDataTypeDef(_DataTypeDef):
         try:
             for attr_name in self.attributes:
                 if self.attributes[attr_name] != other.attributes[attr_name]:
-                    return False
-                if self.is_attributes_nullable(attr_name) != other.is_attributes_nullable(attr_name):
                     return False
             return True
         finally:

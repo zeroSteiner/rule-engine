@@ -582,8 +582,8 @@ class ObjectDataTypeTests(unittest.TestCase):
         self.assertNotEqual(left, right)
 
     def test_object_equality_different_nullable(self):
-        left = DataType.OBJECT('Hero', attributes={'name': DataType.STRING}, attributes_nullable={'name': True})
-        right = DataType.OBJECT('Hero', attributes={'name': DataType.STRING}, attributes_nullable={'name': False})
+        left = DataType.OBJECT('Hero', attributes={'name': DataType.NULLABLE(DataType.STRING)})
+        right = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
         self.assertNotEqual(left, right)
 
     def test_object_hashable_in_set(self):
@@ -658,16 +658,6 @@ class ObjectDataTypeTests(unittest.TestCase):
     def test_object_from_name_unknown_schema_errors(self):
         with self.assertRaises(ValueError):
             DataType.from_name('Hero')
-
-    def test_object_is_attributes_nullable(self):
-        Hero = DataType.OBJECT('Hero', attributes={
-                'name': DataType.STRING,
-                'nemesis': DataType.STRING,
-        }, attributes_nullable={'nemesis': False})
-        self.assertTrue(Hero.is_attributes_nullable('name'))
-        self.assertFalse(Hero.is_attributes_nullable('nemesis'))
-        # unspecified attributes default to nullable
-        self.assertTrue(Hero.is_attributes_nullable('totally_unknown'))
 
     def test_object_custom_accessor(self):
         def dict_getter(obj, name):
@@ -820,11 +810,8 @@ class ObjectDataTypeTests(unittest.TestCase):
 
         result = DataType.OBJECT.from_dataclass('Hero', Hero)
         self.assertIs(result.attributes['name'], DataType.STRING)
-        self.assertIs(result.attributes['alias'], DataType.STRING)
-        self.assertIs(result.attributes['sidekick'], DataType.STRING)
-        self.assertFalse(result.is_attributes_nullable('name'))
-        self.assertTrue(result.is_attributes_nullable('alias'))
-        self.assertTrue(result.is_attributes_nullable('sidekick'))
+        self.assertEqual(result.attributes['alias'], DataType.NULLABLE(DataType.STRING))
+        self.assertEqual(result.attributes['sidekick'], DataType.NULLABLE(DataType.STRING))
 
     def test_object_from_dataclass_optional_pep604(self):
         @dataclasses.dataclass
@@ -833,9 +820,8 @@ class ObjectDataTypeTests(unittest.TestCase):
             alias: str | None
 
         result = DataType.OBJECT.from_dataclass('Hero', Hero)
-        self.assertIs(result.attributes['alias'], DataType.STRING)
-        self.assertFalse(result.is_attributes_nullable('name'))
-        self.assertTrue(result.is_attributes_nullable('alias'))
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        self.assertEqual(result.attributes['alias'], DataType.NULLABLE(DataType.STRING))
 
     def test_object_from_dataclass_rejects_unsupported_union(self):
         @dataclasses.dataclass
@@ -863,7 +849,10 @@ class ObjectDataTypeTests(unittest.TestCase):
 
     def test_object_from_dataclass_self_reference(self):
         result = DataType.OBJECT.from_dataclass('Hero', _SelfRefHero)
-        self.assertIs(result.attributes['nemesis'], result)
+        # nemesis is Optional[_SelfRefHero], so the walker wraps the self-reference in NULLABLE
+        nemesis = result.attributes['nemesis']
+        self.assertIsInstance(nemesis, types._NullableDataTypeDef)
+        self.assertIs(nemesis.inner_type, result)
 
     def test_object_from_dataclass_self_reference_in_array(self):
         result = DataType.OBJECT.from_dataclass('Hero', _ArraySelfRefHero)
@@ -900,8 +889,9 @@ class ObjectDataTypeTests(unittest.TestCase):
             address: typing.Optional[Address]
 
         result = DataType.OBJECT.from_dataclass('Person', Person)
-        self.assertTrue(result.is_attributes_nullable('address'))
-        nested = result.attributes['address']
+        address = result.attributes['address']
+        self.assertIsInstance(address, types._NullableDataTypeDef)
+        nested = address.inner_type
         self.assertIsInstance(nested, types._ObjectDataTypeDef)
         self.assertEqual(nested.name, 'Address')
 

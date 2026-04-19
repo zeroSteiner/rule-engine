@@ -183,7 +183,8 @@ class SqlAlchemyObjectTests(unittest.TestCase):
         self.assertEqual(schema.name, 'Hero')
         self.assertIs(schema.attributes['id'], DataType.FLOAT)
         self.assertIs(schema.attributes['name'], DataType.STRING)
-        self.assertIs(schema.attributes['alias'], DataType.STRING)
+        # alias is Mapped[str | None], so it's wrapped in NULLABLE
+        self.assertEqual(schema.attributes['alias'], DataType.NULLABLE(DataType.STRING))
         self.assertIs(schema.attributes['first_appearance'], DataType.DATETIME)
         self.assertIs(schema.attributes['active'], DataType.BOOLEAN)
         self.assertIs(schema.accessor, getattr)
@@ -191,10 +192,10 @@ class SqlAlchemyObjectTests(unittest.TestCase):
     def test_object_from_sqlalchemy_nullability(self):
         schema = DataType.OBJECT.from_sqlalchemy('Hero', _Hero)
         # primary keys and Mapped[T] (no Optional) are not nullable
-        self.assertFalse(schema.is_attributes_nullable('id'))
-        self.assertFalse(schema.is_attributes_nullable('name'))
+        self.assertNotIsInstance(schema.attributes['id'], types._NullableDataTypeDef)
+        self.assertNotIsInstance(schema.attributes['name'], types._NullableDataTypeDef)
         # Mapped[T | None] is nullable
-        self.assertTrue(schema.is_attributes_nullable('alias'))
+        self.assertIsInstance(schema.attributes['alias'], types._NullableDataTypeDef)
 
     def test_object_from_sqlalchemy_enum_column(self):
         schema = DataType.OBJECT.from_sqlalchemy('Hero', _Hero)
@@ -259,32 +260,38 @@ class SqlAlchemyObjectTests(unittest.TestCase):
         self.assertEqual(book_type.name, '_Book')
         self.assertIs(book_type.attributes['title'], DataType.STRING)
         # Book.author back-references Author (the root); left as a placeholder for later parse-time resolution
+        # and wrapped in NULLABLE because Book.author_id is nullable
         author_back_ref = book_type.attributes['author']
-        self.assertIsInstance(author_back_ref, types._ReferenceDataTypeDef)
-        self.assertEqual(author_back_ref.name, 'Author')
+        self.assertIsInstance(author_back_ref, types._NullableDataTypeDef)
+        self.assertIsInstance(author_back_ref.inner_type, types._ReferenceDataTypeDef)
+        self.assertEqual(author_back_ref.inner_type.name, 'Author')
         # collection relationships are not nullable (empty list = "no items")
-        self.assertFalse(schema.is_attributes_nullable('books'))
+        self.assertNotIsInstance(schema.attributes['books'], types._NullableDataTypeDef)
 
     def test_object_from_sqlalchemy_many_to_one_relationship(self):
         schema = DataType.OBJECT.from_sqlalchemy('Book', _Book)
         author_type = schema.attributes['author']
-        self.assertIsInstance(author_type, types._ObjectDataTypeDef)
-        self.assertEqual(author_type.name, '_Author')
-        # Book.author_id is nullable, so the scalar relationship is nullable
-        self.assertTrue(schema.is_attributes_nullable('author'))
+        # Book.author_id is nullable, so the scalar relationship is NULLABLE(OBJECT)
+        self.assertIsInstance(author_type, types._NullableDataTypeDef)
+        nested = author_type.inner_type
+        self.assertIsInstance(nested, types._ObjectDataTypeDef)
+        self.assertEqual(nested.name, '_Author')
 
     def test_object_from_sqlalchemy_self_reference(self):
         schema = DataType.OBJECT.from_sqlalchemy('Category', _Category)
-        # parent relationship loops back to the root class
-        self.assertIs(schema.attributes['parent'], schema)
-        self.assertTrue(schema.is_attributes_nullable('parent'))
+        # parent relationship loops back to the root class; nullable because parent_id is nullable
+        parent = schema.attributes['parent']
+        self.assertIsInstance(parent, types._NullableDataTypeDef)
+        self.assertIs(parent.inner_type, schema)
 
     def test_object_from_sqlalchemy_typed_array_column(self):
-        # ARRAY columns preserve their element type; value_type reflects the mapped inner type
+        # ARRAY columns preserve their element type; value_type reflects the mapped inner type. The column
+        # itself is nullable by default (SQLAlchemy's Column default) so the ARRAY is wrapped in NULLABLE.
         schema = DataType.OBJECT.from_sqlalchemy('Post', _Post)
         tags_type = schema.attributes['tags']
-        self.assertIsInstance(tags_type, types._ArrayDataTypeDef)
-        self.assertIs(tags_type.value_type, DataType.STRING)
+        self.assertIsInstance(tags_type, types._NullableDataTypeDef)
+        self.assertIsInstance(tags_type.inner_type, types._ArrayDataTypeDef)
+        self.assertIs(tags_type.inner_type.value_type, DataType.STRING)
 
     def test_object_from_sqlalchemy_array_opaque_element_strict(self):
         # ARRAY of a column type whose python_type raises NotImplementedError — strict raises
@@ -293,9 +300,11 @@ class SqlAlchemyObjectTests(unittest.TestCase):
 
     def test_object_from_sqlalchemy_array_opaque_element_non_strict(self):
         schema = DataType.OBJECT.from_sqlalchemy('ArrayOpaque', _ArrayOpaque, strict=False)
+        # column defaults to nullable; ARRAY wrapped in NULLABLE
         blobs_type = schema.attributes['blobs']
-        self.assertIsInstance(blobs_type, types._ArrayDataTypeDef)
-        self.assertIs(blobs_type.value_type, DataType.UNDEFINED)
+        self.assertIsInstance(blobs_type, types._NullableDataTypeDef)
+        self.assertIsInstance(blobs_type.inner_type, types._ArrayDataTypeDef)
+        self.assertIs(blobs_type.inner_type.value_type, DataType.UNDEFINED)
 
     def test_object_from_sqlalchemy_array_unmappable_element_strict(self):
         # ARRAY of a column type whose python_type is known but not mappable (uuid.UUID) — strict raises
@@ -304,9 +313,11 @@ class SqlAlchemyObjectTests(unittest.TestCase):
 
     def test_object_from_sqlalchemy_array_unmappable_element_non_strict(self):
         schema = DataType.OBJECT.from_sqlalchemy('ArrayUuid', _ArrayUuid, strict=False)
+        # column defaults to nullable; ARRAY wrapped in NULLABLE
         ids_type = schema.attributes['external_ids']
-        self.assertIsInstance(ids_type, types._ArrayDataTypeDef)
-        self.assertIs(ids_type.value_type, DataType.UNDEFINED)
+        self.assertIsInstance(ids_type, types._NullableDataTypeDef)
+        self.assertIsInstance(ids_type.inner_type, types._ArrayDataTypeDef)
+        self.assertIs(ids_type.inner_type.value_type, DataType.UNDEFINED)
 
     def test_object_from_sqlalchemy_skips_column_property(self):
         schema = DataType.OBJECT.from_sqlalchemy('WithColumnProperty', _WithColumnProperty)
@@ -318,13 +329,20 @@ class SqlAlchemyObjectTests(unittest.TestCase):
     def test_object_from_sqlalchemy_forward_reference_on_deep_cycle(self):
         # Alpha -> Beta -> Gamma -> Alpha forms a 3-way cycle. The Gamma.alpha relationship is to the
         # build-stack ancestor Alpha (not the class currently being expanded — that's Gamma), so it
-        # must surface as an unresolved reference that the type_resolver will close later.
+        # must surface as an unresolved reference that the type_resolver will close later. Each scalar
+        # relationship is also nullable because the FK columns are Mapped[int | None].
         schema = DataType.OBJECT.from_sqlalchemy('Alpha', _Alpha)
-        beta_type = schema.attributes['beta']
+        beta_wrapper = schema.attributes['beta']
+        self.assertIsInstance(beta_wrapper, types._NullableDataTypeDef)
+        beta_type = beta_wrapper.inner_type
         self.assertIsInstance(beta_type, types._ObjectDataTypeDef)
-        gamma_type = beta_type.attributes['gamma']
+        gamma_wrapper = beta_type.attributes['gamma']
+        self.assertIsInstance(gamma_wrapper, types._NullableDataTypeDef)
+        gamma_type = gamma_wrapper.inner_type
         self.assertIsInstance(gamma_type, types._ObjectDataTypeDef)
-        alpha_ref = gamma_type.attributes['alpha']
+        alpha_wrapper = gamma_type.attributes['alpha']
+        self.assertIsInstance(alpha_wrapper, types._NullableDataTypeDef)
+        alpha_ref = alpha_wrapper.inner_type
         self.assertIsInstance(alpha_ref, types._ReferenceDataTypeDef)
         self.assertEqual(alpha_ref.name, 'Alpha')
 

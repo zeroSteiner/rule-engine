@@ -51,6 +51,7 @@ __all__ = (
         'ContainsExpressionTests',
         'GetItemExpressionTests',
         'GetSliceExpressionTests',
+        'NullablePropagationTests',
         'SymbolExpressionTests',
         'SymbolExpressionConversionTests',
         'TernaryExpressionTests',
@@ -393,6 +394,104 @@ class UnaryExpressionTests(unittest.TestCase):
             unary = ast.UnaryExpression(context, 'uminus', value)
             with self.assertRaises(errors.EvaluationError):
                 unary.evaluate(None)
+
+class NullablePropagationTests(unittest.TestCase):
+    """Exercise parse-time rejection of NULLABLE(T) operands across AST operators."""
+    def setUp(self):
+        self.sym_nullable_float = 'n'
+        self.sym_float = 'f'
+        self.sym_nullable_str = 's'
+        self.sym_nullable_ary = 'a'
+
+        def type_resolver(name):
+            if name == self.sym_nullable_float:
+                return types.DataType.NULLABLE(types.DataType.FLOAT)
+            if name == self.sym_float:
+                return types.DataType.FLOAT
+            if name == self.sym_nullable_str:
+                return types.DataType.NULLABLE(types.DataType.STRING)
+            if name == self.sym_nullable_ary:
+                return types.DataType.NULLABLE(types.DataType.ARRAY(types.DataType.STRING))
+            return types.DataType.UNDEFINED
+        self.context = engine.Context(type_resolver=type_resolver)
+
+    def _sym(self, name):
+        return ast.SymbolExpression(self.context, name)
+
+    def test_arithmetic_rejects_nullable_at_parse_time(self):
+        with self.assertRaisesRegex(errors.EvaluationError, r'nullable'):
+            ast.AddExpression(self.context, 'add', self._sym(self.sym_nullable_float), self._sym(self.sym_float))
+
+    def test_arithmetic_non_nullable_stays_plain(self):
+        expr = ast.AddExpression(self.context, 'add', self._sym(self.sym_float), self._sym(self.sym_float))
+        self.assertEqual(expr.result_type, types.DataType.FLOAT)
+
+    def test_arithmetic_comparison_rejects_nullable_at_parse_time(self):
+        with self.assertRaisesRegex(errors.EvaluationError, r'nullable'):
+            ast.ArithmeticComparisonExpression(self.context, 'lt', self._sym(self.sym_nullable_float), self._sym(self.sym_float))
+
+    def test_equality_comparison_returns_plain_boolean(self):
+        expr = ast.ComparisonExpression(self.context, 'eq', self._sym(self.sym_nullable_float), self._sym(self.sym_float))
+        self.assertEqual(expr.result_type, types.DataType.BOOLEAN)
+
+    def test_logic_expression_returns_plain_boolean(self):
+        expr = ast.LogicExpression(self.context, 'and', self._sym(self.sym_nullable_float), self._sym(self.sym_nullable_float))
+        self.assertEqual(expr.result_type, types.DataType.BOOLEAN)
+
+    def test_ternary_propagates_nullable_from_either_branch(self):
+        cond = self._sym(self.sym_float)
+        expr = ast.TernaryExpression(self.context, cond, self._sym(self.sym_nullable_float), self._sym(self.sym_float))
+        self.assertEqual(expr.result_type, types.DataType.NULLABLE(types.DataType.FLOAT))
+
+    def test_getitem_on_nullable_array_rejects_at_parse_time(self):
+        item = ast.LiteralExpressionBase.from_value(self.context, 0)
+        with self.assertRaisesRegex(errors.EvaluationError, r'nullable'):
+            ast.GetItemExpression(self.context, self._sym(self.sym_nullable_ary), item)
+
+    def test_safe_getitem_on_nullable_array_returns_nullable(self):
+        item = ast.LiteralExpressionBase.from_value(self.context, 0)
+        expr = ast.GetItemExpression(self.context, self._sym(self.sym_nullable_ary), item, safe=True)
+        self.assertEqual(expr.result_type, types.DataType.NULLABLE(types.DataType.STRING))
+
+    def test_getslice_on_nullable_array_rejects_at_parse_time(self):
+        with self.assertRaisesRegex(errors.EvaluationError, r'nullable'):
+            ast.GetSliceExpression(self.context, self._sym(self.sym_nullable_ary))
+
+    def test_safe_getslice_on_nullable_array_returns_nullable(self):
+        expr = ast.GetSliceExpression(self.context, self._sym(self.sym_nullable_ary), safe=True)
+        self.assertEqual(expr.result_type, types.DataType.NULLABLE(types.DataType.ARRAY(types.DataType.STRING)))
+
+    def test_function_call_rejects_nullable_argument_at_parse_time(self):
+        fn_type = types.DataType.FUNCTION(
+                'upper',
+                return_type=types.DataType.STRING,
+                argument_types=(types.DataType.STRING,),
+                minimum_arguments=1
+        )
+        fake_fn_literal = ast.LiteralExpressionBase.from_value(self.context, lambda s: s.upper())
+        fake_fn_literal.result_type = fn_type
+        with self.assertRaisesRegex(errors.FunctionCallError, r'nullable'):
+            ast.FunctionCallExpression(self.context, fake_fn_literal, (self._sym(self.sym_nullable_str),))
+
+    def test_get_attribute_on_nullable_object_rejects_at_parse_time(self):
+        nested_schema = types.DataType.OBJECT('Inner', attributes={'name': types.DataType.STRING})
+        outer_schema = types.DataType.OBJECT('Outer', attributes={
+                'inner': types.DataType.NULLABLE(nested_schema),
+        })
+        ctx = engine.Context(
+                type_resolver=lambda name: outer_schema if name == 'outer' else types.DataType.UNDEFINED,
+        )
+        outer_sym = ast.SymbolExpression(ctx, 'outer')
+        inner_attr = ast.GetAttributeExpression(ctx, outer_sym, 'inner')
+        self.assertEqual(inner_attr.result_type, types.DataType.NULLABLE(nested_schema))
+        with self.assertRaisesRegex(errors.EvaluationError, r'nullable'):
+            ast.GetAttributeExpression(ctx, inner_attr, 'name')
+        safe_name_attr = ast.GetAttributeExpression(ctx, inner_attr, 'name', safe=True)
+        self.assertEqual(safe_name_attr.result_type, types.DataType.NULLABLE(types.DataType.STRING))
+
+    def test_unary_minus_rejects_nullable_at_parse_time(self):
+        with self.assertRaisesRegex(errors.EvaluationError, r'nullable'):
+            ast.UnaryExpression(self.context, 'uminus', self._sym(self.sym_nullable_float))
 
 if __name__ == '__main__':
     unittest.main()

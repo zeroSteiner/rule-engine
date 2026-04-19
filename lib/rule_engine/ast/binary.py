@@ -47,7 +47,11 @@ from .base import (
         _assert_is_natural_number,
         _assert_is_numeric,
         _assert_is_string,
+        _assert_not_nullable,
+        _is_nullable,
         _is_reduced,
+        _peel_nullable,
+        _wrap_nullable,
 )
 from .literal import StringExpression
 
@@ -134,6 +138,8 @@ class AddExpression(BinaryExpressionBase):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(AddExpression, self).__init__(*args, **kwargs)
+        _assert_not_nullable(self.left.result_type, role="left operand of '+'")
+        _assert_not_nullable(self.right.result_type, role="right operand of '+'")
         if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
             if self.left.result_type == DataType.DATETIME:
                 if self.right.result_type != DataType.TIMEDELTA:
@@ -176,6 +182,8 @@ class SubtractExpression(BinaryExpressionBase):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(SubtractExpression, self).__init__(*args, **kwargs)
+        _assert_not_nullable(self.left.result_type, role="left operand of '-'")
+        _assert_not_nullable(self.right.result_type, role="right operand of '-'")
         if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
             if self.left.result_type == DataType.DATETIME:
                 if self.right.result_type == DataType.DATETIME:
@@ -210,6 +218,11 @@ class ArithmeticExpression(BinaryExpressionBase):
     """A class for representing arithmetic expressions from the grammar text such as multiplication and division."""
     compatible_types: tuple[_DataTypeDef, ...] = (DataType.FLOAT,)
     result_type: _DataTypeDef = DataType.FLOAT
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super(ArithmeticExpression, self).__init__(*args, **kwargs)
+        _assert_not_nullable(self.left.result_type, role='left arithmetic operand')
+        _assert_not_nullable(self.right.result_type, role='right arithmetic operand')
+
     def __op_arithmetic(self, op: Callable[[Any, Any], Any], thing: Any) -> Any:
         left_value = self.left.evaluate(thing)
         _assert_is_numeric(left_value)
@@ -237,6 +250,8 @@ class BitwiseExpression(BinaryExpressionBase):
     result_type: _DataTypeDef = DataType.UNDEFINED
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(BitwiseExpression, self).__init__(*args, **kwargs)
+        _assert_not_nullable(self.left.result_type, role='left bitwise operand')
+        _assert_not_nullable(self.right.result_type, role='right bitwise operand')
         # don't use DataType.is_compatible, because for sets the member type isn't important
         if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
             if self.left.result_type.__class__ != self.right.result_type.__class__:
@@ -320,6 +335,8 @@ class ArithmeticComparisonExpression(ComparisonExpression):
     compatible_types: tuple[_DataTypeDef, ...] = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.NULL, DataType.STRING)
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(ArithmeticComparisonExpression, self).__init__(*args, **kwargs)
+        _assert_not_nullable(self.left.result_type, role='left ordered-comparison operand')
+        _assert_not_nullable(self.right.result_type, role='right ordered-comparison operand')
         if self.left.result_type != DataType.UNDEFINED and self.right.result_type != DataType.UNDEFINED:
             if self.left.result_type != self.right.result_type:
                 raise errors.EvaluationError('data type mismatch')
@@ -359,6 +376,8 @@ class FuzzyComparisonExpression(ComparisonExpression):
     compatible_types: tuple[_DataTypeDef, ...] = (DataType.NULL, DataType.STRING)
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(FuzzyComparisonExpression, self).__init__(*args, **kwargs)
+        _assert_not_nullable(self.left.result_type, role='left regex operand')
+        _assert_not_nullable(self.right.result_type, role='right regex operand')
         if isinstance(self.right, StringExpression):
             self._right = self._compile_regex(self.right.evaluate(None))
 
@@ -392,3 +411,63 @@ class FuzzyComparisonExpression(ComparisonExpression):
     _op_eq_fzs = functools.partialmethod(__op_regex, 'search', operator.is_not)
     _op_ne_fzm = functools.partialmethod(__op_regex, 'match', operator.is_)
     _op_ne_fzs = functools.partialmethod(__op_regex, 'search', operator.is_)
+
+################################################################################
+# Nullability Discharge Expressions
+################################################################################
+class CoalesceExpression(ExpressionBase):
+    """
+    A class representing a null-coalesce (``??``) expression. Evaluates to the left operand when it is not ``None``;
+    otherwise evaluates to the right operand. The result type discharges nullability from the left operand when the
+    right operand is non-nullable.
+
+    .. versionadded:: 5.0.0
+    """
+    __slots__ = ('left', 'right')
+    result_type: _DataTypeDef = DataType.UNDEFINED
+    def __init__(self, context: 'Context', left: ExpressionBase, right: ExpressionBase) -> None:
+        self.context = context
+        self.left = left
+        self.right = right
+        left_peeled = _peel_nullable(left.result_type)
+        right_peeled = _peel_nullable(right.result_type)
+        if left_peeled != DataType.UNDEFINED and right_peeled != DataType.UNDEFINED:
+            if left_peeled != DataType.NULL and right_peeled != DataType.NULL:
+                if not DataType.is_compatible(left_peeled, right_peeled):
+                    raise errors.EvaluationError('data type mismatch')
+        if left_peeled == DataType.NULL or left_peeled == DataType.UNDEFINED:
+            base_type = right_peeled
+        else:
+            base_type = left_peeled
+        if _is_nullable(right.result_type) or right_peeled == DataType.NULL:
+            self.result_type = _wrap_nullable(base_type)
+        else:
+            self.result_type = base_type
+
+    @classmethod
+    def build(cls, context: 'Context', left: ExpressionBase, right: ExpressionBase) -> ExpressionBase:  # type: ignore[override]
+        left_built = left.build()
+        assert isinstance(left_built, ExpressionBase)
+        right_built = right.build()
+        assert isinstance(right_built, ExpressionBase)
+        reduced = cls(context, left_built, right_built).reduce()
+        assert isinstance(reduced, ExpressionBase)
+        return reduced
+
+    def evaluate(self, thing: Any) -> Any:
+        left_value = self.left.evaluate(thing)
+        if left_value is None:
+            return self.right.evaluate(thing)
+        return left_value
+
+    def reduce(self) -> ExpressionBase:
+        if not _is_reduced(self.left, self.right):
+            return self
+        return LiteralExpressionBase.from_value(self.context, self.evaluate(None))
+
+    def to_graphviz(self, digraph: Any, *args: Any, **kwargs: Any) -> None:
+        digraph.node(str(id(self)), self.__class__.__name__)
+        self.left.to_graphviz(digraph, *args, **kwargs)
+        self.right.to_graphviz(digraph, *args, **kwargs)
+        digraph.edge(str(id(self)), str(id(self.left)), label='left')
+        digraph.edge(str(id(self)), str(id(self.right)), label='right')

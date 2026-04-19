@@ -33,6 +33,8 @@
 import collections.abc
 import datetime
 import decimal
+import types as pytypes
+import typing
 from typing import Any
 
 from .definitions import (
@@ -41,6 +43,7 @@ from .definitions import (
         _DataTypeDef,
         _FunctionDataTypeDef,
         _MappingDataTypeDef,
+        _NullableDataTypeDef,
         _ObjectDataTypeDef,
         _PYTHON_FUNCTION_TYPE,
         _ReferenceDataTypeDef,
@@ -144,6 +147,7 @@ class DataType(metaclass=DataTypeMeta):
     FUNCTION = _FunctionDataTypeDef('FUNCTION', _PYTHON_FUNCTION_TYPE)
     MAPPING = _MappingDataTypeDef('MAPPING', dict)
     NULL = _DataTypeDef('NULL', NoneType)
+    NULLABLE = _NullableDataTypeDef('NULLABLE', object)
     OBJECT = _ObjectDataTypeDef('OBJECT', object)
     SET = _SetDataTypeDef('SET', set)
     STRING = _DataTypeDef('STRING', str)
@@ -185,6 +189,15 @@ class DataType(metaclass=DataTypeMeta):
         """
         if not (isinstance(python_type, type) or hasattr(python_type, '__origin__')):
             raise TypeError('from_type argument 1 must be a type or a type hint, not ' + type(python_type).__name__)
+        # Optional[X] / X | None resolve to NULLABLE(from_type(X)); unions of more than one non-None member are
+        # unsupported because Rule Engine has no sum type
+        origin = typing.get_origin(python_type)
+        if origin is typing.Union or origin is pytypes.UnionType:
+            args = typing.get_args(python_type)
+            non_none = tuple(arg for arg in args if arg is not NoneType)
+            if len(non_none) == 1 and len(args) == 2:
+                return cls.NULLABLE(cls.from_type(non_none[0]))
+            raise ValueError("can not map python type {0!r} to a compatible data type".format(python_type))
         if python_type in (list, range, tuple):
             return cls.ARRAY
         elif python_type is bool:
@@ -281,6 +294,16 @@ class DataType(metaclass=DataTypeMeta):
         # parse time via Context.resolve_type
         if isinstance(dt1, _ReferenceDataTypeDef) or isinstance(dt2, _ReferenceDataTypeDef):
             return True
+        # NULLABLE is a parse-time marker: a NULLABLE(T) value is T-or-NULL at runtime, so it is compatible with
+        # T (non-null case), with NULL (null case), and with another NULLABLE whose inner type is compatible.
+        # This check is symmetric; argument-position strictness (rejecting NULLABLE(T) where plain T is required)
+        # lives at the caller.
+        if isinstance(dt1, _NullableDataTypeDef) or isinstance(dt2, _NullableDataTypeDef):
+            if dt1 == cls.NULL or dt2 == cls.NULL:
+                return True
+            inner1 = dt1.inner_type if isinstance(dt1, _NullableDataTypeDef) else dt1
+            inner2 = dt2.inner_type if isinstance(dt2, _NullableDataTypeDef) else dt2
+            return cls.is_compatible(inner1, inner2)
         if dt1.is_scalar and dt2.is_scalar:
             if isinstance(dt1, DataType.FUNCTION.__class__) and isinstance(dt2, DataType.FUNCTION.__class__):
                 if not cls.is_compatible(dt1.return_type, dt2.return_type):

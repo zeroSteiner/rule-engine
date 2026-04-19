@@ -334,6 +334,98 @@ class MetaDataTypeTests(unittest.TestCase):
         self.assertEqual(DataType['STRING'], DataType.STRING)
         self.assertEqual(DataType['UNDEFINED'], DataType.UNDEFINED)
 
+class NullableDataTypeTests(unittest.TestCase):
+    def test_nullable_construction(self):
+        dt = DataType.NULLABLE(DataType.STRING)
+        self.assertIsInstance(dt, types._NullableDataTypeDef)
+        self.assertIs(dt.inner_type, DataType.STRING)
+        self.assertFalse(dt.is_scalar)
+        self.assertTrue(dt.is_compound)
+
+    def test_nullable_equality(self):
+        self.assertEqual(DataType.NULLABLE(DataType.STRING), DataType.NULLABLE(DataType.STRING))
+        self.assertNotEqual(DataType.NULLABLE(DataType.STRING), DataType.NULLABLE(DataType.FLOAT))
+        self.assertNotEqual(DataType.NULLABLE(DataType.STRING), DataType.STRING)
+        self.assertNotEqual(DataType.NULLABLE(DataType.STRING), DataType.NULL)
+
+    def test_nullable_hash(self):
+        self.assertEqual(hash(DataType.NULLABLE(DataType.STRING)), hash(DataType.NULLABLE(DataType.STRING)))
+        seen = {DataType.NULLABLE(DataType.STRING), DataType.NULLABLE(DataType.STRING)}
+        self.assertEqual(len(seen), 1)
+
+    def test_nullable_repr_names_inner_type(self):
+        self.assertIn('STRING', repr(DataType.NULLABLE(DataType.STRING)))
+
+    def test_nullable_collapses_double_wrap(self):
+        # NULLABLE(NULLABLE(T)) == NULLABLE(T)
+        once = DataType.NULLABLE(DataType.STRING)
+        twice = DataType.NULLABLE(once)
+        self.assertEqual(twice, once)
+        self.assertIs(twice.inner_type, DataType.STRING)
+
+    def test_nullable_rejects_null_inner_type(self):
+        with self.assertRaises(errors.EngineError):
+            DataType.NULLABLE(DataType.NULL)
+
+    def test_nullable_is_compatible_with_inner_type(self):
+        self.assertTrue(DataType.is_compatible(DataType.NULLABLE(DataType.STRING), DataType.STRING))
+        self.assertTrue(DataType.is_compatible(DataType.STRING, DataType.NULLABLE(DataType.STRING)))
+
+    def test_nullable_is_compatible_with_null(self):
+        self.assertTrue(DataType.is_compatible(DataType.NULLABLE(DataType.STRING), DataType.NULL))
+        self.assertTrue(DataType.is_compatible(DataType.NULL, DataType.NULLABLE(DataType.STRING)))
+
+    def test_nullable_is_compatible_with_matching_nullable(self):
+        self.assertTrue(DataType.is_compatible(
+                DataType.NULLABLE(DataType.STRING),
+                DataType.NULLABLE(DataType.STRING)
+        ))
+
+    def test_nullable_is_not_compatible_with_mismatched_inner(self):
+        self.assertFalse(DataType.is_compatible(
+                DataType.NULLABLE(DataType.STRING),
+                DataType.NULLABLE(DataType.FLOAT)
+        ))
+        self.assertFalse(DataType.is_compatible(DataType.NULLABLE(DataType.STRING), DataType.FLOAT))
+
+    def test_nullable_is_compatible_with_undefined(self):
+        self.assertTrue(DataType.is_compatible(DataType.NULLABLE(DataType.STRING), DataType.UNDEFINED))
+        self.assertTrue(DataType.is_compatible(DataType.UNDEFINED, DataType.NULLABLE(DataType.STRING)))
+
+    def test_nullable_is_compatible_nested_inside_array(self):
+        self.assertTrue(DataType.is_compatible(
+                DataType.ARRAY(DataType.NULLABLE(DataType.STRING)),
+                DataType.ARRAY(DataType.NULLABLE(DataType.STRING))
+        ))
+        self.assertTrue(DataType.is_compatible(
+                DataType.ARRAY(DataType.NULLABLE(DataType.STRING)),
+                DataType.ARRAY(DataType.STRING)
+        ))
+
+    def test_nullable_from_type_optional(self):
+        self.assertEqual(DataType.from_type(typing.Optional[str]), DataType.NULLABLE(DataType.STRING))
+
+    def test_nullable_from_type_pep604_union(self):
+        self.assertEqual(DataType.from_type(str | None), DataType.NULLABLE(DataType.STRING))
+        self.assertEqual(DataType.from_type(None | str), DataType.NULLABLE(DataType.STRING))
+
+    def test_nullable_from_type_nested_generic(self):
+        self.assertEqual(DataType.from_type(list[int | None]), DataType.ARRAY(DataType.NULLABLE(DataType.FLOAT)))
+
+    def test_nullable_from_type_rejects_multi_member_union(self):
+        with self.assertRaises(ValueError):
+            DataType.from_type(str | int)
+        with self.assertRaises(ValueError):
+            DataType.from_type(typing.Union[str, int, None])
+
+    def test_nullable_from_value_never_returns_nullable(self):
+        # NULLABLE is a type-hint-only construct; runtime None resolves to NULL
+        self.assertIs(DataType.from_value(None), DataType.NULL)
+
+    def test_nullable_bare_is_in_data_type_members(self):
+        self.assertIn('NULLABLE', DataType)
+        self.assertIs(DataType.from_name('NULLABLE'), DataType.NULLABLE)
+
 @dataclasses.dataclass
 class _SelfRefHero:
     name: str

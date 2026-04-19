@@ -87,6 +87,53 @@ class _UndefinedDataTypeDef(_DataTypeDef):
 
 _DATA_TYPE_UNDEFINED = _UndefinedDataTypeDef('UNDEFINED', cast(type, errors.UNDEFINED))
 
+class _NullableDataTypeDef(_DataTypeDef):
+    """
+    A wrapper marking a slot whose value may be either of ``inner_type`` or :py:attr:`.NULL`. At runtime values
+    remain plain Python — a ``NULLABLE(STRING)`` is still a ``str`` or ``None`` — so NULLABLE is a parse-time
+    concept the type system uses to track which expression positions may yield NULL. Operators that accept the
+    unwrapped type also accept the NULLABLE form and propagate nullability into their result type, with a few
+    explicit exceptions (equality comparisons always return :py:attr:`.BOOLEAN`; ``??``, ``?.``, ``is null`` and
+    ``is not null`` discharge nullability).
+
+    Constructing ``NULLABLE(NULLABLE(T))`` collapses to ``NULLABLE(T)``. ``NULLABLE(NULL)`` is rejected because
+    a "nullable null" is meaningless.
+
+    .. versionadded:: 5.0.0
+    """
+    __slots__ = ('inner_type',)
+    inner_type: _DataTypeDef
+    def __init__(self, name: str, python_type: type, inner_type: _DataTypeDef = _DATA_TYPE_UNDEFINED) -> None:
+        if isinstance(inner_type, _NullableDataTypeDef):
+            inner_type = inner_type.inner_type
+        if inner_type.python_type is NoneType:
+            raise errors.EngineError('NULLABLE may not wrap NULL')
+        super(_NullableDataTypeDef, self).__init__(name, python_type)
+        self.is_scalar = False
+        self.inner_type = inner_type
+
+    def __call__(self, inner_type: _DataTypeDef) -> '_NullableDataTypeDef':
+        """
+        :param inner_type: The non-null data type this slot may hold. Passing an already-nullable type collapses
+                (i.e. ``NULLABLE(NULLABLE(T))`` is ``NULLABLE(T)``); passing :py:attr:`.NULL` raises
+                :py:exc:`~rule_engine.errors.EngineError`.
+
+        .. versionadded:: 5.0.0
+        """
+        return self.__class__(self.name, self.python_type, inner_type=inner_type)
+
+    def __repr__(self) -> str:
+        return "<{} name={} inner_type={} >".format(self.__class__.__name__, self.name, self.inner_type.name)
+
+    def __eq__(self, other: object) -> bool:
+        if not super().__eq__(other):
+            return False
+        assert isinstance(other, _NullableDataTypeDef)
+        return self.inner_type == other.inner_type
+
+    def __hash__(self) -> int:
+        return hash((self.python_type, self.is_scalar, hash(self.inner_type)))
+
 class _CollectionDataTypeDef(_DataTypeDef):
     __slots__ = ('value_type', 'value_type_nullable')
     value_type: _DataTypeDef

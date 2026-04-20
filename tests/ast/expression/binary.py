@@ -39,6 +39,7 @@ from .literal import context, trueish, falseish
 import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
+import rule_engine.types as types
 
 __all__ = (
         'ArithmeticExpressionTests',
@@ -52,7 +53,10 @@ __all__ = (
         # comparison expressions
         'ComparisonExpressionTests',
         'ArithmeticComparisonExpressionTests',
-        'FuzzyComparisonExpressionTests'
+        'FuzzyComparisonExpressionTests',
+        # nullability discharge expressions
+        'CoalesceExpressionTests',
+        'NullableDischargeParseTests',
 )
 
 class BinaryExpressionTestsBase(unittest.TestCase):
@@ -533,3 +537,130 @@ class FuzzyComparisonExpressionTests(BinaryExpressionTestsBase):
                 self.assertEqual(error.value, '*')
             else:
                 self.fail('fuzzySyntaxError was not raised')
+
+class _FakeDigraph:
+    def __init__(self):
+        self.nodes = []
+        self.edges = []
+    def node(self, *args, **kwargs):
+        self.nodes.append((args, kwargs))
+    def edge(self, *args, **kwargs):
+        self.edges.append((args, kwargs))
+
+class _NullableBinaryBase(unittest.TestCase):
+    def _nullable_ctx(self):
+        t = types.DataType
+        def type_resolver(name):
+            mapping = {
+                    'nname': t.NULLABLE(t.STRING),
+                    'nage':  t.NULLABLE(t.FLOAT),
+                    'name':  t.STRING,
+                    'age':   t.FLOAT,
+            }
+            return mapping.get(name, t.UNDEFINED)
+        return engine.Context(type_resolver=type_resolver)
+
+class CoalesceExpressionTests(_NullableBinaryBase):
+    def test_coalesce_literal_null_falls_back_to_right(self):
+        expr = ast.CoalesceExpression(context, ast.NullExpression(context), ast.StringExpression(context, 'fallback'))
+        self.assertEqual(expr.evaluate(None), 'fallback')
+
+    def test_coalesce_literal_non_null_returns_left(self):
+        expr = ast.CoalesceExpression(context, ast.StringExpression(context, 'value'), ast.StringExpression(context, 'fallback'))
+        self.assertEqual(expr.evaluate(None), 'value')
+
+    def test_coalesce_discharges_nullable_when_right_is_non_nullable(self):
+        ctx = self._nullable_ctx()
+        expr = ast.CoalesceExpression(ctx, ast.SymbolExpression(ctx, 'nname'), ast.StringExpression(context, ''))
+        self.assertEqual(expr.result_type, types.DataType.STRING)
+
+    def test_coalesce_preserves_nullable_when_right_is_nullable(self):
+        ctx = self._nullable_ctx()
+        expr = ast.CoalesceExpression(ctx, ast.SymbolExpression(ctx, 'nname'), ast.SymbolExpression(ctx, 'nname'))
+        self.assertEqual(expr.result_type, types.DataType.NULLABLE(types.DataType.STRING))
+
+    def test_coalesce_preserves_nullable_when_right_is_null_literal(self):
+        ctx = self._nullable_ctx()
+        expr = ast.CoalesceExpression(ctx, ast.SymbolExpression(ctx, 'nname'), ast.NullExpression(context))
+        self.assertEqual(expr.result_type, types.DataType.NULLABLE(types.DataType.STRING))
+
+    def test_coalesce_rejects_incompatible_types(self):
+        with self.assertRaises(errors.EvaluationError):
+            ast.CoalesceExpression(context, ast.StringExpression(context, 'x'), ast.FloatExpression(context, 1.0))
+
+    def test_coalesce_null_left_literal_uses_right_type(self):
+        expr = ast.CoalesceExpression(context, ast.NullExpression(context), ast.StringExpression(context, 'x'))
+        self.assertEqual(expr.result_type, types.DataType.STRING)
+
+class NullableDischargeParseTests(unittest.TestCase):
+    def setUp(self):
+        t = types.DataType
+        self.ctx = engine.Context(type_resolver=lambda n: t.NULLABLE(t.STRING) if n == 'name' else t.UNDEFINED)
+
+    def test_coalesce_grammar_discharges_nullable(self):
+        import rule_engine
+        rule = rule_engine.Rule("(name ?? '').length > 0", context=self.ctx)
+        self.assertIs(rule.evaluate({'name': None}), False)
+        self.assertIs(rule.evaluate({'name': 'alice'}), True)
+
+    def test_literal_coalesce_reduces(self):
+        import rule_engine
+        rule = rule_engine.Rule("null ?? 'fallback'")
+        self.assertIsInstance(rule.statement.expression, ast.StringExpression)
+        self.assertEqual(rule.evaluate(None), 'fallback')
+
+    def test_coalesce_to_graphviz(self):
+        digraph = _FakeDigraph()
+        expr = ast.CoalesceExpression(context, ast.NullExpression(context), ast.StringExpression(context, 'x'))
+        expr.to_graphviz(digraph)
+        self.assertGreater(len(digraph.nodes), 0)
+        self.assertGreater(len(digraph.edges), 0)
+
+    def test_coalesce_binds_tighter_than_or(self):
+        import rule_engine
+        rule = rule_engine.Rule("name == 'x' or name ?? 'y'", context=self.ctx)
+        expr = rule.statement.expression
+        self.assertIsInstance(expr, ast.LogicExpression)
+        self.assertEqual(expr.type, 'or')
+        self.assertIsInstance(expr.right, ast.CoalesceExpression)
+
+    def test_coalesce_fits_inside_ternary_true_branch(self):
+        import rule_engine
+        rule = rule_engine.Rule("name == null ? name ?? 'x' : 'y'", context=self.ctx)
+        expr = rule.statement.expression
+        self.assertIsInstance(expr, ast.TernaryExpression)
+        self.assertIsInstance(expr.case_true, ast.CoalesceExpression)
+
+    def test_coalesce_is_right_associative(self):
+        import rule_engine
+        rule = rule_engine.Rule("name ?? name ?? 'fallback'", context=self.ctx)
+        expr = rule.statement.expression
+        self.assertIsInstance(expr, ast.CoalesceExpression)
+        self.assertIsInstance(expr.left, ast.SymbolExpression)
+        self.assertIsInstance(expr.right, ast.CoalesceExpression)
+
+    def test_coalesce_binds_tighter_than_and(self):
+        import rule_engine
+        rule = rule_engine.Rule("name ?? 'x' and name == 'y'", context=self.ctx)
+        expr = rule.statement.expression
+        self.assertIsInstance(expr, ast.LogicExpression)
+        self.assertEqual(expr.type, 'and')
+        self.assertIsInstance(expr.left, ast.CoalesceExpression)
+
+    def test_coalesce_binds_tighter_than_not(self):
+        import rule_engine
+        rule = rule_engine.Rule("not name ?? 'x'", context=self.ctx)
+        expr = rule.statement.expression
+        self.assertIsInstance(expr, ast.UnaryExpression)
+        self.assertEqual(expr.type, 'not')
+        self.assertIsInstance(expr.right, ast.CoalesceExpression)
+
+    def test_eq_binds_tighter_than_coalesce(self):
+        import rule_engine
+        with self.assertRaises(errors.EvaluationError):
+            rule_engine.Rule("name ?? '' == 'x'", context=self.ctx)
+        rule = rule_engine.Rule("(name ?? '') == 'x'", context=self.ctx)
+        expr = rule.statement.expression
+        self.assertIsInstance(expr, ast.ComparisonExpression)
+        self.assertIsInstance(expr.left, ast.CoalesceExpression)
+

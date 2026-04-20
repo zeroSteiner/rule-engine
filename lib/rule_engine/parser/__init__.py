@@ -109,6 +109,7 @@ class Parser(ParserBase):
             # other operators
             '.':   'ATTR',
             '&.':  'ATTR_SAFE',
+            '??':  'COALESCE',
             'in':  'IN',
     }
     reserved_words = {
@@ -143,6 +144,7 @@ class Parser(ParserBase):
     t_RPAREN           = r'\)'
     t_EQ               = r'=='
     t_NE               = r'!='
+    t_COALESCE         = r'\?\?'
     t_QMARK            = r'\?'
     t_COLON            = r'\:'
     t_ADD              = r'\+'
@@ -179,6 +181,7 @@ class Parser(ParserBase):
                     ('left',     'BWOR'),
                     ('nonassoc', 'EQ_FZM', 'EQ_FZS', 'NE_FZM', 'NE_FZS', 'GE', 'GT', 'LE', 'LT', 'IN'),  # Nonassociative operators
                     ('nonassoc', 'EQ', 'NE'),
+                    ('right',    'COALESCE'),
                     ('right',    'NOT'),
                     ('left',     'AND'),
                     ('left',     'OR'),
@@ -306,6 +309,13 @@ class Parser(ParserBase):
         """
         condition, _, case_true, _, case_false = p[1:6]
         p[0] = _DeferredAstNode(ast.TernaryExpression, args=(self.context, condition, case_true, case_false))
+
+    def p_expression_coalesce(self, p: Any) -> None:
+        """
+        expression : expression COALESCE expression
+        """
+        left, _, right = p[1:4]
+        p[0] = _DeferredAstNode(ast.CoalesceExpression, args=(self.context, left, right))
 
     def p_expression_arithmetic(self, p: Any) -> None:
         """

@@ -51,6 +51,7 @@ from .base import (
         _is_nullable,
         _is_reduced,
         _peel_nullable,
+        _propagate_nullable,
         _wrap_nullable,
 )
 from .literal import StringExpression

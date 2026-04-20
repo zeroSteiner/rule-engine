@@ -97,6 +97,10 @@ The following table outlines all operators that can be used in Rule Engine expre
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``!~~``      | Regex search fails :sup:`4`  | :py:attr:`~.DataType.NULL`, :py:attr:`~.DataType.STRING`        |
 +--------------+------------------------------+-----------------------------------------------------------------+
+| **Nullable Operators** :sup:`5`                                                                               |
++--------------+------------------------------+-----------------------------------------------------------------+
+| ``??``       | Null-coalesce                | *ANY*                                                           |
++--------------+------------------------------+-----------------------------------------------------------------+
 | **Logical Operators**                                                                                         |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``and``      | Logical and                  | *ANY*                                                           |
@@ -149,6 +153,15 @@ based sequence comparison `technique used by Python`_.
 
 :sup:`4` When using regular expression operations, the expression on the left is the string to compare and the
 expression on the right is the regular expression to use for either the match or search operation.
+
+:sup:`5` The null-coalesce operator ``??`` discharges :py:attr:`~.DataType.NULLABLE` wrappers from an expression's
+static type so the result can flow into slots that expect a non-nullable type. ``a ?? b`` evaluates to ``a`` unless
+``a`` is null, in which case it evaluates to ``b``; the result type is the peeled type of ``a``, re-wrapped only
+when ``b`` is itself nullable. ``??`` is right-associative and sits between equality and the boolean operators in the
+precedence table — tighter than ``not`` / ``and`` / ``or`` / ``?`` ``:``, looser than ``==`` / ``!=`` and the
+comparison operators. ``a or b ?? c`` parses as ``a or (b ?? c)``, ``cond ? a ?? b : c`` puts the coalesce on the
+true branch, and ``a ?? b ?? c`` is right-associative as ``a ?? (b ?? c)``. Mixing with ``==`` requires explicit
+parentheses — ``(name ?? '') == 'x'``.
 
 Accessor Operators
 """"""""""""""""""

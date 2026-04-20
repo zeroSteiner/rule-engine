@@ -835,9 +835,10 @@ class _ObjectDataTypeDef(_DataTypeDef):
         with its type derived from the field annotation via :py:meth:`DataType.from_type`. Stringified annotations
         (e.g. from ``from __future__ import annotations``) are resolved using :py:func:`typing.get_type_hints`.
 
-        Fields annotated with :py:data:`typing.Optional` (or the PEP 604 ``T | None`` form) are unwrapped to their
-        non-``None`` type, and the corresponding attribute is recorded as nullable. Non-Optional fields are recorded
-        as non-nullable.
+        Fields annotated with :py:data:`typing.Optional` (or the PEP 604 ``T | None`` form) are surfaced as
+        :py:attr:`~rule_engine.types.DataType.NULLABLE` wrappers around the non-``None`` type; non-Optional fields
+        are recorded unwrapped. See :ref:`the NULLABLE section<data-types>` for how nullability propagates through
+        the grammar and how to discharge it.
 
         Fields whose annotation is itself a dataclass (or contains one inside a ``list``/``set``/``dict`` generic)
         produce nested OBJECT schemas. Self-references resolve to the enclosing schema via the
@@ -870,8 +871,10 @@ class _ObjectDataTypeDef(_DataTypeDef):
         """
         Build an :py:attr:`~rule_engine.types.DataType.OBJECT` schema from a SQLAlchemy ORM mapped class. Each
         mapped column of *cls* becomes an attribute in the resulting OBJECT schema, with its type derived from the
-        column's :py:meth:`~sqlalchemy.types.TypeEngine.python_type` via :py:meth:`DataType.from_type`. Column
-        nullability is taken directly from :py:attr:`~sqlalchemy.Column.nullable`.
+        column's :py:meth:`~sqlalchemy.types.TypeEngine.python_type` via :py:meth:`DataType.from_type`. Columns
+        with :py:attr:`~sqlalchemy.Column.nullable` set to ``True`` are surfaced as
+        :py:attr:`~rule_engine.types.DataType.NULLABLE` wrappers around the column type; scalar relationships whose
+        local foreign-key columns are nullable are wrapped the same way.
 
         By default (``strict=True``) a column whose ``python_type`` raises :py:exc:`NotImplementedError`
         (typically dialect-specific types such as PostgreSQL ``CIDR`` or ``INET``) or resolves to a Python type

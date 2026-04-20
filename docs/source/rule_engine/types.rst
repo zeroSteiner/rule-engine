@@ -52,6 +52,8 @@ Classes
    .. autoattribute:: NULL
       :annotation:
 
+   .. automethod:: NULLABLE
+
    .. automethod:: OBJECT
 
    .. py:method:: DataType.OBJECT.from_dataclass(name, cls, *, accessor=None)

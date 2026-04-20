@@ -31,6 +31,9 @@ compatible with. For a information regarding supported operations, see the
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.NULL`     | :py:class:`NoneType`          |
 +-------------------------------+-------------------------------+
+| :py:attr:`~DataType.NULLABLE` | *inner type* or               |
+|                               | :py:class:`NoneType`          |
++-------------------------------+-------------------------------+
 | :py:attr:`~DataType.OBJECT`   | *any* (schema-driven)         |
 +-------------------------------+-------------------------------+
 | :py:attr:`~DataType.SET`      | :py:class:`set`               |
@@ -243,6 +246,54 @@ Restrictions
   Use ``ARRAY(OBJECT(...))`` instead.
 - ``OBJECT`` types are not inferred by :py:meth:`~DataType.from_value`. They must be annotated explicitly via the
   ``type_resolver``.
+
+NULLABLE
+--------
+
+.. _data-types-nullable:
+
+.. versionadded:: 5.0.0
+
+:py:attr:`~DataType.NULLABLE` is a one-argument type constructor that wraps another data type to mark a slot as
+permitting :py:class:`NoneType` (``null``) at runtime. ``NULLABLE(T)`` is structurally distinct from both ``T`` and
+:py:attr:`~DataType.NULL` and is the single source of truth for nullability in the rule engine's type system.
+
+``NULLABLE`` is produced automatically wherever the source of a type annotation declares optionality:
+
+- :py:meth:`DataType.from_type` maps Python's ``Optional[T]`` / ``T | None`` to ``NULLABLE(from_type(T))``.
+- :py:meth:`DataType.OBJECT.from_dataclass` wraps attribute types for dataclass fields typed as ``Optional[T]`` and
+  for nested dataclass fields that can hold ``None``.
+- :py:meth:`DataType.OBJECT.from_sqlalchemy` wraps attribute types for columns whose ``nullable`` is ``True``, and for
+  scalar relationships whose local foreign-key columns are nullable.
+- Compound element types (``ARRAY``, ``SET``, ``MAPPING`` values) store ``NULLABLE(T)`` directly when the member may
+  be ``None``.
+
+Semantics are Python-style, not SQL three-valued logic. ``None`` flows through expressions as the Python ``None``
+value. Parse-time checking is strict: operators that do not meaningfully accept ``None`` — arithmetic (``+``, ``-``,
+``*``, ``/``, …), ordered comparisons (``<``, ``<=``, ``>``, ``>=``), the regex operators (``=~``, ``=~~``, ``!~``,
+``!~~``), bitwise and bitwise-shift operators, unary minus, containment (``x in container``), attribute access
+(``obj.attr``), item access (``container[key]``), slicing (``container[a:b]``), and function arguments — reject a
+``NULLABLE(T)`` operand at parse time with an :py:exc:`~rule_engine.errors.EvaluationError` (or
+:py:exc:`~rule_engine.errors.FunctionCallError` for function arguments) whose message points at the discharge
+operators. The rule does not parse; the author must discharge nullability first.
+
+Operators that are meaningful on ``None`` stay lenient: equality and logical connectives (``==``, ``!=``, ``and``,
+``or``, ``not``) always accept ``NULLABLE`` operands and return plain :py:attr:`~DataType.BOOLEAN`; ternary
+expressions (``cond ? a : b``) propagate ``NULLABLE`` to the result if either branch is nullable; and safe-navigation
+operators accept ``NULLABLE`` targets by design.
+
+The grammar exposes two mechanisms for working with nullable values:
+
+- ``left ?? right`` (null-coalesce) — *discharges* ``NULLABLE``. Evaluates to ``left`` when it is not ``None``, else
+  ``right``. The result type is the peeled type of the left operand, re-wrapped in ``NULLABLE`` only if the right
+  operand is itself nullable.
+- Safe attribute access (``obj&.attr``) and safe item access (``container&[key]``) — *accept* a ``NULLABLE`` target
+  without raising but do not discharge it. The overall expression remains nullable, so chaining
+  ``obj&.inner&.leaf`` yields a ``NULLABLE`` value that a downstream operator must still discharge.
+
+The legacy ``attributes_nullable`` / ``value_type_nullable`` kwargs on :py:class:`~DataType.OBJECT` and compound-type
+constructors are still accepted in v5 for backward compatibility but emit a :py:class:`DeprecationWarning` and will
+be removed in v6.0. Wrap the attribute or element type in :py:attr:`~DataType.NULLABLE` directly instead.
 
 FLOAT
 -----

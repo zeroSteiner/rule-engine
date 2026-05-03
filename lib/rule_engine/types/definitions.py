@@ -230,7 +230,7 @@ class _SetDataTypeDef(_CollectionDataTypeDef):
     ) -> None:
         inner = value_type.inner_type if isinstance(value_type, _NullableDataTypeDef) else value_type
         if isinstance(inner, _ObjectDataTypeDef):
-            raise errors.EngineError('OBJECT values may not be used as SET members')
+            raise errors.EngineError('the OBJECT data type may not be used as a SET member')
         super(_SetDataTypeDef, self).__init__(name, python_type, value_type=value_type, value_type_nullable=value_type_nullable)
 
 class _MappingDataTypeDef(_DataTypeDef):

@@ -158,8 +158,9 @@ directly from the field annotations using :py:meth:`DataType.OBJECT.from_datacla
 
 The derived schema reflects three behaviors automatically:
 
-- **Optional / nullability**: a field annotated as :py:class:`~typing.Optional` (or ``T | None``) is unwrapped to ``T``
-  and recorded as a nullable attribute on the resulting schema. Non-Optional fields are explicitly marked non-nullable.
+- **Optional / nullability**: a field annotated as :py:class:`~typing.Optional` (or ``T | None``) produces a
+  :py:attr:`~DataType.NULLABLE`-wrapped attribute type in the resulting schema; non-Optional fields are stored
+  unwrapped. See :ref:`the NULLABLE section<data-types-nullable>` for how to work with nullable attributes in rules.
 - **Nested dataclasses**: a field whose annotation is itself a dataclass becomes a nested ``OBJECT`` (recursively).
   Generic containers (e.g. ``list[Address]``, ``dict[str, Address]``) are walked so nested dataclasses inside
   ``ARRAY``, ``SET``, and ``MAPPING`` types are also expanded.
@@ -286,10 +287,20 @@ The grammar exposes two mechanisms for working with nullable values:
 
 - ``left ?? right`` (null-coalesce) — *discharges* ``NULLABLE``. Evaluates to ``left`` when it is not ``None``, else
   ``right``. The result type is the peeled type of the left operand, re-wrapped in ``NULLABLE`` only if the right
-  operand is itself nullable.
+  operand is itself nullable or is the ``null`` literal.
 - Safe attribute access (``obj&.attr``) and safe item access (``container&[key]``) — *accept* a ``NULLABLE`` target
   without raising but do not discharge it. The overall expression remains nullable, so chaining
   ``obj&.inner&.leaf`` yields a ``NULLABLE`` value that a downstream operator must still discharge.
+
+A few Python-style edge cases worth knowing:
+
+- A ``NULLABLE(BOOLEAN)`` value used as a ternary condition (``flag ? x : y``) is accepted at parse time. ``None``
+  is falsy, so a null condition evaluates the false branch at runtime.
+- ``not NULLABLE(BOOLEAN)`` is accepted and returns plain ``BOOLEAN``. ``not None`` evaluates to ``True``.
+- ``NULLABLE(T) in container`` (nullable *member*, non-nullable container) is accepted. ``None in [...]`` returns
+  ``False``, consistent with Python.
+- ``non_nullable_value ?? null`` gives a ``NULLABLE`` result type. The static analysis conservatively wraps the
+  result whenever the right operand is ``null``, even if the left can never be ``None`` at runtime.
 
 The legacy ``attributes_nullable`` / ``value_type_nullable`` kwargs on :py:class:`~DataType.OBJECT` and compound-type
 constructors are still accepted in v5 for backward compatibility but emit a :py:class:`DeprecationWarning` and will

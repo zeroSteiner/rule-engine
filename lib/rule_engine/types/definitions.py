@@ -97,8 +97,9 @@ class _NullableDataTypeDef(_DataTypeDef):
     explicit exceptions (equality comparisons always return :py:attr:`.BOOLEAN`; ``??``, ``?.``, ``is null`` and
     ``is not null`` discharge nullability).
 
-    Constructing ``NULLABLE(NULLABLE(T))`` collapses to ``NULLABLE(T)``. ``NULLABLE(NULL)`` is rejected because
-    a "nullable null" is meaningless.
+    Constructing ``NULLABLE(NULLABLE(T))`` collapses to ``NULLABLE(T)``. Calling ``NULLABLE(NULL)`` or
+    ``NULLABLE(UNDEFINED)`` raises :py:exc:`~rule_engine.errors.EngineError` because neither has meaningful nullable
+    semantics.
 
     .. versionadded:: 5.0.0
     """
@@ -116,11 +117,13 @@ class _NullableDataTypeDef(_DataTypeDef):
     def __call__(self, inner_type: _DataTypeDef) -> '_NullableDataTypeDef':
         """
         :param inner_type: The non-null data type this slot may hold. Passing an already-nullable type collapses
-                (i.e. ``NULLABLE(NULLABLE(T))`` is ``NULLABLE(T)``); passing :py:attr:`.NULL` raises
-                :py:exc:`~rule_engine.errors.EngineError`.
+                (i.e. ``NULLABLE(NULLABLE(T))`` is ``NULLABLE(T)``); passing :py:attr:`.NULL` or
+                :py:attr:`.UNDEFINED` raises :py:exc:`~rule_engine.errors.EngineError`.
 
         .. versionadded:: 5.0.0
         """
+        if isinstance(inner_type, _UndefinedDataTypeDef):
+            raise errors.EngineError('NULLABLE may not wrap UNDEFINED')
         return self.__class__(self.name, self.python_type, inner_type=inner_type)
 
     def __repr__(self) -> str:

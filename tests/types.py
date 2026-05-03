@@ -390,6 +390,10 @@ class NullableDataTypeTests(unittest.TestCase):
         with self.assertRaises(errors.EngineError):
             DataType.NULLABLE(DataType.NULL)
 
+    def test_nullable_rejects_undefined_inner_type(self):
+        with self.assertRaises(errors.EngineError):
+            DataType.NULLABLE(DataType.UNDEFINED)
+
     def test_nullable_is_compatible_with_inner_type(self):
         self.assertTrue(DataType.is_compatible(DataType.NULLABLE(DataType.STRING), DataType.STRING))
         self.assertTrue(DataType.is_compatible(DataType.STRING, DataType.NULLABLE(DataType.STRING)))

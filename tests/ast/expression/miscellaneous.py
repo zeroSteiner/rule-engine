@@ -493,5 +493,39 @@ class NullablePropagationTests(unittest.TestCase):
         with self.assertRaisesRegex(errors.EvaluationError, r'nullable'):
             ast.UnaryExpression(self.context, 'uminus', self._sym(self.sym_nullable_float))
 
+    def test_regex_ops_reject_nullable_at_parse_time(self):
+        ctx = engine.Context(type_resolver=lambda name: types.DataType.NULLABLE(types.DataType.STRING) if name == 'name' else types.DataType.UNDEFINED)
+        for op in ('=~', '!~', '=~~', '!~~'):
+            with self.subTest(op=op), self.assertRaisesRegex(errors.EvaluationError, r'nullable'):
+                engine.Rule(f"name {op} 'foo'", context=ctx)
+
+    def test_containment_nullable_member_is_allowed(self):
+        ctx = engine.Context(type_resolver=lambda name: {
+            'name': types.DataType.NULLABLE(types.DataType.STRING),
+            'names': types.DataType.ARRAY(types.DataType.STRING),
+        }.get(name, types.DataType.UNDEFINED))
+        r = engine.Rule('name in names', context=ctx)
+        self.assertIsInstance(r.statement.expression, ast.ContainsExpression)
+        self.assertFalse(r.evaluate({'name': None, 'names': ['a', 'b']}))
+        self.assertTrue(r.evaluate({'name': 'a', 'names': ['a', 'b']}))
+
+    def test_unary_not_nullable_boolean_is_allowed(self):
+        ctx = engine.Context(type_resolver=lambda name: types.DataType.NULLABLE(types.DataType.BOOLEAN) if name == 'flag' else types.DataType.UNDEFINED)
+        r = engine.Rule('not flag', context=ctx)
+        self.assertEqual(r.statement.expression.result_type, types.DataType.BOOLEAN)
+        self.assertTrue(r.evaluate({'flag': None}))
+        self.assertFalse(r.evaluate({'flag': True}))
+
+    def test_ternary_nullable_condition_is_allowed(self):
+        ctx = engine.Context(type_resolver=lambda name: types.DataType.NULLABLE(types.DataType.BOOLEAN) if name == 'flag' else types.DataType.UNDEFINED)
+        r = engine.Rule("flag ? 'yes' : 'no'", context=ctx)
+        self.assertEqual(r.evaluate({'flag': None}), 'no')
+        self.assertEqual(r.evaluate({'flag': True}), 'yes')
+
+    def test_coalesce_non_nullable_with_null_literal_gives_nullable_result(self):
+        ctx = engine.Context(type_resolver=lambda name: types.DataType.STRING if name == 'name' else types.DataType.UNDEFINED)
+        r = engine.Rule('name ?? null', context=ctx)
+        self.assertIsInstance(r.statement.expression.result_type, types._NullableDataTypeDef)
+
 if __name__ == '__main__':
     unittest.main()

@@ -225,7 +225,8 @@ class _SetDataTypeDef(_CollectionDataTypeDef):
             value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
             value_type_nullable: bool | None = None
     ) -> None:
-        if isinstance(value_type, _ObjectDataTypeDef):
+        inner = value_type.inner_type if isinstance(value_type, _NullableDataTypeDef) else value_type
+        if isinstance(inner, _ObjectDataTypeDef):
             raise errors.EngineError('OBJECT values may not be used as SET members')
         super(_SetDataTypeDef, self).__init__(name, python_type, value_type=value_type, value_type_nullable=value_type_nullable)
 

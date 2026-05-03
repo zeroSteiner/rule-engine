@@ -658,6 +658,11 @@ class ObjectDataTypeTests(unittest.TestCase):
         with self.assertRaises(errors.EngineError):
             DataType.SET(Hero)
 
+    def test_nullable_object_set_rejection(self):
+        Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+        with self.assertRaises(errors.EngineError):
+            DataType.SET(DataType.NULLABLE(Hero))
+
     def test_object_mapping_value_accepted(self):
         Hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
         mapping = DataType.MAPPING(DataType.STRING, value_type=Hero)

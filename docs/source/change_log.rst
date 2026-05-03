@@ -24,7 +24,7 @@ Version 5.0.0
 * Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy
   removes an external install requirement and silences third-party vulnerability reports targeting it.
 * Added the new :py:attr:`~rule_engine.types.DataType.OBJECT` compound data type for user-defined schemas with named,
-  typed attributes. See the :ref:`OBJECT section<data-types>` in the Data Types page for details.
+  typed attributes. See the :ref:`OBJECT section<data-types-object>` in the Data Types page for details.
 
     * Use :py:meth:`~rule_engine.types.DataType.OBJECT.reference` (or the
       :py:attr:`~rule_engine.types.DataType.OBJECT.self` shorthand sentinel) for self-referential and mutually-recursive
@@ -52,8 +52,8 @@ Version 5.0.0
   :py:class:`~rule_engine.errors.AttributeResolutionError`, raised when an attribute is not found in an ``OBJECT``
   schema
 * Promoted nullability to a first-class type-system construct via the new
-  :py:attr:`~rule_engine.types.DataType.NULLABLE` one-argument type constructor. See
-  :ref:`the NULLABLE section<data-types-nullable>` in the Data Types page for the full semantics.
+  :py:attr:`~rule_engine.types.DataType.NULLABLE` one-argument type constructor. See the
+  :ref:`NULLABLE section<data-types-nullable>` in the Data Types page for the full semantics.
 
     * :py:meth:`~rule_engine.types.DataType.from_type` maps Python's ``Optional[T]`` / ``T | None`` to
       ``NULLABLE(from_type(T))``.

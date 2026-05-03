@@ -57,6 +57,8 @@ Compound data types are also iterable, meaning that array comprehension operatio
 operations apply to the members of :py:attr:`~DataType.ARRAY` and :py:attr:`~DataType.SET` values, and the keys of
 :py:attr:`~DataType.MAPPING` values. This allows the types to behave in the same was as they do in Python.
 
+.. _data-types-object:
+
 OBJECT
 ------
 

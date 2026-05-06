@@ -46,8 +46,8 @@ from .definitions import _DataTypeDef
 from .definitions import _FunctionDataTypeDef
 from .definitions import _MappingDataTypeDef
 from .definitions import _NullableDataTypeDef
-from .definitions import _ObjectDataTypeDef
 from .definitions import _ReferenceDataTypeDef
+from ._object import _ObjectDataTypeDef
 
 __all__ = (
         'DataType',

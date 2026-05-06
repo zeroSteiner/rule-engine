@@ -44,12 +44,12 @@ from .definitions import (
         _FunctionDataTypeDef,
         _MappingDataTypeDef,
         _NullableDataTypeDef,
-        _ObjectDataTypeDef,
         _PYTHON_FUNCTION_TYPE,
         _ReferenceDataTypeDef,
         _SetDataTypeDef,
         NoneType,
 )
+from ._object import _ObjectDataTypeDef
 
 def iterable_member_value_type(python_value: Any) -> _DataTypeDef:
     """

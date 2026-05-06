@@ -59,17 +59,17 @@ Classes
    .. py:method:: DataType.OBJECT.from_dataclass(name, cls, *, accessor=None)
       :staticmethod:
 
-      .. embed-docstring:: rule_engine.types.definitions._ObjectDataTypeDef.from_dataclass
+      .. embed-docstring:: rule_engine.types._object._ObjectDataTypeDef.from_dataclass
 
    .. py:method:: DataType.OBJECT.from_sqlalchemy(name, cls, *, accessor=None)
       :staticmethod:
 
-      .. embed-docstring:: rule_engine.types.definitions._ObjectDataTypeDef.from_sqlalchemy
+      .. embed-docstring:: rule_engine.types._object._ObjectDataTypeDef.from_sqlalchemy
 
    .. py:method:: DataType.OBJECT.reference(name)
       :staticmethod:
 
-      .. embed-docstring:: rule_engine.types.definitions._ObjectDataTypeDef.reference
+      .. embed-docstring:: rule_engine.types._object._ObjectDataTypeDef.reference
 
    .. py:attribute:: DataType.OBJECT.self
 

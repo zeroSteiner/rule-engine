@@ -262,14 +262,14 @@ class BitwiseExpression(BinaryExpressionBase):
             if _is_reduced(self.right):
                 _assert_is_natural_number(self.right.evaluate(None))
             self.result_type = DataType.FLOAT
-        if isinstance(self.left.result_type, DataType.SET.__class__) or isinstance(self.right.result_type, DataType.SET.__class__):
+        if DataType.is_type(self.left.result_type, DataType.SET) or DataType.is_type(self.right.result_type, DataType.SET):
             self.result_type = DataType.SET  # this discards the member type info
 
     def _op_bitwise(self, op: Callable[[Any, Any], Any], thing: Any) -> Any:
         left = self.left.evaluate(thing)
         if DataType.from_value(left) == DataType.FLOAT:
             return self._op_bitwise_float(op, thing, left)
-        elif isinstance(DataType.from_value(left), DataType.SET.__class__):
+        elif DataType.is_type(DataType.from_value(left), DataType.SET):
             return self._op_bitwise_set(op, thing, left)
         raise errors.EvaluationError('data type mismatch')
 

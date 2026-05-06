@@ -41,7 +41,7 @@ from .. import builtins as _builtins
 from .. import errors
 from ..suggestions import suggest_symbol
 from ..types import DataType, coerce_value, is_numeric
-from ..types import _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef, _NullableDataTypeDef, _ObjectDataTypeDef
+from ..types import _ArrayDataTypeDef, _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef, _NullableDataTypeDef, _ObjectDataTypeDef
 
 from .base import (
         Assignment,
@@ -221,7 +221,7 @@ class GetAttributeExpression(ExpressionBase):
                         self.result_type = context.resolve_attribute_type(object_type, name)
                     except errors.AttributeResolutionError as error:
                         # this is necessary because MAPPING objects can have their keys accessed as attributes
-                        if not isinstance(object_type, DataType.MAPPING.__class__):
+                        if not DataType.is_type(object_type, DataType.MAPPING):
                             raise error
                         if not context.mapping_attribute_lookup:
                             raise errors.EvaluationError(
@@ -340,15 +340,15 @@ class GetItemExpression(ExpressionBase):
             self.result_type = DataType.STRING
         # check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
         # is explicitly checking if result_type is an array with out checking the value_type
-        elif isinstance(resolved_container_type, DataType.ARRAY.__class__):
+        elif isinstance(resolved_container_type, _ArrayDataTypeDef):
             if not DataType.is_compatible(item.result_type, DataType.FLOAT):
                 raise errors.EvaluationError('data type mismatch (not an integer number)')
             self.result_type = _resolve_type(resolved_container_type.value_type, context)
-        elif isinstance(resolved_container_type, DataType.MAPPING.__class__):
+        elif isinstance(resolved_container_type, _MappingDataTypeDef):
             if not (safe or DataType.is_compatible(item.result_type, resolved_container_type.key_type)):
                 raise errors.LookupError(errors.UNDEFINED, errors.UNDEFINED)
             self.result_type = _resolve_type(resolved_container_type.value_type, context)
-        elif isinstance(resolved_container_type, DataType.SET.__class__):
+        elif DataType.is_type(resolved_container_type, DataType.SET):
             raise errors.EvaluationError('data type mismatch (container is a set)')
         elif isinstance(resolved_container_type, _ObjectDataTypeDef):
             raise errors.EvaluationError(
@@ -395,7 +395,7 @@ class GetItemExpression(ExpressionBase):
         return self._new_value(value, verify_type=False)
 
     def reduce(self) -> ExpressionBase:
-        if isinstance(self.container.result_type, DataType.MAPPING.__class__):
+        if isinstance(self.container.result_type, _MappingDataTypeDef):
             if self.safe and not DataType.is_compatible(self.item.result_type, self.container.result_type.key_type):
                 return NullExpression(self.context)
         if _is_reduced(self.container, self.item):
@@ -441,9 +441,9 @@ class GetSliceExpression(ExpressionBase):
             self.result_type = DataType.STRING
         # check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
         # is explicitly checking if result_type is an array with out checking the value_type
-        elif isinstance(container_type, DataType.ARRAY.__class__):
+        elif DataType.is_type(container_type, DataType.ARRAY):
             self.result_type = container_type
-        elif isinstance(container_type, DataType.SET.__class__):
+        elif DataType.is_type(container_type, DataType.SET):
             raise errors.EvaluationError('data type mismatch (container is a set)')
         elif container_type != DataType.UNDEFINED:
             if not (container_type == DataType.NULL and safe):
@@ -712,7 +712,7 @@ class TernaryExpression(ExpressionBase):
         false_type = DataType.NULLABLE.unwrap(self.case_false.result_type)
         if true_type == false_type:
             self.result_type = true_type
-        elif isinstance(true_type, DataType.ARRAY.__class__) and isinstance(false_type, DataType.ARRAY.__class__):
+        elif DataType.is_type(true_type, DataType.ARRAY) and DataType.is_type(false_type, DataType.ARRAY):
             self.result_type = DataType.ARRAY
         # todo: the other compound types should be checked here as well.
         self.result_type = _propagate_nullable(self.result_type, self.case_true.result_type, self.case_false.result_type)

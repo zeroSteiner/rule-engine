@@ -358,3 +358,23 @@ The following mathematical operations are supported:
 * Subtracting a timedelta from a datetime (result is a datetime)
 * Subtracting a datetime from another datetime (result is a timedelta)
 * Subtracting a timedelta from another timedelta (result is a timedelta)
+
+DataType Utilities
+------------------
+
+.. py:currentmodule:: rule_engine
+
+:py:meth:`~.DataType.is_type` and :py:meth:`~.DataType.is_compatible` are the two classmethods for comparing
+data type definitions without a rule expression.
+
+:py:meth:`~.DataType.is_type` checks whether a data type belongs to the same *family* as a given sentinel,
+ignoring member types for compound types:
+
+.. code-block:: python
+
+   DataType.is_type(dt, DataType.ARRAY)    # True for ARRAY(STRING), ARRAY(FLOAT), bare ARRAY, …
+   DataType.is_type(dt, DataType.MAPPING)  # True for any parameterized or bare MAPPING
+   DataType.is_type(dt, DataType.STRING)   # True only for STRING itself (scalars are singletons)
+
+:py:meth:`~.DataType.is_compatible` additionally recurses into member types and handles
+:py:attr:`~.DataType.NULLABLE` unwrapping — use it when the full structural type matters.

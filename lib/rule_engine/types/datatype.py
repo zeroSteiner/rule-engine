@@ -123,10 +123,10 @@ class DataType(metaclass=DataTypeMeta):
       This is the most explicit form of testing and when dealing with compound data types, it recursively checks that
       all of the member types are also equal.
 
-    Class checking
+    Type checking
       .. code-block::
 
-        isinstance(dt, DataType.TYPE.__class__)
+        DataType.is_type(dt, DataType.TYPE)
 
       This checks that the data types are the same but when dealing with compound data types, the member types are
       ignored.
@@ -305,7 +305,7 @@ class DataType(metaclass=DataTypeMeta):
             inner2 = dt2.inner_type if isinstance(dt2, _NullableDataTypeDef) else dt2
             return cls.is_compatible(inner1, inner2)
         if dt1.is_scalar and dt2.is_scalar:
-            if isinstance(dt1, DataType.FUNCTION.__class__) and isinstance(dt2, DataType.FUNCTION.__class__):
+            if isinstance(dt1, _FunctionDataTypeDef) and isinstance(dt2, _FunctionDataTypeDef):
                 if not cls.is_compatible(dt1.return_type, dt2.return_type):
                     return False
                 if dt1.argument_types != _DATA_TYPE_UNDEFINED and dt2.argument_types != _DATA_TYPE_UNDEFINED:
@@ -320,15 +320,15 @@ class DataType(metaclass=DataTypeMeta):
                 return True
             return dt1 == dt2
         elif dt1.is_compound and dt2.is_compound:
-            if isinstance(dt1, DataType.ARRAY.__class__) and isinstance(dt2, DataType.ARRAY.__class__):
+            if isinstance(dt1, _ArrayDataTypeDef) and isinstance(dt2, _ArrayDataTypeDef):
                 return cls.is_compatible(dt1.value_type, dt2.value_type)
-            elif isinstance(dt1, DataType.MAPPING.__class__) and isinstance(dt2, DataType.MAPPING.__class__):
+            elif isinstance(dt1, _MappingDataTypeDef) and isinstance(dt2, _MappingDataTypeDef):
                 if not cls.is_compatible(dt1.key_type, dt2.key_type):
                     return False
                 if not cls.is_compatible(dt1.value_type, dt2.value_type):
                     return False
                 return True
-            elif isinstance(dt1, DataType.SET.__class__) and isinstance(dt2, DataType.SET.__class__):
+            elif isinstance(dt1, _SetDataTypeDef) and isinstance(dt2, _SetDataTypeDef):
                 return cls.is_compatible(dt1.value_type, dt2.value_type)
             elif isinstance(dt1, _ObjectDataTypeDef) and isinstance(dt2, _ObjectDataTypeDef):
                 # bare DataType.OBJECT acts as a wildcard, mirroring how an untyped ARRAY (value_type UNDEFINED)
@@ -350,3 +350,25 @@ class DataType(metaclass=DataTypeMeta):
         :rtype: bool
         """
         return isinstance(value, _DataTypeDef)
+
+    @classmethod
+    def is_type(cls, dt: _DataTypeDef, kind: _DataTypeDef) -> bool:
+        """
+        Check if *dt* is the same base type as *kind*, ignoring member types for compound types. This is the
+        preferred replacement for ``isinstance(dt, DataType.TYPE.__class__)``.
+
+        For scalar types (e.g. :py:attr:`.STRING`, :py:attr:`.BOOLEAN`) *kind* is a singleton so this is
+        equivalent to an equality check. For compound types (e.g. :py:attr:`.ARRAY`, :py:attr:`.MAPPING`,
+        :py:attr:`.OBJECT`) it checks the type family without inspecting member / key / value types — use
+        :py:meth:`is_compatible` when those matter.
+
+        .. versionadded:: 5.0.0
+
+        :param dt: The data type to test.
+        :param kind: The base type to test against (e.g. ``DataType.ARRAY``).
+        :return: ``True`` if *dt* belongs to the same type family as *kind*.
+        :rtype: bool
+        """
+        if type(kind) is _DataTypeDef:
+            return dt is kind
+        return isinstance(dt, type(kind))

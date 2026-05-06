@@ -35,7 +35,7 @@ from typing import TYPE_CHECKING, Any, Iterable
 
 from .. import errors
 from ..types import *
-from ..types import _DataTypeDef, _NullableDataTypeDef, _ObjectDataTypeDef, _ReferenceDataTypeDef
+from ..types import _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef, _NullableDataTypeDef, _ObjectDataTypeDef, _ReferenceDataTypeDef
 
 if TYPE_CHECKING:
     from ..engine.context import Context
@@ -124,7 +124,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
         return resolved
     if isinstance(definition, _ObjectDataTypeDef):
         return definition
-    if isinstance(definition, DataType.NULLABLE.__class__):
+    if isinstance(definition, _NullableDataTypeDef):
         new_inner = _resolve_type(definition.inner_type, context)
         if new_inner is definition.inner_type:
             return definition
@@ -133,7 +133,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
                 definition.python_type,
                 inner_type=new_inner
         )
-    if isinstance(definition, DataType.ARRAY.__class__) or isinstance(definition, DataType.SET.__class__):
+    if isinstance(definition, _CollectionDataTypeDef):
         new_value_type = _resolve_type(definition.value_type, context)
         if new_value_type is definition.value_type:
             return definition
@@ -142,7 +142,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
                 definition.python_type,
                 value_type=new_value_type
         )
-    if isinstance(definition, DataType.MAPPING.__class__):
+    if isinstance(definition, _MappingDataTypeDef):
         new_key_type = _resolve_type(definition.key_type, context)
         new_value_type = _resolve_type(definition.value_type, context)
         if new_key_type is definition.key_type and new_value_type is definition.value_type:
@@ -153,7 +153,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
                 key_type=new_key_type,
                 value_type=new_value_type
         )
-    if isinstance(definition, DataType.FUNCTION.__class__):
+    if isinstance(definition, _FunctionDataTypeDef):
         new_return_type = _resolve_type(definition.return_type, context)
         new_argument_types: tuple[_DataTypeDef, ...] | _DataTypeDef
         if definition.argument_types is DataType.UNDEFINED:
@@ -290,9 +290,9 @@ class LiteralExpressionBase(ExpressionBase):
         else:
             raise errors.EngineError("can not create literal expression from python value: {!r}".format(value))
         if datatype.is_compound:
-            if isinstance(datatype, DataType.ARRAY.__class__) or isinstance(datatype, DataType.SET.__class__):
+            if DataType.is_type(datatype, DataType.ARRAY) or DataType.is_type(datatype, DataType.SET):
                 value = datatype.python_type(cls.from_value(context, v) for v in value)
-            elif isinstance(datatype, DataType.MAPPING.__class__):
+            elif DataType.is_type(datatype, DataType.MAPPING):
                 value = tuple((cls.from_value(context, k), cls.from_value(context, v)) for k, v in value.items())
         else:
             value = coerce_value(value)

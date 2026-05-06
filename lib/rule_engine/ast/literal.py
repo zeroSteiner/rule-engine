@@ -145,7 +145,7 @@ class MappingExpression(LiteralExpressionBase):
         for key, value in self.value:
             key = key.evaluate(thing)
             key_type = DataType.from_value(key)
-            if key_type.is_compound and not isinstance(key_type, DataType.ARRAY.__class__):
+            if key_type.is_compound and not DataType.is_type(key_type, DataType.ARRAY):
                 raise errors.EngineError("the {} data type may not be used for mapping keys".format(key_type.name))
             mapping[key] = value
         # defer value evaluation to avoid evaluating values of duplicate keys

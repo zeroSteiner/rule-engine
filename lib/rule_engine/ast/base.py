@@ -35,7 +35,7 @@ from typing import TYPE_CHECKING, Any, Iterable
 
 from .. import errors
 from ..types import *
-from ..types import _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef, _NullableDataTypeDef, _ObjectDataTypeDef, _ReferenceDataTypeDef
+from ..types import _CollectionDataTypeDef, _DataTypeDef, _ReferenceDataTypeDef
 
 if TYPE_CHECKING:
     from ..engine.context import Context
@@ -81,7 +81,7 @@ def _propagate_nullable(result_type: _DataTypeDef, *operand_types: _DataTypeDef)
     uses this — its branches are alternatives rather than operands, so an operand-position strictness check does
     not apply.
     """
-    if any(DataType.NULLABLE.is_nullable(t) for t in operand_types):
+    if any(DataType.is_type(t, DataType.NULLABLE) for t in operand_types):
         return DataType.NULLABLE.wrap(result_type)
     return result_type
 
@@ -91,7 +91,7 @@ def _assert_not_nullable(dt: _DataTypeDef, *, role: str) -> None:
     string describes the rejected operand (e.g. ``"left operand of '+'"``, ``"slice target"``) and is embedded
     in the error message along with a pointer at the discharge operators (``??``, ``&.``, ``&[``).
     """
-    if isinstance(dt, _NullableDataTypeDef):
+    if DataType.is_type(dt, DataType.NULLABLE):
         raise errors.EvaluationError(
                 "data type mismatch ({0} is nullable; discharge with '??' or use '&.' / '&[' for safe navigation)".format(role)
         )
@@ -113,7 +113,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
             raise errors.EvaluationError(
                     "unresolved object reference: {0!r} - add it to the Context type_resolver".format(definition.name)
             ) from error
-        if not isinstance(resolved, _ObjectDataTypeDef):
+        if not DataType.is_type(resolved, DataType.OBJECT):
             raise errors.EvaluationError(
                     "reference {0!r} does not resolve to an OBJECT type".format(definition.name)
             )
@@ -122,9 +122,9 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
                     "reference {0!r} resolves to an OBJECT with mismatched name {1!r}".format(definition.name, resolved.name)
             )
         return resolved
-    if isinstance(definition, _ObjectDataTypeDef):
+    if DataType.is_type(definition, DataType.OBJECT):
         return definition
-    if isinstance(definition, _NullableDataTypeDef):
+    if DataType.is_type(definition, DataType.NULLABLE):
         new_inner = _resolve_type(definition.inner_type, context)
         if new_inner is definition.inner_type:
             return definition
@@ -142,7 +142,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
                 definition.python_type,
                 value_type=new_value_type
         )
-    if isinstance(definition, _MappingDataTypeDef):
+    if DataType.is_type(definition, DataType.MAPPING):
         new_key_type = _resolve_type(definition.key_type, context)
         new_value_type = _resolve_type(definition.value_type, context)
         if new_key_type is definition.key_type and new_value_type is definition.value_type:
@@ -153,7 +153,7 @@ def _resolve_type(definition: _DataTypeDef, context: 'Context') -> _DataTypeDef:
                 key_type=new_key_type,
                 value_type=new_value_type
         )
-    if isinstance(definition, _FunctionDataTypeDef):
+    if DataType.is_type(definition, DataType.FUNCTION):
         new_return_type = _resolve_type(definition.return_type, context)
         new_argument_types: tuple[_DataTypeDef, ...] | _DataTypeDef
         if definition.argument_types is DataType.UNDEFINED:

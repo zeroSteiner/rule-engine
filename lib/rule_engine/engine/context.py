@@ -46,7 +46,7 @@ from .. import builtins
 from .. import errors
 from .. import types
 from ..suggestions import suggest_symbol
-from ..types import _DataTypeDef
+from ..types import DataType, _DataTypeDef
 
 from ._attribute_resolver import _AttributeResolver
 
@@ -114,7 +114,7 @@ def type_resolver_from_dict(dictionary: collections.abc.Mapping[str, Any]) -> Ca
     return functools.partial(_type_resolver, type_map)
 
 def _collect_object_types(definition: _DataTypeDef, type_map: dict[str, _DataTypeDef], seen: set[str]) -> None:
-    if isinstance(definition, types._ObjectDataTypeDef):
+    if DataType.is_type(definition, DataType.OBJECT):
         if definition.name in seen:
             return
         seen.add(definition.name)
@@ -123,14 +123,14 @@ def _collect_object_types(definition: _DataTypeDef, type_map: dict[str, _DataTyp
         for attr_type in definition.attributes.values():
             _collect_object_types(attr_type, type_map, seen)
         return
-    if isinstance(definition, types._MappingDataTypeDef):
+    if DataType.is_type(definition, DataType.MAPPING):
         _collect_object_types(definition.key_type, type_map, seen)
         _collect_object_types(definition.value_type, type_map, seen)
         return
     if isinstance(definition, types._CollectionDataTypeDef):
         _collect_object_types(definition.value_type, type_map, seen)
         return
-    if isinstance(definition, types._NullableDataTypeDef):
+    if DataType.is_type(definition, DataType.NULLABLE):
         _collect_object_types(definition.inner_type, type_map, seen)
         return
 

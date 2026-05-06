@@ -437,7 +437,7 @@ class CoalesceExpression(ExpressionBase):
             base_type = right_peeled
         else:
             base_type = left_peeled
-        if DataType.NULLABLE.is_nullable(right.result_type) or right_peeled == DataType.NULL:
+        if DataType.is_type(right.result_type, DataType.NULLABLE) or right_peeled == DataType.NULL:
             self.result_type = DataType.NULLABLE.wrap(base_type)
         else:
             self.result_type = base_type

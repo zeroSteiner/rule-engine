@@ -35,7 +35,7 @@ import datetime
 import decimal
 import types as pytypes
 import typing
-from typing import Any
+from typing import Any, TypeGuard, overload
 
 from .definitions import (
         _ArrayDataTypeDef,
@@ -128,8 +128,11 @@ class DataType(metaclass=DataTypeMeta):
 
         DataType.is_type(dt, DataType.TYPE)
 
-      This checks that the data types are the same but when dealing with compound data types, the member types are
-      ignored.
+      This checks that the data type belongs to the same family as the given sentinel. For scalar types this is
+      equivalent to an equality check; for compound types (e.g. :py:attr:`.ARRAY`, :py:attr:`.MAPPING`) it matches
+      any parameterization of that type without inspecting member types. When used in an ``if`` branch mypy narrows
+      the type of *dt* to the matching concrete class (e.g. after ``DataType.is_type(dt, DataType.NULLABLE)`` mypy
+      knows *dt* is a :py:class:`~rule_engine.types._NullableDataTypeDef`).
 
     Compatibility checking
       .. code-block::
@@ -305,7 +308,7 @@ class DataType(metaclass=DataTypeMeta):
             inner2 = dt2.inner_type if isinstance(dt2, _NullableDataTypeDef) else dt2
             return cls.is_compatible(inner1, inner2)
         if dt1.is_scalar and dt2.is_scalar:
-            if isinstance(dt1, _FunctionDataTypeDef) and isinstance(dt2, _FunctionDataTypeDef):
+            if DataType.is_type(dt1, DataType.FUNCTION) and DataType.is_type(dt2, DataType.FUNCTION):
                 if not cls.is_compatible(dt1.return_type, dt2.return_type):
                     return False
                 if dt1.argument_types != _DATA_TYPE_UNDEFINED and dt2.argument_types != _DATA_TYPE_UNDEFINED:
@@ -320,17 +323,17 @@ class DataType(metaclass=DataTypeMeta):
                 return True
             return dt1 == dt2
         elif dt1.is_compound and dt2.is_compound:
-            if isinstance(dt1, _ArrayDataTypeDef) and isinstance(dt2, _ArrayDataTypeDef):
+            if DataType.is_type(dt1, DataType.ARRAY) and DataType.is_type(dt2, DataType.ARRAY):
                 return cls.is_compatible(dt1.value_type, dt2.value_type)
-            elif isinstance(dt1, _MappingDataTypeDef) and isinstance(dt2, _MappingDataTypeDef):
+            elif DataType.is_type(dt1, DataType.MAPPING) and DataType.is_type(dt2, DataType.MAPPING):
                 if not cls.is_compatible(dt1.key_type, dt2.key_type):
                     return False
                 if not cls.is_compatible(dt1.value_type, dt2.value_type):
                     return False
                 return True
-            elif isinstance(dt1, _SetDataTypeDef) and isinstance(dt2, _SetDataTypeDef):
+            elif DataType.is_type(dt1, DataType.SET) and DataType.is_type(dt2, DataType.SET):
                 return cls.is_compatible(dt1.value_type, dt2.value_type)
-            elif isinstance(dt1, _ObjectDataTypeDef) and isinstance(dt2, _ObjectDataTypeDef):
+            elif DataType.is_type(dt1, DataType.OBJECT) and DataType.is_type(dt2, DataType.OBJECT):
                 # bare DataType.OBJECT acts as a wildcard, mirroring how an untyped ARRAY (value_type UNDEFINED)
                 # matches any typed ARRAY via its value_type compatibility check
                 if dt1 is DataType.OBJECT or dt2 is DataType.OBJECT:
@@ -351,6 +354,27 @@ class DataType(metaclass=DataTypeMeta):
         """
         return isinstance(value, _DataTypeDef)
 
+    @classmethod
+    @overload
+    def is_type(cls, dt: _DataTypeDef, kind: _ArrayDataTypeDef) -> TypeGuard[_ArrayDataTypeDef]: ...
+    @classmethod
+    @overload
+    def is_type(cls, dt: _DataTypeDef, kind: _FunctionDataTypeDef) -> TypeGuard[_FunctionDataTypeDef]: ...
+    @classmethod
+    @overload
+    def is_type(cls, dt: _DataTypeDef, kind: _MappingDataTypeDef) -> TypeGuard[_MappingDataTypeDef]: ...
+    @classmethod
+    @overload
+    def is_type(cls, dt: _DataTypeDef, kind: _NullableDataTypeDef) -> TypeGuard[_NullableDataTypeDef]: ...
+    @classmethod
+    @overload
+    def is_type(cls, dt: _DataTypeDef, kind: _ObjectDataTypeDef) -> TypeGuard[_ObjectDataTypeDef]: ...
+    @classmethod
+    @overload
+    def is_type(cls, dt: _DataTypeDef, kind: _SetDataTypeDef) -> TypeGuard[_SetDataTypeDef]: ...
+    @classmethod
+    @overload
+    def is_type(cls, dt: _DataTypeDef, kind: _DataTypeDef) -> bool: ...
     @classmethod
     def is_type(cls, dt: _DataTypeDef, kind: _DataTypeDef) -> bool:
         """

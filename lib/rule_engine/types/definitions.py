@@ -139,11 +139,6 @@ class _NullableDataTypeDef(_DataTypeDef):
         return hash((self.python_type, self.is_scalar, hash(self.inner_type)))
 
     @staticmethod
-    def is_nullable(dt: '_DataTypeDef') -> bool:
-        """Return ``True`` if *dt* is a :py:class:`_NullableDataTypeDef` instance."""
-        return isinstance(dt, _NullableDataTypeDef)
-
-    @staticmethod
     def unwrap(dt: '_DataTypeDef') -> '_DataTypeDef':
         """Return the inner type of *dt* if it is nullable, otherwise return *dt* unchanged."""
         if isinstance(dt, _NullableDataTypeDef):

@@ -41,7 +41,7 @@ from .. import builtins as _builtins
 from .. import errors
 from ..suggestions import suggest_symbol
 from ..types import DataType, coerce_value, is_numeric
-from ..types import _ArrayDataTypeDef, _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef, _NullableDataTypeDef, _ObjectDataTypeDef
+from ..types import _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef
 
 from .base import (
         Assignment,
@@ -141,7 +141,7 @@ class ContainsExpression(ExpressionBase):
         if container_type == DataType.BYTES or container_type == DataType.STRING:
             if member_type != DataType.UNDEFINED and member_type != container_type:
                 raise errors.EvaluationError('data type mismatch')
-        elif isinstance(_resolve_type(container_type, context), _ObjectDataTypeDef):
+        elif DataType.is_type(_resolve_type(container_type, context), DataType.OBJECT):
             raise errors.EvaluationError('data type mismatch (containment check on OBJECT)')
         elif container_type != DataType.UNDEFINED and container_type.is_scalar:
             raise errors.EvaluationError('data type mismatch')
@@ -206,7 +206,7 @@ class GetAttributeExpression(ExpressionBase):
         if object_type != DataType.UNDEFINED:
             if not (object_type == DataType.NULL and safe):
                 resolved_object_type = _resolve_type(object_type, context)
-                if isinstance(resolved_object_type, _ObjectDataTypeDef):
+                if DataType.is_type(resolved_object_type, DataType.OBJECT):
                     if name not in resolved_object_type.attributes:
                         raise errors.ObjectAttributeError(
                                 name,
@@ -230,7 +230,7 @@ class GetAttributeExpression(ExpressionBase):
                                     "behavior (deprecated, removal scheduled for v6.0)".format(name)
                             )
                         # leave the result type undefined because the name could be a mapping key or attribute
-                if DataType.NULLABLE.is_nullable(self.object.result_type) and self.result_type != DataType.UNDEFINED:
+                if DataType.is_type(self.object.result_type, DataType.NULLABLE) and self.result_type != DataType.UNDEFINED:
                     self.result_type = DataType.NULLABLE.wrap(self.result_type)
         self.name = name
         self.safe = safe
@@ -250,7 +250,7 @@ class GetAttributeExpression(ExpressionBase):
         resolved_obj = self.object.evaluate(thing)
         if resolved_obj is None and self.safe:
             return resolved_obj
-        if resolved_obj is None and DataType.NULLABLE.is_nullable(self.object.result_type):
+        if resolved_obj is None and DataType.is_type(self.object.result_type, DataType.NULLABLE):
             raise errors.EvaluationError(
                     "attribute access on a null value (use ?. to safely navigate a NULLABLE expression)"
             )
@@ -338,26 +338,24 @@ class GetItemExpression(ExpressionBase):
             if not DataType.is_compatible(item.result_type, DataType.FLOAT):
                 raise errors.EvaluationError('data type mismatch (not an integer number)')
             self.result_type = DataType.STRING
-        # check against __class__ so the parent class is dynamic in case it changes in the future, what we're doing here
-        # is explicitly checking if result_type is an array with out checking the value_type
-        elif isinstance(resolved_container_type, _ArrayDataTypeDef):
+        elif DataType.is_type(resolved_container_type, DataType.ARRAY):
             if not DataType.is_compatible(item.result_type, DataType.FLOAT):
                 raise errors.EvaluationError('data type mismatch (not an integer number)')
             self.result_type = _resolve_type(resolved_container_type.value_type, context)
-        elif isinstance(resolved_container_type, _MappingDataTypeDef):
+        elif DataType.is_type(resolved_container_type, DataType.MAPPING):
             if not (safe or DataType.is_compatible(item.result_type, resolved_container_type.key_type)):
                 raise errors.LookupError(errors.UNDEFINED, errors.UNDEFINED)
             self.result_type = _resolve_type(resolved_container_type.value_type, context)
         elif DataType.is_type(resolved_container_type, DataType.SET):
             raise errors.EvaluationError('data type mismatch (container is a set)')
-        elif isinstance(resolved_container_type, _ObjectDataTypeDef):
+        elif DataType.is_type(resolved_container_type, DataType.OBJECT):
             raise errors.EvaluationError(
                     "data type mismatch (item access on OBJECT - use {0}.attribute instead)".format(resolved_container_type.name)
             )
         elif container_type != DataType.UNDEFINED:
             if not (container_type == DataType.NULL and safe):
                 raise errors.EvaluationError('data type mismatch')
-        if DataType.NULLABLE.is_nullable(container.result_type) and self.result_type != DataType.UNDEFINED:
+        if DataType.is_type(container.result_type, DataType.NULLABLE) and self.result_type != DataType.UNDEFINED:
             self.result_type = DataType.NULLABLE.wrap(self.result_type)
         self.item = item
         self.safe = safe
@@ -395,7 +393,7 @@ class GetItemExpression(ExpressionBase):
         return self._new_value(value, verify_type=False)
 
     def reduce(self) -> ExpressionBase:
-        if isinstance(self.container.result_type, _MappingDataTypeDef):
+        if DataType.is_type(self.container.result_type, DataType.MAPPING):
             if self.safe and not DataType.is_compatible(self.item.result_type, self.container.result_type.key_type):
                 return NullExpression(self.context)
         if _is_reduced(self.container, self.item):
@@ -448,7 +446,7 @@ class GetSliceExpression(ExpressionBase):
         elif container_type != DataType.UNDEFINED:
             if not (container_type == DataType.NULL and safe):
                 raise errors.EvaluationError('data type mismatch')
-        if DataType.NULLABLE.is_nullable(container.result_type) and self.result_type != DataType.UNDEFINED:
+        if DataType.is_type(container.result_type, DataType.NULLABLE) and self.result_type != DataType.UNDEFINED:
             self.result_type = DataType.NULLABLE.wrap(self.result_type)
         self.start = start or LiteralExpressionBase.from_value(context, 0)
         self.stop = stop or LiteralExpressionBase.from_value(context, None)
@@ -554,14 +552,14 @@ class SymbolExpression(ExpressionBase):
         # NULLABLE(T) is T-or-None at runtime; None is always valid, and any other value is checked against the
         # unwrapped inner type
         effective_type: _DataTypeDef = self.result_type
-        if isinstance(effective_type, _NullableDataTypeDef):
+        if DataType.is_type(effective_type, DataType.NULLABLE):
             if value is None:
                 return value
             effective_type = effective_type.inner_type
 
         # OBJECT values are opaque to DataType.from_value; trust the schema annotation and delegate attribute-level
         # type checking to GetAttributeExpression
-        if isinstance(effective_type, _ObjectDataTypeDef):
+        if DataType.is_type(effective_type, DataType.OBJECT):
             return value
 
         # use DataType.from_value to raise a TypeError if value is not of a
@@ -676,7 +674,7 @@ class FunctionCallExpression(ExpressionBase):
                             "data type mismatch (argument #{})".format(pos),
                             function_name=function_type.value_name
                     )
-                if DataType.NULLABLE.is_nullable(arg1_type) and not DataType.NULLABLE.is_nullable(arg2_type) and arg2_type != DataType.UNDEFINED:
+                if DataType.is_type(arg1_type, DataType.NULLABLE) and not DataType.is_type(arg2_type, DataType.NULLABLE) and arg2_type != DataType.UNDEFINED:
                     raise errors.FunctionCallError(
                             "data type mismatch (argument #{} is nullable; discharge with '??' or use '&.' / '&[' for safe navigation)".format(pos),
                             function_name=function_type.value_name

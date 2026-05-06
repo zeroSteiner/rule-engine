@@ -49,12 +49,9 @@ from .base import (
         LiteralExpressionBase,
         _assert_is_integer_number,
         _assert_not_nullable,
-        _is_nullable,
         _is_reduced,
-        _peel_nullable,
         _propagate_nullable,
         _resolve_type,
-        _wrap_nullable,
 )
 from .literal import BooleanExpression, FloatExpression, NullExpression, TimedeltaExpression
 
@@ -140,7 +137,7 @@ class ContainsExpression(ExpressionBase):
     def __init__(self, context: 'Context', container: ExpressionBase, member: ExpressionBase) -> None:
         _assert_not_nullable(container.result_type, role='containment container')
         container_type = container.result_type
-        member_type = _peel_nullable(member.result_type)
+        member_type = DataType.NULLABLE.unwrap(member.result_type)
         if container_type == DataType.BYTES or container_type == DataType.STRING:
             if member_type != DataType.UNDEFINED and member_type != container_type:
                 raise errors.EvaluationError('data type mismatch')
@@ -205,7 +202,7 @@ class GetAttributeExpression(ExpressionBase):
         self._object_type = None
         if not safe:
             _assert_not_nullable(self.object.result_type, role='attribute access target')
-        object_type = _peel_nullable(self.object.result_type)
+        object_type = DataType.NULLABLE.unwrap(self.object.result_type)
         if object_type != DataType.UNDEFINED:
             if not (object_type == DataType.NULL and safe):
                 resolved_object_type = _resolve_type(object_type, context)
@@ -233,8 +230,8 @@ class GetAttributeExpression(ExpressionBase):
                                     "behavior (deprecated, removal scheduled for v6.0)".format(name)
                             )
                         # leave the result type undefined because the name could be a mapping key or attribute
-                if _is_nullable(self.object.result_type) and self.result_type != DataType.UNDEFINED:
-                    self.result_type = _wrap_nullable(self.result_type)
+                if DataType.NULLABLE.is_nullable(self.object.result_type) and self.result_type != DataType.UNDEFINED:
+                    self.result_type = DataType.NULLABLE.wrap(self.result_type)
         self.name = name
         self.safe = safe
 
@@ -253,7 +250,7 @@ class GetAttributeExpression(ExpressionBase):
         resolved_obj = self.object.evaluate(thing)
         if resolved_obj is None and self.safe:
             return resolved_obj
-        if resolved_obj is None and _is_nullable(self.object.result_type):
+        if resolved_obj is None and DataType.NULLABLE.is_nullable(self.object.result_type):
             raise errors.EvaluationError(
                     "attribute access on a null value (use ?. to safely navigate a NULLABLE expression)"
             )
@@ -331,7 +328,7 @@ class GetItemExpression(ExpressionBase):
         self.container = container
         if not safe:
             _assert_not_nullable(container.result_type, role='item access container')
-        container_type = _peel_nullable(container.result_type)
+        container_type = DataType.NULLABLE.unwrap(container.result_type)
         resolved_container_type = _resolve_type(container_type, context)
         if container_type == DataType.BYTES:
             if not DataType.is_compatible(item.result_type, DataType.FLOAT):
@@ -360,8 +357,8 @@ class GetItemExpression(ExpressionBase):
         elif container_type != DataType.UNDEFINED:
             if not (container_type == DataType.NULL and safe):
                 raise errors.EvaluationError('data type mismatch')
-        if _is_nullable(container.result_type) and self.result_type != DataType.UNDEFINED:
-            self.result_type = _wrap_nullable(self.result_type)
+        if DataType.NULLABLE.is_nullable(container.result_type) and self.result_type != DataType.UNDEFINED:
+            self.result_type = DataType.NULLABLE.wrap(self.result_type)
         self.item = item
         self.safe = safe
 
@@ -437,7 +434,7 @@ class GetSliceExpression(ExpressionBase):
         self.container = container
         if not safe:
             _assert_not_nullable(container.result_type, role='slice container')
-        container_type = _peel_nullable(container.result_type)
+        container_type = DataType.NULLABLE.unwrap(container.result_type)
         if container_type == DataType.BYTES:
             self.result_type = DataType.BYTES
         elif container_type == DataType.STRING:
@@ -451,8 +448,8 @@ class GetSliceExpression(ExpressionBase):
         elif container_type != DataType.UNDEFINED:
             if not (container_type == DataType.NULL and safe):
                 raise errors.EvaluationError('data type mismatch')
-        if _is_nullable(container.result_type) and self.result_type != DataType.UNDEFINED:
-            self.result_type = _wrap_nullable(self.result_type)
+        if DataType.NULLABLE.is_nullable(container.result_type) and self.result_type != DataType.UNDEFINED:
+            self.result_type = DataType.NULLABLE.wrap(self.result_type)
         self.start = start or LiteralExpressionBase.from_value(context, 0)
         self.stop = stop or LiteralExpressionBase.from_value(context, None)
         self.safe = safe
@@ -679,7 +676,7 @@ class FunctionCallExpression(ExpressionBase):
                             "data type mismatch (argument #{})".format(pos),
                             function_name=function_type.value_name
                     )
-                if _is_nullable(arg1_type) and not _is_nullable(arg2_type) and arg2_type != DataType.UNDEFINED:
+                if DataType.NULLABLE.is_nullable(arg1_type) and not DataType.NULLABLE.is_nullable(arg2_type) and arg2_type != DataType.UNDEFINED:
                     raise errors.FunctionCallError(
                             "data type mismatch (argument #{} is nullable; discharge with '??' or use '&.' / '&[' for safe navigation)".format(pos),
                             function_name=function_type.value_name
@@ -711,8 +708,8 @@ class TernaryExpression(ExpressionBase):
         self.condition = condition
         self.case_true = case_true
         self.case_false = case_false
-        true_type = _peel_nullable(self.case_true.result_type)
-        false_type = _peel_nullable(self.case_false.result_type)
+        true_type = DataType.NULLABLE.unwrap(self.case_true.result_type)
+        false_type = DataType.NULLABLE.unwrap(self.case_false.result_type)
         if true_type == false_type:
             self.result_type = true_type
         elif isinstance(true_type, DataType.ARRAY.__class__) and isinstance(false_type, DataType.ARRAY.__class__):

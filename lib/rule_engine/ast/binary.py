@@ -48,11 +48,8 @@ from .base import (
         _assert_is_numeric,
         _assert_is_string,
         _assert_not_nullable,
-        _is_nullable,
         _is_reduced,
-        _peel_nullable,
         _propagate_nullable,
-        _wrap_nullable,
 )
 from .literal import StringExpression
 
@@ -430,8 +427,8 @@ class CoalesceExpression(ExpressionBase):
         self.context = context
         self.left = left
         self.right = right
-        left_peeled = _peel_nullable(left.result_type)
-        right_peeled = _peel_nullable(right.result_type)
+        left_peeled = DataType.NULLABLE.unwrap(left.result_type)
+        right_peeled = DataType.NULLABLE.unwrap(right.result_type)
         if left_peeled != DataType.UNDEFINED and right_peeled != DataType.UNDEFINED:
             if left_peeled != DataType.NULL and right_peeled != DataType.NULL:
                 if not DataType.is_compatible(left_peeled, right_peeled):
@@ -440,8 +437,8 @@ class CoalesceExpression(ExpressionBase):
             base_type = right_peeled
         else:
             base_type = left_peeled
-        if _is_nullable(right.result_type) or right_peeled == DataType.NULL:
-            self.result_type = _wrap_nullable(base_type)
+        if DataType.NULLABLE.is_nullable(right.result_type) or right_peeled == DataType.NULL:
+            self.result_type = DataType.NULLABLE.wrap(base_type)
         else:
             self.result_type = base_type
 

@@ -138,6 +138,27 @@ class _NullableDataTypeDef(_DataTypeDef):
     def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar, hash(self.inner_type)))
 
+    @staticmethod
+    def is_nullable(dt: '_DataTypeDef') -> bool:
+        """Return ``True`` if *dt* is a :py:class:`_NullableDataTypeDef` instance."""
+        return isinstance(dt, _NullableDataTypeDef)
+
+    @staticmethod
+    def unwrap(dt: '_DataTypeDef') -> '_DataTypeDef':
+        """Return the inner type of *dt* if it is nullable, otherwise return *dt* unchanged."""
+        if isinstance(dt, _NullableDataTypeDef):
+            return dt.inner_type
+        return dt
+
+    @staticmethod
+    def wrap(dt: '_DataTypeDef') -> '_DataTypeDef':
+        """Wrap *dt* in :py:class:`_NullableDataTypeDef` unless it is already nullable, ``NULL``, or ``UNDEFINED``."""
+        if isinstance(dt, (_NullableDataTypeDef, _UndefinedDataTypeDef)):
+            return dt
+        if dt.python_type is NoneType:
+            return dt
+        return _NullableDataTypeDef('NULLABLE', object, inner_type=dt)
+
 class _CollectionDataTypeDef(_DataTypeDef):
     __slots__ = ('value_type',)
     value_type: _DataTypeDef
@@ -165,7 +186,7 @@ class _CollectionDataTypeDef(_DataTypeDef):
                     stacklevel=2
             )
             if value_type_nullable:
-                value_type = _wrap_nullable(value_type)
+                value_type = _NullableDataTypeDef.wrap(value_type)
         self.value_type = value_type
 
     @property
@@ -193,7 +214,7 @@ class _CollectionDataTypeDef(_DataTypeDef):
                     stacklevel=2
             )
             if value_type_nullable:
-                value_type = _wrap_nullable(value_type)
+                value_type = _NullableDataTypeDef.wrap(value_type)
         return self.__class__(
                 self.name,
                 self.python_type,
@@ -261,7 +282,7 @@ class _MappingDataTypeDef(_DataTypeDef):
                     stacklevel=2
             )
             if value_type_nullable:
-                value_type = _wrap_nullable(value_type)
+                value_type = _NullableDataTypeDef.wrap(value_type)
         self.key_type = key_type
         self.value_type = value_type
 
@@ -296,7 +317,7 @@ class _MappingDataTypeDef(_DataTypeDef):
                     stacklevel=2
             )
             if value_type_nullable:
-                value_type = _wrap_nullable(value_type)
+                value_type = _NullableDataTypeDef.wrap(value_type)
         return self.__class__(
                 self.name,
                 self.python_type,
@@ -509,15 +530,6 @@ def _resolve_dataclass_field_type(
             raise
         return DataType.UNDEFINED
 
-def _wrap_nullable(attr_type: _DataTypeDef) -> _DataTypeDef:
-    """Wrap *attr_type* in :py:class:`_NullableDataTypeDef` unless it is already nullable or a NULL."""
-    # deferred to avoid the definitions.py -> datatype.py import cycle
-    from .datatype import DataType
-    if isinstance(attr_type, _NullableDataTypeDef):
-        return attr_type
-    if attr_type == DataType.NULL:
-        return attr_type
-    return cast(_DataTypeDef, DataType.NULLABLE(attr_type))
 
 def _build_object_from_dataclass(
         cls: type,
@@ -536,7 +548,7 @@ def _build_object_from_dataclass(
         unwrapped, is_nullable = _unwrap_optional(annotation)
         attr_type = _resolve_dataclass_field_type(unwrapped, cls, seen, strict)
         if is_nullable:
-            attr_type = _wrap_nullable(attr_type)
+            attr_type = _NullableDataTypeDef.wrap(attr_type)
         attributes[field.name] = attr_type
     return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor)
 
@@ -664,12 +676,12 @@ def _build_object_from_sqlalchemy(
             continue
         attr_type = _resolve_sqlalchemy_column_type(column, strict)
         if bool(column.nullable):
-            attr_type = _wrap_nullable(attr_type)
+            attr_type = _NullableDataTypeDef.wrap(attr_type)
         attributes[column.key] = attr_type
     for relationship in mapper.relationships:
         attr_type = _resolve_sqlalchemy_relationship_type(relationship, cls, seen, strict)
         if _sqlalchemy_relationship_is_nullable(relationship):
-            attr_type = _wrap_nullable(attr_type)
+            attr_type = _NullableDataTypeDef.wrap(attr_type)
         attributes[relationship.key] = attr_type
     return _ObjectDataTypeDef(name, attributes=attributes, accessor=accessor)
 

@@ -74,23 +74,6 @@ def _iterable_member_value_type(value: Iterable[Any]) -> _DataTypeDef:
     )
     return iterable_member_value_type(value)
 
-def _peel_nullable(dt: _DataTypeDef) -> _DataTypeDef:
-    """Return the inner type of a :py:class:`_NullableDataTypeDef`; pass other types through unchanged."""
-    if isinstance(dt, _NullableDataTypeDef):
-        return dt.inner_type
-    return dt
-
-def _is_nullable(dt: _DataTypeDef) -> bool:
-    return isinstance(dt, _NullableDataTypeDef)
-
-def _wrap_nullable(dt: _DataTypeDef) -> _DataTypeDef:
-    """Wrap *dt* in :py:class:`_NullableDataTypeDef` unless it's already nullable, ``NULL``, or ``UNDEFINED``."""
-    if isinstance(dt, _NullableDataTypeDef):
-        return dt
-    if dt == DataType.NULL or dt == DataType.UNDEFINED:
-        return dt
-    return DataType.NULLABLE(dt)
-
 def _propagate_nullable(result_type: _DataTypeDef, *operand_types: _DataTypeDef) -> _DataTypeDef:
     """
     Sticky nullability: if any operand's static type is :py:class:`_NullableDataTypeDef`, wrap *result_type* in
@@ -98,8 +81,8 @@ def _propagate_nullable(result_type: _DataTypeDef, *operand_types: _DataTypeDef)
     uses this — its branches are alternatives rather than operands, so an operand-position strictness check does
     not apply.
     """
-    if any(_is_nullable(t) for t in operand_types):
-        return _wrap_nullable(result_type)
+    if any(DataType.NULLABLE.is_nullable(t) for t in operand_types):
+        return DataType.NULLABLE.wrap(result_type)
     return result_type
 
 def _assert_not_nullable(dt: _DataTypeDef, *, role: str) -> None:

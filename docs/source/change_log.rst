@@ -10,11 +10,11 @@ Version 5.x.x
 Version 5.0.0
 ^^^^^^^^^^^^^
 
-*In Progress*
+Released :release:`5.0.0` on May 17th, 2026
 
 * **Breaking:** Dropped support for Python versions 3.6, 3.7 and 3.8.
 * **Breaking:** Changed the precedence of operators to be more aligned with common programming languages.
-* **Breaking:** The :ref:`debug-repl` utility now requires development dependencies t.o be installed.
+* **Breaking:** The :ref:`debug-repl` utility now requires development dependencies to be installed.
 * **Breaking:** BYTES literals now throw exceptions for invalid escape sequences
 * **Breaking:** Removed ``setup.py``; project metadata now lives entirely in ``pyproject.toml`` (PEP 517/621).
 * **Breaking:** The ``rule_engine.ast`` module no longer re-exports names from ``rule_engine.types`` (e.g. ``DataType``,

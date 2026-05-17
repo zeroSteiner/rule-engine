@@ -6,7 +6,7 @@
 .github/workflows/*.jnj
 .pylintrc
 .python-version
-Pipfile.lock
+.venv/
 repl_setup.py
 build/*
 dist/*
@@ -15,5 +15,6 @@ docs/coverage
 docs/html
 examples/shodan/*.json
 lib/rule_engine.egg-info/*
-lib/rule_engine/parser.out
-lib/rule_engine/parsetab.py
+lib/rule_engine/parser/parser.out
+lib/rule_engine/parser/parsetab.py
+AGENTS.md

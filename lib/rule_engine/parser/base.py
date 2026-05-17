@@ -31,52 +31,56 @@
 #
 
 import threading
+from typing import TYPE_CHECKING, Any
 
-import ply.lex as lex
-import ply.yacc as yacc
+from .._vendor.ply import lex, yacc
+
+if TYPE_CHECKING:
+    from ..engine.context import Context
+    from ..ast import Statement
 
 class ParserBase(object):
-	"""
-	A base class for parser objects to inherit from. This does not provide any
-	grammar related definitions.
-	"""
-	precedence = ()
-	"""The precedence for operators."""
-	tokens = ()
-	reserved_words = {}
-	"""
-	A mapping of literal words which are reserved to their corresponding grammar
-	names.
-	"""
-	__mutex = threading.Lock()
-	def __init__(self, debug=False):
-		"""
-		:param bool debug: Whether or not to enable debugging features when
-			using the ply API.
-		"""
-		self.debug = debug
-		self.context = None
-		# Build the lexer and parser
-		self._lexer = lex.lex(module=self, debug=self.debug)
-		self._parser = yacc.yacc(module=self, debug=self.debug, write_tables=self.debug)
+    """
+    A base class for parser objects to inherit from. This does not provide any
+    grammar related definitions.
+    """
+    precedence: tuple[tuple[str, ...], ...] = ()
+    """The precedence for operators."""
+    tokens: tuple[str, ...] = ()
+    reserved_words: dict[str, str] = {}
+    """
+    A mapping of literal words which are reserved to their corresponding grammar
+    names.
+    """
+    __mutex = threading.Lock()
+    def __init__(self, debug: bool = False) -> None:
+        """
+        :param bool debug: Whether or not to enable debugging features when
+                using the ply API.
+        """
+        self.debug = debug
+        self.context: 'Context | None' = None
+        # Build the lexer and parser
+        self._lexer = lex.lex(module=self, debug=self.debug)
+        self._parser = yacc.yacc(module=self, debug=self.debug, write_tables=self.debug)
 
-	def parse(self, text, context, **kwargs):
-		"""
-		Parse the specified text in an abstract syntax tree of nodes that can later be evaluated. This is done in two
-		phases. First, the syntax is parsed and a tree of deferred / uninitialized AST nodes are constructed. Next each
-		node is built recursively using it's respective :py:meth:`rule_engine.ast.ASTNodeBase.build`.
+    def parse(self, text: str, context: 'Context', **kwargs: Any) -> 'Statement':
+        """
+        Parse the specified text in an abstract syntax tree of nodes that can later be evaluated. This is done in two
+        phases. First, the syntax is parsed and a tree of deferred / uninitialized AST nodes are constructed. Next each
+        node is built recursively using it's respective :py:meth:`rule_engine.ast.ASTNodeBase.build`.
 
-		:param str text: The grammar text to parse into an AST.
-		:param context: A context for specifying parsing and evaluation options.
-		:type context: :py:class:`~rule_engine.engine.Context`
-		:return: The parsed AST statement.
-		:rtype: :py:class:`~rule_engine.ast.Statement`
-		"""
-		kwargs['lexer'] = kwargs.pop('lexer', self._lexer)
-		with self.__mutex:
-			self.context = context
-			# phase 1: parse the string into a tree of deferred nodes
-			result = self._parser.parse(text, **kwargs)
-			self.context = None
-		# phase 2: initialize each AST node recursively, providing them with an opportunity to define assignments
-		return result.build()
+        :param str text: The grammar text to parse into an AST.
+        :param context: A context for specifying parsing and evaluation options.
+        :type context: :py:class:`~rule_engine.engine.Context`
+        :return: The parsed AST statement.
+        :rtype: :py:class:`~rule_engine.ast.Statement`
+        """
+        kwargs['lexer'] = kwargs.pop('lexer', self._lexer)
+        with self.__mutex:
+            self.context = context
+            # phase 1: parse the string into a tree of deferred nodes
+            result = self._parser.parse(text, **kwargs)
+            self.context = None
+        # phase 2: initialize each AST node recursively, providing them with an opportunity to define assignments
+        return result.build()

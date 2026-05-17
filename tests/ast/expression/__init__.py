@@ -34,9 +34,9 @@ import unittest
 
 from .attribute import *
 from .function_call import *
-from .left_operator_right import *
+from .binary import *
 from .literal import *
 from .miscellaneous import *
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

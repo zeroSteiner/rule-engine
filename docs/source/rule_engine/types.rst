@@ -28,7 +28,7 @@ Classes
 
 .. autoclass:: DataType
    :members:
-   :exclude-members: ARRAY, MAPPING, SET
+   :exclude-members: ARRAY, MAPPING, SET, UNDEFINED
    :show-inheritance:
 
    .. automethod:: ARRAY
@@ -51,6 +51,29 @@ Classes
 
    .. autoattribute:: NULL
       :annotation:
+
+   .. automethod:: NULLABLE
+
+   .. automethod:: OBJECT
+
+   .. py:method:: DataType.OBJECT.from_dataclass(name, cls, *, accessor=None)
+      :staticmethod:
+
+      .. embed-docstring:: rule_engine.types._object._ObjectDataTypeDef.from_dataclass
+
+   .. py:method:: DataType.OBJECT.from_sqlalchemy(name, cls, *, accessor=None)
+      :staticmethod:
+
+      .. embed-docstring:: rule_engine.types._object._ObjectDataTypeDef.from_sqlalchemy
+
+   .. py:method:: DataType.OBJECT.reference(name)
+      :staticmethod:
+
+      .. embed-docstring:: rule_engine.types._object._ObjectDataTypeDef.reference
+
+   .. py:attribute:: DataType.OBJECT.self
+
+      .. embed-docstring:: rule_engine.types.definitions._SelfReferenceDataTypeDef
 
    .. automethod:: SET
 

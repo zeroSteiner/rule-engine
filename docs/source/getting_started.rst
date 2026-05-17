@@ -229,7 +229,7 @@ symbol is resolved.
 
 To define type information, a *type_resolver* function must be passed to the :py:class:`~engine.Context` class. The type
 resolver function is expected to take a single argument, and that is the name of the symbol (as a Python string) whose
-type needs to be resolved. The return type should be a member of the :py:class:`~ast.DataType` enumeration.
+type needs to be resolved. The return type should be a member of the :py:class:`~types.DataType` enumeration.
 
 .. code-block:: python
 
@@ -271,6 +271,82 @@ In all cases, when a *type_resolver* is defined, the :py:class:`~engine.Rule` ob
    rule = rule_engine.Rule('author == "Stan Lee"')
    # => <Rule text='author == "Stan Lee"' >
 
+.. _getting-started-object-data-types:
+
+Object Data Types
+"""""""""""""""""
+
+.. versionadded:: 5.0.0
+
+The :py:attr:`~.DataType.OBJECT` type defines a schema with named, typed attributes. This gives parse-time validation:
+an unknown attribute in a rule will raise an error immediately, before the rule is ever applied to real data.
+
+Continuing the comic book example, suppose the data is backed by Python objects instead of plain dictionaries:
+
+.. code-block:: python
+
+   import dataclasses
+   import datetime
+   import rule_engine
+
+   @dataclasses.dataclass
+   class Hero:
+       name: str
+       publisher: str
+       first_appearance: datetime.date
+       nemesis: 'Hero' = None  # self-referential
+
+Define the corresponding ``OBJECT`` type and place it in the ``type_resolver``. Use
+:py:attr:`~.DataType.OBJECT.self` as a shorthand for the self-referential ``nemesis`` attribute (or
+:py:meth:`~.DataType.OBJECT.reference` by name for cross-type references):
+
+.. code-block:: python
+
+   HeroType = rule_engine.DataType.OBJECT('Hero', attributes={
+       'name': rule_engine.DataType.STRING,
+       'publisher': rule_engine.DataType.STRING,
+       'first_appearance': rule_engine.DataType.DATETIME,
+       'nemesis': rule_engine.DataType.OBJECT.self,
+   })
+
+   context = rule_engine.Context(type_resolver={
+       'hero': HeroType,
+       'Hero': HeroType,
+   })
+
+Now rules get attribute validation at parse time:
+
+.. code-block:: python
+
+   # valid rule - 'name' is in the schema
+   rule = rule_engine.Rule('hero.name == "Batman"', context=context)
+
+   # invalid rule - 'secret_identity' is not in the schema
+   rule = rule_engine.Rule('hero.secret_identity == "Bruce Wayne"', context=context)
+   # => ObjectAttributeError: unknown attribute: 'secret_identity'
+
+Self-referential chains work automatically:
+
+.. code-block:: python
+
+   rule = rule_engine.Rule('hero.nemesis.name == "Joker"', context=context)
+
+   batman = Hero('Batman', 'DC', datetime.date(1939, 5, 1))
+   joker = Hero('Joker', 'DC', datetime.date(1940, 4, 25), nemesis=batman)
+   batman.nemesis = joker
+
+   rule.matches({'hero': batman})  # => True
+
+For mutually recursive types (e.g. ``Hero`` and ``Sidekick``), place both types in the same ``type_resolver`` dict.
+Cross-type references are resolved lazily at rule parse time - see the :ref:`OBJECT reference<data-types>` in the Data
+Types page for a full example.
+
+.. note::
+
+   ``OBJECT`` attributes are accessed with dot syntax (``hero.name``). Item access (``hero["name"]``) is not supported
+   and will raise a parse-time error. If your data is dictionary-shaped, consider using the ``accessor`` parameter to
+   customize how values are fetched - see :py:attr:`~.DataType.OBJECT` for details.
+
 .. _getting-started-compound-data-types:
 
 Compound Data Types
@@ -306,12 +382,12 @@ and finally the maximum number of times to split the string.
        # the name of the function is provided for error messages
        'split',
        # the return data type, in this case an array of strings
-       return_type=ast.DataType.ARRAY(ast.DataType.STRING),
+       return_type=rule_engine.DataType.ARRAY(rule_engine.DataType.STRING),
        # the data type of each of the three arguments
        argument_types=(
-          ast.DataType.STRING, # argument 1, the string to split
-          ast.DataType.STRING, # argument 2, the seperator to split on
-          ast.DataType.FLOAT   # argument 3, the maximum times to split the string
+          rule_engine.DataType.STRING, # argument 1, the string to split
+          rule_engine.DataType.STRING, # argument 2, the seperator to split on
+          rule_engine.DataType.FLOAT   # argument 3, the maximum times to split the string
        ),
        # the minimum number of arguments, in this case the second two arguments are optional
        minimum_arguments=1
@@ -322,7 +398,7 @@ If the return type, or argument types are not specified, then no type checking i
 Defining Types From A Dictionary
 """"""""""""""""""""""""""""""""
 For convenience, the :py:func:`~engine.type_resolver_from_dict` function can be used to generate a *type_resolver*
-function from a dictionary mapping symbol names to their respective :py:class:`~ast.DataType`. Starting with version
+function from a dictionary mapping symbol names to their respective :py:class:`~types.DataType`. Starting with version
 :release:`2.1.0` if a :py:class:`dict` is passed as the *type_resolver*, the :py:func:`~engine.type_resolver_from_dict`
 function will be used automatically.
 
@@ -337,6 +413,92 @@ function will be used automatically.
            'released':  rule_engine.DataType.DATETIME
        })
    )
+
+.. _getting-started-types-from-dataclass:
+
+Defining Types From A Dataclass
+"""""""""""""""""""""""""""""""
+
+.. versionadded:: 5.0.0
+
+When the source data is modeled as a :py:func:`~dataclasses.dataclass`, the
+:py:func:`~engine.type_resolver_from_dataclass` helper builds a *type_resolver* directly from the field annotations.
+The dataclass's fields become the top-level resolvable symbols, and any nested dataclasses (including self- and
+mutually-recursive references) are reachable through attribute access on the resolved ``OBJECT``.
+
+.. code-block:: python
+
+   import dataclasses
+   import datetime
+   import typing
+   import rule_engine
+
+   @dataclasses.dataclass
+   class Hero:
+       name: str
+       publisher: str
+       first_appearance: datetime.datetime
+       sidekick: typing.Optional[str] = None
+
+   context = rule_engine.Context(
+       resolver=rule_engine.resolve_attribute,
+       type_resolver=rule_engine.type_resolver_from_dataclass(Hero),
+   )
+
+   rule = rule_engine.Rule('name == "Batman" and sidekick == "Robin"', context=context)
+   batman = Hero('Batman', 'DC', datetime.datetime(1939, 5, 1), sidekick='Robin')
+   rule.matches(batman)  # => True
+
+:py:class:`~typing.Optional` annotations (and the PEP 604 ``T | None`` form) are unwrapped so the attribute carries the
+underlying type and is marked nullable. Fields whose annotation is itself a dataclass become nested ``OBJECT`` types
+automatically, and ``list[Other]`` / ``dict[str, Other]`` style containers are walked so nested dataclass schemas
+inside compound types are also expanded. See :ref:`the OBJECT documentation<getting-started-object-data-types>` for
+details on the resulting schema's behavior.
+
+.. _getting-started-types-from-sqlalchemy:
+
+Defining Types From A SQLAlchemy Model
+""""""""""""""""""""""""""""""""""""""
+
+.. versionadded:: 5.0.0
+
+Projects that already use `SQLAlchemy <https://www.sqlalchemy.org/>`_ can feed a mapped class into
+:py:func:`~engine.type_resolver_from_sqlalchemy` to obtain a type resolver without restating the schema.
+SQLAlchemy is **not** a runtime dependency of Rule Engine; install it separately
+(``pip install "sqlalchemy>=2.0"``) only if you intend to call this helper.
+
+.. code-block:: python
+
+   import datetime
+   from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+   import rule_engine
+
+   class Base(DeclarativeBase):
+       pass
+
+   class Hero(Base):
+       __tablename__ = 'heroes'
+       id: Mapped[int] = mapped_column(primary_key=True)
+       name: Mapped[str]
+       alias: Mapped[str | None]
+       first_appearance: Mapped[datetime.datetime]
+       active: Mapped[bool]
+
+   context = rule_engine.Context(
+       resolver=rule_engine.resolve_attribute,
+       type_resolver=rule_engine.type_resolver_from_sqlalchemy(Hero),
+   )
+
+   rule = rule_engine.Rule('name == "Batman" and active', context=context)
+   batman = Hero(id=1, name='Batman', alias='Bruce Wayne',
+                 first_appearance=datetime.datetime(1939, 5, 1), active=True)
+   rule.matches(batman)  # => True
+
+Column nullability (``column.nullable``) is copied through, ``Mapped[T | None]`` is honored, and mapped
+relationships expand into nested ``OBJECT`` schemas (with ``uselist`` collections wrapped in
+:py:attr:`~rule_engine.types.DataType.ARRAY`). Self-references and cycles between mutually related classes
+resolve at parse time because every reachable schema is registered by name on the resulting resolver. See the
+:ref:`OBJECT documentation<getting-started-object-data-types>` for the full column-to-type mapping and limits.
 
 .. _changing-builtin-symbols:
 

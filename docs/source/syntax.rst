@@ -97,6 +97,10 @@ The following table outlines all operators that can be used in Rule Engine expre
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``!~~``      | Regex search fails :sup:`4`  | :py:attr:`~.DataType.NULL`, :py:attr:`~.DataType.STRING`        |
 +--------------+------------------------------+-----------------------------------------------------------------+
+| **Nullable Operators** :sup:`5`                                                                               |
++--------------+------------------------------+-----------------------------------------------------------------+
+| ``??``       | Null-coalesce                | *ANY*                                                           |
++--------------+------------------------------+-----------------------------------------------------------------+
 | **Logical Operators**                                                                                         |
 +--------------+------------------------------+-----------------------------------------------------------------+
 | ``and``      | Logical and                  | *ANY*                                                           |
@@ -149,6 +153,15 @@ based sequence comparison `technique used by Python`_.
 
 :sup:`4` When using regular expression operations, the expression on the left is the string to compare and the
 expression on the right is the regular expression to use for either the match or search operation.
+
+:sup:`5` The null-coalesce operator ``??`` discharges :py:attr:`~.DataType.NULLABLE` wrappers from an expression's
+static type so the result can flow into slots that expect a non-nullable type. ``a ?? b`` evaluates to ``a`` unless
+``a`` is null, in which case it evaluates to ``b``; the result type is the peeled type of ``a``, re-wrapped only
+when ``b`` is itself nullable. ``??`` is right-associative and sits between equality and the boolean operators in the
+precedence table — tighter than ``not`` / ``and`` / ``or`` / ``?`` ``:``, looser than ``==`` / ``!=`` and the
+comparison operators. ``a or b ?? c`` parses as ``a or (b ?? c)``, ``cond ? a ?? b : c`` puts the coalesce on the
+true branch, and ``a ?? b ?? c`` is right-associative as ``a ?? (b ?? c)``. Mixing with ``==`` requires explicit
+parentheses — ``(name ?? '') == 'x'``.
 
 Accessor Operators
 """"""""""""""""""
@@ -283,8 +296,25 @@ Literal Values
 :py:attr:`~.DataType.DATETIME`, :py:attr:`~.DataType.STRING`, and :py:attr:`TIMEDELTA` literal values are specified in a
 very similar manner by defining the value as a string of characters enclosed in either single or double quotes. The
 difference comes in an optional leading character before the opening quote. Either no leading character or a single
-``s`` will specify a standard :py:attr:`~.DataType.STRING` value, while a single ``d`` will specify a
+``s`` will specify a standard :py:attr:`~.DataType.STRING` value, a single ``r`` will specify a raw
+:py:attr:`~.DataType.STRING` value in which backslashes are treated literally, while a single ``d`` will specify a
 :py:attr:`~.DataType.DATETIME` value, and a single ``t`` will specify a :py:attr:`~.DataType.TIMEDELTA` value.
+
+Raw string literals (``r'...'`` / ``r"..."``) are useful when writing values that contain backslashes such as regular
+expressions or Windows-style paths. In a raw string, ``\`` is always a literal backslash — no escape sequences are
+processed. For example, ``r'\w+'`` is a four character string identical to ``'\\w+'``. As in Python, a backslash
+still prevents the following quote character from terminating the string, but the backslash itself is retained, so
+``r'it\'s'`` is the five character string ``it\'s``. A raw string literal cannot end with an odd number of trailing
+backslashes.
+
+.. _literal-bytes-values:
+
+Literal BYTES Values
+""""""""""""""""""""
+
+:py:attr:`~.DataType.BYTES` literals are strings prefixed with ``b`` followed by either a single or double quote. The
+contents of the string may use escape sequences by specifying ``\`` followed by a single selection of ``tnr"'\`` or
+``x`` followed by two hexadecimal digits.
 
 .. _literal-datetime-values:
 

@@ -13,7 +13,11 @@ Functions
 
 .. autofunction:: resolve_item
 
+.. autofunction:: type_resolver_from_dataclass
+
 .. autofunction:: type_resolver_from_dict
+
+.. autofunction:: type_resolver_from_sqlalchemy
 
 Classes
 -------

@@ -30,11 +30,13 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-__version__ = '4.5.3'
+__version__ = '5.0.0'
 
 from .engine import resolve_attribute
 from .engine import resolve_item
+from .engine import type_resolver_from_dataclass
 from .engine import type_resolver_from_dict
+from .engine import type_resolver_from_sqlalchemy
 from .engine import Context
 from .engine import Rule
 
@@ -45,3 +47,19 @@ from .errors import RuleSyntaxError
 from .errors import SymbolResolutionError
 
 from .types import DataType
+
+__all__ = (
+    'AttributeResolutionError',
+    'Context',
+    'DataType',
+    'EngineError',
+    'EvaluationError',
+    'Rule',
+    'RuleSyntaxError',
+    'SymbolResolutionError',
+    'resolve_attribute',
+    'resolve_item',
+    'type_resolver_from_dataclass',
+    'type_resolver_from_dict',
+    'type_resolver_from_sqlalchemy',
+)

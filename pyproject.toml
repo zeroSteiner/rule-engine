@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rule-engine"
+dynamic = ["version"]
+description = "A lightweight, optionally typed expression language with a custom grammar for matching arbitrary Python objects."
+readme = "README.rst"
+license = {text = "BSD"}
+authors = [
+    {name = "Spencer McIntyre", email = "zeroSteiner@gmail.com"},
+]
+maintainers = [
+    {name = "Spencer McIntyre", email = "zeroSteiner@gmail.com"},
+]
+requires-python = ">=3.10"
+dependencies = [
+    "python-dateutil~=2.7",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    #"Programming Language :: Python :: 3.4",  # dropped in v4.0
+    #"Programming Language :: Python :: 3.5",  # dropped in v4.0
+    #"Programming Language :: Python :: 3.6",  # dropped in v5.0
+    #"Programming Language :: Python :: 3.7",  # dropped in v5.0
+    #"Programming Language :: Python :: 3.8",  # dropped in v5.0
+    #"Programming Language :: Python :: 3.9",  # dropped in v5.0
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/zeroSteiner/rule-engine"
+
+[dependency-groups]
+dev = [
+    "coverage",
+    "graphviz",
+    "invoke",
+    "ipython>=9.0; python_version >= '3.11'",
+    "mypy",
+    "sphinx>=9.1; python_version >= '3.12'",
+    "sphinx-rtd-theme",
+    "sqlalchemy>=2.0",
+    "types-python-dateutil",
+]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["lib/rule_engine"]
+exclude = ["lib/rule_engine/_vendor/", "lib/rule_engine/parser/parsetab\\.py"]
+
+[[tool.mypy.overrides]]
+module = ["rule_engine._vendor.*", "rule_engine.parser.parsetab"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["graphviz", "invoke.*", "sqlalchemy", "sqlalchemy.*"]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["lib/rule_engine"]
+omit = [
+    "lib/rule_engine/_vendor/*",
+    "lib/rule_engine/debug_ast.py",
+    "lib/rule_engine/debug_repl.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.setuptools]
+package-dir = {"" = "lib"}
+
+[tool.setuptools.packages.find]
+where = ["lib"]
+
+[tool.setuptools.package-data]
+"rule_engine._vendor.ply" = ["LICENSE"]
+
+[tool.setuptools.dynamic]
+version = {attr = "rule_engine.__version__"}

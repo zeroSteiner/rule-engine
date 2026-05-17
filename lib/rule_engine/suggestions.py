@@ -32,71 +32,74 @@
 
 import functools
 import re
+from collections.abc import Iterable, Sequence
+from typing import Any
 
-def jaro_distance(str1, str2):
-	if str1 == str2:
-		return 1.0
 
-	str1_len = len(str1)
-	str2_len = len(str2)
-	max_len = max(str1_len, str2_len)
-	match_distance = (max_len // 2) - 1
-	str1_matches = [False] * max_len
-	str2_matches = [False] * max_len
-	matches = 0.0
+def jaro_distance(str1: str, str2: str) -> float:
+    if str1 == str2:
+        return 1.0
 
-	for i in range(str1_len):
-		start = max(0, i - match_distance)
-		end = min(i + match_distance, str2_len - 1) + 1
-		for j in range(start, end):
-			if not str2_matches[j] and str1[i] == str2[j]:
-				str1_matches[i] = True
-				str2_matches[j] = True
-				matches += 1
-				break
+    str1_len = len(str1)
+    str2_len = len(str2)
+    max_len = max(str1_len, str2_len)
+    match_distance = (max_len // 2) - 1
+    str1_matches = [False] * max_len
+    str2_matches = [False] * max_len
+    matches = 0.0
 
-	if matches == 0.0:
-		return 0.0
+    for i in range(str1_len):
+        start = max(0, i - match_distance)
+        end = min(i + match_distance, str2_len - 1) + 1
+        for j in range(start, end):
+            if not str2_matches[j] and str1[i] == str2[j]:
+                str1_matches[i] = True
+                str2_matches[j] = True
+                matches += 1
+                break
 
-	k = 0
-	transpositions = 0.0
-	for i in range(str1_len):
-		if not str1_matches[i]:
-			continue
-		while not str2_matches[k]:
-			k += 1
-		if str1[i] != str2[k]:
-			transpositions += 1.0
-		k += 1
-	return ((matches / str1_len) + (matches / str2_len) + ((matches - transpositions / 2.0) / matches)) / 3.0
+    if matches == 0.0:
+        return 0.0
 
-def jaro_winkler_distance(str1, str2, scale=0.1):
-	jaro_dist = jaro_distance(str1, str2)
-	if jaro_dist > 0.7:
-		prefix = 0
-		while prefix < min(len(str1), len(str2), 5) and str1[prefix] == str2[prefix]:
-			prefix += 1
-		jaro_dist += scale * prefix * (1 - jaro_dist)
-	return jaro_dist
+    k = 0
+    transpositions = 0.0
+    for i in range(str1_len):
+        if not str1_matches[i]:
+            continue
+        while not str2_matches[k]:
+            k += 1
+        if str1[i] != str2[k]:
+            transpositions += 1.0
+        k += 1
+    return ((matches / str1_len) + (matches / str2_len) + ((matches - transpositions / 2.0) / matches)) / 3.0
 
-def jaro_winkler_similarity(*args, **kwargs):
-	return 1 - jaro_winkler_distance(*args, **kwargs)
+def jaro_winkler_distance(str1: str, str2: str, scale: float = 0.1) -> float:
+    jaro_dist = jaro_distance(str1, str2)
+    if jaro_dist > 0.7:
+        prefix = 0
+        while prefix < min(len(str1), len(str2), 5) and str1[prefix] == str2[prefix]:
+            prefix += 1
+        jaro_dist += scale * prefix * (1 - jaro_dist)
+    return jaro_dist
 
-def _suggest(word, options):
-	if not len(options):
-		return None
-	return sorted(options, key=functools.partial(jaro_winkler_similarity, word))[0]
+def jaro_winkler_similarity(*args: Any, **kwargs: Any) -> float:
+    return 1 - jaro_winkler_distance(*args, **kwargs)
 
-def suggest_symbol(word, options):
-	"""
-	Select the best match for *word* from a list of value *options*. Values that are not suitable symbol names will be
-	filtered out of *options*. If no match is found, this function will return None.
+def _suggest(word: str, options: Sequence[str]) -> str | None:
+    if not len(options):
+        return None
+    return sorted(options, key=functools.partial(jaro_winkler_similarity, word))[0]
 
-	:param str word: The original word to suggest an alternative for.
-	:param tuple options: A list of strings to select the best match from.
-	:return: The best replacement for *word*.
-	:rtype: str
-	"""
-	from .parser import Parser  # avoid circular imports
-	symbol_regex = '^' + Parser.get_token_regex('SYMBOL') + '$'
-	return _suggest(word, [option for option in options if re.match(symbol_regex, option)])
+def suggest_symbol(word: str, options: Iterable[str]) -> str | None:
+    """
+    Select the best match for *word* from a list of value *options*. Values that are not suitable symbol names will be
+    filtered out of *options*. If no match is found, this function will return None.
+
+    :param str word: The original word to suggest an alternative for.
+    :param tuple options: A list of strings to select the best match from.
+    :return: The best replacement for *word*.
+    :rtype: str
+    """
+    from .parser import Parser  # avoid circular imports
+    symbol_regex = '^' + Parser.get_token_regex('SYMBOL') + '$'
+    return _suggest(word, [option for option in options if re.match(symbol_regex, option)])

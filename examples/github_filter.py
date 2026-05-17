@@ -37,10 +37,10 @@ import os
 import sys
 
 try:
-	import github
+    import github
 except ImportError:
-	print('this script requires PyGithub', file=sys.stderr)
-	sys.exit(os.EX_UNAVAILABLE)
+    print('this script requires PyGithub', file=sys.stderr)
+    sys.exit(os.EX_UNAVAILABLE)
 
 DESCRIPTION = 'Apply a rule to filter pull requests or issues from GitHub.'
 EPILOG = """\
@@ -58,44 +58,44 @@ import rule_engine
 import rule_engine.engine
 
 def _get_github(arguments):
-	if arguments.auth_token:
-		gh = github.Github(arguments.auth_token)
-	elif arguments.auth_user:
-		password = getpass.getpass("{0}@github.com: ".format(arguments.auth_user))
-		gh = github.Github(arguments.auth_user, password)
-	else:
-		gh = github.Github()
-	return gh
+    if arguments.auth_token:
+        gh = github.Github(arguments.auth_token)
+    elif arguments.auth_user:
+        password = getpass.getpass("{0}@github.com: ".format(arguments.auth_user))
+        gh = github.Github(arguments.auth_user, password)
+    else:
+        gh = github.Github()
+    return gh
 
 def main():
-	parser = argparse.ArgumentParser(
-		conflict_handler='resolve',
-		description=DESCRIPTION,
-		formatter_class=argparse.RawDescriptionHelpFormatter
-	)
-	auth_type_parser_group = parser.add_mutually_exclusive_group()
-	auth_type_parser_group.add_argument('--auth-token', dest='auth_token', help='authenticate to github with a token')
-	auth_type_parser_group.add_argument('--auth-user', dest='auth_user', help='authenticate to github with credentials')
-	parser.add_argument('repo_slug', help='the repository to filter')
-	parser.add_argument('type', choices=('issues', 'pulls'), help='thing to filter')
-	parser.add_argument('rule', help='the rule to apply')
-	parser.epilog = EPILOG
-	arguments = parser.parse_args()
+    parser = argparse.ArgumentParser(
+            conflict_handler='resolve',
+            description=DESCRIPTION,
+            formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    auth_type_parser_group = parser.add_mutually_exclusive_group()
+    auth_type_parser_group.add_argument('--auth-token', dest='auth_token', help='authenticate to github with a token')
+    auth_type_parser_group.add_argument('--auth-user', dest='auth_user', help='authenticate to github with credentials')
+    parser.add_argument('repo_slug', help='the repository to filter')
+    parser.add_argument('type', choices=('issues', 'pulls'), help='thing to filter')
+    parser.add_argument('rule', help='the rule to apply')
+    parser.epilog = EPILOG
+    arguments = parser.parse_args()
 
-	# need to define a custom context to use a custom resolver function
-	context = rule_engine.Context(resolver=rule_engine.engine.resolve_attribute)
-	try:
-		rule = rule_engine.Rule(arguments.rule, context=context)
-	except rule_engine.RuleSyntaxError as error:
-		print(error.message)
-		return 0
+    # need to define a custom context to use a custom resolver function
+    context = rule_engine.Context(resolver=rule_engine.engine.resolve_attribute)
+    try:
+        rule = rule_engine.Rule(arguments.rule, context=context)
+    except rule_engine.RuleSyntaxError as error:
+        print(error.message)
+        return 0
 
-	gh = _get_github(arguments)
-	repo = gh.get_repo(arguments.repo_slug)
-	things = tuple(getattr(repo, 'get_' + arguments.type)(state='all'))
-	for thing in rule.filter(things):
-		print("{0}#{1: <4} - {2}".format(arguments.repo_slug, thing.number, thing.title))
-	return 0
+    gh = _get_github(arguments)
+    repo = gh.get_repo(arguments.repo_slug)
+    things = tuple(getattr(repo, 'get_' + arguments.type)(state='all'))
+    for thing in rule.filter(things):
+        print("{0}#{1: <4} - {2}".format(arguments.repo_slug, thing.number, thing.title))
+    return 0
 
 if __name__ == '__main__':
-	sys.exit(main())
+    sys.exit(main())

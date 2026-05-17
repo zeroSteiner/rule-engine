@@ -37,34 +37,34 @@ import unittest
 import rule_engine.errors as errors
 
 class ResolutionErrorTests(unittest.TestCase):
-	def test_attribute_error_repr(self):
-		attribute_error = errors.AttributeResolutionError('doesnotexist', None)
-		self.assertIn('suggestion', repr(attribute_error))
+    def test_attribute_error_repr(self):
+        attribute_error = errors.AttributeResolutionError('doesnotexist', None)
+        self.assertIn('suggestion', repr(attribute_error))
 
-		suggestion = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-		attribute_error = errors.AttributeResolutionError('doesnotexist', None, suggestion=suggestion)
-		self.assertIn('suggestion', repr(attribute_error))
-		self.assertIn(suggestion, repr(attribute_error))
+        suggestion = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+        attribute_error = errors.AttributeResolutionError('doesnotexist', None, suggestion=suggestion)
+        self.assertIn('suggestion', repr(attribute_error))
+        self.assertIn(suggestion, repr(attribute_error))
 
-	def test_symbol_error_repr(self):
-		symbol_error = errors.SymbolResolutionError('doesnotexist')
-		self.assertIn('suggestion', repr(symbol_error))
+    def test_symbol_error_repr(self):
+        symbol_error = errors.SymbolResolutionError('doesnotexist')
+        self.assertIn('suggestion', repr(symbol_error))
 
-		suggestion = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-		symbol_error = errors.SymbolResolutionError('doesnotexist', suggestion=suggestion)
-		self.assertIn('suggestion', repr(symbol_error))
-		self.assertIn(suggestion, repr(symbol_error))
+        suggestion = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+        symbol_error = errors.SymbolResolutionError('doesnotexist', suggestion=suggestion)
+        self.assertIn('suggestion', repr(symbol_error))
+        self.assertIn(suggestion, repr(symbol_error))
 
 class UndefinedSentinelTests(unittest.TestCase):
-	def test_undefined_has_a_repr(self):
-		self.assertEqual(repr(errors.UNDEFINED), 'UNDEFINED')
+    def test_undefined_has_a_repr(self):
+        self.assertEqual(repr(errors.UNDEFINED), 'UNDEFINED')
 
-	def test_undefined_is_a_sentinel(self):
-		self.assertIsNotNone(errors.UNDEFINED)
-		self.assertIs(errors.UNDEFINED, errors.UNDEFINED)
+    def test_undefined_is_a_sentinel(self):
+        self.assertIsNotNone(errors.UNDEFINED)
+        self.assertIs(errors.UNDEFINED, errors.UNDEFINED)
 
-	def test_undefined_is_falsy(self):
-		self.assertFalse(errors.UNDEFINED)
+    def test_undefined_is_falsy(self):
+        self.assertFalse(errors.UNDEFINED)
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

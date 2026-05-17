@@ -7,28 +7,10 @@ on:
 jobs:
   unit-tests:
     name: Test on Python v${{ matrix.python-version }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        include:
-          - pipenv-version: '2022.4.8'
-            python-version: '3.6'
-            install-with: pyenv
-          - pipenv-version: '2022.4.8'
-            python-version: '3.7'
-            install-with: pyenv
-          - pipenv-version: '2022.4.8'
-            python-version: '3.8'
-          - pipenv-version: '2022.4.8'
-            python-version: '3.9'
-          - pipenv-version: '2023.2.4'
-            python-version: '3.10'
-          - pipenv-version: '2023.2.4'
-            python-version: '3.11'
-          - pipenv-version: '2024.4.0'
-            python-version: '3.12'
-          - pipenv-version: '2024.4.0'
-            python-version: '3.13'
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
       - name: Checkout the repository
@@ -39,30 +21,21 @@ jobs:
       - name: Install build essentials
         run: sudo apt-get --yes install build-essential
 
-      - name: Install Python via pyenv
-        if: matrix.install-with == 'pyenv'
-        run: |
-          export PYENV_GIT_TAG="v2.6.11"
-          curl https://pyenv.run | bash
-          export PATH="$HOME/.pyenv/bin:$PATH"
-          eval "$(pyenv init -)"
-          pyenv install ${{ matrix.python-version }}
-          pyenv global ${{ matrix.python-version }}
-          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
-
-      - name: Install Python via actions/setup-python
-        if: matrix.install-with == null || matrix.install-with == 'actions/setup'
-        uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: |
-          pip install pipenv==${{ matrix.pipenv-version }}
-          pipenv install --dev
+        run: uv sync --group dev
 
-      - run: pipenv run tests
-      - run: pipenv run tests-coverage
+      - name: Run tests
+        run: uv run python -m unittest -v tests
+
+      - name: Run tests with coverage
+        run: |
+          uv run coverage run -m unittest -v tests
+          uv run coverage report --include="*/rule_engine/*"
 
   test-documentation:
     name: Test building the documentation
@@ -78,28 +51,14 @@ jobs:
       - name: Install build essentials
         run: sudo apt-get --yes install build-essential
 
-      - name: Install Python via pyenv
-        if: matrix.install-with == 'pyenv'
-        run: |
-          export PYENV_GIT_TAG="v2.6.11"
-          curl https://pyenv.run | bash
-          export PATH="$HOME/.pyenv/bin:$PATH"
-          eval "$(pyenv init -)"
-          pyenv install ${{ matrix.python-version }}
-          pyenv global ${{ matrix.python-version }}
-          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
-
-      - name: Install Python via actions/setup-python
-        if: matrix.install-with == null || matrix.install-with == 'actions/setup'
-        uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
-        run: |
-          pip install pipenv
-          pipenv install --dev
+        run: uv sync --group dev
 
       - name: Build the documentation
-        run: pipenv run sphinx-build -b html -a -E -v docs/source docs/html
+        run: uv run sphinx-build -b html -a -E -v docs/source docs/html
 
   publish-documentation:
     name: Build and publish the documentation
@@ -115,28 +74,14 @@ jobs:
       - name: Install build essentials
         run: sudo apt-get --yes install build-essential
 
-      - name: Install Python via pyenv
-        if: matrix.install-with == 'pyenv'
-        run: |
-          export PYENV_GIT_TAG="v2.6.11"
-          curl https://pyenv.run | bash
-          export PATH="$HOME/.pyenv/bin:$PATH"
-          eval "$(pyenv init -)"
-          pyenv install ${{ matrix.python-version }}
-          pyenv global ${{ matrix.python-version }}
-          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
-
-      - name: Install Python via actions/setup-python
-        if: matrix.install-with == null || matrix.install-with == 'actions/setup'
-        uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
-        run: |
-          pip install pipenv
-          pipenv install --dev
+        run: uv sync --group dev
 
       - name: Build the documentation
-        run: pipenv run sphinx-build -b html -a -E -v docs/source docs/html
+        run: uv run sphinx-build -b html -a -E -v docs/source docs/html
 
       - name: Publish the documentation
         uses: JamesIves/github-pages-deploy-action@3.7.1
@@ -160,28 +105,14 @@ jobs:
       - name: Install build essentials
         run: sudo apt-get --yes install build-essential
 
-      - name: Install Python via pyenv
-        if: matrix.install-with == 'pyenv'
-        run: |
-          export PYENV_GIT_TAG="v2.6.11"
-          curl https://pyenv.run | bash
-          export PATH="$HOME/.pyenv/bin:$PATH"
-          eval "$(pyenv init -)"
-          pyenv install ${{ matrix.python-version }}
-          pyenv global ${{ matrix.python-version }}
-          echo "$HOME/.pyenv/shims" >> $GITHUB_PATH
-
-      - name: Install Python via actions/setup-python
-        if: matrix.install-with == null || matrix.install-with == 'actions/setup'
-        uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
-        run: |
-          pip install pipenv
-          pipenv install --dev
+        run: uv sync --group dev
 
       - name: Create the distribution
-        run: pipenv run python setup.py build sdist
+        run: uv build
 
       - name: Publish the distribution
         uses: pypa/gh-action-pypi-publish@release/v1
@@ -189,12 +120,18 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
 
+      - name: Check if pre-release
+        id: check_prerelease
+        run: |
+          if echo "${{ github.ref_name }}" | grep -qE '(a|b|rc)[0-9]+$'; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create the release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          generate_release_notes: true
+          prerelease: ${{ steps.check_prerelease.outputs.prerelease == 'true' }}
 

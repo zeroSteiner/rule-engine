@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.parser.utilities &mdash; Rule Engine 4.5.3 documentation</title>
+  <title>rule_engine.parser.utilities &mdash; Rule Engine 5.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=0c24fe83" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=690d16f2"></script>
+      <script src="../../../_static/documentation_options.js?v=ce74c6a2"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -121,85 +121,84 @@
 
 <span class="n">_sub_regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;[0-9]+([,.][0-9]+)?&#39;</span>
 <span class="n">timedelta_regex</span> <span class="o">=</span> <span class="p">(</span>
-	<span class="sa">r</span><span class="s1">&#39;P(?!\b)&#39;</span>
-	<span class="sa">r</span><span class="s1">&#39;(?P&lt;weeks&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;W)?&#39;</span>
-	<span class="sa">r</span><span class="s1">&#39;(?P&lt;days&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;D)?&#39;</span>
-	<span class="sa">r</span><span class="s1">&#39;(T&#39;</span>
-	<span class="sa">r</span><span class="s1">&#39;(?P&lt;hours&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;H)?&#39;</span>
-	<span class="sa">r</span><span class="s1">&#39;(?P&lt;minutes&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;M)?&#39;</span>
-	<span class="sa">r</span><span class="s1">&#39;(?P&lt;seconds&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;S)?&#39;</span>
-	<span class="sa">r</span><span class="s1">&#39;)?&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;P(?!\b)&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;weeks&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;W)?&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;days&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;D)?&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(T&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;hours&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;H)?&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;minutes&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;M)?&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;(?P&lt;seconds&gt;&#39;</span> <span class="o">+</span> <span class="n">_sub_regex</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;S)?&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;)?&#39;</span>
 <span class="p">)</span>
 
 <div class="viewcode-block" id="parse_datetime">
 <a class="viewcode-back" href="../../../rule_engine/parser/utilities.html#rule_engine.parser.utilities.parse_datetime">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">parse_datetime</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">default_timezone</span><span class="p">):</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	Parse a timestamp string. If the timestamp does not specify a timezone, *default_timezone* is used.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_datetime</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default_timezone</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse a timestamp string. If the timestamp does not specify a timezone, *default_timezone* is used.</span>
 
-<span class="sd">	:param str string: The string to parse.</span>
-<span class="sd">	:param datetime.tzinfo default_timezone: The default timezone to set.</span>
-<span class="sd">	:rtype: datetime.datetime</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">try</span><span class="p">:</span>
-		<span class="n">dt</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">isoparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-	<span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-	<span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-		<span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">default_timezone</span><span class="p">)</span>
-	<span class="k">return</span> <span class="n">dt</span></div>
+<span class="sd">    :param str string: The string to parse.</span>
+<span class="sd">    :param datetime.tzinfo default_timezone: The default timezone to set.</span>
+<span class="sd">    :rtype: datetime.datetime</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">isoparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">DatetimeSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid datetime literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+    <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">default_timezone</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dt</span></div>
 
 
 <div class="viewcode-block" id="parse_float">
 <a class="viewcode-back" href="../../../rule_engine/parser/utilities.html#rule_engine.parser.utilities.parse_float">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	Parse a literal string representing a floating point value.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse a literal string representing a floating point value.</span>
 
-<span class="sd">	:param str string: The string to parse.</span>
-<span class="sd">	:rtype: decimal.Decimal</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[0-9]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal (leading zeros in decimal literals are not permitted)&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
-	<span class="k">try</span><span class="p">:</span>
-		<span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[box]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-			<span class="n">val</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">pyast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
-		<span class="k">else</span><span class="p">:</span>
-			<span class="n">val</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-	<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-	<span class="k">return</span> <span class="n">val</span></div>
+<span class="sd">    :param str string: The string to parse.</span>
+<span class="sd">    :rtype: decimal.Decimal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[0-9]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal (leading zeros in decimal literals are not permitted)&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[box]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">pyast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+    <span class="k">return</span> <span class="n">val</span></div>
 
 
 <div class="viewcode-block" id="parse_timedelta">
 <a class="viewcode-back" href="../../../rule_engine/parser/utilities.html#rule_engine.parser.utilities.parse_timedelta">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">parse_timedelta</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
-<span class="w">	</span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	Parse a literal string representing a time period in the ISO-8601 duration format.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_timedelta</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse a literal string representing a time period in the ISO-8601 duration format.</span>
 
-<span class="sd">	:param str string: The string to parse.</span>
-<span class="sd">	:rtype: datetime.timedelta</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">if</span> <span class="n">string</span> <span class="o">==</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">TimedeltaSyntaxError</span><span class="p">(</span><span class="s1">&#39;empty timedelta string&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+<span class="sd">    :param str string: The string to parse.</span>
+<span class="sd">    :rtype: datetime.timedelta</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">string</span> <span class="o">==</span> <span class="s2">&quot;P&quot;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">TimedeltaSyntaxError</span><span class="p">(</span><span class="s1">&#39;empty timedelta string&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
 
-	<span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^&quot;</span> <span class="o">+</span> <span class="n">timedelta_regex</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
-	<span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
-		<span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">TimedeltaSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid timedelta string&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;^&quot;</span> <span class="o">+</span> <span class="n">timedelta_regex</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">TimedeltaSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid timedelta string&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
 
-	<span class="n">groups</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span>
-	<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-		<span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-			<span class="n">val</span> <span class="o">=</span> <span class="s2">&quot;0n&quot;</span>
-		<span class="n">groups</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">))</span>
+    <span class="n">groups</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="nb">float</span><span class="p">((</span><span class="n">val</span> <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;0n&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">match</span><span class="o">.</span><span class="n">groupdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
 
-	<span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span>
-		<span class="n">weeks</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;weeks&#39;</span><span class="p">],</span>
-		<span class="n">days</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;days&#39;</span><span class="p">],</span>
-		<span class="n">hours</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;hours&#39;</span><span class="p">],</span>
-		<span class="n">minutes</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;minutes&#39;</span><span class="p">],</span>
-		<span class="n">seconds</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;seconds&#39;</span><span class="p">],</span>
-	<span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span>
+            <span class="n">weeks</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;weeks&#39;</span><span class="p">],</span>
+            <span class="n">days</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;days&#39;</span><span class="p">],</span>
+            <span class="n">hours</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;hours&#39;</span><span class="p">],</span>
+            <span class="n">minutes</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;minutes&#39;</span><span class="p">],</span>
+            <span class="n">seconds</span><span class="o">=</span><span class="n">groups</span><span class="p">[</span><span class="s1">&#39;seconds&#39;</span><span class="p">],</span>
+    <span class="p">)</span></div>
 
 </pre></div>
 

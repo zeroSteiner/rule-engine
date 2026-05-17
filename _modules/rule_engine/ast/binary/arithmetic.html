@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rule_engine.ast.binary.arithmetic &mdash; Rule Engine 5.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=0c24fe83" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=ce74c6a2"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Rule Engine
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../types.html">Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug_repl.html">Debug REPL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../change_log.html">Change Log</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Rule Engine</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rule_engine.ast.binary.arithmetic</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rule_engine.ast.binary.arithmetic</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  rule_engine/ast/binary/arithmetic.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">...</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">coerce_value</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...types</span><span class="w"> </span><span class="kn">import</span> <span class="n">_DataTypeDef</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">_assert_is_bytes</span><span class="p">,</span> <span class="n">_assert_is_natural_number</span><span class="p">,</span> <span class="n">_assert_is_numeric</span><span class="p">,</span> <span class="n">_assert_is_string</span><span class="p">,</span> <span class="n">_assert_not_nullable</span><span class="p">,</span> <span class="n">_is_reduced</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryExpressionBase</span>
+
+<div class="viewcode-block" id="AddExpression">
+<a class="viewcode-back" href="../../../../rule_engine/ast.html#rule_engine.ast.AddExpression">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AddExpression</span><span class="p">(</span><span class="n">BinaryExpressionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for representing addition expressions from the grammar text.&quot;&quot;&quot;</span>
+    <span class="n">compatible_types</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_DataTypeDef</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">BYTES</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">)</span>
+    <span class="n">result_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AddExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_assert_not_nullable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;left operand of &#39;+&#39;&quot;</span><span class="p">)</span>
+        <span class="n">_assert_not_nullable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;right operand of &#39;+&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_op_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">left_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="n">right_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a timedelta value)&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a datetime or timedelta value)&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">_assert_is_bytes</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">_assert_is_string</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubtractExpression">
+<a class="viewcode-back" href="../../../../rule_engine/ast.html#rule_engine.ast.SubtractExpression">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubtractExpression</span><span class="p">(</span><span class="n">BinaryExpressionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for representing subtraction expressions from the grammar text.</span>
+
+<span class="sd">    .. versionadded:: 3.5.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">compatible_types</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_DataTypeDef</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">)</span>
+    <span class="n">result_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SubtractExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_assert_not_nullable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;left operand of &#39;-&#39;&quot;</span><span class="p">)</span>
+        <span class="n">_assert_not_nullable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s2">&quot;right operand of &#39;-&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">TIMEDELTA</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_op_sub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">left_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="n">right_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a datetime or timedelta value)&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a timedelta value)&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ArithmeticExpression">
+<a class="viewcode-back" href="../../../../rule_engine/ast.html#rule_engine.ast.ArithmeticExpression">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArithmeticExpression</span><span class="p">(</span><span class="n">BinaryExpressionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for representing arithmetic expressions from the grammar text such as multiplication and division.&quot;&quot;&quot;</span>
+    <span class="n">compatible_types</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_DataTypeDef</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,)</span>
+    <span class="n">result_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ArithmeticExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_assert_not_nullable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s1">&#39;left arithmetic operand&#39;</span><span class="p">)</span>
+        <span class="n">_assert_not_nullable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s1">&#39;right arithmetic operand&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__op_arithmetic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">left_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">left_value</span><span class="p">)</span>
+        <span class="n">right_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="n">_assert_is_numeric</span><span class="p">(</span><span class="n">right_value</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">left_value</span><span class="p">,</span> <span class="n">right_value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">ArithmeticError</span><span class="p">(</span><span class="s1">&#39;arithmetic error: division by zero&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">ArithmeticError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">ArithmeticError</span><span class="p">(</span><span class="s1">&#39;arithmetic error&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="n">_op_fdiv</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">floordiv</span><span class="p">)</span>
+    <span class="n">_op_tdiv</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">)</span>
+    <span class="n">_op_mod</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">)</span>
+    <span class="n">_op_mul</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">)</span>
+    <span class="n">_op_pow</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">__op_arithmetic</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">pow</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BitwiseExpression">
+<a class="viewcode-back" href="../../../../rule_engine/ast.html#rule_engine.ast.BitwiseExpression">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BitwiseExpression</span><span class="p">(</span><span class="n">BinaryExpressionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for representing bitwise arithmetic expressions from the grammar text such as XOR and shifting operations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">compatible_types</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_DataTypeDef</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">)</span>
+    <span class="n">result_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BitwiseExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">_assert_not_nullable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s1">&#39;left bitwise operand&#39;</span><span class="p">)</span>
+        <span class="n">_assert_not_nullable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s1">&#39;right bitwise operand&#39;</span><span class="p">)</span>
+        <span class="c1"># don&#39;t use DataType.is_compatible, because for sets the member type isn&#39;t important</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="vm">__class__</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="vm">__class__</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">):</span>
+                <span class="n">_assert_is_natural_number</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">):</span>
+                <span class="n">_assert_is_natural_number</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
+        <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span>  <span class="c1"># this discards the member type info</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_op_bitwise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">left</span><span class="p">)</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op_bitwise_float</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">left</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">left</span><span class="p">),</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op_bitwise_set</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">thing</span><span class="p">,</span> <span class="n">left</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_op_bitwise_float</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">_assert_is_natural_number</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="n">_assert_is_natural_number</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">op</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">left</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">right</span><span class="p">)))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_op_bitwise_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">left</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">right</span><span class="p">),</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+    <span class="n">_op_bwand</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">)</span>
+    <span class="n">_op_bwor</span>  <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">)</span>
+    <span class="n">_op_bwxor</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">xor</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BitwiseShiftExpression">
+<a class="viewcode-back" href="../../../../rule_engine/ast.html#rule_engine.ast.BitwiseShiftExpression">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BitwiseShiftExpression</span><span class="p">(</span><span class="n">BitwiseExpression</span><span class="p">):</span>
+    <span class="n">compatible_types</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_DataTypeDef</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,)</span>
+    <span class="n">result_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_op_bitwise_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op_bitwise</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">_op_bwlsh</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise_shift</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">lshift</span><span class="p">)</span>
+    <span class="n">_op_bwrsh</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partialmethod</span><span class="p">(</span><span class="n">_op_bitwise_shift</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">rshift</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Spencer McIntyre.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

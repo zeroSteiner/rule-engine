@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rule_engine.ast.expression.resolution &mdash; Rule Engine 5.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/theme_overrides.css?v=0c24fe83" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=ce74c6a2"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Rule Engine
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../types.html">Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../debug_repl.html">Debug REPL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../change_log.html">Change Log</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Rule Engine</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rule_engine.ast.expression.resolution</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rule_engine.ast.expression.resolution</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  rule_engine/ast/expression/resolution.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">...</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...types</span><span class="w"> </span><span class="kn">import</span> <span class="n">_CollectionDataTypeDef</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">,</span> <span class="n">_FunctionDataTypeDef</span><span class="p">,</span> <span class="n">_MappingDataTypeDef</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExpressionBase</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">,</span> <span class="n">_is_reduced</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">...engine.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
+
+<div class="viewcode-block" id="SymbolExpression">
+<a class="viewcode-back" href="../../../../rule_engine/ast.html#rule_engine.ast.SymbolExpression">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SymbolExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class representing a symbol name to be resolved at evaluation time with the help of a</span>
+<span class="sd">    :py:class:`~rule_engine.engine.Context` object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;result_type&#39;</span><span class="p">,</span> <span class="s1">&#39;scope&#39;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param context: The context to use for evaluating the expression.</span>
+<span class="sd">        :type context: :py:class:`~rule_engine.engine.Context`</span>
+<span class="sd">        :param str name: The name of the symbol. This will be resolved with a given context object on the specified</span>
+<span class="sd">                *thing*.</span>
+<span class="sd">        :param str scope: The optional scope to use while resolving the symbol.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">symbols</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="n">type_hint</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">type_hint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">type_hint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scope</span> <span class="o">=</span> <span class="n">scope</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> name=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">:</span>
+            <span class="n">default_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">default_value</span>
+            <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+                <span class="k">raise</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">default_value</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_value</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># if the expected result type is undefined, return the value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+
+        <span class="c1"># NULLABLE(T) is T-or-None at runtime; None is always valid, and any other value is checked against the</span>
+        <span class="c1"># unwrapped inner type</span>
+        <span class="n">effective_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span>
+        <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">effective_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+            <span class="n">effective_type</span> <span class="o">=</span> <span class="n">effective_type</span><span class="o">.</span><span class="n">inner_type</span>
+
+        <span class="c1"># OBJECT values are opaque to DataType.from_value; trust the schema annotation and delegate attribute-level</span>
+        <span class="c1"># type checking to GetAttributeExpression</span>
+        <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">effective_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span>
+
+        <span class="c1"># use DataType.from_value to raise a TypeError if value is not of a</span>
+        <span class="c1"># compatible data type</span>
+        <span class="n">value_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="c1"># if the type is the expected result type, return the value</span>
+        <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">value_type</span><span class="p">,</span> <span class="n">effective_type</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">effective_type</span><span class="o">.</span><span class="n">is_scalar</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">effective_type</span><span class="p">,</span> <span class="p">(</span><span class="n">_CollectionDataTypeDef</span><span class="p">,</span> <span class="n">_MappingDataTypeDef</span><span class="p">))</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_type</span><span class="p">,</span> <span class="p">(</span><span class="n">_CollectionDataTypeDef</span><span class="p">,</span> <span class="n">_MappingDataTypeDef</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">effective_type</span><span class="o">.</span><span class="n">value_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+            <span class="k">if</span> <span class="n">value_type</span><span class="o">.</span><span class="n">value_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+            <span class="k">if</span> <span class="n">effective_type</span><span class="o">.</span><span class="n">value_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">effective_type</span><span class="o">.</span><span class="n">value_type_nullable</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolTypeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">effective_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">value_type</span><span class="o">.</span><span class="n">value_type</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">value</span>
+
+        <span class="c1"># if the type is null, return the value (treat null as a special case)</span>
+        <span class="k">if</span> <span class="n">value_type</span> <span class="o">==</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span>
+
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolTypeError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">is_value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">is_type</span><span class="o">=</span><span class="n">value_type</span><span class="p">,</span> <span class="n">expected_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">name=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">FunctionCallExpression</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;arguments&#39;</span><span class="p">,)</span>
+    <span class="n">arguments</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ExpressionBase</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n">ExpressionBase</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ExpressionBase</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
+        <span class="n">argument_tuple</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ExpressionBase</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="n">function_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">result_type</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_function</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">argument_tuple</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">_FunctionDataTypeDef</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span> <span class="o">=</span> <span class="n">function_type</span><span class="o">.</span><span class="n">return_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="o">=</span> <span class="n">argument_tuple</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n">ExpressionBase</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ExpressionBase</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ExpressionBase</span><span class="p">:</span>  <span class="c1"># type: ignore[override]</span>
+        <span class="n">function_built</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function_built</span><span class="p">,</span> <span class="n">ExpressionBase</span><span class="p">)</span>
+        <span class="n">built_args</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ExpressionBase</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="n">arguments</span><span class="p">:</span>
+            <span class="n">argument_built</span> <span class="o">=</span> <span class="n">argument</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">argument_built</span><span class="p">,</span> <span class="n">ExpressionBase</span><span class="p">)</span>
+            <span class="n">built_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">argument_built</span><span class="p">)</span>
+        <span class="n">reduced</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">function_built</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">built_args</span><span class="p">))</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reduced</span><span class="p">,</span> <span class="n">ExpressionBase</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reduced</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExpressionBase</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_reduced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">LiteralExpressionBase</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a callable value)&#39;</span><span class="p">)</span>
+        <span class="n">arguments</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">argument</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span> <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+        <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s1">&#39;&lt;unknown&gt;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">result_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="n">function_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">result_type</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">_FunctionDataTypeDef</span><span class="p">)</span>
+            <span class="n">function_name</span> <span class="o">=</span> <span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_function</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">arguments</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">):</span>
+            <span class="n">function_name</span> <span class="o">=</span> <span class="n">function</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">arguments</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">error</span><span class="o">.</span><span class="n">function_name</span> <span class="o">=</span> <span class="n">function_name</span>
+            <span class="k">raise</span> <span class="n">error</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;function call failed&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span> <span class="n">function_name</span><span class="o">=</span><span class="n">function_name</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_value</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;function call failed (data type mismatch on returned value)&#39;</span><span class="p">,</span> <span class="n">function_name</span><span class="o">=</span><span class="n">function_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span><span class="p">,</span> <span class="n">arguments</span><span class="p">:</span> <span class="s1">&#39;tuple[Any, ...]&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function_type</span><span class="p">,</span> <span class="n">_FunctionDataTypeDef</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a callable value)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">function_type</span><span class="o">.</span><span class="n">minimum_arguments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">minimum_arguments</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">function_type</span><span class="o">.</span><span class="n">minimum_arguments</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span>
+                        <span class="s2">&quot;expected at least </span><span class="si">{}</span><span class="s2"> positional arguments&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">minimum_arguments</span><span class="p">),</span>
+                        <span class="n">function_name</span><span class="o">=</span><span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span>
+                        <span class="s2">&quot;expected at most </span><span class="si">{}</span><span class="s2"> positional arguments&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span><span class="p">)),</span>
+                        <span class="n">function_name</span><span class="o">=</span><span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">pos</span><span class="p">,</span> <span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2_type</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">arguments</span><span class="p">,</span> <span class="n">function_type</span><span class="o">.</span><span class="n">argument_types</span><span class="p">),</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">ExpressionBase</span><span class="p">):</span>
+                    <span class="n">arg1_type</span> <span class="o">=</span> <span class="n">arg1</span><span class="o">.</span><span class="n">result_type</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">arg1_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">arg1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">arg1_type</span><span class="p">,</span> <span class="n">arg2_type</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span>
+                            <span class="s2">&quot;data type mismatch (argument #</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pos</span><span class="p">),</span>
+                            <span class="n">function_name</span><span class="o">=</span><span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">arg1_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">arg2_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="p">)</span> <span class="ow">and</span> <span class="n">arg2_type</span> <span class="o">!=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span>
+                            <span class="s2">&quot;data type mismatch (argument #</span><span class="si">{}</span><span class="s2"> is nullable; discharge with &#39;??&#39; or use &#39;&amp;.&#39; / &#39;&amp;[&#39; for safe navigation)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pos</span><span class="p">),</span>
+                            <span class="n">function_name</span><span class="o">=</span><span class="n">function_type</span><span class="o">.</span><span class="n">value_name</span>
+                    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FunctionCallExpression</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">argument</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">argument</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">argument</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;argument #</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Spencer McIntyre.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

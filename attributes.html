@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Attributes &mdash; Rule Engine 4.5.3 documentation</title>
+  <title>Data Attributes &mdash; Rule Engine 5.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=690d16f2"></script>
+      <script src="_static/documentation_options.js?v=ce74c6a2"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -52,6 +52,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#builtin-attributes">Builtin Attributes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#float-attributes-1">FLOAT Attributes <sup>1</sup></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#encoding-and-decoding">Encoding and Decoding</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#object-attribute-access">OBJECT Attribute Access</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#object-methods">Object Methods</a></li>
 </ul>
 </li>
@@ -292,6 +293,20 @@ method. <a class="reference internal" href="rule_engine/types.html#rule_engine.t
 it can be any encoding name that Python can handle such as <code class="docutils literal notranslate"><span class="pre">UTF-8</span></code>. In addition to the encoding names that Python can
 handle, the special names <code class="docutils literal notranslate"><span class="pre">hex</span></code>, <code class="docutils literal notranslate"><span class="pre">base16</span></code> and <code class="docutils literal notranslate"><span class="pre">base64</span></code> can be used for transcoding ascii-hex, and base-64
 formatted data.</p>
+</section>
+<section id="object-attribute-access">
+<h3>OBJECT Attribute Access<a class="headerlink" href="#object-attribute-access" title="Link to this heading"></a></h3>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 5.0.0.</span></p>
+</div>
+<p>Attributes on <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT" title="rule_engine.types.DataType.OBJECT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">OBJECT</span></code></a> values are resolved differently from the builtin attributes listed above.
+Instead of using the builtin attribute resolver, the engine checks the attribute name against the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code>’s declared
+schema at <strong>parse time</strong>. If the attribute is not in the schema, an <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.ObjectAttributeError" title="rule_engine.errors.ObjectAttributeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectAttributeError</span></code></a> is raised
+immediately with a suggestion for the closest valid attribute name.</p>
+<p>At <strong>evaluation time</strong>, the value is fetched using the <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> type’s <em>accessor</em> callable, which defaults to
+<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#getattr" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">getattr()</span></code></a>. This means the builtin attribute resolvers (<code class="docutils literal notranslate"><span class="pre">length</span></code>, <code class="docutils literal notranslate"><span class="pre">as_upper</span></code>, etc.) do <strong>not</strong> apply to
+<code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> values - only the attributes declared in the schema are accessible. The symbol resolver fallback used by
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> values is also bypassed entirely for <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> types.</p>
 </section>
 <section id="object-methods">
 <h3>Object Methods<a class="headerlink" href="#object-methods" title="Link to this heading"></a></h3>

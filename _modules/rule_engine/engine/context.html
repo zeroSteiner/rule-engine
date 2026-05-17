@@ -1,0 +1,579 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rule_engine.engine.context &mdash; Rule Engine 5.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=0c24fe83" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=ce74c6a2"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Rule Engine
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../types.html">Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug_repl.html">Debug REPL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../change_log.html">Change Log</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rule Engine</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rule_engine.engine.context</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rule_engine.engine.context</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  rule_engine/engine/context.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">collections.abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">decimal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">ast</span>  <span class="c1"># noqa: F401 — must be imported before builtins to avoid a circular import</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">builtins</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..suggestions</span><span class="w"> </span><span class="kn">import</span> <span class="n">suggest_symbol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">_DataTypeDef</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">._attribute_resolver</span><span class="w"> </span><span class="kn">import</span> <span class="n">_AttributeResolver</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">dateutil.tz</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_tls_getter</span><span class="p">(</span><span class="n">thread_local</span><span class="p">:</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_builtins</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="c1"># a function stub to be used with functools.partial for retrieving thread-local values</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">thread_local</span><span class="o">.</span><span class="n">storage</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_default_type_resolver</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_DataTypeDef</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+
+<div class="viewcode-block" id="resolve_attribute">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.resolve_attribute">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A replacement resolver function for looking up symbols as members of *thing*. This is effectively the same as</span>
+<span class="sd">    ``thing.name``. The *thing* object can be a :py:func:`~collections.namedtuple`, a custom Python class or any other</span>
+<span class="sd">    object. Each of the members of *thing* must be of a compatible data type.</span>
+
+<span class="sd">    .. warning::</span>
+<span class="sd">            This effectively exposes all members of *thing*. If any members are sensitive, then a custom resolver should be</span>
+<span class="sd">            used that checks *name* against a whitelist of attributes that are allowed to be accessed.</span>
+
+<span class="sd">    :param thing: The object on which the *name* attribute will be accessed.</span>
+<span class="sd">    :param str name: The symbol name that is being resolved.</span>
+<span class="sd">    :return: The value for the corresponding attribute *name*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="n">suggest_symbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">dir</span><span class="p">(</span><span class="n">thing</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="resolve_item">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.resolve_item">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A resolver function for looking up symbols as items from an object (*thing*) which supports the</span>
+<span class="sd">    :py:class:`~collections.abc.Mapping` interface, such as a dictionary. This is effectively the same as</span>
+<span class="sd">    ``thing[&#39;name&#39;]``. Each of the values in *thing* must be of a compatible data type.</span>
+
+<span class="sd">    :param thing: The object from which the *name* item will be accessed.</span>
+<span class="sd">    :param str name: The symbol name that is being resolved.</span>
+<span class="sd">    :return: The value for the corresponding attribute *name*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">thing</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="n">suggest_symbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">thing</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">thing</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_type_resolver</span><span class="p">(</span><span class="n">type_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_DataTypeDef</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">type_map</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="n">suggest_symbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">type_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">type_map</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+<div class="viewcode-block" id="type_resolver_from_dict">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">type_resolver_from_dict</span><span class="p">(</span><span class="n">dictionary</span><span class="p">:</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">_DataTypeDef</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a dictionary. If</span>
+<span class="sd">    any of the values within the dictionary are not of a compatible data type, a :py:exc:`TypeError` will be raised.</span>
+<span class="sd">    Additionally, the resulting function will raise a :py:exc:`~rule_engine.errors.SymbolResolutionError` if the symbol</span>
+<span class="sd">    name does not exist within the dictionary.</span>
+
+<span class="sd">    :param dict dictionary: A dictionary (or any other object which supports the :py:class:`~collections.abc.Mapping`</span>
+<span class="sd">            interface) from which to create the callback function.</span>
+<span class="sd">    :return: The callback function.</span>
+<span class="sd">    :rtype: function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">if</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">is_definition</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">else</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">type_map</span><span class="p">)</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_collect_object_types</span><span class="p">(</span><span class="n">definition</span><span class="p">:</span> <span class="n">_DataTypeDef</span><span class="p">,</span> <span class="n">type_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">],</span> <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">definition</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="c1"># don&#39;t overwrite an entry that was set earlier (e.g. a top-level field whose name happens to match)</span>
+        <span class="n">type_map</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">definition</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr_type</span> <span class="ow">in</span> <span class="n">definition</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">_collect_object_types</span><span class="p">(</span><span class="n">attr_type</span><span class="p">,</span> <span class="n">type_map</span><span class="p">,</span> <span class="n">seen</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="p">):</span>
+        <span class="n">_collect_object_types</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">key_type</span><span class="p">,</span> <span class="n">type_map</span><span class="p">,</span> <span class="n">seen</span><span class="p">)</span>
+        <span class="n">_collect_object_types</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">type_map</span><span class="p">,</span> <span class="n">seen</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">_CollectionDataTypeDef</span><span class="p">):</span>
+        <span class="n">_collect_object_types</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">type_map</span><span class="p">,</span> <span class="n">seen</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="p">):</span>
+        <span class="n">_collect_object_types</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">inner_type</span><span class="p">,</span> <span class="n">type_map</span><span class="p">,</span> <span class="n">seen</span><span class="p">)</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="type_resolver_from_dataclass">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.type_resolver_from_dataclass">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">type_resolver_from_dataclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">_DataTypeDef</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a Python</span>
+<span class="sd">    :py:func:`~dataclasses.dataclass`. The dataclass&#39;s top-level fields become resolvable symbols (so a rule may</span>
+<span class="sd">    reference them by name) and every transitively-reachable :py:attr:`~rule_engine.types.DataType.OBJECT` schema</span>
+<span class="sd">    is registered by its OBJECT name so that cross-type references in mutually-recursive schemas resolve at parse</span>
+<span class="sd">    time.</span>
+
+<span class="sd">    The companion :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` is used internally to derive the</span>
+<span class="sd">    schema; see its documentation for the supported annotation forms (primitives, generics, ``Optional``, nested</span>
+<span class="sd">    dataclasses and self/mutual recursion). Nullable fields (annotated ``Optional[T]`` or ``T | None``) surface as</span>
+<span class="sd">    :py:attr:`~rule_engine.types.DataType.NULLABLE` wrappers in the resolved symbol types.</span>
+
+<span class="sd">    .. versionadded:: 5.0.0</span>
+
+<span class="sd">    :param type cls: A class decorated with :py:func:`~dataclasses.dataclass`.</span>
+<span class="sd">    :param bool strict: Forwarded to :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass`. When ``True``</span>
+<span class="sd">            (the default), a field annotated with a type that cannot be mapped to a Rule Engine data type raises</span>
+<span class="sd">            :py:exc:`ValueError`. When ``False``, such fields fall back to</span>
+<span class="sd">            :py:attr:`~rule_engine.types.DataType.UNDEFINED`.</span>
+<span class="sd">    :return: The callback function.</span>
+<span class="sd">    :rtype: function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">is_dataclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;type_resolver_from_dataclass argument 1 must be a dataclass, not &#39;</span> <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="o">.</span><span class="n">from_dataclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+    <span class="n">type_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">_collect_object_types</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">type_map</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">type_map</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="type_resolver_from_sqlalchemy">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.type_resolver_from_sqlalchemy">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">type_resolver_from_sqlalchemy</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">_DataTypeDef</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a function suitable for use as the *type_resolver* for a :py:class:`.Context` instance from a</span>
+<span class="sd">    SQLAlchemy ORM mapped class. The class&#39;s top-level columns and relationships become resolvable symbols</span>
+<span class="sd">    and every transitively-reachable :py:attr:`~rule_engine.types.DataType.OBJECT` schema is registered by</span>
+<span class="sd">    its OBJECT name so that cross-type references in mutually-recursive relationship graphs resolve at parse</span>
+<span class="sd">    time.</span>
+
+<span class="sd">    The companion :py:meth:`~rule_engine.types.DataType.OBJECT.from_sqlalchemy` is used internally to derive</span>
+<span class="sd">    the schema; see its documentation for the column → :py:class:`~rule_engine.types.DataType` mapping and</span>
+<span class="sd">    how relationships are expanded into nested OBJECT types. Columns with ``nullable=True`` and scalar</span>
+<span class="sd">    relationships whose local foreign-key columns are nullable surface as</span>
+<span class="sd">    :py:attr:`~rule_engine.types.DataType.NULLABLE` wrappers in the resolved symbol types.</span>
+
+<span class="sd">    SQLAlchemy is an *optional* dependency; the import is deferred until this function is actually called.</span>
+
+<span class="sd">    .. versionadded:: 5.0.0</span>
+
+<span class="sd">    :param type cls: A SQLAlchemy ORM mapped class.</span>
+<span class="sd">    :param bool strict: Forwarded to :py:meth:`~rule_engine.types.DataType.OBJECT.from_sqlalchemy`. When ``True``</span>
+<span class="sd">            (the default), a column whose ``python_type`` raises :py:exc:`NotImplementedError` or cannot be mapped</span>
+<span class="sd">            to a Rule Engine data type raises :py:exc:`ValueError`. When ``False``, such columns fall back to</span>
+<span class="sd">            :py:attr:`~rule_engine.types.DataType.UNDEFINED`.</span>
+<span class="sd">    :return: The callback function.</span>
+<span class="sd">    :rtype: function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;__mapper__&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s1">&#39;type_resolver_from_sqlalchemy argument 1 must be a SQLAlchemy mapped class, not &#39;</span>
+                <span class="o">+</span> <span class="nb">type</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="p">)</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="o">.</span><span class="n">from_sqlalchemy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">strict</span><span class="p">)</span>
+    <span class="n">type_map</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">_collect_object_types</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">type_map</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_type_resolver</span><span class="p">,</span> <span class="n">type_map</span><span class="p">)</span></div>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ThreadLocalStorage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An object whose attributes are required to be tracked separately among multiple threads. This is to guarantee that</span>
+<span class="sd">    if a context is used by one or more rules that are being evaluated simultaneously in multiple threads, that the</span>
+<span class="sd">    states are kept isolated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;assignment_scopes&#39;</span><span class="p">,</span> <span class="s1">&#39;regex_groups&#39;</span><span class="p">)</span>
+    <span class="n">assignment_scopes</span><span class="p">:</span> <span class="s1">&#39;collections.deque[dict[str, ast.Assignment]]&#39;</span>
+    <span class="n">regex_groups</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignment_scopes</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_groups</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_groups</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Context">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.Context">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An object defining the context for a rule&#39;s evaluation. This can be used to change the behavior of certain aspects</span>
+<span class="sd">    of the rule such as how symbols are resolved and what regex flags should be used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Context.__init__">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.Context.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="p">,</span>
+                    <span class="o">*</span><span class="p">,</span>
+                    <span class="n">regex_flags</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">resolver</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">type_resolver</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">_DataTypeDef</span><span class="p">]</span> <span class="o">|</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">default_timezone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span><span class="o">.</span><span class="n">tzinfo</span> <span class="o">=</span> <span class="s1">&#39;local&#39;</span><span class="p">,</span>
+                    <span class="n">default_value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">,</span>
+                    <span class="n">decimal_context</span><span class="p">:</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Context</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">mapping_attribute_lookup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int regex_flags: The flags to provide to functions in the :py:mod:`re` module when calling either the</span>
+<span class="sd">                :py:func:`~re.match` or :py:func:`~re.search` functions for comparison expressions.</span>
+<span class="sd">        :param resolver: An optional callback function to use in place of :py:meth:`.resolve`.</span>
+<span class="sd">        :param type_resolver: An optional callback function to use in place of :py:meth:`.resolve_type`.</span>
+<span class="sd">        :type type_resolver: function, dict</span>
+<span class="sd">        :param default_timezone: The default timezone to apply to :py:class:`~datetime.datetime` instances which do not</span>
+<span class="sd">                have one specified. This is necessary for comparison operations. The value should either be a</span>
+<span class="sd">                :py:class:`~datetime.tzinfo` instance, or a string. If *default_timzezone* is a string it must be one of the</span>
+<span class="sd">                specially supported (case-insensitive) values of &quot;local&quot; or &quot;utc&quot;.</span>
+<span class="sd">        :type default_timezone: str, :py:class:`~datetime.tzinfo`</span>
+<span class="sd">        :param default_value: The default value to return when resolving either a missing symbol or attribute.</span>
+<span class="sd">        :param decimal_context: A specific :py:class:`decimal.Context` object to use for evaluation of ``FLOAT`` values.</span>
+<span class="sd">                The default value will be taken from the current thread and will be used by all evaluations using this</span>
+<span class="sd">                :py:class:`~rule_engine.engine.Context` regardless of the decimal context of the thread which evaluates the</span>
+<span class="sd">                rule. This causes the rule evaluation to be consistent regardless of the calling thread.</span>
+<span class="sd">        :param bool mapping_attribute_lookup: Whether or not to allow attribute-style access on :py:attr:`.MAPPING`</span>
+<span class="sd">                values as a fallback to key-style lookup. When ``True`` (the default), accessing ``mapping.key`` falls</span>
+<span class="sd">                back to ``mapping[&#39;key&#39;]`` and emits a :py:exc:`~rule_engine.errors.MappingAttributeLookupDeprecation`</span>
+<span class="sd">                once per context. When ``False``, attribute access on a :py:attr:`.MAPPING` raises a parse-time error.</span>
+<span class="sd">                This fallback is scheduled for removal in v6.0.</span>
+
+<span class="sd">        .. versionchanged:: 2.0.0</span>
+<span class="sd">                Added the *default_value* parameter.</span>
+
+<span class="sd">        .. versionchanged:: 2.1.0</span>
+<span class="sd">                If *type_resolver* is a dictionary, :py:func:`~.type_resolver_from_dict` will be called on it automatically</span>
+<span class="sd">                and the result will be used as the callback.</span>
+
+<span class="sd">        .. versionchanged:: 3.0.0</span>
+<span class="sd">                Added the *decimal_context* parameter.</span>
+
+<span class="sd">        .. versionchanged:: 5.0.0</span>
+<span class="sd">                Added the *mapping_attribute_lookup* parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">regex_flags</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The *regex_flags* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The symbols that are referred to by the rule. Some or all of these will need to be resolved at evaluation time.</span>
+<span class="sd">        This attribute can be used after a rule is generated to ensure that all symbols are valid before it is</span>
+<span class="sd">        evaluated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_timezone</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">default_timezone</span> <span class="o">=</span> <span class="n">default_timezone</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">default_timezone</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+                <span class="n">default_timezone</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">tz</span><span class="o">.</span><span class="n">tzlocal</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">default_timezone</span> <span class="o">==</span> <span class="s1">&#39;utc&#39;</span><span class="p">:</span>
+                <span class="n">default_timezone</span> <span class="o">=</span> <span class="n">dateutil</span><span class="o">.</span><span class="n">tz</span><span class="o">.</span><span class="n">tzutc</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unsupported timezone: &#39;</span> <span class="o">+</span> <span class="n">default_timezone</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_timezone</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;invalid default_timezone type&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span> <span class="o">=</span> <span class="n">default_timezone</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The *default_timezone* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">default_value</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The *default_value* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span>
+                <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">BuiltinValueGenerator</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_tls_getter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="p">,</span> <span class="s1">&#39;regex_groups&#39;</span><span class="p">))},</span>
+                <span class="n">value_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)},</span>
+                <span class="n">timezone</span><span class="o">=</span><span class="n">default_timezone</span>
+        <span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;An instance of :py:class:`~rule_engine.builtins.Builtins` to provided a default set of builtin symbol values.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decimal_context</span> <span class="o">=</span> <span class="n">decimal_context</span> <span class="ow">or</span> <span class="n">decimal</span><span class="o">.</span><span class="n">getcontext</span><span class="p">()</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The *decimal_context* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">type_resolver</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">abc</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
+            <span class="n">type_resolver</span> <span class="o">=</span> <span class="n">type_resolver_from_dict</span><span class="p">(</span><span class="n">type_resolver</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span> <span class="ow">or</span> <span class="n">_default_type_resolver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">resolver</span> <span class="ow">or</span> <span class="n">resolve_item</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span> <span class="o">=</span> <span class="n">mapping_attribute_lookup</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The *mapping_attribute_lookup* parameter from :py:meth:`~__init__`.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;regex_flags&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span><span class="p">,</span>
+                <span class="s1">&#39;symbols&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span><span class="p">,</span>
+                <span class="s1">&#39;default_timezone&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span><span class="p">,</span>
+                <span class="s1">&#39;default_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">,</span>
+                <span class="s1">&#39;decimal_context&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimal_context</span><span class="p">,</span>
+                <span class="s1">&#39;mapping_attribute_lookup&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span><span class="p">,</span>
+                <span class="s1">&#39;_mapping_fallback_warned&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span><span class="p">,</span>
+                <span class="s1">&#39;_Context__type_resolver&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span><span class="p">,</span>
+                <span class="s1">&#39;_Context__resolver&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;regex_flags&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;symbols&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;default_timezone&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;default_value&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decimal_context</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;decimal_context&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;mapping_attribute_lookup&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_mapping_fallback_warned&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__type_resolver&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__resolver&#39;</span><span class="p">]</span>
+        <span class="c1"># recreate transient objects that can not be pickled</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span>
+                <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">BuiltinValueGenerator</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_tls_getter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="p">,</span> <span class="s1">&#39;regex_groups&#39;</span><span class="p">))},</span>
+                <span class="n">value_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)},</span>
+                <span class="n">timezone</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Context.assignments">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.Context.assignments">[docs]</a>
+    <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assignments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">assignments</span><span class="p">:</span> <span class="s1">&#39;ast.Assignment&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add the specified assignments to a thread-specific scope. This is used when an assignment originates from an</span>
+<span class="sd">        expression.</span>
+
+<span class="sd">        :param assignments: The one or more assignments to define.</span>
+<span class="sd">        :type assignments: :py:class:`~rule_engine.ast.Assignment`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">assign</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">assign</span> <span class="k">for</span> <span class="n">assign</span> <span class="ow">in</span> <span class="n">assignments</span><span class="p">})</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_tls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ThreadLocalStorage</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="p">,</span> <span class="s1">&#39;storage&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="o">.</span><span class="n">storage</span> <span class="o">=</span> <span class="n">_ThreadLocalStorage</span><span class="p">()</span>
+        <span class="n">storage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="o">.</span><span class="n">storage</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">storage</span><span class="p">,</span> <span class="n">_ThreadLocalStorage</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">storage</span>
+
+<div class="viewcode-block" id="Context.resolve">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.Context.resolve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The method to use for resolving symbols names to values. This function must return a compatible value for the</span>
+<span class="sd">        specified symbol name. When a *scope* is defined, this function handles the resolution itself, however when the</span>
+<span class="sd">        *scope* is ``None`` the resolver specified in :py:meth:`~.Context.__init__` is used which defaults to</span>
+<span class="sd">        :py:func:`resolve_item`.</span>
+
+<span class="sd">        If *name* fails to resolve, this method will raise :py:exc:`~rule_engine.errors.SymbolResolutionError`. It is</span>
+<span class="sd">        then up to the caller to determine whether or not it is appropriate to use :py:attr:`.default_value`.</span>
+
+<span class="sd">        :param thing: The object from which the *name* item will be accessed.</span>
+<span class="sd">        :param str name: The symbol name that is being resolved.</span>
+<span class="sd">        :return: The value for the corresponding symbol *name*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">scope_name</span><span class="p">:</span>
+            <span class="n">thing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Builtins</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">resolve_item</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">assignments</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">assignments</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">assignments</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol_scope</span><span class="o">=</span><span class="n">scope</span><span class="p">,</span> <span class="n">thing</span><span class="o">=</span><span class="n">thing</span><span class="p">)</span></div>
+
+
+    <span class="n">__resolve_attribute</span> <span class="o">=</span> <span class="n">_AttributeResolver</span><span class="p">()</span>
+<div class="viewcode-block" id="Context.resolve_attribute">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.Context.resolve_attribute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">object_</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The method to use for resolving attributes from values. This function must return a compatible value for the</span>
+<span class="sd">        specified attribute name.</span>
+
+<span class="sd">        If *name* fails to resolve, this method will raise :py:exc:`~rule_engine.errors.AttributeResolutionError`. It is</span>
+<span class="sd">        then up to the caller to determine whether or not it is appropriate to use :py:attr:`.default_value`.</span>
+
+<span class="sd">        :param thing: The object from which the *object_* was retrieved.</span>
+<span class="sd">        :param object_: The object from which the *name* attribute will be accessed.</span>
+<span class="sd">        :param str name: The attribute name that is being resolved.</span>
+<span class="sd">        :return: The value for the corresponding attribute *name*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+    <span class="n">resolve_attribute_type</span> <span class="o">=</span> <span class="n">__resolve_attribute</span><span class="o">.</span><span class="n">resolve_type</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_mapping_fallback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;accessing attribute </span><span class="si">{0!r}</span><span class="s2"> on a MAPPING value via dot syntax is deprecated; &quot;</span>
+                <span class="s2">&quot;use mapping[</span><span class="si">{0!r}</span><span class="s2">] instead. This fallback will be removed in v6.0. Set &quot;</span>
+                <span class="s2">&quot;Context(mapping_attribute_lookup=False) to opt out now, or filter &quot;</span>
+                <span class="s2">&quot;rule_engine.errors.MappingAttributeLookupDeprecation to silence this warning.&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">errors</span><span class="o">.</span><span class="n">MappingAttributeLookupDeprecation</span><span class="p">(</span><span class="n">message</span><span class="p">),</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Context.resolve_type">
+<a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_DataTypeDef</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A method for providing type hints while the rule is being generated. This can be used to ensure that all symbol</span>
+<span class="sd">        names are valid and that the types are appropriate for the operations being performed. It must then return one</span>
+<span class="sd">        of the compatible data type constants if the symbol is valid or raise an exception. The default behavior is to</span>
+<span class="sd">        return :py:data:`~rule_engine.types.DataType.UNDEFINED` for all symbols.</span>
+
+<span class="sd">        :param str name: The symbol name to provide a type hint for.</span>
+<span class="sd">        :param str scope: An optional scope name that identifies from where to resolve the name.</span>
+<span class="sd">        :return: The type of the specified symbol.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">scope</span> <span class="o">==</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">scope_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">assignments</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">assignments</span><span class="p">:</span>
+                <span class="n">value_type</span> <span class="o">=</span> <span class="n">assignments</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">value_type</span>
+                <span class="k">return</span> <span class="n">value_type</span> <span class="k">if</span> <span class="n">value_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Spencer McIntyre.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,469 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rule_engine.ast.base &mdash; Rule Engine 5.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=0c24fe83" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=ce74c6a2"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Rule Engine
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../syntax.html">Rule Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../types.html">Data Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../attributes.html">Data Attributes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rule_engine/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">rule_engine</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../debug_repl.html">Debug REPL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../change_log.html">Change Log</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Rule Engine</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rule_engine.ast.base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rule_engine.ast.base</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1">#</span>
+<span class="c1">#  rule_engine/ast/base.py</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are</span>
+<span class="c1">#  met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following disclaimer</span>
+<span class="c1">#    in the documentation and/or other materials provided with the</span>
+<span class="c1">#    distribution.</span>
+<span class="c1">#  * Neither the name of the project nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived from</span>
+<span class="c1">#    this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1">#  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</span>
+<span class="c1">#  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT</span>
+<span class="c1">#  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</span>
+<span class="c1">#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</span>
+<span class="c1">#  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
+<span class="c1">#  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</span>
+<span class="c1">#  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</span>
+<span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..types</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..types</span><span class="w"> </span><span class="kn">import</span> <span class="n">_CollectionDataTypeDef</span><span class="p">,</span> <span class="n">_DataTypeDef</span><span class="p">,</span> <span class="n">_ReferenceDataTypeDef</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">..engine.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_is_bytes</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="p">[</span><span class="nb">bytes</span><span class="p">])):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a bytes value)&#39;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_is_integer_number</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_integer_number</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not an integer number)&#39;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_is_natural_number</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_natural_number</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a natural number)&#39;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_is_numeric</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">is_numeric</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a numeric value)&#39;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_is_string</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">])):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span><span class="s1">&#39;data type mismatch (not a string value)&#39;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_reduced</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the ast expression *value* is a literal expression and if it is a compound datatype, that all of its</span>
+<span class="sd">    members are reduced literals. A value that causes this to evaluate to True for is able to be evaluated without a</span>
+<span class="sd">    *thing*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">LiteralExpressionBase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">is_reduced</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_iterable_member_value_type</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_DataTypeDef</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">member</span><span class="o">.</span><span class="n">result_type</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">ExpressionBase</span><span class="p">)</span> <span class="k">else</span> <span class="n">member</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">value</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">iterable_member_value_type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_propagate_nullable</span><span class="p">(</span><span class="n">result_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span><span class="p">,</span> <span class="o">*</span><span class="n">operand_types</span><span class="p">:</span> <span class="n">_DataTypeDef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_DataTypeDef</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sticky nullability: if any operand&#39;s static type is :py:class:`_NullableDataTypeDef`, wrap *result_type* in</span>
+<span class="sd">    :py:class:`_NullableDataTypeDef`; otherwise return *result_type* unchanged. Only :py:class:`.TernaryExpression`</span>
+<span class="sd">    uses this — its branches are alternatives rather than operands, so an operand-position strictness check does</span>
+<span class="sd">    not apply.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">operand_types</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">result_type</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result_type</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_not_nullable</span><span class="p">(</span><span class="n">dt</span><span class="p">:</span> <span class="n">_DataTypeDef</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raise :py:exc:`~rule_engine.errors.EvaluationError` if *dt* is :py:class:`_NullableDataTypeDef`. The *role*</span>
+<span class="sd">    string describes the rejected operand (e.g. ``&quot;left operand of &#39;+&#39;&quot;``, ``&quot;slice target&quot;``) and is embedded</span>
+<span class="sd">    in the error message along with a pointer at the discharge operators (``??``, ``&amp;.``, ``&amp;[``).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span>
+                <span class="s2">&quot;data type mismatch (</span><span class="si">{0}</span><span class="s2"> is nullable; discharge with &#39;??&#39; or use &#39;&amp;.&#39; / &#39;&amp;[&#39; for safe navigation)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+        <span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_type</span><span class="p">(</span><span class="n">definition</span><span class="p">:</span> <span class="n">_DataTypeDef</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_DataTypeDef</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Resolve any :py:class:`~rule_engine.types._ReferenceDataTypeDef` placeholders inside *definition* via the</span>
+<span class="sd">    *context*&#39;s :py:meth:`~rule_engine.engine.Context.resolve_type` callback. Returns a new definition with the</span>
+<span class="sd">    placeholders substituted; the input is never mutated. Already-resolved definitions pass through unchanged.</span>
+
+<span class="sd">    This helper is used at rule parse time to complete the cross-type reference resolution that</span>
+<span class="sd">    :py:class:`_ObjectDataTypeDef` deliberately leaves for later (self references are already bound at construction</span>
+<span class="sd">    time).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">_ReferenceDataTypeDef</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">resolved</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">resolve_type</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">errors</span><span class="o">.</span><span class="n">SymbolResolutionError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span>
+                    <span class="s2">&quot;unresolved object reference: </span><span class="si">{0!r}</span><span class="s2"> - add it to the Context type_resolver&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">resolved</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span>
+                    <span class="s2">&quot;reference </span><span class="si">{0!r}</span><span class="s2"> does not resolve to an OBJECT type&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">resolved</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span>
+                    <span class="s2">&quot;reference </span><span class="si">{0!r}</span><span class="s2"> resolves to an OBJECT with mismatched name </span><span class="si">{1!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">resolved</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">resolved</span>
+    <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">definition</span>
+    <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="p">):</span>
+        <span class="n">new_inner</span> <span class="o">=</span> <span class="n">_resolve_type</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">inner_type</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_inner</span> <span class="ow">is</span> <span class="n">definition</span><span class="o">.</span><span class="n">inner_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">definition</span>
+        <span class="k">return</span> <span class="n">definition</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+                <span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">definition</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span>
+                <span class="n">inner_type</span><span class="o">=</span><span class="n">new_inner</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">_CollectionDataTypeDef</span><span class="p">):</span>
+        <span class="n">new_value_type</span> <span class="o">=</span> <span class="n">_resolve_type</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_value_type</span> <span class="ow">is</span> <span class="n">definition</span><span class="o">.</span><span class="n">value_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">definition</span>
+        <span class="k">return</span> <span class="n">definition</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+                <span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">definition</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span>
+                <span class="n">value_type</span><span class="o">=</span><span class="n">new_value_type</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="p">):</span>
+        <span class="n">new_key_type</span> <span class="o">=</span> <span class="n">_resolve_type</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">key_type</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="n">new_value_type</span> <span class="o">=</span> <span class="n">_resolve_type</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">value_type</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_key_type</span> <span class="ow">is</span> <span class="n">definition</span><span class="o">.</span><span class="n">key_type</span> <span class="ow">and</span> <span class="n">new_value_type</span> <span class="ow">is</span> <span class="n">definition</span><span class="o">.</span><span class="n">value_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">definition</span>
+        <span class="k">return</span> <span class="n">definition</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+                <span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">definition</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span>
+                <span class="n">key_type</span><span class="o">=</span><span class="n">new_key_type</span><span class="p">,</span>
+                <span class="n">value_type</span><span class="o">=</span><span class="n">new_value_type</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">definition</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">FUNCTION</span><span class="p">):</span>
+        <span class="n">new_return_type</span> <span class="o">=</span> <span class="n">_resolve_type</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">return_type</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="n">new_argument_types</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">_DataTypeDef</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="n">_DataTypeDef</span>
+        <span class="k">if</span> <span class="n">definition</span><span class="o">.</span><span class="n">argument_types</span> <span class="ow">is</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">:</span>
+            <span class="n">new_argument_types</span> <span class="o">=</span> <span class="n">definition</span><span class="o">.</span><span class="n">argument_types</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">argument_types</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+            <span class="n">new_argument_types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_resolve_type</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">definition</span><span class="o">.</span><span class="n">argument_types</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_return_type</span> <span class="ow">is</span> <span class="n">definition</span><span class="o">.</span><span class="n">return_type</span> <span class="ow">and</span> <span class="n">new_argument_types</span> <span class="ow">is</span> <span class="n">definition</span><span class="o">.</span><span class="n">argument_types</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">definition</span>
+        <span class="k">return</span> <span class="n">definition</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+                <span class="n">definition</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">definition</span><span class="o">.</span><span class="n">python_type</span><span class="p">,</span>
+                <span class="n">value_name</span><span class="o">=</span><span class="n">definition</span><span class="o">.</span><span class="n">value_name</span><span class="p">,</span>
+                <span class="n">return_type</span><span class="o">=</span><span class="n">new_return_type</span><span class="p">,</span>
+                <span class="n">argument_types</span><span class="o">=</span><span class="n">new_argument_types</span><span class="p">,</span>
+                <span class="n">minimum_arguments</span><span class="o">=</span><span class="n">definition</span><span class="o">.</span><span class="n">minimum_arguments</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">definition</span>
+
+<div class="viewcode-block" id="Assignment">
+<a class="viewcode-back" href="../../../rule_engine/ast.html#rule_engine.ast.Assignment">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Assignment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An internal assignment whereby a symbol is populated with a value of the specified type.&quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;value_type&#39;</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">value_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">|</span> <span class="kc">None</span>
+<div class="viewcode-block" id="Assignment.__init__">
+<a class="viewcode-back" href="../../../rule_engine/ast.html#rule_engine.ast.Assignment.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">,</span> <span class="n">value_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str name: The symbol name that the assignment is defining.</span>
+<span class="sd">        :param value: The value of the assignment.</span>
+<span class="sd">        :param value_type: The data type of the assignment.</span>
+<span class="sd">        :type value_type: :py:class:`~.DataType`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span> <span class="ow">and</span> <span class="n">value_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value_type</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">=</span> <span class="n">value_type</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> name=</span><span class="si">{!r}</span><span class="s2"> value=</span><span class="si">{!r}</span><span class="s2"> value_type=</span><span class="si">{!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span><span class="p">)</span></div>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ASTNodeBase</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ASTNodeBase&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate this AST node and all applicable children nodes.</span>
+
+<span class="sd">        :param thing: The object to use for symbol resolution.</span>
+<span class="sd">        :return: The result of the evaluation as a native Python type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;ASTNodeBase&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reduce this expression into a smaller subset of nodes. If the expression can not be reduced, then return an</span>
+<span class="sd">        instance of itself, otherwise return a reduced :py:class:`.ExpressionBase` to replace it.</span>
+
+<span class="sd">        :return: Either a reduced version of this node or itself.</span>
+<span class="sd">        :rtype: :py:class:`.ExpressionBase`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Comment</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,)</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> </span><span class="si">{1!r}</span><span class="s2">&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+<span class="c1">################################################################################</span>
+<span class="c1"># Base Expression Classes</span>
+<span class="c1">################################################################################</span>
+<div class="viewcode-block" id="ExpressionBase">
+<a class="viewcode-back" href="../../../rule_engine/ast.html#rule_engine.ast.ExpressionBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExpressionBase</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">,)</span>
+    <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span>
+    <span class="n">result_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">UNDEFINED</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The data type of the result of successful evaluation.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_new_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="c1"># perform a context aware load of value</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">coerce_value</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">default_timezone</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="LiteralExpressionBase">
+<a class="viewcode-back" href="../../../rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LiteralExpressionBase</span><span class="p">(</span><span class="n">ExpressionBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A base class for representing literal values from the grammar text.&quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,)</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">is_reduced</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<div class="viewcode-block" id="LiteralExpressionBase.__init__">
+<a class="viewcode-back" href="../../../rule_engine/ast.html#rule_engine.ast.LiteralExpressionBase.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param context: The context to use for evaluating the expression.</span>
+<span class="sd">        :type context: :py:class:`~rule_engine.engine.Context`</span>
+<span class="sd">        :param value: The native Python value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">is_scalar</span> <span class="ow">and</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;__init__ argument 2 must be </span><span class="si">{}</span><span class="s2">, not </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">python_type</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{0}</span><span class="s2"> value=</span><span class="si">{1!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;LiteralExpressionBase&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a Literal Expression instance to represent the specified *value*.</span>
+
+<span class="sd">        .. versionadded:: 2.0.0</span>
+
+<span class="sd">        :param context: The context to use for evaluating the expression.</span>
+<span class="sd">        :type context: :py:class:`~rule_engine.engine.Context`</span>
+<span class="sd">        :param value: The value to represent as a Literal Expression.</span>
+<span class="sd">        :return: A subclass of :py:class:`~.LiteralExpressionBase` specific to the type of *value*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">datatype</span> <span class="o">=</span> <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">subclass</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_compatible</span><span class="p">(</span><span class="n">subclass</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EngineError</span><span class="p">(</span><span class="s2">&quot;can not create literal expression from python value: </span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">datatype</span><span class="o">.</span><span class="n">is_compound</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">SET</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">datatype</span><span class="o">.</span><span class="n">python_type</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="bp">cls</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">subclass</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">result_type</span><span class="o">.</span><span class="n">is_compound</span><span class="p">:</span>
+            <span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">digraph</span><span class="o">.</span><span class="n">node</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="se">\n</span><span class="s2">value=</span><span class="si">{!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Statement">
+<a class="viewcode-back" href="../../../rule_engine/ast.html#rule_engine.ast.Statement">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Statement</span><span class="p">(</span><span class="n">ASTNodeBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class representing the top level statement of the grammar text.&quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;context&#39;</span><span class="p">,</span> <span class="s1">&#39;expression&#39;</span><span class="p">,</span> <span class="s1">&#39;comment&#39;</span><span class="p">)</span>
+    <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span>
+    <span class="n">expression</span><span class="p">:</span> <span class="n">ExpressionBase</span>
+    <span class="n">comment</span><span class="p">:</span> <span class="n">Comment</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="n">ExpressionBase</span><span class="p">,</span> <span class="n">comment</span><span class="p">:</span> <span class="n">Comment</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param context: The context to use for evaluating the statement.</span>
+<span class="sd">        :type context: :py:class:`~rule_engine.engine.Context`</span>
+<span class="sd">        :param expression: The top level expression of the statement.</span>
+<span class="sd">        :type expression: :py:class:`~.ExpressionBase`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expression</span> <span class="o">=</span> <span class="n">expression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="s1">&#39;Context&#39;</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="n">ExpressionBase</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Statement&#39;</span><span class="p">:</span>  <span class="c1"># type: ignore[override]</span>
+        <span class="n">built</span> <span class="o">=</span> <span class="n">expression</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">built</span><span class="p">,</span> <span class="n">ExpressionBase</span><span class="p">)</span>
+        <span class="n">reduced</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">built</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reduced</span><span class="p">,</span> <span class="n">Statement</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reduced</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expression</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">thing</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_graphviz</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">digraph</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Statement</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expression</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">digraph</span><span class="o">.</span><span class="n">edge</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expression</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">digraph</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Spencer McIntyre.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started &mdash; Rule Engine 4.5.3 documentation</title>
+  <title>Getting Started &mdash; Rule Engine 5.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=690d16f2"></script>
+      <script src="_static/documentation_options.js?v=ce74c6a2"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -57,9 +57,12 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#type-hinting">Type Hinting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#object-data-types">Object Data Types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#compound-data-types">Compound Data Types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#function-data-types">Function Data Types</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#defining-types-from-a-dictionary">Defining Types From A Dictionary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-types-from-a-dataclass">Defining Types From A Dataclass</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-types-from-a-sqlalchemy-model">Defining Types From A SQLAlchemy Model</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#changing-builtin-symbols">Changing Builtin Symbols</a></li>
@@ -352,7 +355,7 @@ specified type or be <code class="xref py py-attr docutils literal notranslate">
 symbol is resolved.</p>
 <p>To define type information, a <em>type_resolver</em> function must be passed to the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> class. The type
 resolver function is expected to take a single argument, and that is the name of the symbol (as a Python string) whose
-type needs to be resolved. The return type should be a member of the <code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code> enumeration.</p>
+type needs to be resolved. The return type should be a member of the <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType" title="rule_engine.types.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a> enumeration.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define a basic type resolver, that knows about the four attributes of a</span>
 <span class="c1"># comic book</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">type_resolver</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
@@ -370,7 +373,7 @@ type needs to be resolved. The return type should be a member of the <code class
 <span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">=</span><span class="n">type_resolver</span><span class="p">)</span>
 </pre></div>
 </div>
-<p><a class="reference internal" href="rule_engine/types.html#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> can be defined as the data type for a valid symbol without specifying explicit type
+<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> can be defined as the data type for a valid symbol without specifying explicit type
 information. In this case, the rule object will know that it is a valid symbol, but will not validate any operations
 that reference it.</p>
 <p>In all cases, when a <em>type_resolver</em> is defined, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> object will raise a
@@ -389,6 +392,71 @@ that reference it.</p>
 <span class="c1"># =&gt; &lt;Rule text=&#39;author == &quot;Stan Lee&quot;&#39; &gt;</span>
 </pre></div>
 </div>
+<section id="object-data-types">
+<span id="getting-started-object-data-types"></span><h4>Object Data Types<a class="headerlink" href="#object-data-types" title="Link to this heading"></a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 5.0.0.</span></p>
+</div>
+<p>The <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT" title="rule_engine.types.DataType.OBJECT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">OBJECT</span></code></a> type defines a schema with named, typed attributes. This gives parse-time validation:
+an unknown attribute in a rule will raise an error immediately, before the rule is ever applied to real data.</p>
+<p>Continuing the comic book example, suppose the data is backed by Python objects instead of plain dictionaries:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rule_engine</span>
+
+<span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Hero</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">publisher</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">first_appearance</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span>
+    <span class="n">nemesis</span><span class="p">:</span> <span class="s1">&#39;Hero&#39;</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># self-referential</span>
+</pre></div>
+</div>
+<p>Define the corresponding <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> type and place it in the <code class="docutils literal notranslate"><span class="pre">type_resolver</span></code>. Use
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.self" title="rule_engine.types.DataType.OBJECT.self"><code class="xref py py-attr docutils literal notranslate"><span class="pre">self</span></code></a> as a shorthand for the self-referential <code class="docutils literal notranslate"><span class="pre">nemesis</span></code> attribute (or
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.reference" title="rule_engine.types.DataType.OBJECT.reference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reference()</span></code></a> by name for cross-type references):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">HeroType</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">(</span><span class="s1">&#39;Hero&#39;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+    <span class="s1">&#39;first_appearance&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span>
+    <span class="s1">&#39;nemesis&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="o">.</span><span class="n">self</span><span class="p">,</span>
+<span class="p">})</span>
+
+<span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;hero&#39;</span><span class="p">:</span> <span class="n">HeroType</span><span class="p">,</span>
+    <span class="s1">&#39;Hero&#39;</span><span class="p">:</span> <span class="n">HeroType</span><span class="p">,</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>Now rules get attribute validation at parse time:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># valid rule - &#39;name&#39; is in the schema</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;hero.name == &quot;Batman&quot;&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+
+<span class="c1"># invalid rule - &#39;secret_identity&#39; is not in the schema</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;hero.secret_identity == &quot;Bruce Wayne&quot;&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+<span class="c1"># =&gt; ObjectAttributeError: unknown attribute: &#39;secret_identity&#39;</span>
+</pre></div>
+</div>
+<p>Self-referential chains work automatically:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;hero.nemesis.name == &quot;Joker&quot;&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+
+<span class="n">batman</span> <span class="o">=</span> <span class="n">Hero</span><span class="p">(</span><span class="s1">&#39;Batman&#39;</span><span class="p">,</span> <span class="s1">&#39;DC&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">1939</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">joker</span> <span class="o">=</span> <span class="n">Hero</span><span class="p">(</span><span class="s1">&#39;Joker&#39;</span><span class="p">,</span> <span class="s1">&#39;DC&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">1940</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span> <span class="n">nemesis</span><span class="o">=</span><span class="n">batman</span><span class="p">)</span>
+<span class="n">batman</span><span class="o">.</span><span class="n">nemesis</span> <span class="o">=</span> <span class="n">joker</span>
+
+<span class="n">rule</span><span class="o">.</span><span class="n">matches</span><span class="p">({</span><span class="s1">&#39;hero&#39;</span><span class="p">:</span> <span class="n">batman</span><span class="p">})</span>  <span class="c1"># =&gt; True</span>
+</pre></div>
+</div>
+<p>For mutually recursive types (e.g. <code class="docutils literal notranslate"><span class="pre">Hero</span></code> and <code class="docutils literal notranslate"><span class="pre">Sidekick</span></code>), place both types in the same <code class="docutils literal notranslate"><span class="pre">type_resolver</span></code> dict.
+Cross-type references are resolved lazily at rule parse time - see the <a class="reference internal" href="types.html#id1"><span class="std std-ref">OBJECT reference</span></a> in the Data
+Types page for a full example.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> attributes are accessed with dot syntax (<code class="docutils literal notranslate"><span class="pre">hero.name</span></code>). Item access (<code class="docutils literal notranslate"><span class="pre">hero[&quot;name&quot;]</span></code>) is not supported
+and will raise a parse-time error. If your data is dictionary-shaped, consider using the <code class="docutils literal notranslate"><span class="pre">accessor</span></code> parameter to
+customize how values are fetched - see <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT" title="rule_engine.types.DataType.OBJECT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">OBJECT</span></code></a> for details.</p>
+</div>
+</section>
 <section id="compound-data-types">
 <span id="getting-started-compound-data-types"></span><h4>Compound Data Types<a class="headerlink" href="#compound-data-types" title="Link to this heading"></a></h4>
 <p>Compound data types such as the <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> and <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> types can optionally
@@ -401,7 +469,7 @@ that the member value can be either the specified type or <a class="reference in
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type whose values are all nullable strings may be defined, while a
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type with one value type of a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> and another of a
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a> may not be defined. In this case, the key type may be defined while the value type is set
-to <a class="reference internal" href="rule_engine/types.html#id0" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> which is the default value.</p>
+to <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> which is the default value.</p>
 </section>
 <section id="function-data-types">
 <h4>Function Data Types<a class="headerlink" href="#function-data-types" title="Link to this heading"></a></h4>
@@ -417,12 +485,12 @@ and finally the maximum number of times to split the string.</p>
     <span class="c1"># the name of the function is provided for error messages</span>
     <span class="s1">&#39;split&#39;</span><span class="p">,</span>
     <span class="c1"># the return data type, in this case an array of strings</span>
-    <span class="n">return_type</span><span class="o">=</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">),</span>
+    <span class="n">return_type</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">),</span>
     <span class="c1"># the data type of each of the three arguments</span>
     <span class="n">argument_types</span><span class="o">=</span><span class="p">(</span>
-       <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="c1"># argument 1, the string to split</span>
-       <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="c1"># argument 2, the seperator to split on</span>
-       <span class="n">ast</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>   <span class="c1"># argument 3, the maximum times to split the string</span>
+       <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="c1"># argument 1, the string to split</span>
+       <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span> <span class="c1"># argument 2, the seperator to split on</span>
+       <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">FLOAT</span>   <span class="c1"># argument 3, the maximum times to split the string</span>
     <span class="p">),</span>
     <span class="c1"># the minimum number of arguments, in this case the second two arguments are optional</span>
     <span class="n">minimum_arguments</span><span class="o">=</span><span class="mi">1</span>
@@ -434,7 +502,7 @@ and finally the maximum number of times to split the string.</p>
 <section id="defining-types-from-a-dictionary">
 <h4>Defining Types From A Dictionary<a class="headerlink" href="#defining-types-from-a-dictionary" title="Link to this heading"></a></h4>
 <p>For convenience, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a> function can be used to generate a <em>type_resolver</em>
-function from a dictionary mapping symbol names to their respective <code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code>. Starting with version
+function from a dictionary mapping symbol names to their respective <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType" title="rule_engine.types.DataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataType</span></code></a>. Starting with version
 <a class="extlink-release reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v2.1.0">v2.1.0</a> if a <a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#dict" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> is passed as the <em>type_resolver</em>, the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dict" title="rule_engine.engine.type_resolver_from_dict"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dict()</span></code></a>
 function will be used automatically.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
@@ -448,6 +516,84 @@ function will be used automatically.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<section id="defining-types-from-a-dataclass">
+<span id="getting-started-types-from-dataclass"></span><h4>Defining Types From A Dataclass<a class="headerlink" href="#defining-types-from-a-dataclass" title="Link to this heading"></a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 5.0.0.</span></p>
+</div>
+<p>When the source data is modeled as a <a class="reference external" href="https://docs.python.org/3.12/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclass()</span></code></a>, the
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dataclass" title="rule_engine.engine.type_resolver_from_dataclass"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dataclass()</span></code></a> helper builds a <em>type_resolver</em> directly from the field annotations.
+The dataclass’s fields become the top-level resolvable symbols, and any nested dataclasses (including self- and
+mutually-recursive references) are reachable through attribute access on the resolved <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rule_engine</span>
+
+<span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Hero</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">publisher</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">first_appearance</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
+    <span class="n">sidekick</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+    <span class="n">resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">resolve_attribute</span><span class="p">,</span>
+    <span class="n">type_resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">type_resolver_from_dataclass</span><span class="p">(</span><span class="n">Hero</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;name == &quot;Batman&quot; and sidekick == &quot;Robin&quot;&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+<span class="n">batman</span> <span class="o">=</span> <span class="n">Hero</span><span class="p">(</span><span class="s1">&#39;Batman&#39;</span><span class="p">,</span> <span class="s1">&#39;DC&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1939</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sidekick</span><span class="o">=</span><span class="s1">&#39;Robin&#39;</span><span class="p">)</span>
+<span class="n">rule</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">batman</span><span class="p">)</span>  <span class="c1"># =&gt; True</span>
+</pre></div>
+</div>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Optional</span></code> annotations (and the PEP 604 <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">|</span> <span class="pre">None</span></code> form) are unwrapped so the attribute carries the
+underlying type and is marked nullable. Fields whose annotation is itself a dataclass become nested <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> types
+automatically, and <code class="docutils literal notranslate"><span class="pre">list[Other]</span></code> / <code class="docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Other]</span></code> style containers are walked so nested dataclass schemas
+inside compound types are also expanded. See <a class="reference internal" href="#getting-started-object-data-types"><span class="std std-ref">the OBJECT documentation</span></a> for
+details on the resulting schema’s behavior.</p>
+</section>
+<section id="defining-types-from-a-sqlalchemy-model">
+<span id="getting-started-types-from-sqlalchemy"></span><h4>Defining Types From A SQLAlchemy Model<a class="headerlink" href="#defining-types-from-a-sqlalchemy-model" title="Link to this heading"></a></h4>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 5.0.0.</span></p>
+</div>
+<p>Projects that already use <a class="reference external" href="https://www.sqlalchemy.org/">SQLAlchemy</a> can feed a mapped class into
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_sqlalchemy" title="rule_engine.engine.type_resolver_from_sqlalchemy"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_sqlalchemy()</span></code></a> to obtain a type resolver without restating the schema.
+SQLAlchemy is <strong>not</strong> a runtime dependency of Rule Engine; install it separately
+(<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;sqlalchemy&gt;=2.0&quot;</span></code>) only if you intend to call this helper.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeclarativeBase</span><span class="p">,</span> <span class="n">Mapped</span><span class="p">,</span> <span class="n">mapped_column</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rule_engine</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Base</span><span class="p">(</span><span class="n">DeclarativeBase</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Hero</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;heroes&#39;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapped_column</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">alias</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">first_appearance</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">]</span>
+    <span class="n">active</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
+
+<span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span>
+    <span class="n">resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">resolve_attribute</span><span class="p">,</span>
+    <span class="n">type_resolver</span><span class="o">=</span><span class="n">rule_engine</span><span class="o">.</span><span class="n">type_resolver_from_sqlalchemy</span><span class="p">(</span><span class="n">Hero</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;name == &quot;Batman&quot; and active&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+<span class="n">batman</span> <span class="o">=</span> <span class="n">Hero</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Batman&#39;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s1">&#39;Bruce Wayne&#39;</span><span class="p">,</span>
+              <span class="n">first_appearance</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">1939</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">rule</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">batman</span><span class="p">)</span>  <span class="c1"># =&gt; True</span>
+</pre></div>
+</div>
+<p>Column nullability (<code class="docutils literal notranslate"><span class="pre">column.nullable</span></code>) is copied through, <code class="docutils literal notranslate"><span class="pre">Mapped[T</span> <span class="pre">|</span> <span class="pre">None]</span></code> is honored, and mapped
+relationships expand into nested <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> schemas (with <code class="docutils literal notranslate"><span class="pre">uselist</span></code> collections wrapped in
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>). Self-references and cycles between mutually related classes
+resolve at parse time because every reachable schema is registered by name on the resulting resolver. See the
+<a class="reference internal" href="#getting-started-object-data-types"><span class="std std-ref">OBJECT documentation</span></a> for the full column-to-type mapping and limits.</p>
 </section>
 </section>
 <section id="changing-builtin-symbols">

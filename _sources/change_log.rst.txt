@@ -4,6 +4,84 @@ Change Log
 This document contains notes on the major changes for each version of the Rule Engine. In comparison to the git log,
 this list is curated by the development team for note worthy changes.
 
+Version 5.x.x
+-------------
+
+Version 5.0.0
+^^^^^^^^^^^^^
+
+Released :release:`5.0.0` on May 17th, 2026
+
+* **Breaking:** Dropped support for Python versions 3.6, 3.7 and 3.8.
+* **Breaking:** Changed the precedence of operators to be more aligned with common programming languages.
+* **Breaking:** The :ref:`debug-repl` utility now requires development dependencies to be installed.
+* **Breaking:** BYTES literals now throw exceptions for invalid escape sequences
+* **Breaking:** Removed ``setup.py``; project metadata now lives entirely in ``pyproject.toml`` (PEP 517/621).
+* **Breaking:** The ``rule_engine.ast`` module no longer re-exports names from ``rule_engine.types`` (e.g. ``DataType``,
+  ``coerce_value``); import them from ``rule_engine`` or ``rule_engine.types`` directly.
+* Migrated the development workflow and CI from pipenv to `uv <https://docs.astral.sh/uv/>`_.
+* Added support for raw STRING literals using the ``r`` prefix (e.g. ``r'\w+'``).
+* Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy
+  removes an external install requirement and silences third-party vulnerability reports targeting it.
+* Added the new :py:attr:`~rule_engine.types.DataType.OBJECT` compound data type for user-defined schemas with named,
+  typed attributes. See the :ref:`OBJECT section<data-types-object>` in the Data Types page for details.
+
+    * Use :py:meth:`~rule_engine.types.DataType.OBJECT.reference` (or the
+      :py:attr:`~rule_engine.types.DataType.OBJECT.self` shorthand sentinel) for self-referential and mutually-recursive
+      schemas.
+    * Attribute access is validated at parse time against the declared schema.
+    * Item access (``obj["name"]``) and containment checks (``"name" in obj``) on ``OBJECT`` values are rejected at
+      parse time.
+    * ``SET(OBJECT(...))`` is rejected at construction; use ``ARRAY(OBJECT(...))`` instead
+    * A custom *accessor* callable can be specified per ``OBJECT`` type (default: :py:func:`getattr`).
+    * Added :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` and
+      :py:func:`~rule_engine.engine.type_resolver_from_dataclass` for deriving ``OBJECT`` schemas and *type_resolvers*
+      automatically from Python :py:func:`~dataclasses.dataclass` definitions, including nullability for
+      :py:class:`~typing.Optional` fields and self / mutually-recursive references (closes :issue:`55`).
+    * Added :py:meth:`~rule_engine.types.DataType.OBJECT.from_sqlalchemy` and
+      :py:func:`~rule_engine.engine.type_resolver_from_sqlalchemy` for deriving ``OBJECT`` schemas and *type_resolvers*
+      from SQLAlchemy ORM mapped classes. Columns, relationships, and cycles between mutually-related classes are
+      all expanded automatically. SQLAlchemy is an optional dependency; the import is deferred until these entry
+      points are called.
+    * The ``from_dataclass`` and ``from_sqlalchemy`` entry points (and their ``type_resolver_from_*`` companions)
+      accept a ``strict`` keyword argument. The default ``strict=True`` raises :py:exc:`ValueError` on any
+      field / column whose type cannot be mapped to a Rule Engine data type; ``strict=False`` falls back to
+      :py:attr:`~rule_engine.types.DataType.UNDEFINED`.
+
+* Added :py:class:`~rule_engine.errors.ObjectAttributeError`, a subclass of
+  :py:class:`~rule_engine.errors.AttributeResolutionError`, raised when an attribute is not found in an ``OBJECT``
+  schema
+* Promoted nullability to a first-class type-system construct via the new
+  :py:attr:`~rule_engine.types.DataType.NULLABLE` one-argument type constructor. See the
+  :ref:`NULLABLE section<data-types-nullable>` in the Data Types page for the full semantics.
+
+    * :py:meth:`~rule_engine.types.DataType.from_type` maps Python's ``Optional[T]`` / ``T | None`` to
+      ``NULLABLE(from_type(T))``.
+    * :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` and
+      :py:meth:`~rule_engine.types.DataType.OBJECT.from_sqlalchemy` wrap nullable fields, columns, and scalar
+      relationships in ``NULLABLE(T)``; :py:func:`~rule_engine.engine.type_resolver_from_dataclass` and
+      :py:func:`~rule_engine.engine.type_resolver_from_sqlalchemy` preserve the wrappers through to the top-level
+      symbol types.
+    * Compound element and value types (``ARRAY``, ``SET``, ``MAPPING``) store ``NULLABLE(T)`` directly when the
+      member may be ``None``.
+    * AST operators reject ``NULLABLE`` operands at parse time wherever ``None`` has no meaningful semantics:
+      arithmetic, ordered comparisons, the regex operators, bitwise and bitwise-shift operators, unary minus,
+      containment, attribute access, item access, slicing, and function arguments all raise
+      :py:exc:`~rule_engine.errors.EvaluationError` (or :py:exc:`~rule_engine.errors.FunctionCallError` for function
+      arguments) with a message pointing at the discharge operators. Equality (``==``, ``!=``), logical connectives
+      (``and``, ``or``, ``not``), ternary expressions, and safe-navigation operators remain lenient.
+    * A new null-coalesce operator ``left ?? right`` discharges ``NULLABLE(T)`` to ``T``. Existing safe attribute
+      (``&.``) and item (``&[``) accessors still apply to nullable receivers and are the only access forms that do.
+* **Deprecated:** The ``attributes_nullable`` kwarg on :py:attr:`~rule_engine.types.DataType.OBJECT` and the
+  ``value_type_nullable`` kwarg on :py:attr:`~rule_engine.types.DataType.ARRAY`, :py:attr:`~rule_engine.types.DataType.SET`,
+  and :py:attr:`~rule_engine.types.DataType.MAPPING` now emit :py:class:`DeprecationWarning`. Wrap the relevant
+  attribute or element type in :py:attr:`~rule_engine.types.DataType.NULLABLE` instead. The kwargs will be removed
+  in v6.0.
+* **Deprecated:** Accessing :py:attr:`~rule_engine.types.DataType.MAPPING` keys via dot syntax (``mapping.key``) now
+  emits a :py:class:`~rule_engine.errors.MappingAttributeLookupDeprecation` warning. Use bracket syntax
+  (``mapping["key"]``) instead. This fallback will be removed in v6.0. Set ``Context(mapping_attribute_lookup=False)``
+  to opt out now.
+
 Version 4.x.x
 -------------
 
@@ -75,7 +153,7 @@ Version 3.6.0
 Released :release:`3.6.0` on June 16th, 2023
 
 * Removed testing for Python versions 3.4 and 3.5 on GitHub Actions
-* Add regex error details to the debug REPL
+* Add regex error details to the :ref:`debug-repl` utility
 * Add support for Python-style comments
 
 Version 3.5.0

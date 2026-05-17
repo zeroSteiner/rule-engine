@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Types &mdash; Rule Engine 4.5.3 documentation</title>
+  <title>Data Types &mdash; Rule Engine 5.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=690d16f2"></script>
+      <script src="_static/documentation_options.js?v=ce74c6a2"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -49,9 +49,20 @@
 <li class="toctree-l1"><a class="reference internal" href="syntax.html">Rule Syntax</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Data Types</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#compound-types">Compound Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#object">OBJECT</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#defining-an-object-type">Defining an Object Type</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-accessors">Custom Accessors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#forward-references-and-recursion">Forward References and Recursion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-a-dataclass">From a Dataclass</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#from-a-sqlalchemy-model">From a SQLAlchemy Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#restrictions">Restrictions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nullable">NULLABLE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#float">FLOAT</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#function">FUNCTION</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#timedelta">TIMEDELTA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#datatype-utilities">DataType Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="attributes.html">Data Attributes</a></li>
@@ -122,6 +133,13 @@ compatible with. For a information regarding supported operations, see the
 <tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a></p></td>
 <td><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULLABLE" title="rule_engine.types.DataType.NULLABLE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULLABLE</span></code></a></p></td>
+<td><p><em>inner type</em> or
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT" title="rule_engine.types.DataType.OBJECT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">OBJECT</span></code></a></p></td>
+<td><p><em>any</em> (schema-driven)</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.SET" title="rule_engine.types.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
 <td><p><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#set" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a></p></td>
 </tr>
@@ -145,6 +163,233 @@ section on <a class="reference internal" href="getting_started.html#getting-star
 <p>Compound data types are also iterable, meaning that array comprehension operations can be applied to them. Iteration
 operations apply to the members of <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> and <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.SET" title="rule_engine.types.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a> values, and the keys of
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> values. This allows the types to behave in the same was as they do in Python.</p>
+</section>
+<section id="object">
+<span id="data-types-object"></span><h2>OBJECT<a class="headerlink" href="#object" title="Link to this heading"></a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 5.0.0.</span></p>
+</div>
+<p>The <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT" title="rule_engine.types.DataType.OBJECT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">OBJECT</span></code></a> type represents a user-defined schema with named, typed attributes. Unlike
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a>, which is keyed by arbitrary values, an <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> has a fixed set of attributes known at
+rule parse time. This enables parse-time validation: accessing an unknown attribute raises an
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.ObjectAttributeError" title="rule_engine.errors.ObjectAttributeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectAttributeError</span></code></a> with a suggestion, and item access (<code class="docutils literal notranslate"><span class="pre">obj[&quot;name&quot;]</span></code>) is rejected
+outright.</p>
+<section id="defining-an-object-type">
+<h3>Defining an Object Type<a class="headerlink" href="#defining-an-object-type" title="Link to this heading"></a></h3>
+<p>An <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> type is created by calling <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT" title="rule_engine.types.DataType.OBJECT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">OBJECT</span></code></a> with a name and an attribute schema:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">rule_engine</span>
+
+<span class="n">Hero</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">(</span><span class="s1">&#39;Hero&#39;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+    <span class="s1">&#39;first_appearance&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">,</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>The <em>name</em> is used for nominal type compatibility: two <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> types are compatible only when their names match.</p>
+</section>
+<section id="custom-accessors">
+<h3>Custom Accessors<a class="headerlink" href="#custom-accessors" title="Link to this heading"></a></h3>
+<p>By default, attribute values are fetched with <a class="reference external" href="https://docs.python.org/3.12/library/functions.html#getattr" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">getattr()</span></code></a>. A custom <em>accessor</em> can be provided to support other
+backing stores (dictionaries, database rows, etc.):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># use a dict-backed object instead of an attribute-backed one</span>
+<span class="n">Hero</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">(</span><span class="s1">&#39;Hero&#39;</span><span class="p">,</span>
+    <span class="n">attributes</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">},</span>
+    <span class="n">accessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">obj</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="forward-references-and-recursion">
+<h3>Forward References and Recursion<a class="headerlink" href="#forward-references-and-recursion" title="Link to this heading"></a></h3>
+<p>Use <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.reference" title="rule_engine.types.DataType.OBJECT.reference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.OBJECT.reference()</span></code></a> to create a forward-reference placeholder inside an attribute schema.
+Self-references are resolved automatically at construction. For self-references, <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.self" title="rule_engine.types.DataType.OBJECT.self"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataType.OBJECT.self</span></code></a> is
+a shorthand sentinel that avoids repeating the enclosing schema’s name:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Hero</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">(</span><span class="s1">&#39;Hero&#39;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+    <span class="s1">&#39;nemesis&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="o">.</span><span class="n">self</span><span class="p">,</span>  <span class="c1"># resolved to Hero</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>For mutually-recursive types, place both types in the <code class="docutils literal notranslate"><span class="pre">type_resolver</span></code> dict and the references will be resolved lazily
+at rule parse time:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Person</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">(</span><span class="s1">&#39;Person&#39;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+    <span class="s1">&#39;employer&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="o">.</span><span class="n">reference</span><span class="p">(</span><span class="s1">&#39;Company&#39;</span><span class="p">),</span>
+<span class="p">})</span>
+<span class="n">Company</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="p">(</span><span class="s1">&#39;Company&#39;</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">,</span>
+    <span class="s1">&#39;ceo&#39;</span><span class="p">:</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="o">.</span><span class="n">reference</span><span class="p">(</span><span class="s1">&#39;Person&#39;</span><span class="p">),</span>
+<span class="p">})</span>
+
+<span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;employee&#39;</span><span class="p">:</span> <span class="n">Person</span><span class="p">,</span>
+    <span class="s1">&#39;Person&#39;</span><span class="p">:</span> <span class="n">Person</span><span class="p">,</span>
+    <span class="s1">&#39;Company&#39;</span><span class="p">:</span> <span class="n">Company</span><span class="p">,</span>
+<span class="p">})</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span><span class="s1">&#39;employee.employer.ceo.name == &quot;Palpatine&quot;&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="from-a-dataclass">
+<h3>From a Dataclass<a class="headerlink" href="#from-a-dataclass" title="Link to this heading"></a></h3>
+<p>When the source data is already modeled as a Python <a class="reference external" href="https://docs.python.org/3.12/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclass()</span></code></a>, the schema can be derived
+directly from the field annotations using <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.from_dataclass" title="rule_engine.types.DataType.OBJECT.from_dataclass"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.OBJECT.from_dataclass()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rule_engine</span>
+
+<span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Hero</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">publisher</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">first_appearance</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
+    <span class="n">sidekick</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">HeroType</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="o">.</span><span class="n">from_dataclass</span><span class="p">(</span><span class="s1">&#39;Hero&#39;</span><span class="p">,</span> <span class="n">Hero</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The derived schema reflects three behaviors automatically:</p>
+<ul class="simple">
+<li><p><strong>Optional / nullability</strong>: a field annotated as <code class="xref py py-class docutils literal notranslate"><span class="pre">Optional</span></code> (or <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">|</span> <span class="pre">None</span></code>) produces a
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULLABLE" title="rule_engine.types.DataType.NULLABLE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULLABLE</span></code></a>-wrapped attribute type in the resulting schema; non-Optional fields are stored
+unwrapped. See <a class="reference internal" href="#data-types-nullable"><span class="std std-ref">the NULLABLE section</span></a> for how to work with nullable attributes in rules.</p></li>
+<li><p><strong>Nested dataclasses</strong>: a field whose annotation is itself a dataclass becomes a nested <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> (recursively).
+Generic containers (e.g. <code class="docutils literal notranslate"><span class="pre">list[Address]</span></code>, <code class="docutils literal notranslate"><span class="pre">dict[str,</span> <span class="pre">Address]</span></code>) are walked so nested dataclasses inside
+<code class="docutils literal notranslate"><span class="pre">ARRAY</span></code>, <code class="docutils literal notranslate"><span class="pre">SET</span></code>, and <code class="docutils literal notranslate"><span class="pre">MAPPING</span></code> types are also expanded.</p></li>
+<li><p><strong>Self and mutual recursion</strong>: a field whose annotation refers back to the enclosing dataclass becomes
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.self" title="rule_engine.types.DataType.OBJECT.self"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataType.OBJECT.self</span></code></a>; cycles between sibling dataclasses produce
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.reference" title="rule_engine.types.DataType.OBJECT.reference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.OBJECT.reference()</span></code></a> placeholders that resolve at rule parse time when both schemas are reachable
+through the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> <code class="docutils literal notranslate"><span class="pre">type_resolver</span></code>.</p></li>
+</ul>
+<p>By default (<code class="docutils literal notranslate"><span class="pre">strict=True</span></code>) a field whose annotation cannot be mapped to a Rule Engine data type raises
+<a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> so the schema mistake is caught early. Pass <code class="docutils literal notranslate"><span class="pre">strict=False</span></code> to instead map the offending
+field to <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>, leaving it selectable but not type-checked at parse time.</p>
+<p>For the common case of building a <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> directly from a dataclass, the
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_dataclass" title="rule_engine.engine.type_resolver_from_dataclass"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_dataclass()</span></code></a> helper produces a resolver whose top-level fields are the
+dataclass’s own attributes and whose nested <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> types are reachable by name. See
+<a class="reference internal" href="getting_started.html#getting-started-types-from-dataclass"><span class="std std-ref">Defining Types From A Dataclass</span></a> for an end-to-end example.</p>
+</section>
+<section id="from-a-sqlalchemy-model">
+<h3>From a SQLAlchemy Model<a class="headerlink" href="#from-a-sqlalchemy-model" title="Link to this heading"></a></h3>
+<p>Projects that already model their data with <a class="reference external" href="https://www.sqlalchemy.org/">SQLAlchemy</a> can derive a schema directly
+from a mapped class using <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.from_sqlalchemy" title="rule_engine.types.DataType.OBJECT.from_sqlalchemy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.OBJECT.from_sqlalchemy()</span></code></a>. SQLAlchemy is an <em>optional</em> dependency; it is
+only needed when this entry point is actually invoked. Install it with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;sqlalchemy&gt;=2.0&quot;</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy.orm</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeclarativeBase</span><span class="p">,</span> <span class="n">Mapped</span><span class="p">,</span> <span class="n">mapped_column</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rule_engine</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Base</span><span class="p">(</span><span class="n">DeclarativeBase</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Hero</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;heroes&#39;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapped_column</span><span class="p">(</span><span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">alias</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">first_appearance</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">]</span>
+    <span class="n">active</span><span class="p">:</span> <span class="n">Mapped</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
+
+<span class="n">HeroType</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">OBJECT</span><span class="o">.</span><span class="n">from_sqlalchemy</span><span class="p">(</span><span class="s1">&#39;Hero&#39;</span><span class="p">,</span> <span class="n">Hero</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The walker reads <code class="docutils literal notranslate"><span class="pre">column.type.python_type</span></code> for each mapped column and threads it through
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.from_type" title="rule_engine.types.DataType.from_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.from_type()</span></code></a>. Column nullability (<code class="docutils literal notranslate"><span class="pre">column.nullable</span></code>) is copied through to the schema’s
+per-attribute nullability map. <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code> columns become <code class="docutils literal notranslate"><span class="pre">STRING</span></code> unless the enum class is an
+<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> subclass (such as <a class="reference external" href="https://docs.python.org/3.12/library/enum.html#enum.IntEnum" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></a>), in which case they become <code class="docutils literal notranslate"><span class="pre">FLOAT</span></code> to match the
+integer values stored at runtime. <code class="xref py py-class docutils literal notranslate"><span class="pre">ARRAY</span></code> columns become <code class="docutils literal notranslate"><span class="pre">ARRAY(T)</span></code> where <code class="docutils literal notranslate"><span class="pre">T</span></code> is the
+mapped element type (<code class="docutils literal notranslate"><span class="pre">ARRAY(UNDEFINED)</span></code> when the element type is itself unmappable under <code class="docutils literal notranslate"><span class="pre">strict=False</span></code>).
+<code class="xref py py-class docutils literal notranslate"><span class="pre">JSON</span></code> columns report <code class="docutils literal notranslate"><span class="pre">dict</span></code> as their <code class="docutils literal notranslate"><span class="pre">python_type</span></code> and therefore map to
+<code class="docutils literal notranslate"><span class="pre">MAPPING(UNDEFINED,</span> <span class="pre">UNDEFINED)</span></code> in both strict and non-strict mode; the nested keys and values remain untyped.
+By default (<code class="docutils literal notranslate"><span class="pre">strict=True</span></code>) a
+column whose <code class="docutils literal notranslate"><span class="pre">python_type</span></code> raises <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#NotImplementedError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NotImplementedError</span></code></a> or resolves to a Python type Rule Engine cannot map
+(e.g. <a class="reference external" href="https://docs.python.org/3.12/library/uuid.html#uuid.UUID" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></a>) raises <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>. Pass <code class="docutils literal notranslate"><span class="pre">strict=False</span></code> to instead map those columns to
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>; this is usually the right choice for schemas that include dialect-specific types
+whose values can not be statically described.</p>
+<p>Relationships expand automatically:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">uselist</span></code> collections (<code class="docutils literal notranslate"><span class="pre">one-to-many</span></code> / <code class="docutils literal notranslate"><span class="pre">many-to-many</span></code>) become <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataType.ARRAY</span></code></a> wrapped around the
+target class’s <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> and are always non-nullable on the parent (an empty list represents “no items”).</p></li>
+<li><p>Scalar relationships (<code class="docutils literal notranslate"><span class="pre">many-to-one</span></code> / <code class="docutils literal notranslate"><span class="pre">one-to-one</span></code>) become a nested <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> whose nullability is derived
+from the local foreign-key columns.</p></li>
+<li><p>Self-references and cycles are detected during the walk: a relationship back to the root class becomes
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.self" title="rule_engine.types.DataType.OBJECT.self"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataType.OBJECT.self</span></code></a>; a relationship back to another ancestor on the build stack becomes a
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.reference" title="rule_engine.types.DataType.OBJECT.reference"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.OBJECT.reference()</span></code></a> placeholder that resolves at rule parse time via the
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> <code class="docutils literal notranslate"><span class="pre">type_resolver</span></code>.</p></li>
+</ul>
+<p>For the common case of building a <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> directly from a mapped class, the
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.type_resolver_from_sqlalchemy" title="rule_engine.engine.type_resolver_from_sqlalchemy"><code class="xref py py-func docutils literal notranslate"><span class="pre">type_resolver_from_sqlalchemy()</span></code></a> helper produces a resolver whose top-level symbols
+are the root class’s columns and relationships and whose nested <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> schemas are reachable by name. See
+<a class="reference internal" href="getting_started.html#getting-started-types-from-sqlalchemy"><span class="std std-ref">Defining Types From A SQLAlchemy Model</span></a> for an end-to-end example.</p>
+<p>Polymorphic / inherited mappings, hybrid properties, and <code class="docutils literal notranslate"><span class="pre">column_property</span></code> aggregates are out of scope; only
+mapped <code class="xref py py-class docutils literal notranslate"><span class="pre">Column</span></code> entries and <code class="docutils literal notranslate"><span class="pre">mapper.relationships</span></code> are walked. <code class="docutils literal notranslate"><span class="pre">column_property</span></code> entries
+that surface in <code class="docutils literal notranslate"><span class="pre">mapper.columns</span></code> are silently skipped since they do not expose the metadata the walker needs.</p>
+</section>
+<section id="restrictions">
+<h3>Restrictions<a class="headerlink" href="#restrictions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Item access on an <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> is a parse-time error. Use <code class="docutils literal notranslate"><span class="pre">obj.attribute</span></code> instead of <code class="docutils literal notranslate"><span class="pre">obj[&quot;attribute&quot;]</span></code>.</p></li>
+<li><p>Containment checks (<code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span> <span class="pre">in</span> <span class="pre">obj</span></code>) are rejected at parse time.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SET(OBJECT(...))</span></code> is rejected at construction because <code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> values are not guaranteed to be hashable.
+Use <code class="docutils literal notranslate"><span class="pre">ARRAY(OBJECT(...))</span></code> instead.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OBJECT</span></code> types are not inferred by <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.from_value" title="rule_engine.types.DataType.from_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_value()</span></code></a>. They must be annotated explicitly via the
+<code class="docutils literal notranslate"><span class="pre">type_resolver</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="nullable">
+<h2>NULLABLE<a class="headerlink" href="#nullable" title="Link to this heading"></a></h2>
+<div class="versionadded" id="data-types-nullable">
+<p><span class="versionmodified added">Added in version 5.0.0.</span></p>
+</div>
+<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULLABLE" title="rule_engine.types.DataType.NULLABLE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULLABLE</span></code></a> is a one-argument type constructor that wraps another data type to mark a slot as
+permitting <code class="xref py py-class docutils literal notranslate"><span class="pre">NoneType</span></code> (<code class="docutils literal notranslate"><span class="pre">null</span></code>) at runtime. <code class="docutils literal notranslate"><span class="pre">NULLABLE(T)</span></code> is structurally distinct from both <code class="docutils literal notranslate"><span class="pre">T</span></code> and
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a> and is the single source of truth for nullability in the rule engine’s type system.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> is produced automatically wherever the source of a type annotation declares optionality:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.from_type" title="rule_engine.types.DataType.from_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.from_type()</span></code></a> maps Python’s <code class="docutils literal notranslate"><span class="pre">Optional[T]</span></code> / <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">|</span> <span class="pre">None</span></code> to <code class="docutils literal notranslate"><span class="pre">NULLABLE(from_type(T))</span></code>.</p></li>
+<li><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.from_dataclass" title="rule_engine.types.DataType.OBJECT.from_dataclass"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.OBJECT.from_dataclass()</span></code></a> wraps attribute types for dataclass fields typed as <code class="docutils literal notranslate"><span class="pre">Optional[T]</span></code> and
+for nested dataclass fields that can hold <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT.from_sqlalchemy" title="rule_engine.types.DataType.OBJECT.from_sqlalchemy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.OBJECT.from_sqlalchemy()</span></code></a> wraps attribute types for columns whose <code class="docutils literal notranslate"><span class="pre">nullable</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>, and for
+scalar relationships whose local foreign-key columns are nullable.</p></li>
+<li><p>Compound element types (<code class="docutils literal notranslate"><span class="pre">ARRAY</span></code>, <code class="docutils literal notranslate"><span class="pre">SET</span></code>, <code class="docutils literal notranslate"><span class="pre">MAPPING</span></code> values) store <code class="docutils literal notranslate"><span class="pre">NULLABLE(T)</span></code> directly when the member may
+be <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+<p>Semantics are Python-style, not SQL three-valued logic. <code class="docutils literal notranslate"><span class="pre">None</span></code> flows through expressions as the Python <code class="docutils literal notranslate"><span class="pre">None</span></code>
+value. Parse-time checking is strict: operators that do not meaningfully accept <code class="docutils literal notranslate"><span class="pre">None</span></code> — arithmetic (<code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>,
+<code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">/</span></code>, …), ordered comparisons (<code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;=</span></code>), the regex operators (<code class="docutils literal notranslate"><span class="pre">=~</span></code>, <code class="docutils literal notranslate"><span class="pre">=~~</span></code>, <code class="docutils literal notranslate"><span class="pre">!~</span></code>,
+<code class="docutils literal notranslate"><span class="pre">!~~</span></code>), bitwise and bitwise-shift operators, unary minus, containment (<code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">in</span> <span class="pre">container</span></code>), attribute access
+(<code class="docutils literal notranslate"><span class="pre">obj.attr</span></code>), item access (<code class="docutils literal notranslate"><span class="pre">container[key]</span></code>), slicing (<code class="docutils literal notranslate"><span class="pre">container[a:b]</span></code>), and function arguments — reject a
+<code class="docutils literal notranslate"><span class="pre">NULLABLE(T)</span></code> operand at parse time with an <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.EvaluationError" title="rule_engine.errors.EvaluationError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EvaluationError</span></code></a> (or
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.FunctionCallError" title="rule_engine.errors.FunctionCallError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FunctionCallError</span></code></a> for function arguments) whose message points at the discharge
+operators. The rule does not parse; the author must discharge nullability first.</p>
+<p>Operators that are meaningful on <code class="docutils literal notranslate"><span class="pre">None</span></code> stay lenient: equality and logical connectives (<code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">!=</span></code>, <code class="docutils literal notranslate"><span class="pre">and</span></code>,
+<code class="docutils literal notranslate"><span class="pre">or</span></code>, <code class="docutils literal notranslate"><span class="pre">not</span></code>) always accept <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> operands and return plain <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a>; ternary
+expressions (<code class="docutils literal notranslate"><span class="pre">cond</span> <span class="pre">?</span> <span class="pre">a</span> <span class="pre">:</span> <span class="pre">b</span></code>) propagate <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> to the result if either branch is nullable; and safe-navigation
+operators accept <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> targets by design.</p>
+<p>The grammar exposes two mechanisms for working with nullable values:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">left</span> <span class="pre">??</span> <span class="pre">right</span></code> (null-coalesce) — <em>discharges</em> <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code>. Evaluates to <code class="docutils literal notranslate"><span class="pre">left</span></code> when it is not <code class="docutils literal notranslate"><span class="pre">None</span></code>, else
+<code class="docutils literal notranslate"><span class="pre">right</span></code>. The result type is the peeled type of the left operand, re-wrapped in <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> only if the right
+operand is itself nullable or is the <code class="docutils literal notranslate"><span class="pre">null</span></code> literal.</p></li>
+<li><p>Safe attribute access (<code class="docutils literal notranslate"><span class="pre">obj&amp;.attr</span></code>) and safe item access (<code class="docutils literal notranslate"><span class="pre">container&amp;[key]</span></code>) — <em>accept</em> a <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> target
+without raising but do not discharge it. The overall expression remains nullable, so chaining
+<code class="docutils literal notranslate"><span class="pre">obj&amp;.inner&amp;.leaf</span></code> yields a <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> value that a downstream operator must still discharge.</p></li>
+</ul>
+<p>A few Python-style edge cases worth knowing:</p>
+<ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">NULLABLE(BOOLEAN)</span></code> value used as a ternary condition (<code class="docutils literal notranslate"><span class="pre">flag</span> <span class="pre">?</span> <span class="pre">x</span> <span class="pre">:</span> <span class="pre">y</span></code>) is accepted at parse time. <code class="docutils literal notranslate"><span class="pre">None</span></code>
+is falsy, so a null condition evaluates the false branch at runtime.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">not</span> <span class="pre">NULLABLE(BOOLEAN)</span></code> is accepted and returns plain <code class="docutils literal notranslate"><span class="pre">BOOLEAN</span></code>. <code class="docutils literal notranslate"><span class="pre">not</span> <span class="pre">None</span></code> evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NULLABLE(T)</span> <span class="pre">in</span> <span class="pre">container</span></code> (nullable <em>member</em>, non-nullable container) is accepted. <code class="docutils literal notranslate"><span class="pre">None</span> <span class="pre">in</span> <span class="pre">[...]</span></code> returns
+<code class="docutils literal notranslate"><span class="pre">False</span></code>, consistent with Python.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">non_nullable_value</span> <span class="pre">??</span> <span class="pre">null</span></code> gives a <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> result type. The static analysis conservatively wraps the
+result whenever the right operand is <code class="docutils literal notranslate"><span class="pre">null</span></code>, even if the left can never be <code class="docutils literal notranslate"><span class="pre">None</span></code> at runtime.</p></li>
+</ul>
+<p>The legacy <code class="docutils literal notranslate"><span class="pre">attributes_nullable</span></code> / <code class="docutils literal notranslate"><span class="pre">value_type_nullable</span></code> kwargs on <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT" title="rule_engine.types.DataType.OBJECT"><code class="xref py py-class docutils literal notranslate"><span class="pre">OBJECT</span></code></a> and compound-type
+constructors are still accepted in v5 for backward compatibility but emit a <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#DeprecationWarning" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeprecationWarning</span></code></a> and will
+be removed in v6.0. Wrap the attribute or element type in <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULLABLE" title="rule_engine.types.DataType.NULLABLE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULLABLE</span></code></a> directly instead.</p>
 </section>
 <section id="float">
 <h2>FLOAT<a class="headerlink" href="#float" title="Link to this heading"></a></h2>
@@ -192,6 +437,20 @@ such as “has it been 30 days since this thing happened?” or “how much time
 <li><p>Subtracting a datetime from another datetime (result is a timedelta)</p></li>
 <li><p>Subtracting a timedelta from another timedelta (result is a timedelta)</p></li>
 </ul>
+</section>
+<section id="datatype-utilities">
+<h2>DataType Utilities<a class="headerlink" href="#datatype-utilities" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.is_type" title="rule_engine.types.DataType.is_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_type()</span></code></a> and <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.is_compatible" title="rule_engine.types.DataType.is_compatible"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_compatible()</span></code></a> are the two classmethods for comparing
+data type definitions without a rule expression.</p>
+<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.is_type" title="rule_engine.types.DataType.is_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_type()</span></code></a> checks whether a data type belongs to the same <em>family</em> as a given sentinel,
+ignoring member types for compound types:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">)</span>    <span class="c1"># True for ARRAY(STRING), ARRAY(FLOAT), bare ARRAY, …</span>
+<span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">MAPPING</span><span class="p">)</span>  <span class="c1"># True for any parameterized or bare MAPPING</span>
+<span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>   <span class="c1"># True only for STRING itself (scalars are singletons)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.is_compatible" title="rule_engine.types.DataType.is_compatible"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_compatible()</span></code></a> additionally recurses into member types and handles
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULLABLE" title="rule_engine.types.DataType.NULLABLE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULLABLE</span></code></a> unwrapping — use it when the full structural type matters.</p>
 </section>
 </section>
 

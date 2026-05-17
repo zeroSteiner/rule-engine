@@ -154,6 +154,21 @@ it can be any encoding name that Python can handle such as ``UTF-8``. In additio
 handle, the special names ``hex``, ``base16`` and ``base64`` can be used for transcoding ascii-hex, and base-64
 formatted data.
 
+OBJECT Attribute Access
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 5.0.0
+
+Attributes on :py:attr:`~.DataType.OBJECT` values are resolved differently from the builtin attributes listed above.
+Instead of using the builtin attribute resolver, the engine checks the attribute name against the ``OBJECT``'s declared
+schema at **parse time**. If the attribute is not in the schema, an :py:class:`~errors.ObjectAttributeError` is raised
+immediately with a suggestion for the closest valid attribute name.
+
+At **evaluation time**, the value is fetched using the ``OBJECT`` type's *accessor* callable, which defaults to
+:py:func:`getattr`. This means the builtin attribute resolvers (``length``, ``as_upper``, etc.) do **not** apply to
+``OBJECT`` values - only the attributes declared in the schema are accessible. The symbol resolver fallback used by
+:py:attr:`~.DataType.MAPPING` values is also bypassed entirely for ``OBJECT`` types.
+
 Object Methods
 ^^^^^^^^^^^^^^
 Much like in Python, a method is a function that is associated with an object. They are defined as

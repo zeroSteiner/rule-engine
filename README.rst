@@ -7,6 +7,9 @@ A lightweight, optionally typed expression language with a custom grammar for ma
 Documentation is available at https://zeroSteiner.github.io/rule-engine/.
 
 :Warning:
+  Version 6.0 will remove support for Python version 3.10. There is currently no timeline for its release.
+
+:Warning:
   Version 5.0 removes support for Python versions 3.6, 3.7, 3.8, and 3.9 and deprecates attribute-style access on
   ``MAPPING`` values (use bracket syntax ``mapping["key"]`` instead). See the `Change Log`_ for details.
 

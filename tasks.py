@@ -27,8 +27,8 @@ def docs(c):
 def tests(c, coverage=False):
     """Run unit tests."""
     if coverage:
-        c.run('uv run coverage run -m unittest -v', pty=True)
-        c.run('uv run coverage report')
+        c.run('uv run python -m coverage run -m unittest -v', pty=True)
+        c.run('uv run python -m coverage report')
     else:
         c.run('uv run python -m unittest -v', pty=True)
 

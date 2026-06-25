@@ -55,7 +55,7 @@ def _builtin_parse_datetime(builtins: 'Builtins', string: str) -> datetime.datet
     return parse_datetime(string, builtins.timezone)
 
 def _builtin_random(boundary: Any = None) -> Any:
-    if boundary:
+    if boundary is not None:
         if not types.is_natural_number(boundary):
             raise errors.FunctionCallError('argument #1 (boundary) must be a natural number')
         return random.randint(0, int(boundary))
@@ -73,10 +73,10 @@ def _builtin_parse_datetime_generator(builtins: 'Builtins') -> 'functools.partia
 def _builtin_range(start: Any, stop: Any = None, step: Any = None) -> list[int]:
     if not types.is_integer_number(start):
         raise errors.FunctionCallError('argument #1 (start) must be an integer number')
-    if stop:
+    if stop is not None:
         if not types.is_integer_number(stop):
             raise errors.FunctionCallError('argument #2 (stop) must be an integer number')
-        if step:
+        if step is not None:
             if not types.is_integer_number(step):
                 raise errors.FunctionCallError('argument #3 (step) must be an integer number')
             return list(range(int(start), int(stop), int(step)))

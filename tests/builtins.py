@@ -189,6 +189,8 @@ class BuiltinsTests(unittest.TestCase):
             value = random.randint(0, 1_000_000)
             random.setstate(state)
             self.assertBuiltinFunction('random', value, 1_000_000)
+        # boundary=0 is a valid natural number; result must always be 0
+        self.assertBuiltinFunction('random', 0, 0)
         with self.assertRaises(errors.FunctionCallError):
             self.assertBuiltinFunction('random', 1, 1.5)
 
@@ -199,6 +201,8 @@ class BuiltinsTests(unittest.TestCase):
         self.assertBuiltinFunction('range', [5, 4], 5, 3, -1)
         self.assertBuiltinFunction('range', [0, 1, 2, 3, 4, 5, 6, 7], 8)
         self.assertBuiltinFunction('range', [], -8)
+        # stop=0 must produce an empty sequence, not range(start)
+        self.assertBuiltinFunction('range', [], 5, 0)
         with self.assertRaises(errors.FunctionCallError):
             self.assertBuiltinFunction('range', None, 3.5)
         with self.assertRaises(errors.FunctionCallError):

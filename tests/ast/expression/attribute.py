@@ -350,6 +350,38 @@ class GetAttributeExpressionTests(unittest.TestCase):
             self.assertTrue(callable(method), "attribute starts_with failed (method not callable)")
             self.assertEqual(method(prefix), result)
 
+    def test_ast_expression_value_methods_empty_affix(self):
+        # regression: an empty prefix/suffix must match any sequence, mirroring
+        # Python's str.startswith('') / str.endswith('') semantics. ends_with
+        # previously returned False for an empty suffix because
+        # value[-len(suffix):] is value[-0:] == value[0:] (the whole value)
+        # rather than an empty slice, diverging from its starts_with sibling.
+        cases = [
+                (ast.StringExpression, 'Rule Engine', '', 'Rule Engine'),
+                (ast.BytesExpression, b'Rule Engine', b'', b'Rule Engine'),
+        ]
+        for expression_class, value, empty, whole in cases:
+            for method_name in ('ends_with', 'starts_with'):
+                symbol = expression_class(context, value)
+                expression = ast.GetAttributeExpression(context, symbol, method_name)
+                method = expression.evaluate(None)
+                self.assertTrue(callable(method), "attribute {} failed (method not callable)".format(method_name))
+                # an empty affix always matches
+                self.assertTrue(method(empty), "{}({!r}) should be True".format(method_name, empty))
+                # the whole value is both a prefix and a suffix of itself
+                self.assertTrue(method(whole), "{}({!r}) should be True".format(method_name, whole))
+
+        # arrays behave the same as strings and bytes
+        array_expression = ast.ArrayExpression(context, [
+                ast.StringExpression(context, 'Rule'),
+                ast.StringExpression(context, 'Engine')
+        ])
+        for method_name in ('ends_with', 'starts_with'):
+            expression = ast.GetAttributeExpression(context, array_expression, method_name)
+            method = expression.evaluate(None)
+            self.assertTrue(method(()), "{}(()) should be True".format(method_name))
+            self.assertTrue(method(('Rule', 'Engine')), "{}(whole) should be True".format(method_name))
+
     def test_ast_expression_string_attributes_flt(self):
         combos = (
                 ('3.14159', decimal.Decimal('3.14159')),

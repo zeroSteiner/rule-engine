@@ -313,7 +313,10 @@ class _AttributeResolver(object):
         return functools.partial(self._value_ends_with, value)
 
     def _value_ends_with(self, value: Sequence[Any], suffix: Sequence[Any]) -> bool:
-        return value[-len(suffix):] == suffix
+        # index from the front (len(value) - len(suffix)) rather than the back
+        # (-len(suffix)) so an empty suffix yields an empty slice instead of the
+        # whole value; value[-0:] is value[0:], which made ends_with('') False
+        return value[len(value) - len(suffix):] == suffix
 
     @attribute('is_empty', types.DataType.ARRAY, types.DataType.BYTES, types.DataType.STRING, types.DataType.MAPPING, types.DataType.SET, result_type=types.DataType.BOOLEAN)
     def value_is_empty(self, value: Sized) -> bool:

@@ -23,6 +23,10 @@ Released :release:`5.0.0` on May 17th, 2026
 * Added support for raw STRING literals using the ``r`` prefix (e.g. ``r'\w+'``).
 * Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy
   removes an external install requirement and silences third-party vulnerability reports targeting it.
+* Made :py:class:`~rule_engine.engine.Rule` and :py:class:`~rule_engine.engine.Context` objects serializable with
+  :py:mod:`pickle`. Transient, unpicklable state (thread-local storage, locks and the builtins table) is recreated on
+  restore. Any *type_resolver* or *resolver* callable must itself be picklable, so lambdas and other local functions
+  can not be used on a context that needs to be serialized.
 * Added the new :py:attr:`~rule_engine.types.DataType.OBJECT` compound data type for user-defined schemas with named,
   typed attributes. See the :ref:`OBJECT section<data-types-object>` in the Data Types page for details.
 

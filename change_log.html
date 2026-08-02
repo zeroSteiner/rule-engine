@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Change Log &mdash; Rule Engine 5.0.2 documentation</title>
+  <title>Change Log &mdash; Rule Engine 5.0.3 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=5df4c8d1"></script>
+      <script src="_static/documentation_options.js?v=f98c4cc8"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -136,6 +136,10 @@ this list is curated by the development team for note worthy changes.</p>
 <li><p>Added support for raw STRING literals using the <code class="docutils literal notranslate"><span class="pre">r</span></code> prefix (e.g. <code class="docutils literal notranslate"><span class="pre">r'\w+'</span></code>).</p></li>
 <li><p>Vendored the PLY dependency under <code class="docutils literal notranslate"><span class="pre">rule_engine._vendor.ply</span></code> — the upstream project is unmaintained, so the copy
 removes an external install requirement and silences third-party vulnerability reports targeting it.</p></li>
+<li><p>Made <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> and <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> objects serializable with
+<a class="reference external" href="https://docs.python.org/3.12/library/pickle.html#module-pickle" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code></a>. Transient, unpicklable state (thread-local storage, locks and the builtins table) is recreated on
+restore. Any <em>type_resolver</em> or <em>resolver</em> callable must itself be picklable, so lambdas and other local functions
+can not be used on a context that needs to be serialized.</p></li>
 <li><p>Added the new <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.OBJECT" title="rule_engine.types.DataType.OBJECT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">OBJECT</span></code></a> compound data type for user-defined schemas with named,
 typed attributes. See the <a class="reference internal" href="types.html#data-types-object"><span class="std std-ref">OBJECT section</span></a> in the Data Types page for details.</p>
 <blockquote>

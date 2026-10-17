@@ -46,11 +46,17 @@ class _UNDEFINED(object):
     __nonzero__ = __bool__
     def __repr__(self) -> str:
         return self.__name__
+    def __reduce__(self) -> str:
+        # restore the module-level singleton so identity checks (``is UNDEFINED``) still work after pickle or copy
+        return 'UNDEFINED'
 UNDEFINED = _UNDEFINED()
 """
 A sentinel value to specify that something is undefined. When evaluated, the value is falsy.
 
 .. versionadded:: 2.0.0
+
+.. versionchanged:: 5.1.0
+        The sentinel keeps its identity when it is pickled or copied.
 """
 
 class EngineError(Exception):

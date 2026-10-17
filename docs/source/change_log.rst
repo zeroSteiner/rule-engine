@@ -7,6 +7,17 @@ this list is curated by the development team for note worthy changes.
 Version 5.x.x
 -------------
 
+Version 5.1.0
+^^^^^^^^^^^^^
+
+*In Progress*
+
+* Fixed the :py:data:`~rule_engine.errors.UNDEFINED` sentinel losing its identity when pickled or copied. A restored
+  :py:class:`~rule_engine.engine.Context` using the default *default_value* would return a stand-in object for missing
+  symbols and attributes instead of raising a :py:exc:`~rule_engine.errors.SymbolResolutionError` or
+  :py:exc:`~rule_engine.errors.AttributeResolutionError`. Contexts that were pickled by an earlier version are
+  corrected when they are loaded.
+
 Version 5.0.0
 ^^^^^^^^^^^^^
 

@@ -30,6 +30,8 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import copy
+import pickle
 import random
 import string
 import unittest
@@ -65,6 +67,21 @@ class UndefinedSentinelTests(unittest.TestCase):
 
     def test_undefined_is_falsy(self):
         self.assertFalse(errors.UNDEFINED)
+
+    def test_undefined_pickle_preserves_identity(self):
+        for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+            with self.subTest(protocol=protocol):
+                self.assertIs(pickle.loads(pickle.dumps(errors.UNDEFINED, protocol=protocol)), errors.UNDEFINED)
+
+    def test_undefined_copy_preserves_identity(self):
+        self.assertIs(copy.copy(errors.UNDEFINED), errors.UNDEFINED)
+        self.assertIs(copy.deepcopy(errors.UNDEFINED), errors.UNDEFINED)
+        self.assertIs(copy.deepcopy([errors.UNDEFINED])[0], errors.UNDEFINED)
+
+    def test_undefined_pickle_in_exception(self):
+        symbol_error = pickle.loads(pickle.dumps(errors.SymbolResolutionError('doesnotexist')))
+        self.assertEqual(symbol_error.symbol_name, 'doesnotexist')
+        self.assertIs(symbol_error.thing, errors.UNDEFINED)
 
 if __name__ == '__main__':
     unittest.main()

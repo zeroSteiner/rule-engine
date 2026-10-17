@@ -686,8 +686,14 @@ class ContextSerializationTests(unittest.TestCase):
         context = engine.Context()
         context2 = pickle.loads(pickle.dumps(context))
         self.assertEqual(context2.regex_flags, 0)
-        self.assertIsInstance(context2.default_value, type(errors.UNDEFINED))
+        self.assertIs(context2.default_value, errors.UNDEFINED)
         self.assertTrue(context2.mapping_attribute_lookup)
+
+    def test_context_pickle_default_raises_symbol_resolution_error(self):
+        context = pickle.loads(pickle.dumps(engine.Context()))
+        rule = engine.Rule('missing', context=context)
+        with self.assertRaises(errors.SymbolResolutionError):
+            rule.evaluate({})
 
     def test_context_pickle_custom_params(self):
         context = engine.Context(
@@ -747,6 +753,17 @@ class ContextSerializationTests(unittest.TestCase):
         self.assertTrue(rule2.matches({'name': 'test'}))
         self.assertFalse(rule2.matches({'name': 'other'}))
 
+    def test_rule_pickle_missing_symbol_raises(self):
+        rule = pickle.loads(pickle.dumps(engine.Rule('missing')))
+        with self.assertRaises(errors.SymbolResolutionError):
+            rule.evaluate({})
+        context = engine.Context(resolver=engine.resolve_attribute)
+        rule = pickle.loads(pickle.dumps(engine.Rule('thing.missing', context=context)))
+        outer = collections.namedtuple('Outer', ('thing',))
+        inner = collections.namedtuple('Inner', ('name',))
+        with self.assertRaises(errors.AttributeResolutionError):
+            rule.evaluate(outer(inner('test')))
+
     def test_rule_pickle_text_preserved(self):
         rule = engine.Rule('name == "test"')
         rule2 = pickle.loads(pickle.dumps(rule))
@@ -763,6 +780,34 @@ class ContextSerializationTests(unittest.TestCase):
         self.assertEqual(context2.default_timezone, dateutil.tz.tzutc())
         rule = engine.Rule('name == "test"', context=context2)
         self.assertTrue(rule.matches({'name': 'test'}))
+
+    def test_context_pickle_object_missing_attribute_raises(self):
+        person = types.DataType.OBJECT('Person', attributes={'name': types.DataType.STRING})
+        context = engine.Context(type_resolver={'person': person})
+        for context2 in (pickle.loads(pickle.dumps(context)), copy.deepcopy(context)):
+            rule = engine.Rule('person.name == "alice"', context=context2)
+            with self.assertRaises(errors.ObjectAttributeError):
+                rule.evaluate({'person': object()})
+
+    def test_context_unpickle_normalizes_undefined_copies(self):
+        # pickles made before UNDEFINED preserved its identity contain a separate instance of the sentinel class
+        stray_undefined = pickle.loads(b'\x80\x02crule_engine.errors\n_UNDEFINED\nq\x00)\x81q\x01.')
+        self.assertIsInstance(stray_undefined, type(errors.UNDEFINED))
+        self.assertIsNot(stray_undefined, errors.UNDEFINED)
+        state = engine.Context().__getstate__()
+        state['default_value'] = stray_undefined
+        context = engine.Context.__new__(engine.Context)
+        context.__setstate__(state)
+        self.assertIs(context.default_value, errors.UNDEFINED)
+        with self.assertRaises(errors.SymbolResolutionError):
+            engine.Rule('missing', context=context).evaluate({})
+
+    def test_context_deepcopy_missing_symbol_raises(self):
+        context = copy.deepcopy(engine.Context())
+        self.assertIs(context.default_value, errors.UNDEFINED)
+        rule = engine.Rule('missing', context=context)
+        with self.assertRaises(errors.SymbolResolutionError):
+            rule.evaluate({})
 
 if __name__ == '__main__':
     unittest.main()

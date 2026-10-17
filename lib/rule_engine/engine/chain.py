@@ -32,6 +32,8 @@
 
 import collections.abc
 import operator
+import sys
+import threading
 from typing import Any, Iterable, Iterator, NamedTuple, TypeVar, overload
 
 from .. import errors
@@ -76,9 +78,16 @@ class Chain(object):
     A rule matches when :py:meth:`.Rule.matches` returns a truthy value. Exceptions raised while evaluating a rule, such
     as a :py:exc:`~rule_engine.errors.SymbolResolutionError`, are not caught and stop the evaluation.
 
+    Evaluating a chain does not acquire a lock. Each evaluation uses the entries that were present when it started, so
+    one thread can modify a chain while others are evaluating it. Modifications are serialized so concurrent changes
+    are not lost, however adding or removing an entry copies the others, so a large chain is best built by passing its
+    entries to the constructor. A chain should not be modified from a ``__del__`` method or a :py:mod:`weakref`
+    finalizer because the garbage collector can run them while a modification is in progress, which would deadlock.
+    A chain can be pickled as long as its context, rules and values can be.
+
     Indexes start at 0, unlike the rule numbers used by iptables, and negative indexes count from the end of the chain.
     Slicing a chain returns a new chain with the entries in the slice and the same :py:attr:`.default_value` and
-    :py:attr:`.context`.
+    :py:attr:`.context`. Adding or removing entries in either chain afterwards does not change the other.
 
     .. versionadded:: 5.1.0
     """
@@ -103,6 +112,7 @@ class Chain(object):
         """
         if context is None:
             context = Context()
+        self._lock = threading.Lock()
         self.context = context
         """The context that is used for compiling rules that are specified as text."""
         self.default_value = default_value
@@ -152,12 +162,49 @@ class Chain(object):
         self.context = state['context']
         self.default_value = state['default_value']
         self._entries = state['entries']
+        # recreate the lock which can not be pickled
+        self._lock = threading.Lock()
 
     def _new_entry(self, rule: Rule | str, value: Any) -> ChainEntry:
         _check_rule(rule)
         if isinstance(rule, str):
             rule = Rule(rule, context=self.context)
         return ChainEntry(rule, value)
+
+    def append(self, rule: Rule | str, value: Any) -> ChainEntry:
+        """
+        Add a new entry to the end of the chain, like ``iptables --append``.
+
+        :param rule: The rule for the new entry, either a :py:class:`.Rule` instance or the text of one, which will be
+                compiled using :py:attr:`.context`.
+        :param value: The value to return when *rule* matches.
+        :return: The new entry.
+        :rtype: :py:class:`.ChainEntry`
+        """
+        entry = self._new_entry(rule, value)
+        with self._lock:
+            self._entries = self._entries + (entry,)
+        return entry
+
+    def delete(self, index: int) -> ChainEntry:
+        """
+        Remove the entry at *index* from the chain, like ``iptables --delete``. Indexes start at 0 and negative indexes
+        count from the end of the chain.
+
+        :param int index: The index of the entry to remove.
+        :return: The entry that was removed.
+        :rtype: :py:class:`.ChainEntry`
+        :raises IndexError: There is no entry at *index*.
+        """
+        index = operator.index(index)
+        with self._lock:
+            entries = list(self._entries)
+            try:
+                entry = entries.pop(index)
+            except (IndexError, OverflowError):
+                raise IndexError('chain index out of range') from None
+            self._entries = tuple(entries)
+        return entry
 
     def evaluate(self, thing: Any) -> Any:
         """
@@ -191,6 +238,14 @@ class Chain(object):
                 return entry
         return None
 
+    def flush(self) -> None:
+        """
+        Remove all entries from the chain, like ``iptables --flush``. The :py:attr:`.default_value` is unchanged.
+        """
+        with self._lock:
+            entries, self._entries = self._entries, ()
+        # release the old entries after the lock so any finalizers they trigger can modify the chain
+        del entries
 
     def index(self, entry: ChainEntry) -> int:
         """
@@ -210,3 +265,25 @@ class Chain(object):
             if other is entry or other == entry:
                 return position
         raise ValueError('entry is not in the chain')
+
+    def insert(self, index: int, rule: Rule | str, value: Any) -> ChainEntry:
+        """
+        Insert a new entry into the chain before *index*, like ``iptables --insert``. Indexes start at 0 and negative
+        indexes count from the end of the chain. This follows the semantics of :py:meth:`list.insert`, so an *index*
+        past either end of the chain adds the entry to that end.
+
+        :param int index: The index to insert the new entry before.
+        :param rule: The rule for the new entry, either a :py:class:`.Rule` instance or the text of one, which will be
+                compiled using :py:attr:`.context`.
+        :param value: The value to return when *rule* matches.
+        :return: The new entry.
+        :rtype: :py:class:`.ChainEntry`
+        """
+        # clamp the index to the range list.insert supports, it then clamps it again to the ends of the chain
+        index = max(-sys.maxsize - 1, min(operator.index(index), sys.maxsize))
+        entry = self._new_entry(rule, value)
+        with self._lock:
+            entries = list(self._entries)
+            entries.insert(index, entry)
+            self._entries = tuple(entries)
+        return entry

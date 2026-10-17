@@ -40,7 +40,7 @@ import rule_engine
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 
-__all__ = ('ChainEntryTests', 'ChainSerializationTests', 'ChainTests')
+__all__ = ('ChainEntryTests', 'ChainMutationTests', 'ChainSerializationTests', 'ChainTests')
 
 class Action(enum.Enum):
     ACCEPT = 'accept'
@@ -391,6 +391,222 @@ class ChainEntryTests(unittest.TestCase):
         self.assertIsInstance(entry, engine.ChainEntry)
         self.assertTrue(entry.rule.matches({'port': 22}))
         self.assertIs(entry.value, Action.ACCEPT)
+
+class ChainMutationTests(unittest.TestCase):
+    def test_chain_append(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        entry = chain.append('port == 80', 'http')
+        self.assertIsInstance(entry, engine.ChainEntry)
+        self.assertIs(chain[-1], entry)
+        self.assertEqual(len(chain), 2)
+        self.assertIs(entry.rule.context, chain.context)
+        self.assertEqual(chain.evaluate({'port': 80}), 'http')
+
+    def test_chain_append_rule_object(self):
+        rule = engine.Rule('port == 80')
+        chain = engine.Chain()
+        entry = chain.append(rule, 'http')
+        self.assertIs(entry.rule, rule)
+        self.assertIs(chain[0], entry)
+
+    def test_chain_append_invalid_rule_leaves_chain_unchanged(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        entries = list(chain)
+        with self.assertRaisesRegex(TypeError, r'^chain rule must be a str or Rule instance, not int$'):
+            chain.append(1, 'invalid')
+        with self.assertRaises(errors.RuleSyntaxError):
+            chain.append('port ==', 'invalid')
+        self.assertEqual(list(chain), entries)
+
+    def test_chain_insert(self):
+        chain = engine.Chain([('port == 22', 'ssh'), ('port == 80', 'http')])
+        entry = chain.insert(0, 'port == 21', 'ftp')
+        self.assertIs(chain[0], entry)
+        self.assertIs(entry.rule.context, chain.context)
+        chain.insert(2, 'port == 23', 'telnet')
+        chain.insert(4, engine.Rule('port == 443'), 'https')
+        self.assertEqual([entry.value for entry in chain], ['ftp', 'ssh', 'telnet', 'http', 'https'])
+
+    def test_chain_insert_negative_index(self):
+        chain = engine.Chain([('port == 22', 'ssh'), ('true', 'other')])
+        entry = chain.insert(-1, 'port == 80', 'http')
+        self.assertIs(chain[1], entry)
+        self.assertEqual([entry.value for entry in chain], ['ssh', 'http', 'other'])
+
+    def test_chain_insert_out_of_range_index(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        chain.insert(100, 'port == 80', 'http')
+        chain.insert(-100, 'port == 21', 'ftp')
+        self.assertEqual([entry.value for entry in chain], ['ftp', 'ssh', 'http'])
+
+    def test_chain_insert_huge_index(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        chain.insert(2 ** 64, 'port == 80', 'http')
+        chain.insert(-2 ** 64, 'port == 21', 'ftp')
+        self.assertEqual([entry.value for entry in chain], ['ftp', 'ssh', 'http'])
+
+    def test_chain_insert_invalid_index_does_not_compile_rule(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        entries = list(chain)
+        with self.assertRaises(TypeError):
+            chain.insert('0', 'unique_symbol == 1', 'invalid')
+        self.assertEqual(list(chain), entries)
+        self.assertNotIn('unique_symbol', chain.context.symbols)
+
+    def test_chain_insert_invalid_rule_leaves_chain_unchanged(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        entries = list(chain)
+        with self.assertRaises(TypeError):
+            chain.insert(0, None, 'invalid')
+        with self.assertRaises(errors.RuleSyntaxError):
+            chain.insert(0, 'port ==', 'invalid')
+        self.assertEqual(list(chain), entries)
+
+    def test_chain_delete(self):
+        chain = engine.Chain([('port == 22', 'ssh'), ('port == 80', 'http'), ('port == 443', 'https')])
+        entry = chain[1]
+        self.assertIs(chain.delete(1), entry)
+        self.assertEqual([entry.value for entry in chain], ['ssh', 'https'])
+        self.assertEqual(chain.delete(-1).value, 'https')
+        self.assertEqual([entry.value for entry in chain], ['ssh'])
+        self.assertEqual(chain.evaluate({'port': 22}), 'ssh')
+
+    def test_chain_delete_invalid_index_leaves_chain_unchanged(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        entries = list(chain)
+        for index in (1, -2):
+            with self.subTest(index=index):
+                with self.assertRaisesRegex(IndexError, r'^chain index out of range$'):
+                    chain.delete(index)
+        with self.assertRaises(TypeError):
+            chain.delete('0')
+        for index in (2 ** 64, -2 ** 64):
+            with self.subTest(index=index):
+                with self.assertRaisesRegex(IndexError, r'^chain index out of range$'):
+                    chain.delete(index)
+        self.assertEqual(list(chain), entries)
+        with self.assertRaises(IndexError):
+            engine.Chain().delete(0)
+
+    def test_chain_flush(self):
+        chain = engine.Chain([('port == 22', 'ssh')], default_value='other')
+        self.assertIsNone(chain.flush())
+        self.assertEqual(len(chain), 0)
+        self.assertEqual(chain.default_value, 'other')
+        self.assertEqual(chain.evaluate({'port': 22}), 'other')
+        chain.flush()
+        chain.append('port == 22', 'ssh')
+        self.assertEqual(chain.evaluate({'port': 22}), 'ssh')
+
+    def test_chain_flush_without_default_value(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        chain.flush()
+        with self.assertRaises(errors.ChainExhaustedError):
+            chain.evaluate({'port': 22})
+
+    def test_chain_index_follows_modifications(self):
+        chain = engine.Chain([('port == 22', 'ssh'), ('port == 80', 'http')])
+        entry = chain.find({'port': 80})
+        chain.insert(0, 'port == 21', 'ftp')
+        self.assertEqual(chain.index(entry), 2)
+        self.assertEqual(chain.index(chain.append('port == 443', 'https')), 3)
+        self.assertIs(chain.delete(chain.index(entry)), entry)
+        with self.assertRaises(ValueError):
+            chain.index(entry)
+
+    def test_chain_slice_modifications_are_independent(self):
+        chain = engine.Chain([('port == 22', 'ssh'), ('port == 80', 'http')])
+        chain2 = chain[:]
+        self.assertIsNot(chain2._lock, chain._lock)
+        entry = chain2.append('port == 443', 'https')
+        self.assertIs(entry.rule.context, chain.context)
+        chain.delete(0)
+        chain2.default_value = 'other'
+        self.assertEqual([entry.value for entry in chain], ['http'])
+        self.assertIs(chain.default_value, errors.UNDEFINED)
+        self.assertEqual([entry.value for entry in chain2], ['ssh', 'http', 'https'])
+
+    def test_chain_iterator_is_a_snapshot(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        iterator = iter(chain)
+        chain.append('port == 80', 'http')
+        self.assertEqual([entry.value for entry in iterator], ['ssh'])
+        # modifying the chain while iterating over it neither fails nor iterates over the new entries
+        for entry in chain:
+            chain.append(entry.rule, entry.value)
+        self.assertEqual([entry.value for entry in chain], ['ssh', 'http', 'ssh', 'http'])
+
+    def test_chain_mutation_during_evaluate_uses_snapshot(self):
+        replacement = engine.Rule('true')
+        def resolver(thing, name):
+            if name == 'mutate':
+                chain.flush()
+                chain.append(replacement, 'new')
+                return False
+            return engine.resolve_item(thing, name)
+
+        chain = engine.Chain([('mutate', 'old'), ('true', 'other')], context=engine.Context(resolver=resolver))
+        self.assertEqual(chain.evaluate({}), 'other')
+        self.assertEqual(chain.evaluate({}), 'new')
+
+    def test_chain_index_uses_snapshot(self):
+        class InsertOnCompare(object):
+            def __init__(self):
+                self.chain = None
+
+            def __eq__(self, other):
+                if self.chain is not None:
+                    chain, self.chain = self.chain, None
+                    chain.insert(0, 'false', 'inserted')
+                return False
+
+            __hash__ = None
+
+        rule = engine.Rule('true')
+        value = InsertOnCompare()
+        chain = engine.Chain([(rule, value), (rule, 'target')])
+        entry = chain[1]
+        value.chain = chain
+        # the comparison inserts an entry while the chain is being searched, which only affects the next search
+        self.assertEqual(chain.index(entry), 1)
+        self.assertEqual(chain.index(entry), 2)
+
+    def test_chain_slice_uses_snapshot(self):
+        class InsertingIndex(object):
+            def __init__(self, chain):
+                self.chain = chain
+
+            def __index__(self):
+                self.chain.insert(0, 'false', 'inserted')
+                return 0
+
+        chain = engine.Chain([('true', 'a'), ('true', 'b')])
+        self.assertEqual([entry.value for entry in chain[InsertingIndex(chain):]], ['a', 'b'])
+        self.assertEqual(len(chain), 3)
+
+    def test_chain_copy_mutations_are_independent(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        chain2 = copy.copy(chain)
+        self.assertIsNot(chain2._lock, chain._lock)
+        chain2.append('port == 80', 'http')
+        chain.delete(0)
+        self.assertEqual(len(chain), 0)
+        self.assertEqual([entry.value for entry in chain2], ['ssh', 'http'])
+
+    def test_chain_mutable_after_pickle(self):
+        chain = engine.Chain([('port == 22', 'ssh')])
+        chain.insert(0, 'port == 21', 'ftp')
+        chain.append('port == 80', 'http')
+        chain.delete(1)
+        for chain2 in (pickle.loads(pickle.dumps(chain)), copy.deepcopy(chain)):
+            with self.subTest(chain=chain2):
+                self.assertEqual([entry.value for entry in chain2], ['ftp', 'http'])
+                entry = chain2.append('port == 443', 'https')
+                self.assertIs(entry.rule.context, chain2.context)
+                self.assertEqual(chain2.evaluate({'port': 443}), 'https')
+                chain2.flush()
+                self.assertEqual(len(chain2), 0)
+        self.assertEqual(len(chain), 2)
 
 class ChainSerializationTests(unittest.TestCase):
     def _make_chain(self, **kwargs):

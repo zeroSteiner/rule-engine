@@ -32,15 +32,19 @@
 
 import functools
 import queue
+import copy
 import random
+import sys
 import threading
 import unittest
+import weakref
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
+import rule_engine.types as types
 
-__all__ = ('ThreadSafetyTests',)
+__all__ = ('ChainThreadSafetyTests', 'ThreadSafetyTests')
 
 def testing_resolver(lock, thing, name):
     if name == 'lock':
@@ -91,3 +95,184 @@ class ThreadSafetyTests(unittest.TestCase):
             self.assertTrue(rule.evaluate({'words': 'MainThread Test'}))
             lock.release()
         self.assertFalse(thread.join())
+
+class _ResultThread(threading.Thread):
+    def __init__(self, function, *function_args):
+        super(_ResultThread, self).__init__(daemon=True)
+        self.function = function
+        self.function_args = function_args
+        self.result = None
+        self.exception = None
+
+    def run(self):
+        try:
+            self.result = self.function(*self.function_args)
+        except BaseException as error:
+            self.exception = error
+
+    def join_result(self, test_case, timeout=5):
+        self.join(timeout)
+        test_case.assertFalse(self.is_alive(), 'the thread did not finish')
+        if self.exception is not None:
+            raise self.exception
+        return self.result
+
+class _ReentrantIndex(object):
+    def __init__(self, chain, value):
+        self.chain = chain
+        self.value = value
+
+    def __index__(self):
+        self.chain.append(engine.Rule('true'), 'from-index')
+        return self.value
+
+def _call_in_thread(test_case, function, *args):
+    # call *function* in another thread so a deadlock fails the test instead of hanging it
+    thread = _ResultThread(function, *args)
+    thread.start()
+    return thread.join_result(test_case)
+
+class ChainThreadSafetyTests(unittest.TestCase):
+    def test_chain_concurrent_modifications_are_not_lost(self):
+        thread_count = 8
+        entry_count = 250
+        chain = engine.Chain()
+        rule = engine.Rule('true')
+        barrier = threading.Barrier(thread_count)
+        def add_entries(thread_id):
+            barrier.wait(timeout=5)
+            for index in range(entry_count):
+                if index % 2:
+                    chain.append(rule, (thread_id, index))
+                else:
+                    chain.insert(0, rule, (thread_id, index))
+
+        switch_interval = sys.getswitchinterval()
+        # switch threads as often as possible to make a lost update likely if the chain is not locked correctly
+        sys.setswitchinterval(1e-6)
+        try:
+            threads = [_ResultThread(add_entries, thread_id) for thread_id in range(thread_count)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join_result(self)
+        finally:
+            sys.setswitchinterval(switch_interval)
+        self.assertEqual(len(chain), thread_count * entry_count)
+        expected = set((thread_id, index) for thread_id in range(thread_count) for index in range(entry_count))
+        self.assertEqual(set(entry.value for entry in chain), expected)
+
+    def test_chain_concurrent_deletes_are_not_lost(self):
+        thread_count = 8
+        delete_count = 250
+        rule = engine.Rule('true')
+        chain = engine.Chain([(rule, index) for index in range(thread_count * delete_count + 1)])
+        barrier = threading.Barrier(thread_count)
+        def delete_entries():
+            barrier.wait(timeout=5)
+            return [chain.delete(0).value for _ in range(delete_count)]
+
+        switch_interval = sys.getswitchinterval()
+        sys.setswitchinterval(1e-6)
+        try:
+            threads = [_ResultThread(delete_entries) for _ in range(thread_count)]
+            for thread in threads:
+                thread.start()
+            deleted = [value for thread in threads for value in thread.join_result(self)]
+        finally:
+            sys.setswitchinterval(switch_interval)
+        # each entry is deleted exactly once and the last one remains
+        self.assertEqual(sorted(deleted), list(range(thread_count * delete_count)))
+        self.assertEqual([entry.value for entry in chain], [thread_count * delete_count])
+
+    def test_chain_concurrent_flush_is_not_lost(self):
+        rule = engine.Rule('true')
+        resurrected = 0
+        switch_interval = sys.getswitchinterval()
+        sys.setswitchinterval(1e-6)
+        try:
+            for _ in range(100):
+                chain = engine.Chain([(rule, ('old', index)) for index in range(20)])
+                started = threading.Event()
+                stop = threading.Event()
+                def insert_entries():
+                    index = 0
+                    while not stop.is_set():
+                        chain.insert(0, rule, ('new', index))
+                        index += 1
+                        started.set()
+
+                thread = _ResultThread(insert_entries)
+                thread.start()
+                self.assertTrue(started.wait(timeout=5))
+                chain.flush()
+                stop.set()
+                thread.join_result(self)
+                if any(entry.value[0] == 'old' for entry in chain):
+                    resurrected += 1
+        finally:
+            sys.setswitchinterval(switch_interval)
+        self.assertEqual(resurrected, 0, 'entries present before flush() survived it')
+
+    def test_chain_type_resolver_can_modify_chain(self):
+        # the rule is compiled before the lock is acquired, so the type resolver can modify the chain
+        def type_resolver(name):
+            if name == 'trigger':
+                chain.append(engine.Rule('true'), 'nested')
+            return types.DataType.UNDEFINED
+
+        chain = engine.Chain(context=engine.Context(type_resolver=type_resolver))
+        _call_in_thread(self, chain.append, 'trigger', 'outer')
+        _call_in_thread(self, chain.insert, 0, 'trigger', 'outer2')
+        self.assertEqual([entry.value for entry in chain], ['outer2', 'nested', 'outer', 'nested'])
+
+    def test_chain_index_can_modify_chain(self):
+        chain = engine.Chain([('true', 'first')])
+        _call_in_thread(self, chain.insert, _ReentrantIndex(chain, 0), 'true', 'inserted')
+        self.assertEqual([entry.value for entry in chain], ['inserted', 'first', 'from-index'])
+        entry = _call_in_thread(self, chain.delete, _ReentrantIndex(chain, 0))
+        self.assertEqual(entry.value, 'inserted')
+        self.assertEqual([entry.value for entry in chain], ['first', 'from-index', 'from-index'])
+
+    def test_chain_flush_finalizer_can_modify_chain(self):
+        class Target(object):
+            pass
+
+        chain = engine.Chain()
+        target = Target()
+        chain.append(engine.Rule('true'), target)
+        weakref.finalize(target, chain.append, engine.Rule('true'), 'from-finalizer')
+        del target
+        _call_in_thread(self, chain.flush)
+        self.assertEqual([entry.value for entry in chain], ['from-finalizer'])
+
+    def test_chain_copy_has_its_own_lock(self):
+        chain = engine.Chain([('true', 'first')])
+        chain2 = copy.copy(chain)
+        with chain._lock:
+            _call_in_thread(self, chain2.append, 'true', 'second')
+        self.assertEqual([entry.value for entry in chain2], ['first', 'second'])
+        self.assertEqual([entry.value for entry in chain], ['first'])
+
+    def test_chain_evaluate_isolated_from_concurrent_mutation(self):
+        entered = threading.Event()
+        release = threading.Event()
+        released = []
+        def resolver(thing, name):
+            if name == 'gate':
+                entered.set()
+                released.append(release.wait(timeout=5))
+                return False
+            return engine.resolve_item(thing, name)
+
+        chain = engine.Chain([('gate', 'first'), ('true', 'second')], context=engine.Context(resolver=resolver))
+        thread = _ResultThread(chain.evaluate, {})
+        thread.start()
+        self.assertTrue(entered.wait(timeout=5))
+        # the chain is modified while the thread is evaluating it, this must not block on the in-progress evaluation
+        chain.flush()
+        chain.append(engine.Rule('true'), 'replacement')
+        release.set()
+        self.assertEqual(thread.join_result(self), 'second')
+        self.assertEqual(released, [True])
+        self.assertEqual(chain.evaluate({}), 'replacement')

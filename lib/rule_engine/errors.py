@@ -363,3 +363,21 @@ class ArithmeticError(EvaluationError):
 
     .. versionadded:: 5.0.0
     """
+
+class ChainExhaustedError(EvaluationError):
+    """
+    An error raised by :py:meth:`~rule_engine.engine.Chain.evaluate` when none of the rules in the chain match and the
+    chain does not have a default value.
+
+    .. versionadded:: 5.1.0
+    """
+    def __init__(self, thing: Any = UNDEFINED) -> None:
+        """
+        :param thing: The object that was evaluated by the chain.
+        """
+        self.thing = thing
+        """The object that was evaluated by the chain."""
+        super(ChainExhaustedError, self).__init__('no rule in the chain matched and no default value is set')
+        # EngineError doesn't initialize the arguments so they would include *thing* when it's passed positionally, set
+        # them to the message to keep its contents out of str(), tracebacks and anything that serializes them
+        self.args = (self.message,)

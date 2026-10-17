@@ -32,3 +32,4 @@
 
 from .context import resolve_attribute, resolve_item, type_resolver_from_dataclass, type_resolver_from_dict, type_resolver_from_sqlalchemy, Context
 from .rule import Rule, DebugRule
+from .chain import Chain, ChainEntry

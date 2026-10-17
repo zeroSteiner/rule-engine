@@ -22,6 +22,7 @@ Python with some inspiration from Ruby. Some features of this language includes:
 - Compound datatypes (equivalents for Python dict, list and set types)
 - Data attributes
 - Thread safety
+- Rule chains that return the value of the first matching rule
 
 Example Usage
 -------------

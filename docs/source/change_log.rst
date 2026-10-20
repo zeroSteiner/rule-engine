@@ -7,6 +7,31 @@ this list is curated by the development team for note worthy changes.
 Version 5.x.x
 -------------
 
+Version 5.1.0
+^^^^^^^^^^^^^
+
+*In Progress*
+
+* Added the :py:class:`~rule_engine.engine.Chain` class for evaluating an object against an ordered list of rules and
+  returning the value of the first one that matches, similar to a chain in iptables. See
+  :ref:`getting-started-rule-chains` for details.
+
+    * :py:meth:`~rule_engine.engine.Chain.find` returns the :py:class:`~rule_engine.engine.ChainEntry` that matched,
+      which can be used to determine which rule was applied, and :py:meth:`~rule_engine.engine.Chain.index` returns its
+      position in the chain.
+    * When no rule matches and no default value is set, the new :py:exc:`~rule_engine.errors.ChainExhaustedError` is
+      raised.
+    * Chains can be modified with :py:meth:`~rule_engine.engine.Chain.append`,
+      :py:meth:`~rule_engine.engine.Chain.insert`, :py:meth:`~rule_engine.engine.Chain.delete` and
+      :py:meth:`~rule_engine.engine.Chain.flush` while other threads evaluate them, and can be pickled.
+    * Slicing a chain returns a new chain with the same default value and context.
+
+* Fixed the :py:data:`~rule_engine.errors.UNDEFINED` sentinel losing its identity when pickled or copied. A restored
+  :py:class:`~rule_engine.engine.Context` using the default *default_value* would return a stand-in object for missing
+  symbols and attributes instead of raising a :py:exc:`~rule_engine.errors.SymbolResolutionError` or
+  :py:exc:`~rule_engine.errors.AttributeResolutionError`. Contexts that were pickled by an earlier version are
+  corrected when they are loaded.
+
 Version 5.0.0
 ^^^^^^^^^^^^^
 

@@ -46,11 +46,17 @@ class _UNDEFINED(object):
     __nonzero__ = __bool__
     def __repr__(self) -> str:
         return self.__name__
+    def __reduce__(self) -> str:
+        # restore the module-level singleton so identity checks (``is UNDEFINED``) still work after pickle or copy
+        return 'UNDEFINED'
 UNDEFINED = _UNDEFINED()
 """
 A sentinel value to specify that something is undefined. When evaluated, the value is falsy.
 
 .. versionadded:: 2.0.0
+
+.. versionchanged:: 5.1.0
+        The sentinel keeps its identity when it is pickled or copied.
 """
 
 class EngineError(Exception):
@@ -357,3 +363,21 @@ class ArithmeticError(EvaluationError):
 
     .. versionadded:: 5.0.0
     """
+
+class ChainExhaustedError(EvaluationError):
+    """
+    An error raised by :py:meth:`~rule_engine.engine.Chain.evaluate` when none of the rules in the chain match and the
+    chain does not have a default value.
+
+    .. versionadded:: 5.1.0
+    """
+    def __init__(self, thing: Any = UNDEFINED) -> None:
+        """
+        :param thing: The object that was evaluated by the chain.
+        """
+        self.thing = thing
+        """The object that was evaluated by the chain."""
+        super(ChainExhaustedError, self).__init__('no rule in the chain matched and no default value is set')
+        # EngineError doesn't initialize the arguments so they would include *thing* when it's passed positionally, set
+        # them to the message to keep its contents out of str(), tracebacks and anything that serializes them
+        self.args = (self.message,)

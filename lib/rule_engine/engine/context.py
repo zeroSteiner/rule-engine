@@ -326,6 +326,9 @@ class Context(object):
         self.symbols = state['symbols']
         self.default_timezone = state['default_timezone']
         self.default_value = state['default_value']
+        if isinstance(self.default_value, errors._UNDEFINED):
+            # pickles created before UNDEFINED preserved its identity restore a copy of it instead of the singleton
+            self.default_value = errors.UNDEFINED
         self.decimal_context = state['decimal_context']
         self.mapping_attribute_lookup = state['mapping_attribute_lookup']
         self._mapping_fallback_warned = state['_mapping_fallback_warned']

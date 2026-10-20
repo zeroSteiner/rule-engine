@@ -37,10 +37,12 @@ from .engine import resolve_item
 from .engine import type_resolver_from_dataclass
 from .engine import type_resolver_from_dict
 from .engine import type_resolver_from_sqlalchemy
+from .engine import Chain
 from .engine import Context
 from .engine import Rule
 
 from .errors import AttributeResolutionError
+from .errors import ChainExhaustedError
 from .errors import EngineError
 from .errors import EvaluationError
 from .errors import RuleSyntaxError
@@ -50,6 +52,8 @@ from .types import DataType
 
 __all__ = (
     'AttributeResolutionError',
+    'Chain',
+    'ChainExhaustedError',
     'Context',
     'DataType',
     'EngineError',

@@ -30,8 +30,11 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import copy
+import pickle
 import random
 import string
+import traceback
 import unittest
 
 import rule_engine.errors as errors
@@ -55,6 +58,44 @@ class ResolutionErrorTests(unittest.TestCase):
         self.assertIn('suggestion', repr(symbol_error))
         self.assertIn(suggestion, repr(symbol_error))
 
+class ChainExhaustedErrorTests(unittest.TestCase):
+    def test_chain_exhausted_error_attributes(self):
+        thing = {'port': 80}
+        error = errors.ChainExhaustedError(thing)
+        self.assertIsInstance(error, errors.EvaluationError)
+        self.assertIsInstance(error, errors.EngineError)
+        self.assertIs(error.thing, thing)
+        self.assertEqual(error.message, 'no rule in the chain matched and no default value is set')
+
+    def test_chain_exhausted_error_default_thing(self):
+        self.assertIs(errors.ChainExhaustedError().thing, errors.UNDEFINED)
+
+    def test_chain_exhausted_error_does_not_leak_thing(self):
+        secret = ''.join(random.choice(string.ascii_letters) for _ in range(20))
+        error = errors.ChainExhaustedError({'password': secret})
+        self.assertEqual(str(error), error.message)
+        self.assertEqual(error.args, (error.message,))
+        self.assertNotIn(secret, str(error))
+        self.assertNotIn(secret, repr(error))
+        self.assertNotIn(secret, ''.join(traceback.format_exception_only(type(error), error)))
+
+    def test_chain_exhausted_error_repr(self):
+        self.assertEqual(
+            repr(errors.ChainExhaustedError({})),
+            "<ChainExhaustedError message='no rule in the chain matched and no default value is set' >"
+        )
+
+    def test_chain_exhausted_error_pickle(self):
+        for error in (errors.ChainExhaustedError({'port': 80}), errors.ChainExhaustedError(thing={'port': 80})):
+            with self.subTest(error=error):
+                error2 = pickle.loads(pickle.dumps(error))
+                self.assertIsInstance(error2, errors.ChainExhaustedError)
+                self.assertEqual(error2.thing, {'port': 80})
+                self.assertEqual(error2.message, error.message)
+                self.assertEqual(error2.args, (error.message,))
+        error = pickle.loads(pickle.dumps(errors.ChainExhaustedError()))
+        self.assertIs(error.thing, errors.UNDEFINED)
+
 class UndefinedSentinelTests(unittest.TestCase):
     def test_undefined_has_a_repr(self):
         self.assertEqual(repr(errors.UNDEFINED), 'UNDEFINED')
@@ -65,6 +106,21 @@ class UndefinedSentinelTests(unittest.TestCase):
 
     def test_undefined_is_falsy(self):
         self.assertFalse(errors.UNDEFINED)
+
+    def test_undefined_pickle_preserves_identity(self):
+        for protocol in range(pickle.HIGHEST_PROTOCOL + 1):
+            with self.subTest(protocol=protocol):
+                self.assertIs(pickle.loads(pickle.dumps(errors.UNDEFINED, protocol=protocol)), errors.UNDEFINED)
+
+    def test_undefined_copy_preserves_identity(self):
+        self.assertIs(copy.copy(errors.UNDEFINED), errors.UNDEFINED)
+        self.assertIs(copy.deepcopy(errors.UNDEFINED), errors.UNDEFINED)
+        self.assertIs(copy.deepcopy([errors.UNDEFINED])[0], errors.UNDEFINED)
+
+    def test_undefined_pickle_in_exception(self):
+        symbol_error = pickle.loads(pickle.dumps(errors.SymbolResolutionError('doesnotexist')))
+        self.assertEqual(symbol_error.symbol_name, 'doesnotexist')
+        self.assertIs(symbol_error.thing, errors.UNDEFINED)
 
 if __name__ == '__main__':
     unittest.main()

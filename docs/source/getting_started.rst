@@ -171,10 +171,136 @@ The context object can be shared with other rule objects that are to be applied 
 should not be shared with rule object that are applied to other objects which do not have the same attributes (like
 artists).
 
+.. _getting-started-rule-chains:
+
+Rule Chains
+-----------
+
+.. versionadded:: 5.1.0
+
+A :py:class:`~engine.Chain` evaluates an object against an ordered list of rules, each of which is paired with a value,
+and returns the value of the first rule that matches. This is modeled after a chain in iptables, where each rule has a
+target and a packet stops at the first matching rule with a terminating target such as ``ACCEPT`` or ``DROP``. The
+values can be any Python object, such as the members of an :py:class:`~enum.Enum`.
+
+Each rule can be either the text of a rule, which is compiled with the chain's :py:attr:`~engine.Chain.context`, or a
+:py:class:`~engine.Rule` instance, which is used as-is and keeps its own context. Like a rule, a chain uses a default
+:py:class:`~engine.Context` unless one is specified with the *context* parameter.
+
+.. code-block:: python
+
+   import enum
+   import rule_engine
+
+   class Action(enum.Enum):
+       ACCEPT = 'accept'
+       DROP = 'drop'
+
+   chain = rule_engine.Chain(
+       [
+           ('source in ["203.0.113.7", "203.0.113.8"]', Action.DROP),
+           ('port == 22 and source.starts_with("192.168.")', Action.ACCEPT),
+           ('port in [80, 443]', Action.ACCEPT),
+       ],
+       default_value=Action.DROP
+   )
+
+   chain.evaluate({'source': '192.168.1.10', 'port': 22})
+   # => <Action.ACCEPT: 'accept'>
+   chain.evaluate({'source': '203.0.113.7', 'port': 443})
+   # => <Action.DROP: 'drop'>
+   chain.evaluate({'source': '198.51.100.1', 'port': 8080})
+   # => <Action.DROP: 'drop'>
+
+A rule matches the same way :py:meth:`~engine.Rule.matches` does. Errors that are raised while evaluating a rule, such
+as a :py:class:`~errors.SymbolResolutionError` for an object that is missing a symbol, are not caught by the chain.
+
+Chain Default Values
+^^^^^^^^^^^^^^^^^^^^
+When no rule matches, the chain returns its *default_value*, which serves the same purpose as the policy of an iptables
+chain. If no *default_value* is specified, a :py:class:`~errors.ChainExhaustedError` is raised instead. The object that
+was evaluated is available from the exception's :py:attr:`~errors.ChainExhaustedError.thing` attribute, but it is not
+included in the exception's message.
+
+.. code-block:: python
+
+   chain = rule_engine.Chain([('port == 22', Action.ACCEPT)])
+   chain.evaluate({'port': 80})
+   # => ChainExhaustedError: no rule in the chain matched and no default value is set
+
+The chain's *default_value* is separate from the :ref:`default value of a context<getting-started-default-value>`. The
+chain's default value is used when no rule matches, while the context's default value is used for symbols and attributes
+that are missing from the object. To have a rule that refers to a missing symbol evaluate it as ``null`` instead of
+raising an exception, use a context with a default value.
+
+.. code-block:: python
+
+   context = rule_engine.Context(default_value=None)
+   chain = rule_engine.Chain([('port == 22', Action.ACCEPT)], default_value=Action.DROP, context=context)
+   chain.evaluate({})
+   # => <Action.DROP: 'drop'>
+
+Modifying A Chain
+^^^^^^^^^^^^^^^^^
+A chain can be modified after it has been created using methods that are named after the iptables commands. Unlike the
+rule numbers used by iptables, indexes start at 0 and negative indexes count from the end of the chain.
+
+* :py:meth:`~engine.Chain.append` -- Add an entry to the end of the chain, like ``iptables --append``.
+* :py:meth:`~engine.Chain.insert` -- Insert an entry before an index, like ``iptables --insert``. This follows the
+  semantics of :py:meth:`list.insert`, so ``chain.insert(-1, rule, value)`` adds an entry before the last one, which is
+  useful for keeping a catch-all rule at the end of the chain.
+* :py:meth:`~engine.Chain.delete` -- Remove the entry at an index and return it, like ``iptables --delete``.
+* :py:meth:`~engine.Chain.flush` -- Remove every entry, like ``iptables --flush``. The default value is unchanged.
+
+.. code-block:: python
+
+   chain = rule_engine.Chain([('true', Action.DROP)])
+   chain.insert(-1, 'port == 443', Action.ACCEPT)
+   chain.insert(0, 'source == "203.0.113.7"', Action.DROP)
+   [entry.rule.text for entry in chain]
+   # => ['source == "203.0.113.7"', 'port == 443', 'true']
+
+A chain can be evaluated by multiple threads while it is being modified. Each evaluation uses the entries that were in
+the chain when it started, and modifications made by different threads at the same time are not lost. Because adding or
+removing an entry copies the others, a chain with many entries is best created by passing them to the constructor. A
+chain should not be modified from a ``__del__`` method or a :py:mod:`weakref` finalizer, because those can run while
+another modification is in progress.
+
+Inspecting Matches
+^^^^^^^^^^^^^^^^^^
+The :py:meth:`~engine.Chain.find` method returns the :py:class:`~engine.ChainEntry` of the first rule that matches,
+or ``None`` if none of them do. This can be used to determine which rule was applied, for example to log it. Unlike
+:py:meth:`~engine.Chain.evaluate`, the default value is not used. The :py:meth:`~engine.Chain.index` method returns the
+position of an entry in the chain.
+
+.. code-block:: python
+
+   chain = rule_engine.Chain([('port == 22', Action.ACCEPT), ('port == 23', Action.DROP)])
+   entry = chain.find({'port': 23})
+   entry.rule.text
+   # => 'port == 23'
+   entry.value
+   # => <Action.DROP: 'drop'>
+   chain.index(entry)
+   # => 1
+
+A chain's entries can also be inspected with :py:func:`len`, iteration and indexing. Slicing a chain returns a new chain
+with the entries in the slice and the same default value and context as the original, so for example ``chain[:-1]`` is
+the chain without its last entry. Adding or removing entries in either chain afterwards does not change the other. Like
+other containers, a chain without any entries is falsy, even when it has a default value.
+
+Serialization
+^^^^^^^^^^^^^
+A chain can be serialized with :py:mod:`pickle` as long as its context, rules and values can be. In the examples above,
+``Action`` must be defined at the module level for its members to be pickled. Rules that shared a context before the
+chain was pickled continue to share one after it is loaded.
+
 Advanced Usage
 --------------
 The Rule Engine has a number of advanced features that contribute to its flexibility. In most use cases they are
 unnecessary.
+
+.. _getting-started-default-value:
 
 Setting A Default Value
 ^^^^^^^^^^^^^^^^^^^^^^^

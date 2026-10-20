@@ -10,7 +10,7 @@ Version 5.x.x
 Version 5.1.0
 ^^^^^^^^^^^^^
 
-*In Progress*
+Released :release:`5.1.0` on October 20th, 2026
 
 * Added the :py:class:`~rule_engine.engine.Chain` class for evaluating an object against an ordered list of rules and
   returning the value of the first one that matches, similar to a chain in iptables. See

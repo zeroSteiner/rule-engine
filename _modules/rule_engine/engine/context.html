@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.engine.context &mdash; Rule Engine 5.0.3 documentation</title>
+  <title>rule_engine.engine.context &mdash; Rule Engine 5.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=0c24fe83" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=f98c4cc8"></script>
+      <script src="../../../_static/documentation_options.js?v=bfa18cfb"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -424,6 +424,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">symbols</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;symbols&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;default_timezone&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;default_value&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">,</span> <span class="n">errors</span><span class="o">.</span><span class="n">_UNDEFINED</span><span class="p">):</span>
+            <span class="c1"># pickles created before UNDEFINED preserved its identity restore a copy of it instead of the singleton</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decimal_context</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;decimal_context&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;mapping_attribute_lookup&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_mapping_fallback_warned&#39;</span><span class="p">]</span>

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.errors &mdash; Rule Engine 5.0.3 documentation</title>
+  <title>rule_engine.errors &mdash; Rule Engine 5.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=f98c4cc8"></script>
+      <script src="../../_static/documentation_options.js?v=bfa18cfb"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -124,11 +124,17 @@
     <span class="n">__nonzero__</span> <span class="o">=</span> <span class="fm">__bool__</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># restore the module-level singleton so identity checks (``is UNDEFINED``) still work after pickle or copy</span>
+        <span class="k">return</span> <span class="s1">&#39;UNDEFINED&#39;</span>
 <span class="n">UNDEFINED</span> <span class="o">=</span> <span class="n">_UNDEFINED</span><span class="p">()</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">A sentinel value to specify that something is undefined. When evaluated, the value is falsy.</span>
 
 <span class="sd">.. versionadded:: 2.0.0</span>
+
+<span class="sd">.. versionchanged:: 5.1.0</span>
+<span class="sd">        The sentinel keeps its identity when it is pickled or copied.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="EngineError">
@@ -533,6 +539,30 @@
 
 <span class="sd">    .. versionadded:: 5.0.0</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ChainExhaustedError">
+<a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.ChainExhaustedError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChainExhaustedError</span><span class="p">(</span><span class="n">EvaluationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An error raised by :py:meth:`~rule_engine.engine.Chain.evaluate` when none of the rules in the chain match and the</span>
+<span class="sd">    chain does not have a default value.</span>
+
+<span class="sd">    .. versionadded:: 5.1.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ChainExhaustedError.__init__">
+<a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.ChainExhaustedError.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thing</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">UNDEFINED</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param thing: The object that was evaluated by the chain.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thing</span> <span class="o">=</span> <span class="n">thing</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The object that was evaluated by the chain.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ChainExhaustedError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;no rule in the chain matched and no default value is set&#39;</span><span class="p">)</span>
+        <span class="c1"># EngineError doesn&#39;t initialize the arguments so they would include *thing* when it&#39;s passed positionally, set</span>
+        <span class="c1"># them to the message to keep its contents out of str(), tracebacks and anything that serializes them</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,)</span></div>
+</div>
 
 </pre></div>
 

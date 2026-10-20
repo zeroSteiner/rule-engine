@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Change Log &mdash; Rule Engine 5.0.3 documentation</title>
+  <title>Change Log &mdash; Rule Engine 5.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=f98c4cc8"></script>
+      <script src="_static/documentation_options.js?v=bfa18cfb"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -52,6 +52,7 @@
 <li class="toctree-l1"><a class="reference internal" href="debug_repl.html">Debug REPL</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Change Log</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#version-5-x-x">Version 5.x.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#version-5-1-0">Version 5.1.0</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#version-5-0-0">Version 5.0.0</a></li>
 </ul>
 </li>
@@ -121,6 +122,34 @@
 this list is curated by the development team for note worthy changes.</p>
 <section id="version-5-x-x">
 <h2>Version 5.x.x<a class="headerlink" href="#version-5-x-x" title="Link to this heading"></a></h2>
+<section id="version-5-1-0">
+<h3>Version 5.1.0<a class="headerlink" href="#version-5-1-0" title="Link to this heading"></a></h3>
+<p>Released <a class="extlink-release reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v5.1.0">v5.1.0</a> on October 20th, 2026</p>
+<ul>
+<li><p>Added the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain" title="rule_engine.engine.Chain"><code class="xref py py-class docutils literal notranslate"><span class="pre">Chain</span></code></a> class for evaluating an object against an ordered list of rules and
+returning the value of the first one that matches, similar to a chain in iptables. See
+<a class="reference internal" href="getting_started.html#getting-started-rule-chains"><span class="std std-ref">Rule Chains</span></a> for details.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.find" title="rule_engine.engine.Chain.find"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find()</span></code></a> returns the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.ChainEntry" title="rule_engine.engine.ChainEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChainEntry</span></code></a> that matched,
+which can be used to determine which rule was applied, and <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.index" title="rule_engine.engine.Chain.index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">index()</span></code></a> returns its
+position in the chain.</p></li>
+<li><p>When no rule matches and no default value is set, the new <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.ChainExhaustedError" title="rule_engine.errors.ChainExhaustedError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ChainExhaustedError</span></code></a> is
+raised.</p></li>
+<li><p>Chains can be modified with <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.append" title="rule_engine.engine.Chain.append"><code class="xref py py-meth docutils literal notranslate"><span class="pre">append()</span></code></a>,
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.insert" title="rule_engine.engine.Chain.insert"><code class="xref py py-meth docutils literal notranslate"><span class="pre">insert()</span></code></a>, <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.delete" title="rule_engine.engine.Chain.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete()</span></code></a> and
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.flush" title="rule_engine.engine.Chain.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flush()</span></code></a> while other threads evaluate them, and can be pickled.</p></li>
+<li><p>Slicing a chain returns a new chain with the same default value and context.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>Fixed the <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.UNDEFINED" title="rule_engine.errors.UNDEFINED"><code class="xref py py-data docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> sentinel losing its identity when pickled or copied. A restored
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> using the default <em>default_value</em> would return a stand-in object for missing
+symbols and attributes instead of raising a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> or
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.AttributeResolutionError" title="rule_engine.errors.AttributeResolutionError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeResolutionError</span></code></a>. Contexts that were pickled by an earlier version are
+corrected when they are loaded.</p></li>
+</ul>
+</section>
 <section id="version-5-0-0">
 <h3>Version 5.0.0<a class="headerlink" href="#version-5-0-0" title="Link to this heading"></a></h3>
 <p>Released <a class="extlink-release reference external" href="https://github.com/zeroSteiner/rule-engine/releases/tag/v5.0.0">v5.0.0</a> on May 17th, 2026</p>

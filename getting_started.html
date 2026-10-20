@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started &mdash; Rule Engine 5.0.3 documentation</title>
+  <title>Getting Started &mdash; Rule Engine 5.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=f98c4cc8"></script>
+      <script src="_static/documentation_options.js?v=bfa18cfb"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -48,6 +48,13 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basic-usage">Basic Usage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#attribute-backed-objects">Attribute-Backed Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rule-chains">Rule Chains</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chain-default-values">Chain Default Values</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modifying-a-chain">Modifying A Chain</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inspecting-matches">Inspecting Matches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#serialization">Serialization</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#advanced-usage">Advanced Usage</a><ul>
@@ -301,12 +308,125 @@ should not be shared with rule object that are applied to other objects which do
 artists).</p>
 </section>
 </section>
+<section id="rule-chains">
+<span id="getting-started-rule-chains"></span><h2>Rule Chains<a class="headerlink" href="#rule-chains" title="Link to this heading"></a></h2>
+<div class="versionadded">
+<p><span class="versionmodified added">Added in version 5.1.0.</span></p>
+</div>
+<p>A <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain" title="rule_engine.engine.Chain"><code class="xref py py-class docutils literal notranslate"><span class="pre">Chain</span></code></a> evaluates an object against an ordered list of rules, each of which is paired with a value,
+and returns the value of the first rule that matches. This is modeled after a chain in iptables, where each rule has a
+target and a packet stops at the first matching rule with a terminating target such as <code class="docutils literal notranslate"><span class="pre">ACCEPT</span></code> or <code class="docutils literal notranslate"><span class="pre">DROP</span></code>. The
+values can be any Python object, such as the members of an <a class="reference external" href="https://docs.python.org/3.12/library/enum.html#enum.Enum" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a>.</p>
+<p>Each rule can be either the text of a rule, which is compiled with the chain’s <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.context" title="rule_engine.engine.Chain.context"><code class="xref py py-attr docutils literal notranslate"><span class="pre">context</span></code></a>, or a
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rule</span></code></a> instance, which is used as-is and keeps its own context. Like a rule, a chain uses a default
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> unless one is specified with the <em>context</em> parameter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rule_engine</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Action</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ACCEPT</span> <span class="o">=</span> <span class="s1">&#39;accept&#39;</span>
+    <span class="n">DROP</span> <span class="o">=</span> <span class="s1">&#39;drop&#39;</span>
+
+<span class="n">chain</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;source in [&quot;203.0.113.7&quot;, &quot;203.0.113.8&quot;]&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">DROP</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;port == 22 and source.starts_with(&quot;192.168.&quot;)&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;port in [80, 443]&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">default_value</span><span class="o">=</span><span class="n">Action</span><span class="o">.</span><span class="n">DROP</span>
+<span class="p">)</span>
+
+<span class="n">chain</span><span class="o">.</span><span class="n">evaluate</span><span class="p">({</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;192.168.1.10&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">})</span>
+<span class="c1"># =&gt; &lt;Action.ACCEPT: &#39;accept&#39;&gt;</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">evaluate</span><span class="p">({</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;203.0.113.7&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="mi">443</span><span class="p">})</span>
+<span class="c1"># =&gt; &lt;Action.DROP: &#39;drop&#39;&gt;</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">evaluate</span><span class="p">({</span><span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;198.51.100.1&#39;</span><span class="p">,</span> <span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="mi">8080</span><span class="p">})</span>
+<span class="c1"># =&gt; &lt;Action.DROP: &#39;drop&#39;&gt;</span>
+</pre></div>
+</div>
+<p>A rule matches the same way <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule.matches" title="rule_engine.engine.Rule.matches"><code class="xref py py-meth docutils literal notranslate"><span class="pre">matches()</span></code></a> does. Errors that are raised while evaluating a rule, such
+as a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> for an object that is missing a symbol, are not caught by the chain.</p>
+<section id="chain-default-values">
+<h3>Chain Default Values<a class="headerlink" href="#chain-default-values" title="Link to this heading"></a></h3>
+<p>When no rule matches, the chain returns its <em>default_value</em>, which serves the same purpose as the policy of an iptables
+chain. If no <em>default_value</em> is specified, a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.ChainExhaustedError" title="rule_engine.errors.ChainExhaustedError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChainExhaustedError</span></code></a> is raised instead. The object that
+was evaluated is available from the exception’s <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.ChainExhaustedError.thing" title="rule_engine.errors.ChainExhaustedError.thing"><code class="xref py py-attr docutils literal notranslate"><span class="pre">thing</span></code></a> attribute, but it is not
+included in the exception’s message.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chain</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Chain</span><span class="p">([(</span><span class="s1">&#39;port == 22&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">)])</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">evaluate</span><span class="p">({</span><span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">})</span>
+<span class="c1"># =&gt; ChainExhaustedError: no rule in the chain matched and no default value is set</span>
+</pre></div>
+</div>
+<p>The chain’s <em>default_value</em> is separate from the <a class="reference internal" href="#getting-started-default-value"><span class="std std-ref">default value of a context</span></a>. The
+chain’s default value is used when no rule matches, while the context’s default value is used for symbols and attributes
+that are missing from the object. To have a rule that refers to a missing symbol evaluate it as <code class="docutils literal notranslate"><span class="pre">null</span></code> instead of
+raising an exception, use a context with a default value.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">context</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">default_value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">chain</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Chain</span><span class="p">([(</span><span class="s1">&#39;port == 22&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">)],</span> <span class="n">default_value</span><span class="o">=</span><span class="n">Action</span><span class="o">.</span><span class="n">DROP</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">evaluate</span><span class="p">({})</span>
+<span class="c1"># =&gt; &lt;Action.DROP: &#39;drop&#39;&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="modifying-a-chain">
+<h3>Modifying A Chain<a class="headerlink" href="#modifying-a-chain" title="Link to this heading"></a></h3>
+<p>A chain can be modified after it has been created using methods that are named after the iptables commands. Unlike the
+rule numbers used by iptables, indexes start at 0 and negative indexes count from the end of the chain.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.append" title="rule_engine.engine.Chain.append"><code class="xref py py-meth docutils literal notranslate"><span class="pre">append()</span></code></a> – Add an entry to the end of the chain, like <code class="docutils literal notranslate"><span class="pre">iptables</span> <span class="pre">--append</span></code>.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.insert" title="rule_engine.engine.Chain.insert"><code class="xref py py-meth docutils literal notranslate"><span class="pre">insert()</span></code></a> – Insert an entry before an index, like <code class="docutils literal notranslate"><span class="pre">iptables</span> <span class="pre">--insert</span></code>. This follows the
+semantics of <code class="xref py py-meth docutils literal notranslate"><span class="pre">list.insert()</span></code>, so <code class="docutils literal notranslate"><span class="pre">chain.insert(-1,</span> <span class="pre">rule,</span> <span class="pre">value)</span></code> adds an entry before the last one, which is
+useful for keeping a catch-all rule at the end of the chain.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.delete" title="rule_engine.engine.Chain.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete()</span></code></a> – Remove the entry at an index and return it, like <code class="docutils literal notranslate"><span class="pre">iptables</span> <span class="pre">--delete</span></code>.</p></li>
+<li><p><a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.flush" title="rule_engine.engine.Chain.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flush()</span></code></a> – Remove every entry, like <code class="docutils literal notranslate"><span class="pre">iptables</span> <span class="pre">--flush</span></code>. The default value is unchanged.</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chain</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Chain</span><span class="p">([(</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">DROP</span><span class="p">)])</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;port == 443&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">)</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;source == &quot;203.0.113.7&quot;&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">DROP</span><span class="p">)</span>
+<span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">rule</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">]</span>
+<span class="c1"># =&gt; [&#39;source == &quot;203.0.113.7&quot;&#39;, &#39;port == 443&#39;, &#39;true&#39;]</span>
+</pre></div>
+</div>
+<p>A chain can be evaluated by multiple threads while it is being modified. Each evaluation uses the entries that were in
+the chain when it started, and modifications made by different threads at the same time are not lost. Because adding or
+removing an entry copies the others, a chain with many entries is best created by passing them to the constructor. A
+chain should not be modified from a <code class="docutils literal notranslate"><span class="pre">__del__</span></code> method or a <a class="reference external" href="https://docs.python.org/3.12/library/weakref.html#module-weakref" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">weakref</span></code></a> finalizer, because those can run while
+another modification is in progress.</p>
+</section>
+<section id="inspecting-matches">
+<h3>Inspecting Matches<a class="headerlink" href="#inspecting-matches" title="Link to this heading"></a></h3>
+<p>The <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.find" title="rule_engine.engine.Chain.find"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find()</span></code></a> method returns the <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.ChainEntry" title="rule_engine.engine.ChainEntry"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChainEntry</span></code></a> of the first rule that matches,
+or <code class="docutils literal notranslate"><span class="pre">None</span></code> if none of them do. This can be used to determine which rule was applied, for example to log it. Unlike
+<a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.evaluate" title="rule_engine.engine.Chain.evaluate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">evaluate()</span></code></a>, the default value is not used. The <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Chain.index" title="rule_engine.engine.Chain.index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">index()</span></code></a> method returns the
+position of an entry in the chain.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chain</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Chain</span><span class="p">([(</span><span class="s1">&#39;port == 22&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">ACCEPT</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;port == 23&#39;</span><span class="p">,</span> <span class="n">Action</span><span class="o">.</span><span class="n">DROP</span><span class="p">)])</span>
+<span class="n">entry</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s1">&#39;port&#39;</span><span class="p">:</span> <span class="mi">23</span><span class="p">})</span>
+<span class="n">entry</span><span class="o">.</span><span class="n">rule</span><span class="o">.</span><span class="n">text</span>
+<span class="c1"># =&gt; &#39;port == 23&#39;</span>
+<span class="n">entry</span><span class="o">.</span><span class="n">value</span>
+<span class="c1"># =&gt; &lt;Action.DROP: &#39;drop&#39;&gt;</span>
+<span class="n">chain</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+<span class="c1"># =&gt; 1</span>
+</pre></div>
+</div>
+<p>A chain’s entries can also be inspected with <a class="reference external" href="https://docs.python.org/3.12/library/functions.html#len" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">len()</span></code></a>, iteration and indexing. Slicing a chain returns a new chain
+with the entries in the slice and the same default value and context as the original, so for example <code class="docutils literal notranslate"><span class="pre">chain[:-1]</span></code> is
+the chain without its last entry. Adding or removing entries in either chain afterwards does not change the other. Like
+other containers, a chain without any entries is falsy, even when it has a default value.</p>
+</section>
+<section id="serialization">
+<h3>Serialization<a class="headerlink" href="#serialization" title="Link to this heading"></a></h3>
+<p>A chain can be serialized with <a class="reference external" href="https://docs.python.org/3.12/library/pickle.html#module-pickle" title="(in Python v3.12)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">pickle</span></code></a> as long as its context, rules and values can be. In the examples above,
+<code class="docutils literal notranslate"><span class="pre">Action</span></code> must be defined at the module level for its members to be pickled. Rules that shared a context before the
+chain was pickled continue to share one after it is loaded.</p>
+</section>
+</section>
 <section id="advanced-usage">
 <h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Link to this heading"></a></h2>
 <p>The Rule Engine has a number of advanced features that contribute to its flexibility. In most use cases they are
 unnecessary.</p>
 <section id="setting-a-default-value">
-<h3>Setting A Default Value<a class="headerlink" href="#setting-a-default-value" title="Link to this heading"></a></h3>
+<span id="getting-started-default-value"></span><h3>Setting A Default Value<a class="headerlink" href="#setting-a-default-value" title="Link to this heading"></a></h3>
 <p>By default, <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Rule" title="rule_engine.engine.Rule"><code class="xref py py-class docutils literal notranslate"><span class="pre">engine.Rule</span></code></a> will raise a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolResolutionError" title="rule_engine.errors.SymbolResolutionError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolResolutionError</span></code></a> for invalid symbols. In some
 cases, it may be desirable to change the way in which the language behaves to instead treat unknown symbols with a
 default value (most often <code class="docutils literal notranslate"><span class="pre">None</span></code> / <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a> is used for this purpose, but any value of a supported

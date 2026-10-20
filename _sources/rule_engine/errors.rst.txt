@@ -34,6 +34,11 @@ Exceptions
    :show-inheritance:
    :special-members: __init__
 
+.. autoexception:: ChainExhaustedError
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+
 .. autoexception:: DatetimeSyntaxError
    :members:
    :show-inheritance:
@@ -119,6 +124,7 @@ The class hierarchy for Rule Engine exceptions is:
          +-- AttributeResolutionError
               +-- ObjectAttributeError
          +-- AttributeTypeError
+         +-- ChainExhaustedError
          +-- FunctionCallError
          +-- LookupError
          +-- SymbolResolutionError

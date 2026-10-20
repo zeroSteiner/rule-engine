@@ -22,6 +22,16 @@ Functions
 Classes
 -------
 
+.. autoclass:: Chain
+   :members:
+   :show-inheritance:
+   :special-members: __init__
+   :undoc-members:
+
+.. autoclass:: ChainEntry
+   :members:
+   :show-inheritance:
+
 .. autoclass:: Context
    :members:
    :show-inheritance:

@@ -406,6 +406,24 @@ class ParserLiteralTests(ParserTestsBase):
         self.assertLiteralStatementEqual('0xdeadbeef', ast.FloatExpression, decimal.Decimal('3735928559'))
         self.assertLiteralStatementEqual('0xdeADbeEF', ast.FloatExpression, decimal.Decimal('3735928559'))
 
+    def test_parse_float_base_int_max_digits(self):
+        parse_float = parser.utilities.parse_float
+        limit = 10 ** 20
+        for to_literal in (bin, oct, hex):
+            with self.subTest(base=to_literal.__name__):
+                self.assertEqual(parse_float(to_literal(limit - 1), int_max_digits=20), decimal.Decimal(limit - 1))
+                with self.assertRaisesRegex(errors.ArithmeticError, r'\(20 digits\)'):
+                    parse_float(to_literal(limit), int_max_digits=20)
+                self.assertEqual(parse_float(to_literal(limit), int_max_digits=0), decimal.Decimal(limit))
+        # decimal literals aren't converted from an integer so the limit doesn't apply
+        self.assertEqual(parse_float('1e25', int_max_digits=20), decimal.Decimal('1e25'))
+        self.assertEqual(parse_float('1' * 25, int_max_digits=20), decimal.Decimal('1' * 25))
+
+    def test_parse_float_base_invalid(self):
+        for string in ('0x1+1j', '0b1, 2'):
+            with self.subTest(string=string), self.assertRaises(errors.FloatSyntaxError):
+                parser.utilities.parse_float(string)
+
     def test_parse_float_inf(self):
         self.assertLiteralStatementEqual('inf', ast.FloatExpression, decimal.Decimal('inf'))
 

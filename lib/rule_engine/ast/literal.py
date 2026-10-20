@@ -109,12 +109,12 @@ class FloatExpression(LiteralExpressionBase):
     """Literal float expressions representing numerical values."""
     result_type: _DataTypeDef = DataType.FLOAT
     def __init__(self, context: 'Context', value: Any, **kwargs: Any) -> None:
-        value = coerce_value(value)
+        value = coerce_value(value, int_max_digits=context.int_max_digits)
         super(FloatExpression, self).__init__(context, value, **kwargs)
 
     @classmethod
     def from_string(cls, context: 'Context', string: str) -> 'FloatExpression':
-        return cls(context, parse_float(string))
+        return cls(context, parse_float(string, int_max_digits=context.int_max_digits))
 
 class FunctionExpression(LiteralExpressionBase):
     """Literal mapping expression representing a function."""

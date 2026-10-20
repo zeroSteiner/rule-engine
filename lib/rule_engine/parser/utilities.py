@@ -34,9 +34,11 @@ import ast as pyast
 import binascii
 import datetime
 import decimal
+import operator
 import re
 
 from . import errors
+from ..types.coercion import _to_decimal
 
 import dateutil.parser
 
@@ -68,23 +70,32 @@ def parse_datetime(string: str, default_timezone: datetime.tzinfo) -> datetime.d
         dt = dt.replace(tzinfo=default_timezone)
     return dt
 
-def parse_float(string: str) -> decimal.Decimal:
-    """
-    Parse a literal string representing a floating point value.
-
-    :param str string: The string to parse.
-    :rtype: decimal.Decimal
-    """
+def _parse_float(string: str) -> decimal.Decimal | int:
+    # binary, octal and hexadecimal values are returned as an int so the caller can convert it using the correct limit
     if re.match('^0[0-9]', string):
         raise errors.FloatSyntaxError('invalid floating point literal (leading zeros in decimal literals are not permitted)', string)
     try:
         if re.match('^0[box]', string):
-            val = decimal.Decimal(pyast.literal_eval(string))
-        else:
-            val = decimal.Decimal(string)
+            return operator.index(pyast.literal_eval(string))
+        return decimal.Decimal(string)
     except Exception:
         raise errors.FloatSyntaxError('invalid floating point literal', string) from None
-    return val
+
+def parse_float(string: str, *, int_max_digits: int | None = None) -> decimal.Decimal:
+    """
+    Parse a literal string representing a floating point value.
+
+    .. versionchanged:: 5.1.1
+            Added the *int_max_digits* parameter.
+
+    :param str string: The string to parse.
+    :param int int_max_digits: The maximum number of digits that a binary, octal or hexadecimal literal can have once
+            converted to a decimal value. See :py:func:`~rule_engine.types.coerce_value` for details.
+    :rtype: decimal.Decimal
+    :raises ~rule_engine.errors.ArithmeticError: *string* is a binary, octal or hexadecimal literal with more digits
+            than allowed by *int_max_digits*.
+    """
+    return _to_decimal(_parse_float(string), int_max_digits)
 
 def parse_timedelta(string: str) -> datetime.timedelta:
     """

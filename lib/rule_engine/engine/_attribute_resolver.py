@@ -44,10 +44,15 @@ from .. import parser
 from .. import types
 from ..suggestions import suggest_symbol
 from ..types import _CollectionDataTypeDef, _DataTypeDef
+from ..types.coercion import _assert_int_digits
 
-def _float_op(value: decimal.Decimal, op: Callable[[decimal.Decimal], Any]) -> Any:
+def _float_op(value: decimal.Decimal, op: Callable[[decimal.Decimal], Any], int_max_digits: int | None = None) -> Any:
     if value.is_nan() or value.is_infinite():
         return value
+    if not value.is_zero():
+        # the integer result has at least adjusted() + 1 digits, check that before creating it because converting a
+        # Decimal to an integer takes time that grows quadratically with its size
+        _assert_int_digits(value.adjusted() + 1, int_max_digits)
     return op(value)
 
 def _value_to_ary_result_type(object_type: _DataTypeDef) -> _DataTypeDef:
@@ -70,15 +75,17 @@ def _value_with_result_type(name: str, object_type: _DataTypeDef) -> _DataTypeDe
     return types.DataType.FUNCTION(name, argument_types=(object_type,), return_type=types.DataType.BOOLEAN)
 
 class _AttributeResolverFunction(object):
-    __slots__ = ('function', 'type_resolver')
+    __slots__ = ('function', 'type_resolver', 'uses_int_max_digits')
     def __init__(
             self,
             function: Callable[..., Any],
             *,
             result_type: _DataTypeDef,
-            type_resolver: Callable[[_DataTypeDef], _DataTypeDef] | Any
+            type_resolver: Callable[[_DataTypeDef], _DataTypeDef] | Any,
+            uses_int_max_digits: bool = False
     ) -> None:
         self.function = function
+        self.uses_int_max_digits = uses_int_max_digits
         if result_type and result_type is not types.DataType.UNDEFINED:
             if not types.DataType.is_definition(result_type):
                 raise TypeError('result_type must be a types.DataType definition')
@@ -98,34 +105,45 @@ class _AttributeResolverFunction(object):
 
 class _AttributeResolver(object):
     class attribute(object):
-        __slots__ = ('types', 'name', 'result_type', 'type_resolver')
+        __slots__ = ('types', 'name', 'result_type', 'type_resolver', 'uses_int_max_digits')
         type_map: dict[_DataTypeDef, dict[str, _AttributeResolverFunction]] = collections.defaultdict(dict)
         def __init__(
                 self,
                 name: str,
                 *data_types: _DataTypeDef,
                 result_type: _DataTypeDef = types.DataType.UNDEFINED,
-                type_resolver: Callable[[_DataTypeDef], _DataTypeDef] | Any = errors.UNDEFINED
+                type_resolver: Callable[[_DataTypeDef], _DataTypeDef] | Any = errors.UNDEFINED,
+                uses_int_max_digits: bool = False
         ) -> None:
             self.types = data_types
             self.name = name
             self.result_type = result_type
             self.type_resolver = type_resolver
+            # whether the function takes the context's int_max_digits as a keyword argument
+            self.uses_int_max_digits = uses_int_max_digits
 
         def __call__(self, function: Callable[..., Any]) -> Callable[..., Any]:
             for type_ in self.types:
-                self.type_map[type_][self.name] = _AttributeResolverFunction(function, result_type=self.result_type, type_resolver=self.type_resolver)
+                self.type_map[type_][self.name] = _AttributeResolverFunction(
+                        function,
+                        result_type=self.result_type,
+                        type_resolver=self.type_resolver,
+                        uses_int_max_digits=self.uses_int_max_digits
+                )
             return function
 
-    def __call__(self, thing: Any, object_: Any, name: str) -> Any:
+    def __call__(self, thing: Any, object_: Any, name: str, *, int_max_digits: int | None = None) -> Any:
         try:
             object_type = types.DataType.from_value(object_)
         except TypeError:
             # if the object can't be mapped to a supported type, raise a resolution error
             raise errors.AttributeResolutionError(name, object_, thing=thing) from None
         resolver = self._get_resolver(object_type, name, thing=thing)
-        value = resolver.function(self, object_)
-        value = types.coerce_value(value)
+        if resolver.uses_int_max_digits:
+            value = resolver.function(self, object_, int_max_digits=int_max_digits)
+        else:
+            value = resolver.function(self, object_)
+        value = types.coerce_value(value, int_max_digits=int_max_digits)
         value_type = types.DataType.from_value(value)
         expected_value_type = resolver.resolve_type(value_type)
         if types.DataType.is_compatible(expected_value_type, value_type):
@@ -218,13 +236,13 @@ class _AttributeResolver(object):
     def datetime_zone_name(self, value: datetime.datetime) -> str | None:
         return value.tzname()
 
-    @attribute('ceiling', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
-    def float_ceiling(self, value: decimal.Decimal) -> decimal.Decimal | int:
-        return _float_op(value, math.ceil)
+    @attribute('ceiling', types.DataType.FLOAT, result_type=types.DataType.FLOAT, uses_int_max_digits=True)
+    def float_ceiling(self, value: decimal.Decimal, int_max_digits: int | None = None) -> decimal.Decimal | int:
+        return _float_op(value, math.ceil, int_max_digits)
 
-    @attribute('floor', types.DataType.FLOAT, result_type=types.DataType.FLOAT)
-    def float_floor(self, value: decimal.Decimal) -> decimal.Decimal | int:
-        return _float_op(value, math.floor)
+    @attribute('floor', types.DataType.FLOAT, result_type=types.DataType.FLOAT, uses_int_max_digits=True)
+    def float_floor(self, value: decimal.Decimal, int_max_digits: int | None = None) -> decimal.Decimal | int:
+        return _float_op(value, math.floor, int_max_digits)
 
     @attribute('is_nan', types.DataType.FLOAT, result_type=types.DataType.BOOLEAN)
     def float_is_nan(self, value: decimal.Decimal) -> bool:

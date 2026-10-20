@@ -417,7 +417,7 @@ class GetSliceExpression(ExpressionBase):
             _assert_is_integer_number(resolved_stop)
             resolved_stop = int(resolved_stop)
         value = operator.getitem(resolved_obj, slice(resolved_start, resolved_stop))
-        return coerce_value(value, verify_type=False)
+        return coerce_value(value, verify_type=False, int_max_digits=self.context.int_max_digits)
 
     def reduce(self) -> ExpressionBase:
         if not _is_reduced(self.container, self.start, self.stop):

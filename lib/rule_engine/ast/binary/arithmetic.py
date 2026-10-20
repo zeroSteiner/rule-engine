@@ -38,6 +38,7 @@ from typing import Any, Callable
 from ... import errors
 from ...types import DataType, coerce_value
 from ...types import _DataTypeDef
+from ...types.coercion import _assert_int_bit_length
 
 from ..base import _assert_is_bytes, _assert_is_natural_number, _assert_is_numeric, _assert_is_string, _assert_not_nullable, _is_reduced
 from .base import BinaryExpressionBase
@@ -190,7 +191,16 @@ class BitwiseExpression(BinaryExpressionBase):
         _assert_is_natural_number(left)
         right = self.right.evaluate(thing)
         _assert_is_natural_number(right)
-        return coerce_value(op(int(left), int(right)))
+        left, right = int(left), int(right)
+        int_max_digits = self.context.int_max_digits
+        if op is operator.lshift and left:
+            # check the size of the result before shifting to avoid allocating an integer that is too large to convert
+            _assert_int_bit_length(left.bit_length() + right, int_max_digits)
+        try:
+            result = op(left, right)
+        except OverflowError:
+            raise errors.ArithmeticError('arithmetic error') from None
+        return coerce_value(result, int_max_digits=int_max_digits)
 
     def _op_bitwise_set(self, op: Callable[[Any, Any], Any], thing: Any, left: Any) -> Any:
         right = self.right.evaluate(thing)

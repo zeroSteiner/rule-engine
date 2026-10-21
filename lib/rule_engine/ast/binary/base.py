@@ -46,7 +46,7 @@ class BinaryExpressionBase(ExpressionBase):
     A base class for representing complex expressions composed of a left side and a right side, separated by an
     operator.
     """
-    compatible_types: tuple[_DataTypeDef, ...] = (DataType.ARRAY, DataType.BOOLEAN, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.MAPPING, DataType.NULL, DataType.SET, DataType.STRING)
+    compatible_types: tuple[_DataTypeDef, ...] = (DataType.ARRAY, DataType.BOOLEAN, DataType.BYTES, DataType.DATETIME, DataType.TIMEDELTA, DataType.FLOAT, DataType.FUNCTION, DataType.MAPPING, DataType.NULL, DataType.OBJECT, DataType.SET, DataType.STRING)
     """
     A tuple containing the compatible data types that the left and right expressions must return. This can for example
     be used to indicate that arithmetic operations are compatible with :py:attr:`~.DataType.FLOAT` but not

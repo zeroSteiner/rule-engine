@@ -53,7 +53,6 @@ class LogicExpression(BinaryExpressionBase):
 
 class ComparisonExpression(BinaryExpressionBase):
     """A class for representing comparison expressions from the grammar text such as equality checks."""
-    compatible_types: tuple[_DataTypeDef, ...] = BinaryExpressionBase.compatible_types + (DataType.OBJECT,)
     def _op_eq(self, thing: Any) -> bool:
         left_value = self.left.evaluate(thing)
         right_value = self.right.evaluate(thing)

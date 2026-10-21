@@ -428,7 +428,7 @@ class Context(object):
         :param str name: The attribute name that is being resolved.
         :return: The value for the corresponding attribute *name*.
         """
-        return self.__resolve_attribute(thing, object_, name, int_max_digits=self.int_max_digits)
+        return self.__resolve_attribute(thing, object_, name, context=self)
     resolve_attribute_type = __resolve_attribute.resolve_type
 
     def _warn_mapping_fallback(self, attribute_name: str) -> None:

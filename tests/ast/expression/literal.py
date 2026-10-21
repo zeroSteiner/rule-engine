@@ -49,6 +49,7 @@ context.builtins = builtins.Builtins.from_defaults(
 falseish = (
         ast.ArrayExpression(context, tuple()),
         ast.BooleanExpression(context, False),
+        ast.BytesExpression(context, b''),
         ast.TimedeltaExpression(context, datetime.timedelta()),
         ast.FloatExpression(context, 0.0),
         ast.NullExpression(context),
@@ -59,12 +60,14 @@ trueish = (
         ast.ArrayExpression(context, tuple((ast.NullExpression(context),))),
         ast.ArrayExpression(context, tuple((ast.FloatExpression(context, 1.0),))),
         ast.BooleanExpression(context, True),
+        ast.BytesExpression(context, b'non-empty'),
         ast.DatetimeExpression(context, datetime.datetime.now()),
         ast.TimedeltaExpression(context, datetime.timedelta(seconds=1)),
         ast.FloatExpression(context, float('-inf')),
         ast.FloatExpression(context, -1.0),
         ast.FloatExpression(context, 1.0),
         ast.FloatExpression(context, float('inf')),
+        ast.FunctionExpression(context, len),
         ast.StringExpression(context, 'non-empty')
 )
 

@@ -413,6 +413,13 @@ class LogicExpressionTests(BinaryExpressionTestsBase):
         for operator, left, right in itertools.product(('and', 'or'), falseish, falseish):
             self.assertExpressionTests(operator, left, right, False)
 
+    def test_ast_expression_left_operator_right_logical_object(self):
+        typed_context = engine.Context(type_resolver=engine.type_resolver_from_dict({'thing': types.DataType.OBJECT}))
+        symbol = ast.SymbolExpression(typed_context, 'thing')
+        for operator in ('and', 'or'):
+            expression = self.ExpressionClass(typed_context, operator, symbol, ast.BooleanExpression(typed_context, True))
+            self.assertTrue(expression.evaluate({'thing': object()}))
+
 ################################################################################
 # Left-Operator-Right Comparison Expressions
 ################################################################################
@@ -436,6 +443,13 @@ class ComparisonExpressionTests(BinaryExpressionTestsBase):
         self.assertExpressionTests('eq', names1, names2, False)
         self.assertExpressionTests('ne', names1, names1, False)
         self.assertExpressionTests('ne', names1, names2, True)
+
+    def test_ast_expression_left_operator_right_comparison_object(self):
+        typed_context = engine.Context(type_resolver=engine.type_resolver_from_dict({'thing': types.DataType.OBJECT}))
+        symbol = ast.SymbolExpression(typed_context, 'thing')
+        thing = object()
+        self.assertTrue(self.ExpressionClass(typed_context, 'eq', symbol, symbol).evaluate({'thing': thing}))
+        self.assertFalse(self.ExpressionClass(typed_context, 'ne', symbol, symbol).evaluate({'thing': thing}))
 
 class ArithmeticComparisonExpressionTests(BinaryExpressionTestsBase):
     ExpressionClass = ast.ArithmeticComparisonExpression
@@ -569,6 +583,14 @@ class FuzzyComparisonExpressionTests(BinaryExpressionTestsBase):
                 self.assertExpressionTests(operation, string, symbol)
             with self.assertRaises(errors.EvaluationError):
                 self.assertExpressionTests(operation, symbol, string)
+
+    def test_ast_expression_left_operator_right_fuzzycomparison_symbolic_type_errors(self):
+        # the type of a symbol's value is only known when it's evaluated and regular expressions must be strings
+        regex = ast.SymbolExpression(context, 'regex')
+        for operation, value in itertools.product(('eq_fzm', 'eq_fzs', 'ne_fzm', 'ne_fzs'), (b'Luke', 1.0, True)):
+            expression = self.ExpressionClass(context, operation, self.luke, regex)
+            with self.assertRaisesRegex(errors.EvaluationError, 'data type mismatch'):
+                expression.evaluate({'regex': value})
 
     def test_ast_expression_left_operator_right_fuzzycomparison_syntax_errors(self):
         for operation in ('eq_fzm', 'eq_fzs', 'ne_fzm', 'ne_fzs'):

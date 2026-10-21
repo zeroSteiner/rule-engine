@@ -632,6 +632,31 @@ class EngineRuleTests(unittest.TestCase):
             with self.assertRaises(errors.AttributeResolutionError):
                 rule.evaluate({'a': {}})
 
+    def test_engine_rule_evaluate_any_type_operators(self):
+        # ==, !=, and, and or accept values of any type
+        context = engine.Context(type_resolver=engine.type_resolver_from_dict({
+            'data': types.DataType.BYTES,
+            'function': types.DataType.FUNCTION,
+            'thing': types.DataType.OBJECT
+        }))
+        thing = {'data': b'ab', 'function': abs, 'thing': object()}
+        for text, value in (
+                ('b"ab" == b"ab"', True),
+                ('b"ab" != null', True),
+                ('data == b"ab"', True),
+                ('data != "ab"', True),
+                ('data and thing', True),
+                ('thing or false', True),
+                ('function == $abs', True),
+                ('$abs != $abs', False),
+                # functions are compared by identity and accessing a method creates a new one
+                ('data.decode == data.decode', False)
+            ):
+            self.assertEqual(engine.Rule(text, context=context).evaluate(thing), value, msg=text)
+        # ordering is not supported for bytes
+        with self.assertRaises(errors.EvaluationError):
+            engine.Rule('b"a" < b"b"')
+
     def test_engine_rule_debug_parser(self):
         with open(os.devnull, 'w') as file_h:
             original_stderr = sys.stderr

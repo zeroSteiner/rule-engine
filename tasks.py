@@ -1,19 +1,27 @@
+import pathlib
 import shutil
 
 from invoke import task
 
-
-@task
-def build(c):
-    """Build the distribution packages."""
-    c.run('uv build')
+PARSER_TABLES = 'lib/rule_engine/parser/parsetab.json'
+# the generated tables and the files ply wrote in older versions
+PARSER_FILES = (PARSER_TABLES, 'lib/rule_engine/parser/parsetab.py', 'lib/rule_engine/parser/parser.out')
 
 
 @task
 def clean(c):
     """Remove build artifacts."""
-    for path in ('build', 'dist'):
+    # a stale SOURCES.txt in the egg-info can add leftover files to the sdist
+    for path in ('build', 'dist', 'lib/rule_engine.egg-info'):
         shutil.rmtree(path, ignore_errors=True)
+    for path in PARSER_FILES:
+        pathlib.Path(path).unlink(missing_ok=True)
+
+
+@task(pre=[clean])
+def build(c):
+    """Build the distribution packages."""
+    c.run('uv build')
 
 
 @task
@@ -23,7 +31,17 @@ def docs(c):
     c.run('uv run sphinx-build -b html -a -E -v docs/source docs/html')
 
 
-@task(help={'coverage': 'Measure test coverage and print a report.'})
+@task
+def tables(c):
+    """Generate the parser tables."""
+    # existing tables would be loaded and dumped again with stale line numbers, and the parser would still import the
+    # parsetab.py older versions left behind
+    for path in PARSER_FILES:
+        pathlib.Path(path).unlink(missing_ok=True)
+    c.run('uv run python -m rule_engine.parser ' + PARSER_TABLES)
+
+
+@task(pre=[tables], help={'coverage': 'Measure test coverage and print a report.'})
 def tests(c, coverage=False):
     """Run unit tests."""
     if coverage:

@@ -1,5 +1,6 @@
 [build-system]
-requires = ["setuptools>=77"]
+# rule_engine is imported to generate the parser tables, see setup.py
+requires = ["setuptools>=77", "python-dateutil~=2.7"]
 build-backend = "setuptools.build_meta"
 
 [project]

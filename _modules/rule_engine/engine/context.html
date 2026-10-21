@@ -328,7 +328,8 @@
                     <span class="n">default_timezone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">datetime</span><span class="o">.</span><span class="n">tzinfo</span> <span class="o">=</span> <span class="s1">&#39;local&#39;</span><span class="p">,</span>
                     <span class="n">default_value</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span><span class="p">,</span>
                     <span class="n">decimal_context</span><span class="p">:</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Context</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                    <span class="n">mapping_attribute_lookup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">mapping_attribute_lookup</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int regex_flags: The flags to provide to functions in the :py:mod:`re` module when calling either the</span>
@@ -351,6 +352,15 @@
 <span class="sd">                back to ``mapping[&#39;key&#39;]`` and emits a :py:exc:`~rule_engine.errors.MappingAttributeLookupDeprecation`</span>
 <span class="sd">                once per context. When ``False``, attribute access on a :py:attr:`.MAPPING` raises a parse-time error.</span>
 <span class="sd">                This fallback is scheduled for removal in v6.0.</span>
+<span class="sd">        :param int int_max_digits: The maximum number of digits that an integer can have to be converted to a ``FLOAT``</span>
+<span class="sd">                value, such as an integer resolved from a symbol or the result of a left shift. Converting an integer</span>
+<span class="sd">                takes time that grows quadratically with its size, so one with more digits raises an</span>
+<span class="sd">                :py:exc:`~rule_engine.errors.ArithmeticError` instead. ``0`` disables the limit and ``None`` (the</span>
+<span class="sd">                default) uses the interpreter&#39;s limit from :py:func:`sys.get_int_max_str_digits` each time a value is</span>
+<span class="sd">                converted, including while a rule is being parsed. The limit applies wherever an integer is converted,</span>
+<span class="sd">                including the results of functions and attributes such as ``floor`` and ``length``, binary, octal and</span>
+<span class="sd">                hexadecimal literals and integers in ``SET`` values, so a very small limit can reject ordinary values.</span>
+<span class="sd">                Values that are already ``FLOAT`` values, such as the literal ``1e25``, are not checked.</span>
 
 <span class="sd">        .. versionchanged:: 2.0.0</span>
 <span class="sd">                Added the *default_value* parameter.</span>
@@ -364,6 +374,9 @@
 
 <span class="sd">        .. versionchanged:: 5.0.0</span>
 <span class="sd">                Added the *mapping_attribute_lookup* parameter.</span>
+
+<span class="sd">        .. versionchanged:: 5.1.1</span>
+<span class="sd">                Added the *int_max_digits* parameter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">regex_flags</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The *regex_flags* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
@@ -402,6 +415,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">resolver</span> <span class="ow">or</span> <span class="n">resolve_item</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span> <span class="o">=</span> <span class="n">mapping_attribute_lookup</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The *mapping_attribute_lookup* parameter from :py:meth:`~__init__`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">int_max_digits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;invalid int_max_digits type&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">int_max_digits</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid int_max_digits value (must be 0 or greater)&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">int_max_digits</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The *int_max_digits* parameter from :py:meth:`~__init__`.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="kc">False</span></div>
 
@@ -414,6 +434,7 @@
                 <span class="s1">&#39;default_value&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">,</span>
                 <span class="s1">&#39;decimal_context&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">decimal_context</span><span class="p">,</span>
                 <span class="s1">&#39;mapping_attribute_lookup&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span><span class="p">,</span>
+                <span class="s1">&#39;int_max_digits&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">int_max_digits</span><span class="p">,</span>
                 <span class="s1">&#39;_mapping_fallback_warned&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span><span class="p">,</span>
                 <span class="s1">&#39;_Context__type_resolver&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span><span class="p">,</span>
                 <span class="s1">&#39;_Context__resolver&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">,</span>
@@ -429,6 +450,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decimal_context</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;decimal_context&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;mapping_attribute_lookup&#39;</span><span class="p">]</span>
+        <span class="c1"># pickles created before 5.1.1 don&#39;t include int_max_digits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;int_max_digits&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_mapping_fallback_warned&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__type_resolver&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__resolver&#39;</span><span class="p">]</span>
@@ -511,7 +534,7 @@
 <span class="sd">        :param str name: The attribute name that is being resolved.</span>
 <span class="sd">        :return: The value for the corresponding attribute *name*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolve_attribute</span><span class="p">(</span><span class="n">thing</span><span class="p">,</span> <span class="n">object_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
 
     <span class="n">resolve_attribute_type</span> <span class="o">=</span> <span class="n">__resolve_attribute</span><span class="o">.</span><span class="n">resolve_type</span>
 

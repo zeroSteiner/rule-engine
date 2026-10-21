@@ -113,9 +113,11 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">binascii</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">decimal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..types.coercion</span><span class="w"> </span><span class="kn">import</span> <span class="n">_to_decimal</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">dateutil.parser</span>
 
@@ -150,25 +152,34 @@
     <span class="k">return</span> <span class="n">dt</span></div>
 
 
-<div class="viewcode-block" id="parse_float">
-<a class="viewcode-back" href="../../../rule_engine/parser/utilities.html#rule_engine.parser.utilities.parse_float">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parse a literal string representing a floating point value.</span>
-
-<span class="sd">    :param str string: The string to parse.</span>
-<span class="sd">    :rtype: decimal.Decimal</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="c1"># binary, octal and hexadecimal values are returned as an int so the caller can convert it using the correct limit</span>
     <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[0-9]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal (leading zeros in decimal literals are not permitted)&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[box]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">pyast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">pyast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>
-    <span class="k">return</span> <span class="n">val</span></div>
+
+<div class="viewcode-block" id="parse_float">
+<a class="viewcode-back" href="../../../rule_engine/parser/utilities.html#rule_engine.parser.utilities.parse_float">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse a literal string representing a floating point value.</span>
+
+<span class="sd">    .. versionchanged:: 5.1.1</span>
+<span class="sd">            Added the *int_max_digits* parameter.</span>
+
+<span class="sd">    :param str string: The string to parse.</span>
+<span class="sd">    :param int int_max_digits: The maximum number of digits that a binary, octal or hexadecimal literal can have once</span>
+<span class="sd">            converted to a decimal value. See :py:func:`~rule_engine.types.coerce_value` for details.</span>
+<span class="sd">    :rtype: decimal.Decimal</span>
+<span class="sd">    :raises ~rule_engine.errors.ArithmeticError: *string* is a binary, octal or hexadecimal literal with more digits</span>
+<span class="sd">            than allowed by *int_max_digits*.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_to_decimal</span><span class="p">(</span><span class="n">_parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">),</span> <span class="n">int_max_digits</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="parse_timedelta">

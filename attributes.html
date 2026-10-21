@@ -284,6 +284,8 @@ submembers. If the resolver function fails, the attribute will be checked to det
 <h3>FLOAT Attributes <sup>1</sup><a class="headerlink" href="#float-attributes-1" title="Link to this heading"></a></h3>
 <p>Due to the syntax of floating point literals, the attributes must be accessed using parenthesis. For example
 <code class="docutils literal notranslate"><span class="pre">3.14.to_str</span></code> is invalid while <code class="docutils literal notranslate"><span class="pre">(3.14).to_str</span></code> is valid.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ceiling</span></code> and <code class="docutils literal notranslate"><span class="pre">floor</span></code> attributes raise an <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.ArithmeticError" title="rule_engine.errors.ArithmeticError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArithmeticError</span></code></a> if their result would
+have more digits than allowed by the <em>int_max_digits</em> parameter of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>.</p>
 </section>
 <section id="encoding-and-decoding">
 <h3>Encoding and Decoding<a class="headerlink" href="#encoding-and-decoding" title="Link to this heading"></a></h3>

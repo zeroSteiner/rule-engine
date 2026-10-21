@@ -120,14 +120,25 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rule_engine.parser.utilities.parse_float">
-<span class="sig-name descname"><span class="pre">parse_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.12/library/decimal.html#decimal.Decimal" title="(in Python v3.12)"><span class="pre">Decimal</span></a></span></span><a class="reference internal" href="../../_modules/rule_engine/parser/utilities.html#parse_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.parser.utilities.parse_float" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">parse_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">int_max_digits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.12/library/decimal.html#decimal.Decimal" title="(in Python v3.12)"><span class="pre">Decimal</span></a></span></span><a class="reference internal" href="../../_modules/rule_engine/parser/utilities.html#parse_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.parser.utilities.parse_float" title="Link to this definition"></a></dt>
 <dd><p>Parse a literal string representing a floating point value.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 5.1.1: </span>Added the <em>int_max_digits</em> parameter.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>string</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The string to parse.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The string to parse.</p></li>
+<li><p><strong>int_max_digits</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The maximum number of digits that a binary, octal or hexadecimal literal can have once
+converted to a decimal value. See <a class="reference internal" href="../types.html#rule_engine.types.coerce_value" title="rule_engine.types.coerce_value"><code class="xref py py-func docutils literal notranslate"><span class="pre">coerce_value()</span></code></a> for details.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.12/library/decimal.html#decimal.Decimal" title="(in Python v3.12)">decimal.Decimal</a></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="../errors.html#rule_engine.errors.ArithmeticError" title="rule_engine.errors.ArithmeticError"><strong>ArithmeticError</strong></a> – <em>string</em> is a binary, octal or hexadecimal literal with more digits
+than allowed by <em>int_max_digits</em>.</p>
 </dd>
 </dl>
 </dd></dl>

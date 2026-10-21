@@ -119,7 +119,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">types</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.parser.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_datetime</span><span class="p">,</span> <span class="n">parse_float</span><span class="p">,</span> <span class="n">parse_timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parser.utilities</span><span class="w"> </span><span class="kn">import</span> <span class="n">_parse_float</span><span class="p">,</span> <span class="n">parse_datetime</span><span class="p">,</span> <span class="n">parse_timedelta</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">dateutil.tz</span>
 
@@ -279,7 +279,8 @@
                 <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="nb">min</span><span class="p">,</span>
                 <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="n">_builtin_filter</span><span class="p">,</span>
                 <span class="s1">&#39;parse_datetime&#39;</span><span class="p">:</span> <span class="n">BuiltinValueGenerator</span><span class="p">(</span><span class="n">_builtin_parse_datetime_generator</span><span class="p">),</span>
-                <span class="s1">&#39;parse_float&#39;</span><span class="p">:</span> <span class="n">parse_float</span><span class="p">,</span>
+                <span class="c1"># an int result is converted using the context&#39;s int_max_digits like other function results</span>
+                <span class="s1">&#39;parse_float&#39;</span><span class="p">:</span> <span class="n">_parse_float</span><span class="p">,</span>
                 <span class="s1">&#39;parse_timedelta&#39;</span><span class="p">:</span> <span class="n">parse_timedelta</span><span class="p">,</span>
                 <span class="s1">&#39;random&#39;</span><span class="p">:</span> <span class="n">_builtin_random</span><span class="p">,</span>
                 <span class="s1">&#39;range&#39;</span><span class="p">:</span> <span class="n">_builtin_range</span><span class="p">,</span>

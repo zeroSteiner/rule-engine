@@ -111,23 +111,90 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">decimal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">NoReturn</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.datatype</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataType</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_to_decimal</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">:</span>
+<span class="c1"># sys.get_int_max_str_digits was added in Python 3.10.7, older versions use CPython&#39;s default limit</span>
+<span class="n">_get_int_max_str_digits</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="s1">&#39;get_int_max_str_digits&#39;</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="mi">4300</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_int_max_digits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">int_max_digits</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># read the interpreter&#39;s limit each time so changes to it take effect</span>
+        <span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">_get_int_max_str_digits</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">int_max_digits</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_int_max_bits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="c1"># an upper bound for the bit length of 10 ** int_max_digits, calculated without creating it because that&#39;s slow for</span>
+    <span class="c1"># large limits (log2(10) &lt; 3.321929)</span>
+    <span class="k">return</span> <span class="n">int_max_digits</span> <span class="o">*</span> <span class="mi">3321929</span> <span class="o">//</span> <span class="mi">1000000</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_int_limit</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="c1"># the smallest integer with more than int_max_digits digits</span>
+    <span class="k">return</span> <span class="mi">10</span> <span class="o">**</span> <span class="n">int_max_digits</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_raise_int_size_error</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">ArithmeticError</span><span class="p">(</span><span class="s2">&quot;arithmetic error: integer exceeds the limit (</span><span class="si">{0}</span><span class="s2"> digits)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_int_size</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># converting an int to a Decimal takes time that grows quadratically with its size, so large values are rejected</span>
+    <span class="c1"># like Python&#39;s own int to str conversion</span>
+    <span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">_get_int_max_digits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">int_max_digits</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">bit_length</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span>
+    <span class="c1"># values with at most 3 bits per allowed digit are always less than the limit</span>
+    <span class="k">if</span> <span class="n">bit_length</span> <span class="o">&lt;=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">int_max_digits</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="c1"># only compare the value to the limit when the bit length alone isn&#39;t enough to tell</span>
+    <span class="k">if</span> <span class="n">bit_length</span> <span class="o">&gt;</span> <span class="n">_int_max_bits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">_int_limit</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">):</span>
+        <span class="n">_raise_int_size_error</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_member_int_sizes</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># SET members aren&#39;t converted, but comparing one to a FLOAT value converts it, so check the size of the integers</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">_assert_int_size</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">frozenset</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">_assert_member_int_sizes</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_int_bit_length</span><span class="p">(</span><span class="n">bit_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># check the size of an integer that hasn&#39;t been created yet, this only rejects bit lengths that are too large for</span>
+    <span class="c1"># any value so the integer still needs to be checked with _assert_int_size once it has been created</span>
+    <span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">_get_int_max_digits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">int_max_digits</span> <span class="ow">and</span> <span class="n">bit_length</span> <span class="o">&gt;</span> <span class="n">_int_max_bits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">):</span>
+        <span class="n">_raise_int_size_error</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assert_int_digits</span><span class="p">(</span><span class="n">digits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="c1"># check the number of digits of an integer that hasn&#39;t been created yet</span>
+    <span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">_get_int_max_digits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">int_max_digits</span> <span class="ow">and</span> <span class="n">digits</span> <span class="o">&gt;</span> <span class="n">int_max_digits</span><span class="p">:</span>
+        <span class="n">_raise_int_size_error</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_to_decimal</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">value</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="c1"># int subclasses (e.g. IntEnum) don&#39;t necessarily repr() as a plain number; convert via int() so the</span>
         <span class="c1"># Decimal constructor receives a value it can parse</span>
-        <span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">int_max_digits</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">_get_int_max_str_digits</span><span class="p">()</span>
+        <span class="c1"># skip the call for values with at most 3 bits per allowed digit which are always within the limit, this is the</span>
+        <span class="c1"># common case and is checked here to keep it fast</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">int_max_digits</span><span class="p">:</span>
+            <span class="n">_assert_int_size</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
 <div class="viewcode-block" id="coerce_value">
 <a class="viewcode-back" href="../../../rule_engine/types.html#rule_engine.types.coerce_value">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">verify_type</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">coerce_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">verify_type</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Take a native Python *value* and convert it to a value of a data type which can be represented by a Rule Engine</span>
 <span class="sd">    :py:class:`~.DataType`. This function is useful for converting native Python values at the engine boundaries such as</span>
@@ -135,24 +202,43 @@
 
 <span class="sd">    .. versionadded:: 2.0.0</span>
 
+<span class="sd">    .. versionchanged:: 5.1.1</span>
+<span class="sd">            Added the *int_max_digits* parameter.</span>
+
 <span class="sd">    :param value: The value to convert.</span>
 <span class="sd">    :param bool verify_type: Whether or not to verify the converted value&#39;s type.</span>
+<span class="sd">    :param int int_max_digits: The maximum number of digits that an integer can have to be converted to a ``FLOAT``</span>
+<span class="sd">            value. Converting an integer takes time that grows quadratically with its size. ``0`` disables the limit,</span>
+<span class="sd">            and ``None`` (the default) uses the interpreter&#39;s limit from :py:func:`sys.get_int_max_str_digits`.</span>
 <span class="sd">    :return: The converted value.</span>
+<span class="sd">    :raises ~rule_engine.errors.ArithmeticError: *value* is an integer with more digits than allowed by</span>
+<span class="sd">            *int_max_digits*, or it is a :py:class:`dict`, :py:class:`list`, :py:class:`range`, :py:class:`set` or</span>
+<span class="sd">            :py:class:`tuple` that contains one.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># ARRAY</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">coerce_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">_get_int_max_digits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">coerce_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="o">=</span><span class="n">int_max_digits</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
     <span class="c1"># DATETIME</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
     <span class="c1"># FLOAT</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">_to_decimal</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_to_decimal</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">)</span>
     <span class="c1"># MAPPING</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">)):</span>
+        <span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">_get_int_max_digits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span>
-                <span class="p">(</span><span class="n">coerce_value</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">),</span> <span class="n">coerce_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="p">(</span>
+                    <span class="n">coerce_value</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="o">=</span><span class="n">int_max_digits</span><span class="p">),</span>
+                    <span class="n">coerce_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">verify_type</span><span class="o">=</span><span class="n">verify_type</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="o">=</span><span class="n">int_max_digits</span><span class="p">)</span>
+                <span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">)</span>
+    <span class="c1"># SET</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+        <span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">_get_int_max_digits</span><span class="p">(</span><span class="n">int_max_digits</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">int_max_digits</span><span class="p">:</span>
+            <span class="n">_assert_member_int_sizes</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">int_max_digits</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">verify_type</span><span class="p">:</span>
         <span class="n">DataType</span><span class="o">.</span><span class="n">from_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># use this to raise a TypeError, if the type is incompatible</span>
     <span class="k">return</span> <span class="n">value</span></div>

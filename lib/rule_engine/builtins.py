@@ -41,7 +41,7 @@ from typing import Any, Callable, Iterable, Iterator, Mapping
 
 from . import errors
 from . import types
-from .parser.utilities import parse_datetime, parse_float, parse_timedelta
+from .parser.utilities import _parse_float, parse_datetime, parse_timedelta
 
 import dateutil.tz
 
@@ -191,7 +191,8 @@ class Builtins(collections.abc.Mapping):
                 'min': min,
                 'filter': _builtin_filter,
                 'parse_datetime': BuiltinValueGenerator(_builtin_parse_datetime_generator),
-                'parse_float': parse_float,
+                # an int result is converted using the context's int_max_digits like other function results
+                'parse_float': _parse_float,
                 'parse_timedelta': parse_timedelta,
                 'random': _builtin_random,
                 'range': _builtin_range,

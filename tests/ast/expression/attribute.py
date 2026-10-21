@@ -38,7 +38,7 @@ import unittest
 from .literal import context
 import rule_engine.ast as ast
 import rule_engine.engine as engine
-from rule_engine.engine._attribute_resolver import _AttributeResolver
+from rule_engine.engine._attribute_resolver import _AttributeResolver, _float_op
 import rule_engine.errors as errors
 import rule_engine.types as types
 
@@ -249,6 +249,34 @@ class GetAttributeExpressionTests(unittest.TestCase):
         for value in ('nan', 'inf', '-inf'):
             flt = decimal.Decimal(value)
             self.assertEqual(expression.evaluate({'flt': flt}), value, "attribute {} failed".format(attribute_name))
+
+    def test_ast_expression_float_attributes_int_max_digits(self):
+        limited_context = engine.Context(int_max_digits=20)
+        symbol = ast.SymbolExpression(limited_context, 'flt')
+        ceiling = ast.GetAttributeExpression(limited_context, symbol, 'ceiling')
+        floor = ast.GetAttributeExpression(limited_context, symbol, 'floor')
+        self.assertEqual(floor.evaluate({'flt': decimal.Decimal('1E+19')}), 10 ** 19)
+        self.assertEqual(floor.evaluate({'flt': decimal.Decimal('99999999999999999999.5')}), 10 ** 20 - 1)
+        # rejected before converting to an integer
+        with self.assertRaisesRegex(errors.ArithmeticError, r'\(20 digits\)'):
+            floor.evaluate({'flt': decimal.Decimal('1E+20')})
+        with self.assertRaises(errors.ArithmeticError):
+            ceiling.evaluate({'flt': decimal.Decimal('-1E+20')})
+        # rejected after converting to an integer, the result is 10 ** 20
+        with self.assertRaises(errors.ArithmeticError):
+            ceiling.evaluate({'flt': decimal.Decimal('99999999999999999999.5')})
+
+        limited_context = engine.Context(int_max_digits=1)
+        floor = ast.GetAttributeExpression(limited_context, ast.SymbolExpression(limited_context, 'flt'), 'floor')
+        self.assertEqual(floor.evaluate({'flt': decimal.Decimal('0E+5')}), 0)
+        self.assertEqual(floor.evaluate({'flt': decimal.Decimal('-0.5')}), -1)
+        self.assertTrue(floor.evaluate({'flt': decimal.Decimal('nan')}).is_nan())
+
+    def test_ast_expression_float_op_checks_size_first(self):
+        for value, int_max_digits in (('1e5000', 4300), ('1e20', 20), ('-1e20', 20)):
+            with self.subTest(value=value), self.assertRaises(errors.ArithmeticError):
+                _float_op(decimal.Decimal(value), self.fail, int_max_digits)
+        self.assertEqual(_float_op(decimal.Decimal('1e5000'), math.floor, 0), 10 ** 5000)
 
     def test_ast_expression_mapping_attributes(self):
         mapping = dict(one=1, two=2, three=3)

@@ -44,6 +44,7 @@ from types import GeneratorType
 import warnings
 
 import rule_engine.ast as ast
+import rule_engine.builtins as builtins
 import rule_engine.engine as engine
 import rule_engine.types as types
 import rule_engine.errors as errors
@@ -74,6 +75,18 @@ class ContextTests(unittest.TestCase):
     def test_context_type_resolver_mapping(self):
         context = engine.Context(type_resolver={'name': types.DataType.STRING})
         self.assertEqual(context.resolve_type('name'), types.DataType.STRING)
+
+    def test_context_int_max_digits(self):
+        self.assertIsNone(engine.Context().int_max_digits)
+        for int_max_digits in (0, 1, 20, 4300):
+            self.assertEqual(engine.Context(int_max_digits=int_max_digits).int_max_digits, int_max_digits)
+
+    def test_context_int_max_digits_errors(self):
+        for int_max_digits in ('20', 20.0, True):
+            with self.subTest(int_max_digits=int_max_digits), self.assertRaises(TypeError):
+                engine.Context(int_max_digits=int_max_digits)
+        with self.assertRaises(ValueError):
+            engine.Context(int_max_digits=-1)
 
     def test_context_mapping_attribute_lookup_default(self):
         context = engine.Context()
@@ -769,6 +782,26 @@ class ContextSerializationTests(unittest.TestCase):
         rule2 = pickle.loads(pickle.dumps(rule))
         self.assertEqual(rule2.text, rule.text)
 
+    def test_context_pickle_int_max_digits(self):
+        context = pickle.loads(pickle.dumps(engine.Context(int_max_digits=20)))
+        self.assertEqual(context.int_max_digits, 20)
+        rule = engine.Rule('value > 0', context=context)
+        self.assertTrue(rule.matches({'value': 10 ** 20 - 1}))
+        with self.assertRaises(errors.ArithmeticError):
+            rule.matches({'value': 10 ** 20})
+        with self.assertRaises(errors.ArithmeticError):
+            engine.Rule('$parse_float(value) > 0', context=context).matches({'value': hex(10 ** 20)})
+
+    def test_context_unpickle_without_int_max_digits(self):
+        # pickles created before 5.1.1 don't include int_max_digits
+        state = engine.Context().__getstate__()
+        del state['int_max_digits']
+        context = engine.Context.__new__(engine.Context)
+        context.__setstate__(state)
+        self.assertIsNone(context.int_max_digits)
+        rule = engine.Rule('value << 2 == 4 and $parse_float("0x10") == 16', context=context)
+        self.assertTrue(rule.matches({'value': 1}))
+
     def test_context_pickle_lambda_resolver_raises(self):
         context = engine.Context(resolver=lambda thing, name: thing[name])
         with self.assertRaises((AttributeError, pickle.PicklingError)):
@@ -808,6 +841,110 @@ class ContextSerializationTests(unittest.TestCase):
         rule = engine.Rule('missing', context=context)
         with self.assertRaises(errors.SymbolResolutionError):
             rule.evaluate({})
+
+class EngineIntMaxDigitsTests(unittest.TestCase):
+    def _set_int_max_str_digits(self, int_max_digits):
+        if not hasattr(sys, 'set_int_max_str_digits'):
+            self.skipTest('sys.set_int_max_str_digits is not available')
+        self.addCleanup(sys.set_int_max_str_digits, sys.get_int_max_str_digits())
+        sys.set_int_max_str_digits(int_max_digits)
+
+    def test_engine_left_shift_overflow(self):
+        # before the fix these raised an OverflowError or a MemoryError instead of an engine error
+        for rule_text in ('1 << 1e15 == 0', '1 << 1e308 == 0'):
+            with self.subTest(rule_text=rule_text):
+                with self.assertRaises(errors.ArithmeticError):
+                    engine.Rule(rule_text)
+                self.assertFalse(engine.Rule.is_valid(rule_text))
+
+    def test_engine_int_max_digits_large_limit(self):
+        # a large limit must not make every left shift slow
+        context = engine.Context(int_max_digits=10 ** 6)
+        self.assertTrue(engine.Rule('value << 1 == 2', context=context).matches({'value': 1}))
+        with self.assertRaises(errors.ArithmeticError):
+            engine.Rule('1 << 1e15 == 0', context=context)
+
+    def test_engine_int_max_digits_left_shift(self):
+        context = engine.Context(int_max_digits=20)
+        # constant expressions are evaluated while the rule is parsed
+        with self.assertRaises(errors.ArithmeticError):
+            engine.Rule('1 << 67 == 0', context=context)
+        rule = engine.Rule('value << 67 == 0', context=context)
+        with self.assertRaises(errors.ArithmeticError):
+            rule.matches({'value': 1})
+        self.assertTrue(engine.Rule('value << 66 > 0', context=context).matches({'value': 1}))
+
+    def test_engine_int_max_digits_symbol(self):
+        rule = engine.Rule('value > 0', context=engine.Context(int_max_digits=20))
+        self.assertTrue(rule.matches({'value': 10 ** 20 - 1}))
+        with self.assertRaisesRegex(errors.ArithmeticError, r'\(20 digits\)'):
+            rule.matches({'value': 10 ** 20})
+
+    def test_engine_int_max_digits_function_result(self):
+        rule = engine.Rule('function() > 0', context=engine.Context(int_max_digits=20))
+        self.assertTrue(rule.matches({'function': lambda: 10 ** 20 - 1}))
+        with self.assertRaises(errors.ArithmeticError):
+            rule.matches({'function': lambda: 10 ** 20})
+
+    def test_engine_int_max_digits_base_literal(self):
+        context = engine.Context(int_max_digits=20)
+        with self.assertRaises(errors.ArithmeticError):
+            engine.Rule(hex(10 ** 20) + ' > 0', context=context)
+        self.assertTrue(engine.Rule(hex(10 ** 20 - 1) + ' > 0', context=context).matches({}))
+
+    def test_engine_int_max_digits_floor(self):
+        context = engine.Context(int_max_digits=20)
+        with self.assertRaises(errors.ArithmeticError):
+            engine.Rule('(1e20).floor > 0', context=context).matches({})
+        self.assertTrue(engine.Rule('(1e19).floor > 0', context=context).matches({}))
+        # the context's limit is used before converting, not only the interpreter's
+        context = engine.Context(int_max_digits=0)
+        for attribute in ('ceiling', 'floor'):
+            self.assertTrue(engine.Rule('(1e5000).{0} > 0'.format(attribute), context=context).matches({}))
+
+    def test_engine_int_max_digits_set(self):
+        # SET members aren't converted but comparing a large integer to a FLOAT value converts it
+        rule = engine.Rule('1 in value', context=engine.Context(int_max_digits=20))
+        self.assertTrue(rule.matches({'value': {1, 10 ** 20 - 1}}))
+        for value in ({10 ** 20}, {(1, (10 ** 20,))}, {frozenset([10 ** 20])}):
+            with self.subTest(value=value), self.assertRaises(errors.ArithmeticError):
+                rule.matches({'value': value})
+
+    def test_engine_int_max_digits_string_to_flt(self):
+        rule = engine.Rule('value.to_flt > 0', context=engine.Context(int_max_digits=20))
+        self.assertTrue(rule.matches({'value': hex(10 ** 20 - 1)}))
+        with self.assertRaises(errors.ArithmeticError):
+            rule.matches({'value': hex(10 ** 20)})
+
+    def test_engine_int_max_digits_parse_float(self):
+        context = engine.Context(int_max_digits=20)
+        rule = engine.Rule('$parse_float(value) > 0', context=context)
+        self.assertTrue(rule.matches({'value': hex(10 ** 20 - 1)}))
+        with self.assertRaises(errors.ArithmeticError):
+            rule.matches({'value': hex(10 ** 20)})
+        # the limit is read from the context each time the function is called
+        context.int_max_digits = 21
+        self.assertTrue(rule.matches({'value': hex(10 ** 20)}))
+        with self.assertRaises(errors.FunctionCallError):
+            rule.matches({'value': '0x1+1j'})
+
+    def test_engine_int_max_digits_parse_float_custom_builtins(self):
+        # replacing the builtins like the getting started guide shows must keep using the context's limit
+        context = engine.Context(int_max_digits=20)
+        context.builtins = builtins.Builtins.from_defaults({'version': '5.1.1'}, timezone=context.default_timezone)
+        rule = engine.Rule('$parse_float(value) > 0', context=context)
+        with self.assertRaises(errors.ArithmeticError):
+            rule.matches({'value': hex(10 ** 20)})
+        context.int_max_digits = 0
+        self.assertTrue(rule.matches({'value': hex(10 ** 4300)}))
+
+    def test_engine_int_max_digits_default_follows_interpreter(self):
+        self._set_int_max_str_digits(640)
+        rule = engine.Rule('value > 0')
+        with self.assertRaisesRegex(errors.ArithmeticError, r'\(640 digits\)'):
+            rule.matches({'value': 10 ** 640})
+        sys.set_int_max_str_digits(4300)
+        self.assertTrue(rule.matches({'value': 10 ** 640}))
 
 if __name__ == '__main__':
     unittest.main()

@@ -38,9 +38,11 @@ import enum
 import sys
 import typing
 import unittest
+import unittest.mock
 
 import rule_engine.errors as errors
 import rule_engine.types as types
+import rule_engine.types.coercion as coercion
 
 __all__ = ('CoercionTests', 'DataTypeTests', 'MetaDataTypeTests', 'ObjectDataTypeTests', 'ValueIsTests')
 
@@ -54,6 +56,82 @@ class CoercionTests(unittest.TestCase):
 
         value = types.coerce_value(Priority.HIGH)
         self.assertEqual(value, decimal.Decimal(9))
+
+    def _set_int_max_str_digits(self, int_max_digits):
+        if not hasattr(sys, 'set_int_max_str_digits'):
+            self.skipTest('sys.set_int_max_str_digits is not available')
+        self.addCleanup(sys.set_int_max_str_digits, sys.get_int_max_str_digits())
+        sys.set_int_max_str_digits(int_max_digits)
+
+    def test_coerce_int_max_digits_boundaries(self):
+        for int_max_digits in (1, 2, 3, 20, 640, 4300):
+            limit = 10 ** int_max_digits
+            with self.subTest(int_max_digits=int_max_digits):
+                for value in (limit - 1, -(limit - 1), (1 << (3 * int_max_digits)) - 1, 1 << (3 * int_max_digits)):
+                    self.assertEqual(types.coerce_value(value, int_max_digits=int_max_digits), decimal.Decimal(value))
+                for value in (limit, -limit):
+                    with self.assertRaisesRegex(errors.ArithmeticError, r'\({0} digits\)'.format(int_max_digits)):
+                        types.coerce_value(value, int_max_digits=int_max_digits)
+
+    def test_coerce_int_max_digits_unlimited(self):
+        value = 10 ** 4300
+        self.assertEqual(types.coerce_value(value, int_max_digits=0), decimal.Decimal(value))
+
+    def test_coerce_int_max_digits_default_follows_interpreter(self):
+        self._set_int_max_str_digits(640)
+        with self.assertRaisesRegex(errors.ArithmeticError, r'\(640 digits\)'):
+            types.coerce_value(10 ** 640)
+        sys.set_int_max_str_digits(4300)
+        self.assertEqual(types.coerce_value(10 ** 640), decimal.Decimal(10 ** 640))
+
+    def test_coerce_int_max_digits_overrides_interpreter(self):
+        self._set_int_max_str_digits(640)
+        self.assertEqual(types.coerce_value(10 ** 640, int_max_digits=4300), decimal.Decimal(10 ** 640))
+        with self.assertRaises(errors.ArithmeticError):
+            types.coerce_value(10 ** 20, int_max_digits=20)
+
+    def test_coerce_int_max_digits_nested(self):
+        for value in ([1, 10 ** 20], range(10 ** 20, 10 ** 20 + 1), {10 ** 20: 1}, {'a': (10 ** 20,)}):
+            with self.subTest(value=type(value).__name__), self.assertRaises(errors.ArithmeticError):
+                types.coerce_value(value, int_max_digits=20)
+        self.assertEqual(types.coerce_value({'a': [10 ** 19]}, int_max_digits=20), {'a': (decimal.Decimal(10 ** 19),)})
+
+    def test_coerce_int_max_digits_int_subclass(self):
+        class Huge(enum.IntEnum):
+            VALUE = 10 ** 20
+
+        with self.assertRaises(errors.ArithmeticError):
+            types.coerce_value(Huge.VALUE, int_max_digits=20)
+        self.assertEqual(types.coerce_value(Huge.VALUE, int_max_digits=21), decimal.Decimal(10 ** 20))
+
+    def test_coerce_int_max_digits_ignores_other_types(self):
+        self.assertIs(types.coerce_value(True, int_max_digits=1), True)
+        self.assertEqual(types.coerce_value(1e300, int_max_digits=20), decimal.Decimal(repr(1e300)))
+        self.assertEqual(types.coerce_value(decimal.Decimal('1e300'), int_max_digits=20), decimal.Decimal('1e300'))
+
+    def test_coerce_int_max_digits_set(self):
+        # SET members aren't converted, their size is only checked
+        value = {1, 'one', (2, frozenset([3]))}
+        self.assertIs(types.coerce_value(value, int_max_digits=1), value)
+        for value in ({10 ** 20}, {(1, (10 ** 20,))}, {frozenset([-10 ** 20])}):
+            with self.subTest(value=value), self.assertRaises(errors.ArithmeticError):
+                types.coerce_value(value, int_max_digits=20)
+        self.assertEqual(types.coerce_value({10 ** 20}, int_max_digits=0), {10 ** 20})
+
+    def test_coerce_int_max_digits_large_limit(self):
+        # 10 ** int_max_digits is slow to calculate for large limits, so it's only used when the bit length isn't enough
+        with unittest.mock.patch.object(coercion, '_int_limit', side_effect=AssertionError('_int_limit was called')):
+            self.assertEqual(types.coerce_value(1 << 1000, int_max_digits=sys.maxsize), decimal.Decimal(1 << 1000))
+            coercion._assert_int_bit_length(10 ** 6, sys.maxsize)
+            with self.assertRaises(errors.ArithmeticError):
+                types.coerce_value(1 << 100, int_max_digits=20)
+            with self.assertRaises(errors.ArithmeticError):
+                coercion._assert_int_bit_length(68, 20)
+        coercion._assert_int_bit_length(67, 20)
+
+    def test_coerce_int_max_digits_is_keyword_only(self):
+        with self.assertRaises(TypeError):
+            types.coerce_value(10 ** 20, True, 20)
 
 
 class DataTypeTests(unittest.TestCase):

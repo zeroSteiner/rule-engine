@@ -247,7 +247,7 @@ class ExpressionBase(ASTNodeBase):
 
     def _new_value(self, *args: Any, **kwargs: Any) -> Any:
         # perform a context aware load of value
-        value = coerce_value(*args, **kwargs)
+        value = coerce_value(*args, int_max_digits=self.context.int_max_digits, **kwargs)
         if isinstance(value, datetime.datetime) and value.tzinfo is None:
             value = value.replace(tzinfo=self.context.default_timezone)
         return value
@@ -295,7 +295,7 @@ class LiteralExpressionBase(ExpressionBase):
             elif DataType.is_type(datatype, DataType.MAPPING):
                 value = tuple((cls.from_value(context, k), cls.from_value(context, v)) for k, v in value.items())
         else:
-            value = coerce_value(value)
+            value = coerce_value(value, int_max_digits=context.int_max_digits)
         return subclass(context, value)
 
     def evaluate(self, thing: Any) -> Any:

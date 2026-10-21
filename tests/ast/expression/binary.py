@@ -31,6 +31,7 @@
 #
 
 import datetime
+import decimal
 import functools
 import itertools
 import unittest
@@ -343,6 +344,46 @@ class BitwiseShiftExpressionTests(BitwiseExpressionTests):
     def test_ast_expression_left_operator_right_bitwise(self):
         self.assertExpressionTests('bwlsh', equals_value=96.0)
         self.assertExpressionTests('bwrsh', equals_value=0.0)
+
+    def _shift(self, operation, left, right, int_max_digits):
+        context = engine.Context(int_max_digits=int_max_digits)
+        expression = self.ExpressionClass(
+                context,
+                operation,
+                ast.FloatExpression(context, decimal.Decimal(left)),
+                ast.FloatExpression(context, decimal.Decimal(right))
+        )
+        return expression.evaluate(None)
+
+    def test_ast_expression_left_shift_int_max_digits(self):
+        # 10 ** 4300 has 14285 bits so 1 << 14285 is rejected before shifting and 3 << 14283 is rejected after
+        self.assertEqual(self._shift('bwlsh', 1, 14284, 4300), decimal.Decimal(1 << 14284))
+        self.assertEqual(self._shift('bwlsh', 2, 14283, 4300), decimal.Decimal(1 << 14284))
+        for left, right in ((1, 14285), (3, 14283)):
+            with self.assertRaisesRegex(errors.ArithmeticError, r'\(4300 digits\)'):
+                self._shift('bwlsh', left, right, 4300)
+        self.assertEqual(self._shift('bwlsh', 1, 66, 20), decimal.Decimal(1 << 66))
+        with self.assertRaises(errors.ArithmeticError):
+            self._shift('bwlsh', 1, 67, 20)
+        self.assertEqual(self._shift('bwlsh', 1, 14285, 0), decimal.Decimal(1 << 14285))
+
+    def test_ast_expression_left_shift_overflow(self):
+        for int_max_digits in (None, 4300, 0):
+            with self.subTest(int_max_digits=int_max_digits), self.assertRaises(errors.ArithmeticError):
+                self._shift('bwlsh', 1, decimal.Decimal('1e308'), int_max_digits)
+
+    def test_ast_expression_literal_int_max_digits(self):
+        limited_context = engine.Context(int_max_digits=20)
+        for factory in (ast.FloatExpression, ast.LiteralExpressionBase.from_value):
+            with self.subTest(factory=factory.__qualname__):
+                self.assertEqual(factory(limited_context, 10 ** 20 - 1).value, decimal.Decimal(10 ** 20 - 1))
+                with self.assertRaises(errors.ArithmeticError):
+                    factory(limited_context, 10 ** 20)
+
+    def test_ast_expression_shift_small_results_int_max_digits(self):
+        self.assertEqual(self._shift('bwlsh', 0, decimal.Decimal('1e308'), 1), decimal.Decimal(0))
+        self.assertEqual(self._shift('bwlsh', 5, 0, 1), decimal.Decimal(5))
+        self.assertEqual(self._shift('bwrsh', 1, decimal.Decimal('1e308'), 1), decimal.Decimal(0))
 
     def test_ast_expression_left_operator_right_bitwise_type_errors(self):
         for operation in ('bwlsh', 'bwrsh'):

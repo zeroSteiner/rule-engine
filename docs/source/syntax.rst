@@ -144,7 +144,11 @@ not be added to other :py:attr:`~.DataType.DATETIME` values. The remaining types
 :py:attr:`~.DataType.STRING`, and :py:attr:`~.DataType.FLOAT`) must be added to values of the same type.
 
 :sup:`2` Bitwise operations support floating point values, but if the value is not a natural number, an
-:py:class:`~rule_engine.errors.EvaluationError` will be raised.
+:py:class:`~rule_engine.errors.EvaluationError` will be raised. The result of a left shift can not have more digits than
+allowed by the *int_max_digits* parameter of :py:class:`~rule_engine.engine.Context`, which defaults to the
+interpreter's limit from :py:func:`sys.get_int_max_str_digits`, otherwise an
+:py:class:`~rule_engine.errors.ArithmeticError` will be raised. With the default limit of 4,300 digits, ``1 << 14284``
+is the largest power of two that can be produced.
 
 :sup:`3` The arithmetic comparison operators support multiple data types however the data type of the left value must be
 the same as the data type of the right. For example, a :py:attr:`~.DataType.STRING` can be compared to another
@@ -338,7 +342,9 @@ Literal FLOAT Values
 :py:attr:`~.DataType.FLOAT` literals may be expressed in either binary, octal, decimal, or hexadecimal formats. The
 binary, octal and hexadecimal formats use the ``0b``, ``0o``, and ``0x`` prefixes respectively. Values in the decimal
 format require no prefix and is the default base in which values are represented. Only base-10, decimal values may
-include a decimal place component.
+include a decimal place component. Binary, octal and hexadecimal values with more digits, once converted to base-10,
+than allowed by the *int_max_digits* parameter of :py:class:`~rule_engine.engine.Context` raise an
+:py:class:`~rule_engine.errors.ArithmeticError`.
 
 Example rules showing equivalent literal expressions:
 

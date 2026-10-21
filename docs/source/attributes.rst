@@ -145,6 +145,9 @@ FLOAT Attributes :sup:`1`
 Due to the syntax of floating point literals, the attributes must be accessed using parenthesis. For example
 ``3.14.to_str`` is invalid while ``(3.14).to_str`` is valid.
 
+The ``ceiling`` and ``floor`` attributes raise an :py:class:`~rule_engine.errors.ArithmeticError` if their result would
+have more digits than allowed by the *int_max_digits* parameter of :py:class:`~rule_engine.engine.Context`.
+
 Encoding and Decoding
 ^^^^^^^^^^^^^^^^^^^^^
 :py:attr:`~.DataType.BYTES` values can be converted to :py:attr:`~.DataType.STRING` values by calling their ``.decode``

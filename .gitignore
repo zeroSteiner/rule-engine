@@ -16,5 +16,6 @@ docs/html
 examples/shodan/*.json
 lib/rule_engine.egg-info/*
 lib/rule_engine/parser/parser.out
+lib/rule_engine/parser/parsetab.json
 lib/rule_engine/parser/parsetab.py
 AGENTS.md

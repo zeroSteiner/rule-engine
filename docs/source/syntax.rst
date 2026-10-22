@@ -304,9 +304,17 @@ difference comes in an optional leading character before the opening quote. Eith
 :py:attr:`~.DataType.STRING` value in which backslashes are treated literally, while a single ``d`` will specify a
 :py:attr:`~.DataType.DATETIME` value, and a single ``t`` will specify a :py:attr:`~.DataType.TIMEDELTA` value.
 
+The contents of a standard :py:attr:`~.DataType.STRING` literal may use Python-style escape sequences by specifying
+``\`` followed by a single selection of ``\'"abfnrtv``, one to three octal digits, ``x`` followed by two hexadecimal
+digits, ``u`` followed by four, ``U`` followed by eight, or ``N{name}`` with the name of a Unicode character. A
+backslash followed by any other printable ASCII character is kept as a literal backslash, so ``"\."`` is the same two
+character string as ``r"\."``. An invalid escape sequence, such as ``\x`` without two hexadecimal digits or ``\N{...}``
+with an unknown name, raises a :py:exc:`~rule_engine.errors.StringSyntaxError`. Because ``\b`` is a backspace in a
+standard string, regular expressions are easier to write as raw strings.
+
 Raw string literals (``r'...'`` / ``r"..."``) are useful when writing values that contain backslashes such as regular
 expressions or Windows-style paths. In a raw string, ``\`` is always a literal backslash — no escape sequences are
-processed. For example, ``r'\w+'`` is a four character string identical to ``'\\w+'``. As in Python, a backslash
+processed. For example, ``r'\w+'`` is a three character string identical to ``'\\w+'``. As in Python, a backslash
 still prevents the following quote character from terminating the string, but the backslash itself is retained, so
 ``r'it\'s'`` is the five character string ``it\'s``. A raw string literal cannot end with an odd number of trailing
 backslashes.

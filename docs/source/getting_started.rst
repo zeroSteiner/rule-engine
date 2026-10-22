@@ -102,7 +102,7 @@ Basic Usage
 
          rule = rule_engine.Rule(
            # match books with a title starting with 'Captain '
-           'title =~ "Captain\s\S+"'
+           r'title =~ "Captain\s\S+"'
          )
 
 #. Once the rule object has been defined, it can be applied to target object(s). Two primary methods are available for

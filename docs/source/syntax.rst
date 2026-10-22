@@ -540,8 +540,9 @@ Regular Expression Related
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * ``re_groups`` (type: :py:attr:`~.DataType.ARRAY`) -- An array of strings from the last regular expression match as
-  defined by the regular expression itself. See documentation on `grouping`_ for more information. If no match has taken
-  place, this value is :py:attr:`~.DataType.NULL`.
+  defined by the regular expression itself. See documentation on `grouping`_ for more information. A group that did not
+  participate in the match, such as an optional group, is :py:attr:`~.DataType.NULL`. If no match has taken place, this
+  value is :py:attr:`~.DataType.NULL`.
 
   .. note:: For technical reasons, this symbol is provided by the default :py:attr:`~engine.Context` and is not included
     within the :py:meth:`~engine.Builtins.from_defaults`. This means that unlike the other symbols listed here, it will

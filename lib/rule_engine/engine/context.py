@@ -208,7 +208,7 @@ class _ThreadLocalStorage(object):
     """
     __slots__ = ('assignment_scopes', 'regex_groups')
     assignment_scopes: 'collections.deque[dict[str, ast.Assignment]]'
-    regex_groups: tuple[str, ...] | None
+    regex_groups: tuple[str | None, ...] | None
     def __init__(self) -> None:
         self.assignment_scopes = collections.deque()
         self.regex_groups = None
@@ -306,7 +306,7 @@ class Context(object):
         """The *default_value* parameter from :py:meth:`~__init__`"""
         self.builtins = builtins.Builtins.from_defaults(
                 values={'re_groups': builtins.BuiltinValueGenerator(functools.partial(_tls_getter, self._thread_local, 'regex_groups'))},
-                value_types={'re_groups': types.DataType.ARRAY(types.DataType.STRING)},
+                value_types={'re_groups': builtins._RE_GROUPS_TYPE},
                 timezone=default_timezone
         )
         """An instance of :py:class:`~rule_engine.builtins.Builtins` to provided a default set of builtin symbol values."""
@@ -362,7 +362,7 @@ class Context(object):
         self._mapping_fallback_lock = threading.Lock()
         self.builtins = builtins.Builtins.from_defaults(
                 values={'re_groups': builtins.BuiltinValueGenerator(functools.partial(_tls_getter, self._thread_local, 'regex_groups'))},
-                value_types={'re_groups': types.DataType.ARRAY(types.DataType.STRING)},
+                value_types={'re_groups': builtins._RE_GROUPS_TYPE},
                 timezone=self.default_timezone
         )
 

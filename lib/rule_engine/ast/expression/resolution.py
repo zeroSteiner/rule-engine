@@ -32,6 +32,7 @@
 
 from typing import TYPE_CHECKING, Any, Iterable
 
+from ... import builtins as _builtins
 from ... import errors
 from ...types import DataType
 from ...types import _CollectionDataTypeDef, _DataTypeDef, _FunctionDataTypeDef, _MappingDataTypeDef
@@ -107,8 +108,11 @@ class SymbolExpression(ExpressionBase):
                 return value
             if value_type.value_type == DataType.UNDEFINED:
                 return value
-            if effective_type.value_type != DataType.NULL and not effective_type.value_type_nullable and any(v is None for v in value):
-                raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
+            # $re_groups holds None for groups that did not participate in the match (see _RE_GROUPS_TYPE); the type
+            # object can be passed on to other symbols (e.g. comprehension variables) so check the symbol site too
+            if not (self.scope == _builtins.Builtins.scope_name and effective_type is _builtins._RE_GROUPS_TYPE):
+                if effective_type.value_type != DataType.NULL and not effective_type.value_type_nullable and any(v is None for v in value):
+                    raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
             if DataType.is_compatible(effective_type.value_type, value_type.value_type):
                 return value
 

@@ -33,6 +33,7 @@
 import contextlib
 import datetime
 import decimal
+import pickle
 import random
 import string
 import unittest
@@ -224,6 +225,56 @@ class BuiltinsTests(unittest.TestCase):
 
         self.assertFalse(rule.matches({'words': ''.join(words), 'word0': words[0]}))
         self.assertIsNone(context._tls.regex_groups)
+
+    def test_builtins_re_groups_exemption_is_only_for_re_groups(self):
+        # a custom builtin of the same type still rejects None members, the exemption is for the $re_groups type object
+        context = engine.Context()
+        context.builtins = builtins.Builtins.from_defaults(
+                values={'groups': ('a', None)},
+                value_types={'groups': types.DataType.ARRAY(types.DataType.STRING)}
+        )
+        with self.assertRaises(errors.SymbolTypeError):
+            engine.Rule('$groups', context=context).evaluate({})
+
+    def test_builtins_re_groups_optional_group(self):
+        # an optional group that does not participate in the match is None, and the other groups are still available
+        context = engine.Context()
+        rule = engine.Rule(r'word =~ "(a)(c)?b" and $re_groups[0] == "a" and $re_groups[1] == null', context=context)
+        self.assertTrue(rule.matches({'word': 'ab'}))
+        self.assertEqual(context._tls.regex_groups, ('a', None))
+        self.assertFalse(rule.matches({'word': 'acb'}))
+        self.assertEqual(context._tls.regex_groups, ('a', 'c'))
+        self.assertTrue(pickle.loads(pickle.dumps(rule)).matches({'word': 'ab'}))
+
+        # the members are still typed as strings, so rules that use them as strings keep parsing
+        self.assertEqual(
+                context.resolve_type('re_groups', scope=builtins.Builtins.scope_name),
+                types.DataType.ARRAY(types.DataType.STRING)
+        )
+        rule = engine.Rule(r'word =~ "(a)(c)?b" and $re_groups[1] =~ "c"', context=context)
+        self.assertFalse(rule.matches({'word': 'ab'}))
+        self.assertTrue(rule.matches({'word': 'acb'}))
+
+        # other symbols of the same type still reject None members
+        context = engine.Context(type_resolver={'groups': types.DataType.ARRAY(types.DataType.STRING)})
+        with self.assertRaises(errors.SymbolTypeError):
+            engine.Rule('groups', context=context).evaluate({'groups': ('a', None)})
+
+        # including a symbol typed with the very type object that $re_groups uses
+        re_groups_type = engine.Context().resolve_type('re_groups', scope=builtins.Builtins.scope_name)
+        context = engine.Context(type_resolver={'groups': re_groups_type})
+        with self.assertRaises(errors.SymbolTypeError):
+            engine.Rule('groups', context=context).evaluate({'groups': ('a', None)})
+
+        # and a comprehension variable whose type is inferred from $re_groups
+        context = engine.Context(type_resolver={
+                'word': types.DataType.STRING,
+                'obj': types.DataType.MAPPING(types.DataType.STRING, types.DataType.ARRAY(types.DataType.STRING))
+        })
+        rule = engine.Rule(r'word =~ "(a)(c)?b" and [x for x in [$re_groups, obj["k"]]]', context=context)
+        self.assertTrue(rule.matches({'word': 'acb', 'obj': {'k': ('b',)}}))
+        with self.assertRaises(errors.SymbolTypeError):
+            rule.evaluate({'word': 'acb', 'obj': {'k': ('a', None)}})
 
     def test_builtins_recursive(self):
         blts = builtins.Builtins({'count': 1, 'owner': {'name': 'Spencer McIntyre'}}, namespace='people')

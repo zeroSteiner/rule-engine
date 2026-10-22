@@ -128,12 +128,12 @@ class GitHubIssueTests(unittest.TestCase):
         value = re.escape("joe.blogs")
 
         # Check if the some_attribute key in the dictionary matches 'joe.blogs' exactly
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter('always', SyntaxWarning)
-            engine.Rule(rf'some_attribute =~ "^{value}$"')
-            for warning in w:
-                if issubclass(warning.category, SyntaxWarning):
-                    self.fail('SyntaxWarning was raised')
+        with warnings.catch_warnings(record=True) as captured:
+            warnings.simplefilter('always')
+            rule = engine.Rule(rf'some_attribute =~ "^{value}$"')
+        self.assertEqual([str(warning.message) for warning in captured], [], msg='a warning was raised')
+        self.assertTrue(rule.matches({'some_attribute': 'joe.blogs'}))
+        self.assertFalse(rule.matches({'some_attribute': 'joe1blogs'}))
 
     def test_number_104(self):
         rule = engine.Rule(r"'André' in name")

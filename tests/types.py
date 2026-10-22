@@ -445,6 +445,45 @@ class DataTypeTests(unittest.TestCase):
             with self.subTest(label):
                 self.assertEqual(restored, DataType.UNDEFINED)
 
+    def test_data_type_pickle_constants_keep_identity(self):
+        hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+        for name in DataType:
+            data_type = DataType[name]
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, name=name):
+                    self.assertIs(restored, data_type)
+                    self.assertTrue(DataType.is_type(restored, data_type))
+        for label, restored in _restore_data_type(DataType.OBJECT):
+            with self.subTest(label):
+                # the bare OBJECT is compatible with every OBJECT schema
+                self.assertTrue(DataType.is_compatible(restored, hero))
+        for label, restored in _restore_data_type(DataType.ARRAY(DataType.STRING)):
+            with self.subTest(label):
+                self.assertIs(restored.value_type, DataType.STRING)
+        # other instances that are equal to a constant are still copied
+        for label, restored in _restore_data_type(types._DataTypeDef('STRING', str)):
+            with self.subTest(label):
+                self.assertEqual(restored, DataType.STRING)
+                self.assertIsNot(restored, DataType.STRING)
+
+    def test_data_type_pickle_names_that_are_not_constants(self):
+        # the name isn't always a string, or even set
+        unnamed = types._DataTypeDef.__new__(types._DataTypeDef)
+        unnamed.python_type = str
+        for data_type in (
+                DataType.OBJECT(None),
+                DataType.OBJECT(1),
+                DataType.OBJECT(['STRING']),
+                types._DataTypeDef(None, str),
+                DataType.OBJECT.reference(None),
+                unnamed,
+        ):
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, data_type=type(data_type).__name__):
+                    self.assertIsNot(restored, data_type)
+                    self.assertIs(type(restored), type(data_type))
+                    self.assertEqual(getattr(restored, 'name', 'unset'), getattr(data_type, 'name', 'unset'))
+
     def test_data_type_pickle_undefined_copies_replaced(self):
         # pickles that earlier versions wrote hold copies of UNDEFINED, wherever a data type can hold one
         other = type(DataType.UNDEFINED)('UNDEFINED', errors.UNDEFINED)

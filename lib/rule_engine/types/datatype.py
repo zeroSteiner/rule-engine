@@ -141,6 +141,9 @@ class DataType(metaclass=DataTypeMeta):
 
       This checks that the types are compatible without any kind of conversion. When dealing with compound data types,
       this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.
+
+    .. versionchanged:: 5.1.1
+            The constants keep their identity when they are pickled or copied.
     """
     ARRAY = _ArrayDataTypeDef('ARRAY', tuple)
     BYTES = _DataTypeDef('BYTES', bytes)

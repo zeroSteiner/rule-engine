@@ -72,6 +72,15 @@ class _DataTypeDef(object):
     def __repr__(self) -> str:
         return "<{} name={} python_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__)
 
+    def __reduce_ex__(self, protocol: SupportsIndex) -> str | tuple[Any, ...]:
+        # restore the DataType constants themselves so identity checks (e.g. DataType.is_type for the scalar types)
+        # still work after pickle or copy, protocols 0 and 1 still raise TypeError like they do for the other data types
+        from .datatype import DataType
+        name: Any = getattr(self, 'name', None)
+        if operator.index(protocol) >= 2 and name in DataType and DataType[name] is self:
+            return (getattr, (DataType, name))
+        return super().__reduce_ex__(protocol)
+
     @property
     def is_compound(self) -> bool:
         return not self.is_scalar

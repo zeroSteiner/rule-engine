@@ -304,9 +304,10 @@ A few Python-style edge cases worth knowing:
 - ``non_nullable_value ?? null`` gives a ``NULLABLE`` result type. The static analysis conservatively wraps the
   result whenever the right operand is ``null``, even if the left can never be ``None`` at runtime.
 
-The legacy ``attributes_nullable`` / ``value_type_nullable`` kwargs on :py:class:`~DataType.OBJECT` and compound-type
-constructors are still accepted in v5 for backward compatibility but emit a :py:class:`DeprecationWarning` and will
-be removed in v6.0. Wrap the attribute or element type in :py:attr:`~DataType.NULLABLE` directly instead.
+The legacy ``value_type_nullable`` kwarg on the :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.SET`, and
+:py:attr:`~DataType.MAPPING` constructors is still accepted in v5 for backward compatibility but emits a
+:py:class:`DeprecationWarning` and will be removed in v6.0. Wrap the element or value type in
+:py:attr:`~DataType.NULLABLE` directly instead.
 
 FLOAT
 -----

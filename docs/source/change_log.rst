@@ -101,11 +101,10 @@ Released :release:`5.0.0` on May 17th, 2026
       (``and``, ``or``, ``not``), ternary expressions, and safe-navigation operators remain lenient.
     * A new null-coalesce operator ``left ?? right`` discharges ``NULLABLE(T)`` to ``T``. Existing safe attribute
       (``&.``) and item (``&[``) accessors still apply to nullable receivers and are the only access forms that do.
-* **Deprecated:** The ``attributes_nullable`` kwarg on :py:attr:`~rule_engine.types.DataType.OBJECT` and the
-  ``value_type_nullable`` kwarg on :py:attr:`~rule_engine.types.DataType.ARRAY`, :py:attr:`~rule_engine.types.DataType.SET`,
-  and :py:attr:`~rule_engine.types.DataType.MAPPING` now emit :py:class:`DeprecationWarning`. Wrap the relevant
-  attribute or element type in :py:attr:`~rule_engine.types.DataType.NULLABLE` instead. The kwargs will be removed
-  in v6.0.
+* **Deprecated:** The ``value_type_nullable`` kwarg on :py:attr:`~rule_engine.types.DataType.ARRAY`,
+  :py:attr:`~rule_engine.types.DataType.SET`, and :py:attr:`~rule_engine.types.DataType.MAPPING` now emits
+  :py:class:`DeprecationWarning`. Wrap the relevant element or value type in
+  :py:attr:`~rule_engine.types.DataType.NULLABLE` instead. The kwarg will be removed in v6.0.
 * **Deprecated:** Accessing :py:attr:`~rule_engine.types.DataType.MAPPING` keys via dot syntax (``mapping.key``) now
   emits a :py:class:`~rule_engine.errors.MappingAttributeLookupDeprecation` warning. Use bracket syntax
   (``mapping["key"]``) instead. This fallback will be removed in v6.0. Set ``Context(mapping_attribute_lookup=False)``

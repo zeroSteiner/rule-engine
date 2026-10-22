@@ -567,6 +567,28 @@ class ParserTablesCliTests(unittest.TestCase):
         with open(self.path, 'rb') as file_h, open(path, 'rb') as written_h:
             self.assertEqual(file_h.read(), written_h.read())
 
+    def test_main_debug(self):
+        with open(self.path, 'rb') as file_h:
+            content = file_h.read()
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, 'written.json')
+            # ply only describes the tables it builds, so it must not find the matching tables available here
+            with unittest.mock.patch.object(engine.Rule, 'parser', _generated_parser()), \
+                    unittest.mock.patch('pkgutil.get_data', return_value=content), \
+                    unittest.mock.patch.dict(sys.modules, {'rule_engine.parser.parsetab': _tables.load(self.path)}):
+                self.assertEqual(self._main('--debug', path), (0, 'Generating LALR tables\n'))
+            # the tables are the same and ply's debug output is the only other file written
+            self.assertEqual(sorted(os.listdir(directory)), ['parser.out', 'written.json'])
+            with open(self.path, 'rb') as file_h, open(path, 'rb') as written_h:
+                self.assertEqual(file_h.read(), written_h.read())
+            with open(os.path.join(directory, 'parser.out'), 'r', encoding='utf-8') as file_h:
+                lines = file_h.read().splitlines()
+        # the debug output describes every rule of the grammar and every state of the tables
+        for number, production in enumerate(self.document['productions']):
+            self.assertIn('Rule {:<5d} {}'.format(number, production[0]), lines)
+        for state in self.document['action']:
+            self.assertIn('state ' + state, lines)
+
     def test_main_check(self):
         self.assertEqual(self._main('--check', self.path), (0, ''))
 
@@ -623,7 +645,17 @@ class ParserTablesCliTests(unittest.TestCase):
         )
 
     def test_main_usage_error(self):
-        for argv in ((), ('--bogus',), ('one.json', 'two.json')):
+        usage_errors = (
+            (),
+            ('--bogus',),
+            ('one.json', 'two.json'),
+            ('--debug',),
+            ('--check', '--debug', 'one.json'),
+            # the debug output would replace the tables
+            ('--debug', 'parser.out'),
+            ('--debug', os.path.join(self._directory.name, 'parser.out'))
+        )
+        for argv in usage_errors:
             with self.assertRaises(SystemExit) as context:
                 self._main(*argv)
             self.assertEqual(context.exception.code, 2, msg=argv)

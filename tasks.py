@@ -4,8 +4,10 @@ import shutil
 from invoke import task
 
 PARSER_TABLES = 'lib/rule_engine/parser/parsetab.json'
-# the generated tables and the files ply wrote in older versions
-PARSER_FILES = (PARSER_TABLES, 'lib/rule_engine/parser/parsetab.py', 'lib/rule_engine/parser/parser.out')
+# the generated tables and the parsetab.py that older versions wrote
+PARSER_FILES = (PARSER_TABLES, 'lib/rule_engine/parser/parsetab.py')
+# ply's description of the grammar, nothing reads it
+PARSER_DEBUG = 'lib/rule_engine/parser/parser.out'
 
 
 @task
@@ -14,7 +16,7 @@ def clean(c):
     # a stale SOURCES.txt in the egg-info can add leftover files to the sdist
     for path in ('build', 'dist', 'lib/rule_engine.egg-info'):
         shutil.rmtree(path, ignore_errors=True)
-    for path in PARSER_FILES:
+    for path in PARSER_FILES + (PARSER_DEBUG,):
         pathlib.Path(path).unlink(missing_ok=True)
 
 
@@ -31,14 +33,15 @@ def docs(c):
     c.run('uv run sphinx-build -b html -a -E -v docs/source docs/html')
 
 
-@task
-def tables(c):
+@task(help={'debug': 'Also write the grammar debug output to parser.out.'})
+def tables(c, debug=False):
     """Generate the parser tables."""
     # existing tables would be loaded and dumped again with stale line numbers, and the parser would still import the
-    # parsetab.py older versions left behind
+    # parsetab.py older versions left behind, the debug output is kept because the tests task runs this one again
+    # without --debug
     for path in PARSER_FILES:
         pathlib.Path(path).unlink(missing_ok=True)
-    c.run('uv run python -m rule_engine.parser ' + PARSER_TABLES)
+    c.run('uv run python -m rule_engine.parser ' + ('--debug ' if debug else '') + PARSER_TABLES)
 
 
 @task(pre=[tables], help={'coverage': 'Measure test coverage and print a report.'})

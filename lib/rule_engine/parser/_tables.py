@@ -45,6 +45,7 @@ if TYPE_CHECKING:
 
 _PACKAGE = 'rule_engine.parser'
 _FILENAME = 'parsetab.json'
+_DEBUG_FILENAME = 'parser.out'
 _MODULE_NAME = _PACKAGE + '.parsetab'
 # the types of a production's str, name, len, func, file and line fields
 _PRODUCTION_TYPES: tuple[type | tuple[type, ...], ...] = (
@@ -92,6 +93,31 @@ def dump(parser: 'ParserBase', path: str) -> None:
     }
     with open(path, 'w', encoding='utf-8') as file_h:
         json.dump(tables, file_h, separators=(',', ':'), sort_keys=True)
+
+def dump_debug(path: str) -> None:
+    """Build the tables of the rule parser and write ply's description of the grammar and its states to *path*."""
+    # imported here to avoid a circular import
+    from . import Parser
+    # tables without a signature never match the grammar, so ply builds new ones and describes them while it does
+    tables = types.ModuleType(_MODULE_NAME)
+    tables.__dict__.update(
+        _tabversion=yacc.__tabversion__,
+        _lr_action={},
+        _lr_goto={},
+        _lr_productions=[],
+        _lr_method='LALR',
+        _lr_signature=None
+    )
+    # yacc() uses the directory of the table module as the output directory
+    tables.__file__ = path
+    with open(path, 'w', encoding='utf-8') as file_h:
+        yacc.yacc(
+            module=Parser.__new__(Parser),
+            debug=True,
+            tabmodule=tables,
+            write_tables=False,
+            debuglog=yacc.PlyLogger(file_h)
+        )
 
 def _states(data: Any) -> dict[int, dict[str, int | None]]:
     states = {}
@@ -192,14 +218,24 @@ def main(argv: list[str] | None = None) -> int:
         prog='python -m rule_engine.parser',
         description='Rule Engine: Generate the parser tables'
     )
-    arg_parser.add_argument('--check', action='store_true', help='check that the tables in PATH can be used')
+    modes = arg_parser.add_mutually_exclusive_group()
+    modes.add_argument('--check', action='store_true', help='check that the tables in PATH can be used')
+    modes.add_argument(
+        '--debug',
+        action='store_true',
+        help='also write the grammar debug output to ' + _DEBUG_FILENAME + ' next to PATH'
+    )
     arg_parser.add_argument('path', metavar='PATH', nargs='?', help='the tables file (optional with --check)')
     arguments = arg_parser.parse_args(argv)
     if arguments.check:
         return _check(arguments.path)
     if arguments.path is None:
         arg_parser.error('the following arguments are required: PATH')
+    if arguments.debug and os.path.basename(arguments.path) == _DEBUG_FILENAME:
+        arg_parser.error('PATH can not be named ' + _DEBUG_FILENAME + ' with --debug')
     # importing the package already built the rule parser, so write its tables instead of building them again
     from ..engine import Rule
     dump(Rule.parser, arguments.path)
+    if arguments.debug:
+        dump_debug(os.path.join(os.path.dirname(arguments.path), _DEBUG_FILENAME))
     return 0

@@ -38,7 +38,14 @@ import types as pytypes
 import typing
 from typing import Any, Callable, cast
 
-from .definitions import _DataTypeDef, _MappingDataTypeDef, _NullableDataTypeDef, _ReferenceDataTypeDef
+from .. import errors
+from .definitions import (
+        _DataTypeDef,
+        _MappingDataTypeDef,
+        _NullableDataTypeDef,
+        _ReferenceDataTypeDef,
+        _SelfReferenceDataTypeDef,
+)
 from ._object import _ObjectDataTypeDef
 
 def _resolve_forward_ref(annotation: Any, owner_cls: type) -> Any:
@@ -90,7 +97,7 @@ def _resolve_dataclass_field_type(
     :py:class:`_SelfReferenceDataTypeDef` for direct self-references). *seen* maps each ancestor dataclass on the
     build stack to the OBJECT name it will be registered under (used to emit unresolved references for mutual
     recursion). When *strict* is ``False``, annotations that cannot be mapped to a Rule Engine type fall back to
-    :py:attr:`DataType.UNDEFINED` instead of raising :py:exc:`ValueError`.
+    :py:attr:`DataType.UNDEFINED` instead of raising.
     """
     # deferred to avoid the dataclass.py -> datatype.py import cycle
     from .datatype import DataType
@@ -104,24 +111,30 @@ def _resolve_dataclass_field_type(
 
     origin = typing.get_origin(annotation)
     args = typing.get_args(annotation)
-    if origin is not None and args:
-        resolved_args = tuple(_resolve_forward_ref(arg, current_cls) for arg in args)
-        contains_dataclass = any(
-            isinstance(arg, type) and dataclasses.is_dataclass(arg) for arg in resolved_args
-        )
-        if contains_dataclass:
-            origin_type = DataType.from_type(origin)
-            if origin_type is DataType.ARRAY:
-                return DataType.ARRAY(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict))
-            if origin_type is DataType.SET:
-                return DataType.SET(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict))
-            if origin_type is DataType.MAPPING:
-                key_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict)
-                value_type = _resolve_dataclass_field_type(resolved_args[1], current_cls, seen, strict)
-                return cast(_MappingDataTypeDef, DataType.MAPPING(key_type, value_type))
     try:
+        if origin is not None and args:
+            resolved_args = tuple(_resolve_forward_ref(arg, current_cls) for arg in args)
+            contains_dataclass = any(
+                isinstance(arg, type) and dataclasses.is_dataclass(arg) for arg in resolved_args
+            )
+            if contains_dataclass:
+                origin_type = DataType.from_type(origin)
+                if origin_type is DataType.ARRAY:
+                    return DataType.ARRAY(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict))
+                if origin_type is DataType.SET:
+                    value_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict)
+                    # SET rejects OBJECT members, but a self reference only becomes one when the schema is built
+                    if isinstance(_NullableDataTypeDef.unwrap(value_type), _SelfReferenceDataTypeDef):
+                        raise errors.EngineError('the OBJECT data type may not be used as a SET member')
+                    return DataType.SET(value_type)
+                if origin_type is DataType.MAPPING:
+                    key_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict)
+                    value_type = _resolve_dataclass_field_type(resolved_args[1], current_cls, seen, strict)
+                    return cast(_MappingDataTypeDef, DataType.MAPPING(key_type, value_type))
         return DataType.from_type(annotation)
-    except (TypeError, ValueError):
+    except (errors.EngineError, TypeError, ValueError):
+        # data types raise EngineError for member types they reject, such as a NULLABLE mapping key or an OBJECT set
+        # member
         if strict:
             raise
         return DataType.UNDEFINED

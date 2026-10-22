@@ -781,6 +781,11 @@ class _MappingSelfRefHero:
     name: str
     allies: dict[str, '_MappingSelfRefHero'] = dataclasses.field(default_factory=dict)
 
+@dataclasses.dataclass(frozen=True)
+class _SetSelfRefHero:
+    name: str
+    allies: set['_SetSelfRefHero'] = dataclasses.field(default_factory=set)
+
 @dataclasses.dataclass
 class _MutualPerson:
     name: str
@@ -1293,6 +1298,46 @@ class ObjectDataTypeTests(unittest.TestCase):
                     self.assertEqual(restored, data_type)
                     self.assertEqual(hash(restored), hash(data_type))
                     self.assertEqual(repr(restored), repr(data_type))
+
+    def test_object_from_dataclass_unsupported_member_type_strict(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        # the data types reject these member types with an EngineError
+        for annotation in (dict[str | None, str], set[Address], dict[Address, int]):
+            Hero = dataclasses.make_dataclass('Hero', [('name', str), ('value', annotation)])
+            with self.assertRaises(errors.EngineError, msg=repr(annotation)):
+                DataType.OBJECT.from_dataclass('Hero', Hero)
+        for annotation in (frozenset[Address], Address | int):
+            Hero = dataclasses.make_dataclass('Hero', [('name', str), ('value', annotation)])
+            with self.assertRaises((TypeError, ValueError), msg=repr(annotation)):
+                DataType.OBJECT.from_dataclass('Hero', Hero)
+        with self.assertRaises(errors.EngineError):
+            DataType.OBJECT.from_dataclass('Hero', _SetSelfRefHero)
+
+    def test_object_from_dataclass_unsupported_member_type_non_strict(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            nicknames: dict[str | None, str]
+            addresses: set[Address]
+            visits: dict[Address, int]
+            homes: frozenset[Address]
+            home: Address | int
+
+        result = DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        for attribute in ('nicknames', 'addresses', 'visits', 'homes', 'home'):
+            self.assertIs(result.attributes[attribute], DataType.UNDEFINED, msg=attribute)
+
+        result = DataType.OBJECT.from_dataclass('Hero', _SetSelfRefHero, strict=False)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        self.assertIs(result.attributes['allies'], DataType.UNDEFINED)
 
 inf = float('inf')
 nan = float('nan')

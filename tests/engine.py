@@ -520,6 +520,19 @@ class EngineTests(unittest.TestCase):
         self.assertIs(type_resolver('name'), types.DataType.STRING)
         self.assertIs(type_resolver('identifier'), types.DataType.UNDEFINED)
 
+    def test_engine_type_resolver_from_dataclass_non_strict_unsupported_member_type(self):
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            # MAPPING rejects NULLABLE keys
+            scores: dict[str | None, int]
+
+        type_resolver = engine.type_resolver_from_dataclass(Hero, strict=False)
+        self.assertIs(type_resolver('name'), types.DataType.STRING)
+        self.assertIs(type_resolver('scores'), types.DataType.UNDEFINED)
+        context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
+        self.assertTrue(engine.Rule('scores["round 1"] == 10', context=context).matches(Hero('Batman', {'round 1': 10})))
+
     def test_engine_type_resolver_from_dataclass_preserves_nullable(self):
         type_resolver = engine.type_resolver_from_dataclass(_ResolverNullableHero)
         self.assertEqual(type_resolver('name'), types.DataType.NULLABLE(types.DataType.STRING))

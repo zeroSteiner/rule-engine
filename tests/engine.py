@@ -31,11 +31,12 @@
 #
 
 import collections
+import contextlib
 import copy
 import dataclasses
 import datetime
 import decimal
-import os
+import io
 import pickle
 import re
 import sys
@@ -681,11 +682,9 @@ class EngineRuleTests(unittest.TestCase):
             engine.Rule('b"a" < b"b"')
 
     def test_engine_rule_debug_parser(self):
-        with open(os.devnull, 'w') as file_h:
-            original_stderr = sys.stderr
-            sys.stderr = file_h
+        # the debug parser prints ply's debug output
+        with contextlib.redirect_stderr(io.StringIO()):
             debug_rule = engine.DebugRule(self.rule_text)
-            sys.stderr = original_stderr
         self.test_engine_rule_matches(rule=debug_rule)
         self.test_engine_rule_filter(rule=debug_rule)
 

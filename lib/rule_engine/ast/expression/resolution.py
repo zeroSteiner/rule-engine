@@ -42,6 +42,10 @@ from ..base import ExpressionBase, LiteralExpressionBase, _is_reduced
 if TYPE_CHECKING:
     from ...engine.context import Context
 
+def _null_allowed(member_type: _DataTypeDef) -> bool:
+    """Whether a member slot of *member_type* may hold ``None``."""
+    return member_type == DataType.UNDEFINED or member_type == DataType.NULL or DataType.is_type(member_type, DataType.NULLABLE)
+
 class SymbolExpression(ExpressionBase):
     """
     A class representing a symbol name to be resolved at evaluation time with the help of a
@@ -111,8 +115,14 @@ class SymbolExpression(ExpressionBase):
             # $re_groups holds None for groups that did not participate in the match (see _RE_GROUPS_TYPE); the type
             # object can be passed on to other symbols (e.g. comprehension variables) so check the symbol site too
             if not (self.scope == _builtins.Builtins.scope_name and effective_type is _builtins._RE_GROUPS_TYPE):
-                if effective_type.value_type != DataType.NULL and not effective_type.value_type_nullable and any(v is None for v in value):
-                    raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
+                if effective_type.value_type != DataType.NULL and not effective_type.value_type_nullable:
+                    # for a MAPPING this checks the keys, not the values; a None key is fine when the key type allows
+                    # it, but a None value found alongside it stays an error
+                    has_null = any(v is None for v in value)
+                    if has_null and isinstance(effective_type, _MappingDataTypeDef) and _null_allowed(effective_type.key_type):
+                        has_null = any(v is None for v in value.values())
+                    if has_null:
+                        raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
             if DataType.is_compatible(effective_type.value_type, value_type.value_type):
                 return value
 

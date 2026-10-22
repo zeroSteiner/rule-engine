@@ -326,6 +326,29 @@ class SymbolExpressionTests(unittest.TestCase):
         except errors.SymbolTypeError:
             self.fail('raises SymbolTypeError when it should not')
 
+    def test_ast_expression_symbol_type_mapping_null_keys(self):
+        DataType = types.DataType
+        def evaluate(data_type, value):
+            context = engine.Context(type_resolver={'thing': data_type})
+            return ast.SymbolExpression(context, 'thing').evaluate({'thing': value})
+
+        # a None key is valid when the key type allows it
+        for data_type, value in (
+                (DataType.MAPPING(DataType.UNDEFINED, DataType.STRING), {None: 'b'}),
+                (DataType.MAPPING(DataType.UNDEFINED, DataType.STRING), {None: 'b', 'a': 'c'}),
+                (DataType.MAPPING(DataType.NULL, DataType.STRING), {None: 'b'}),
+        ):
+            self.assertEqual(evaluate(data_type, value), value)
+
+        # but not when it doesn't, and not alongside a None value
+        for data_type, value in (
+                (DataType.MAPPING(DataType.STRING, DataType.STRING), {None: 'b'}),
+                (DataType.MAPPING(DataType.FLOAT, DataType.STRING), {None: 'b'}),
+                (DataType.MAPPING(DataType.UNDEFINED, DataType.STRING), {None: None, 'a': 'b'}),
+        ):
+            with self.assertRaises(errors.SymbolTypeError):
+                evaluate(data_type, value)
+
 class SymbolExpressionConversionTests(unittest.TestCase):
     def setUp(self):
         self.sym_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))

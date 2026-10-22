@@ -682,6 +682,30 @@ class EngineRuleTests(unittest.TestCase):
                     rule.matches(thing)
                 self.assertEqual(error_context.exception.message, message)
 
+    def test_engine_rule_errors_str_and_pickle(self):
+        context = engine.Context(type_resolver=engine.type_resolver_from_dict({'name': types.DataType.STRING}))
+        for text, thing, error_class, message in (
+                (
+                    'name == "Luke"',
+                    {'name': 1},
+                    errors.SymbolTypeError,
+                    "symbol 'name' resolved to incorrect datatype (is: FLOAT, expected: STRING)"
+                ),
+                ('first_name == "Luke"', {}, errors.SymbolResolutionError, "unknown symbol: 'first_name'"),
+                ('name.unknown', {'name': 'Luke'}, errors.AttributeResolutionError, "unknown attribute: 'unknown'")
+            ):
+            with self.subTest(text=text):
+                with self.assertRaises(error_class) as error_context:
+                    engine.Rule(text, context=context).evaluate(thing)
+                error = error_context.exception
+                self.assertEqual(str(error), message)
+                self.assertEqual(error.message, message)
+                error2 = pickle.loads(pickle.dumps(error))
+                self.assertIsInstance(error2, error_class)
+                self.assertEqual(error2.args, error.args)
+                self.assertEqual(str(error2), message)
+                self.assertEqual(vars(error2), vars(error))
+
     def test_engine_rule_evaluate_any_type_operators(self):
         # ==, !=, and, and or accept values of any type
         context = engine.Context(type_resolver=engine.type_resolver_from_dict({

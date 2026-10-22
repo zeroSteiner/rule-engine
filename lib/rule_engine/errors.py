@@ -32,6 +32,7 @@
 
 from __future__ import annotations
 
+import copyreg
 import re
 from typing import TYPE_CHECKING, Any
 
@@ -63,6 +64,26 @@ def _format_data_type(data_type: _DataTypeDef) -> str:
     from .types import definitions  # avoid circular imports
     return definitions._format_data_type(data_type)
 
+def _reduce_error(error: BaseException) -> str | tuple[Any, ...]:
+    """
+    Reduce *error* for pickling and copying. Errors are created again from their arguments by default, which fails when
+    the error was created with some of its arguments passed by keyword, because those aren't part of the arguments.
+    Such errors are created without calling ``__init__`` instead, and their attributes, including the ones in slots,
+    are restored. Errors whose arguments fit ``__init__`` are reduced the default way.
+    """
+    import inspect  # it's slow to import and only needed here
+    try:
+        inspect.signature(type(error).__init__).bind(error, *error.args)
+    except TypeError:
+        pass
+    else:
+        return BaseException.__reduce__(error)
+    state = dict(error.__dict__)
+    for name in copyreg._slotnames(type(error)):  # type: ignore[attr-defined]
+        if hasattr(error, name):
+            state[name] = getattr(error, name)
+    return (copyreg.__newobj__, (type(error),) + error.args, state)  # type: ignore[attr-defined]
+
 class EngineError(Exception):
     """The base exception class from which other exceptions within this package inherit."""
     def __init__(self, message: str = '') -> None:
@@ -74,6 +95,12 @@ class EngineError(Exception):
 
     def __repr__(self) -> str:
         return "<{} message={!r} >".format(self.__class__.__name__, self.message)
+
+    def __str__(self) -> str:
+        # __init__ doesn't initialize the arguments, which are whatever positional arguments the error was created with
+        if not hasattr(self, 'message'):
+            return super(EngineError, self).__str__()
+        return str(self.message)
 
 class MappingAttributeLookupDeprecation(DeprecationWarning):
     """
@@ -182,6 +209,10 @@ class RegexSyntaxError(SyntaxError):
         self.value = value
         """The regular expression value which contains the syntax error which caused this exception to be raised."""
 
+    def __reduce__(self) -> str | tuple[Any, ...]:
+        # *error* and *value* are passed by keyword when the package raises this error
+        return _reduce_error(self)
+
 class RuleSyntaxError(SyntaxError):
     """An error raised for issues identified while parsing the grammar of the rule text."""
     def __init__(self, message: str, token: Any = None) -> None:
@@ -273,6 +304,10 @@ class AttributeTypeError(EvaluationError):
         )
         super(AttributeTypeError, self).__init__(message)
 
+    def __reduce__(self) -> str | tuple[Any, ...]:
+        # *is_value*, *is_type* and *expected_type* are passed by keyword when the package raises this error
+        return _reduce_error(self)
+
 class LookupError(EvaluationError):
     """
     An error raised when a lookup operation fails to obtain and *item* from a *container*. This is analogous to a
@@ -349,6 +384,10 @@ class SymbolTypeError(EvaluationError):
         )
         super(SymbolTypeError, self).__init__(message)
 
+    def __reduce__(self) -> str | tuple[Any, ...]:
+        # *is_value*, *is_type* and *expected_type* are passed by keyword when the package raises this error
+        return _reduce_error(self)
+
 class FunctionCallError(EvaluationError):
     """
     An error raised when there is an issue calling a function.
@@ -383,5 +422,5 @@ class ChainExhaustedError(EvaluationError):
         """The object that was evaluated by the chain."""
         super(ChainExhaustedError, self).__init__('no rule in the chain matched and no default value is set')
         # EngineError doesn't initialize the arguments so they would include *thing* when it's passed positionally, set
-        # them to the message to keep its contents out of str(), tracebacks and anything that serializes them
+        # them to the message to keep its contents out of anything that serializes them
         self.args = (self.message,)

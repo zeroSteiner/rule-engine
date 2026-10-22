@@ -31,8 +31,10 @@
 #
 
 import copy
+import copyreg
 import pickle
 import random
+import re
 import string
 import traceback
 import unittest
@@ -41,6 +43,19 @@ import rule_engine.errors as errors
 import rule_engine.types as types
 
 __all__ = ('ChainExhaustedErrorTests', 'ResolutionErrorTests', 'UndefinedSentinelTests')
+
+# subclasses like other packages may define, at the module level so they can be pickled
+class _SlotsEngineError(errors.EngineError):
+    __slots__ = ('code',)
+    def __init__(self, code):
+        super(_SlotsEngineError, self).__init__('code ' + str(code))
+        self.code = code
+
+class _SlotsSymbolTypeError(errors.SymbolTypeError):
+    __slots__ = ('code',)
+    def __init__(self, symbol_name, *, code, **kwargs):
+        super(_SlotsSymbolTypeError, self).__init__(symbol_name, **kwargs)
+        self.code = code
 
 class ResolutionErrorTests(unittest.TestCase):
     def test_attribute_error_repr(self):
@@ -126,6 +141,123 @@ class ResolutionErrorTests(unittest.TestCase):
                 error = errors.SymbolTypeError('name', is_value=1, is_type=data_type, expected_type=FLOAT)
                 self.assertEqual(error.message, message.format(spelling, 'FLOAT'))
                 self.assertIs(error.is_type, data_type)
+
+    def _engine_errors(self):
+        # an error of every class, created with the arguments the package raises it with, and the arguments it keeps
+        DataType = types.DataType
+        person = DataType.OBJECT('Person', attributes={'name': DataType.STRING})
+        return (
+            (errors.EngineError('message'), ('message',)),
+            (errors.EngineError(message='message'), ()),
+            (errors.EvaluationError('message'), ('message',)),
+            (errors.SyntaxError('message'), ('message',)),
+            (errors.BytesSyntaxError('message', 'value'), ('message', 'value')),
+            (errors.StringSyntaxError('message', 'value'), ('message', 'value')),
+            (errors.DatetimeSyntaxError('message', 'value'), ('message', 'value')),
+            (errors.FloatSyntaxError('message', 'value'), ('message', 'value')),
+            (errors.TimedeltaSyntaxError('message', 'value'), ('message', 'value')),
+            (errors.RegexSyntaxError('message', error=re.error('missing )'), value='('), ('message',)),
+            (errors.RuleSyntaxError('message', None), ('message', None)),
+            (
+                errors.AttributeResolutionError('name', {'object': 1}, thing={'thing': 1}, suggestion='nam'),
+                ('name', {'object': 1})
+            ),
+            (errors.ObjectAttributeError('name', person, suggestion='nam'), ('name', person)),
+            (
+                errors.AttributeTypeError(
+                    'name',
+                    {'object': 1},
+                    is_value=1,
+                    is_type=DataType.FLOAT,
+                    expected_type=DataType.STRING
+                ),
+                ('name', {'object': 1})
+            ),
+            (errors.LookupError({'container': 1}, 'item'), ({'container': 1}, 'item')),
+            (
+                errors.SymbolResolutionError('name', symbol_scope='scope', thing={'thing': 1}, suggestion='nam'),
+                ('name',)
+            ),
+            (
+                errors.SymbolTypeError('name', is_value=1, is_type=DataType.FLOAT, expected_type=DataType.STRING),
+                ('name',)
+            ),
+            (errors.FunctionCallError('message', error=ValueError('error'), function_name='function'), ('message',)),
+            (errors.ArithmeticError('message'), ('message',)),
+            (errors.ChainExhaustedError({'thing': 1}), ('no rule in the chain matched and no default value is set',))
+        )
+
+    def _error_state(self, error):
+        # exceptions in the arguments and attributes compare by identity, so compare the representations
+        attributes = dict(vars(error))
+        for name in copyreg._slotnames(type(error)):
+            attributes[name] = getattr(error, name)
+        attributes = sorted((key, repr(value)) for key, value in attributes.items())
+        return (type(error), repr(error.args), str(error), attributes)
+
+    def test_engine_error_str_is_the_message(self):
+        def subclasses(cls):
+            for subclass in cls.__subclasses__():
+                yield subclass
+                yield from subclasses(subclass)
+        classes = set(cls for cls in subclasses(errors.EngineError) if cls.__module__ == errors.__name__)
+        self.assertEqual(classes - set(type(error) for error, _ in self._engine_errors()), set())
+
+        for error, args in self._engine_errors():
+            with self.subTest(error=type(error).__name__, args=args):
+                self.assertEqual(str(error), error.message)
+                self.assertEqual(
+                    traceback.format_exception_only(type(error), error),
+                    ['rule_engine.errors.{}: {}\n'.format(type(error).__name__, error.message)]
+                )
+                self.assertEqual(error.args, args)
+
+        class CustomError(errors.EngineError):
+            def __init__(self, value):
+                # doesn't call EngineError.__init__ so there is no message
+                self.value = value
+        self.assertEqual(str(CustomError('value')), 'value')
+
+    def _subclass_errors(self):
+        DataType = types.DataType
+        return (
+            _SlotsEngineError(1),
+            _SlotsSymbolTypeError('name', code=1, is_value=1, is_type=DataType.FLOAT, expected_type=DataType.STRING)
+        )
+
+    def test_engine_error_reduce(self):
+        # errors whose arguments fit __init__ are reduced the default way, which calls it to create them again
+        DataType = types.DataType
+        for error in (
+                errors.RegexSyntaxError('message', re.error('missing )'), '('),
+                errors.AttributeTypeError('name', 'object', 1, DataType.FLOAT, DataType.STRING),
+                errors.SymbolTypeError('name', 1, DataType.FLOAT, DataType.STRING),
+                _SlotsEngineError(1)
+            ):
+            with self.subTest(error=type(error).__name__):
+                self.assertEqual(error.__reduce__(), BaseException.__reduce__(error))
+        # the others are created without calling __init__
+        for error in (
+                errors.RegexSyntaxError('message', error=re.error('missing )'), value='('),
+                errors.SymbolTypeError('name', is_value=1, is_type=DataType.FLOAT, expected_type=DataType.STRING),
+                self._subclass_errors()[1]
+            ):
+            with self.subTest(error=type(error).__name__):
+                self.assertIs(error.__reduce__()[0], copyreg.__newobj__)
+
+    def test_engine_error_pickle(self):
+        # protocols 0 and 1 can't pickle the data types in some of the attributes
+        for error in [error for error, _ in self._engine_errors()] + list(self._subclass_errors()):
+            for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
+                with self.subTest(error=type(error).__name__, protocol=protocol):
+                    error2 = pickle.loads(pickle.dumps(error, protocol=protocol))
+                    self.assertEqual(self._error_state(error2), self._error_state(error))
+
+    def test_engine_error_copy(self):
+        for error in [error for error, _ in self._engine_errors()] + list(self._subclass_errors()):
+            for copier in (copy.copy, copy.deepcopy):
+                with self.subTest(error=type(error).__name__, copier=copier.__name__):
+                    self.assertEqual(self._error_state(copier(error)), self._error_state(error))
 
 class ChainExhaustedErrorTests(unittest.TestCase):
     def test_chain_exhausted_error_attributes(self):

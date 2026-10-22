@@ -39,6 +39,8 @@ import unittest
 
 import rule_engine.errors as errors
 
+__all__ = ('ChainExhaustedErrorTests', 'ResolutionErrorTests', 'UndefinedSentinelTests')
+
 class ResolutionErrorTests(unittest.TestCase):
     def test_attribute_error_repr(self):
         attribute_error = errors.AttributeResolutionError('doesnotexist', None)

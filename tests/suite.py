@@ -31,6 +31,7 @@
 #
 
 import collections
+import functools
 import os
 import pkgutil
 import sys
@@ -92,6 +93,17 @@ class SuiteTests(unittest.TestCase):
         # the package imports every test module, a module that it doesn't import never runs
         package_dir = os.path.dirname(os.path.abspath(tests.__file__))
         self.assertEqual([name for name in _module_names([package_dir], 'tests.') if name not in sys.modules], [])
+
+    def test_every_test_module_can_be_selected(self):
+        # python -m unittest tests.engine looks the module up as an attribute of the package, so a star-imported alias
+        # with the same name, such as rule_engine.engine, would replace it and no tests would be selected
+        hidden = []
+        for name, module in _test_modules():
+            parts = name.split('.')[1:]
+            resolved = functools.reduce(lambda parent, attribute: getattr(parent, attribute, None), parts, tests)
+            if resolved is not module:
+                hidden.append(name)
+        self.assertEqual(hidden, [])
 
 if __name__ == '__main__':
     unittest.main()

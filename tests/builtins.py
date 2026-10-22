@@ -51,6 +51,8 @@ except ImportError:
 else:
     has_graphviz = True
 
+__all__ = ('BuiltinsTests',)
+
 @contextlib.contextmanager
 def disable_random():
     now = datetime.datetime.now()

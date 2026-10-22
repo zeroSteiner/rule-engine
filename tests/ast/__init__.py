@@ -34,12 +34,15 @@ import datetime
 import unittest
 
 from .expression import *
+from . import expression
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
 import rule_engine.errors as errors
 import rule_engine.parser as parser
 import rule_engine.types as types
+
+__all__ = ('AstTests',) + expression.__all__
 
 inf = float('inf')
 nan = float('nan')

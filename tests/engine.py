@@ -58,6 +58,16 @@ except ImportError:
 else:
     has_graphviz = True
 
+__all__ = (
+    'ContextSerializationTests',
+    'ContextTests',
+    'EngineDatetimeRuleTests',
+    'EngineIntMaxDigitsTests',
+    'EngineRuleTests',
+    'EngineTests',
+    'ObjectTypeTests',
+)
+
 class ContextTests(unittest.TestCase):
     def test_context_default_timezone(self):
         context = engine.Context(default_timezone='Local')

@@ -42,6 +42,8 @@ import rule_engine.types as types
 
 import dateutil.tz
 
+__all__ = ('GitHubIssueTests',)
+
 class GitHubIssueTests(unittest.TestCase):
     def test_number_10(self):
         value = random.randint(1, 10000)

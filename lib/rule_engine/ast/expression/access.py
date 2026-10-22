@@ -175,7 +175,7 @@ class GetAttributeExpression(ExpressionBase):
             return resolved_obj
         if resolved_obj is None and DataType.is_type(self.object.result_type, DataType.NULLABLE):
             raise errors.EvaluationError(
-                    "attribute access on a null value (use ?. to safely navigate a NULLABLE expression)"
+                    "attribute access on a null value (use &. to safely navigate a NULLABLE expression)"
             )
 
         if self._object_type is not None:

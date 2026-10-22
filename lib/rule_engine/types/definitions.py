@@ -103,10 +103,12 @@ class _NullableDataTypeDef(_DataTypeDef):
     """
     A wrapper marking a slot whose value may be either of ``inner_type`` or :py:attr:`.NULL`. At runtime values
     remain plain Python — a ``NULLABLE(STRING)`` is still a ``str`` or ``None`` — so NULLABLE is a parse-time
-    concept the type system uses to track which expression positions may yield NULL. Operators that accept the
-    unwrapped type also accept the NULLABLE form and propagate nullability into their result type, with a few
-    explicit exceptions (equality comparisons always return :py:attr:`.BOOLEAN`; ``??``, ``?.``, ``is null`` and
-    ``is not null`` discharge nullability).
+    concept the type system uses to track which expression positions may yield NULL. Operators that do not
+    meaningfully accept NULL, such as arithmetic, ordered comparisons and attribute or item access, reject a NULLABLE
+    operand when the rule is parsed. Equality comparisons and the logical operators accept one and return
+    :py:attr:`.BOOLEAN`, the ternary operator's result is nullable when either branch is, the safe navigation
+    operators ``&.`` and ``&[`` accept a NULLABLE target and keep the result nullable, and the null-coalesce operator
+    ``??`` discharges nullability.
 
     Constructing ``NULLABLE(NULLABLE(T))`` collapses to ``NULLABLE(T)``. Calling ``NULLABLE(NULL)`` or
     ``NULLABLE(UNDEFINED)`` raises :py:exc:`~rule_engine.errors.EngineError` because neither has meaningful nullable

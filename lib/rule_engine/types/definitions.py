@@ -178,6 +178,7 @@ class _CollectionDataTypeDef(_DataTypeDef):
             value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
             value_type_nullable: bool | None = None
     ) -> None:
+        self._check_value_type(value_type)
         # check these three classes individually instead of using Collection which isn't available before Python v3.6
         if not issubclass(python_type, collections.abc.Container):
             raise TypeError('the specified python_type is not a container')
@@ -197,6 +198,11 @@ class _CollectionDataTypeDef(_DataTypeDef):
             if value_type_nullable:
                 value_type = _NullableDataTypeDef.wrap(value_type)
         self.value_type = value_type
+
+    def _check_value_type(self, value_type: _DataTypeDef) -> None:
+        # subclasses validate the member type here instead of overriding __init__, an override would put another frame
+        # between the caller and the value_type_nullable warning in __init__
+        pass
 
     @property
     def iterable_type(self) -> _DataTypeDef:  # type: ignore[override]
@@ -254,17 +260,10 @@ class _ArrayDataTypeDef(_CollectionDataTypeDef):
     pass
 
 class _SetDataTypeDef(_CollectionDataTypeDef):
-    def __init__(
-            self,
-            name: str,
-            python_type: type,
-            value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
-            value_type_nullable: bool | None = None
-    ) -> None:
+    def _check_value_type(self, value_type: _DataTypeDef) -> None:
         inner = value_type.inner_type if isinstance(value_type, _NullableDataTypeDef) else value_type
         if inner.is_object:
             raise errors.EngineError('the OBJECT data type may not be used as a SET member')
-        super(_SetDataTypeDef, self).__init__(name, python_type, value_type=value_type, value_type_nullable=value_type_nullable)
 
 class _MappingDataTypeDef(_DataTypeDef):
     __slots__ = ('key_type', 'value_type')

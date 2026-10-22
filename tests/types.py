@@ -204,6 +204,22 @@ class DataTypeTests(unittest.TestCase):
         self.assertTrue(DataType.MAPPING(DataType.STRING, DataType.NULLABLE(DataType.STRING)).value_type_nullable)
         self.assertFalse(DataType.MAPPING(DataType.STRING, DataType.STRING).value_type_nullable)
 
+    def test_data_type_value_type_nullable_kwarg_warns_at_caller(self):
+        string = DataType.STRING
+        for label, constructor in (
+                ('ARRAY', lambda: DataType.ARRAY(string, value_type_nullable=True)),
+                ('SET', lambda: DataType.SET(string, value_type_nullable=True)),
+                ('MAPPING', lambda: DataType.MAPPING(string, string, value_type_nullable=True)),
+                ('ARRAY class', lambda: type(DataType.ARRAY)('ARRAY', tuple, value_type=string, value_type_nullable=True)),
+                ('SET class', lambda: type(DataType.SET)('SET', set, value_type=string, value_type_nullable=True)),
+                ('MAPPING class', lambda: type(DataType.MAPPING)('MAPPING', dict, string, string, value_type_nullable=True)),
+        ):
+            with self.subTest(label):
+                with self.assertWarns(DeprecationWarning) as cm:
+                    constructor()
+                self.assertEqual(cm.filename, __file__)
+                self.assertEqual(cm.lineno, constructor.__code__.co_firstlineno)
+
     def test_data_type_from_name(self):
         self.assertIs(DataType.from_name('ARRAY'), DataType.ARRAY)
         self.assertIs(DataType.from_name('BOOLEAN'), DataType.BOOLEAN)

@@ -159,6 +159,9 @@ class DataType(metaclass=DataTypeMeta):
     """
     Undefined values. This constant can be used to indicate that a particular symbol is valid, but it's data type is
     currently unknown.
+
+    .. versionchanged:: 5.1.1
+            The constant keeps its identity when it is pickled or copied.
     """
     @classmethod
     def from_name(cls, name: str) -> _DataTypeDef:

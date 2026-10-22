@@ -424,6 +424,46 @@ class DataTypeTests(unittest.TestCase):
         self.assertIs(restored.value_type, DataType.UNDEFINED)
         self.assertTrue(DataType.is_compatible(restored, DataType.ARRAY(DataType.STRING)))
 
+    def test_data_type_pickle_undefined_keeps_identity(self):
+        for label, restored in _restore_data_type(DataType.UNDEFINED):
+            with self.subTest(label):
+                self.assertIs(restored, DataType.UNDEFINED)
+                self.assertTrue(DataType.is_compatible(restored, DataType.STRING))
+        function_type = DataType.FUNCTION('test', return_type=DataType.FLOAT)
+        restored = copy.deepcopy(function_type)
+        self.assertIs(restored.argument_types, DataType.UNDEFINED)
+        self.assertIs(restored.minimum_arguments, DataType.UNDEFINED)
+        object_type = DataType.OBJECT('Hero', attributes={'misc': DataType.UNDEFINED})
+        for label, restored in _restore_data_type(object_type):
+            with self.subTest(label):
+                self.assertIs(restored.attributes['misc'], DataType.UNDEFINED)
+        # a shallow copy still shares the attributes when there's nothing to replace
+        self.assertIs(copy.copy(object_type).attributes, object_type.attributes)
+        # another instance, like one from a pickle that an earlier version wrote, still pickles
+        other = type(DataType.UNDEFINED)('UNDEFINED', errors.UNDEFINED)
+        for label, restored in _restore_data_type(other):
+            with self.subTest(label):
+                self.assertEqual(restored, DataType.UNDEFINED)
+
+    def test_data_type_pickle_undefined_copies_replaced(self):
+        # pickles that earlier versions wrote hold copies of UNDEFINED, wherever a data type can hold one
+        other = type(DataType.UNDEFINED)('UNDEFINED', errors.UNDEFINED)
+        object_type = DataType.OBJECT('Hero', attributes={'misc': other, 'name': DataType.STRING})
+        nullable_type = type(DataType.NULLABLE)('NULLABLE', object, inner_type=other)
+        for label, restored in _restore_data_type(object_type):
+            with self.subTest(label):
+                self.assertIs(restored.attributes['misc'], DataType.UNDEFINED)
+                self.assertEqual(restored.attributes['name'], DataType.STRING)
+        for label, restored in _restore_data_type(nullable_type):
+            with self.subTest(label):
+                self.assertIs(restored.inner_type, DataType.UNDEFINED)
+        function_type = DataType.FUNCTION('test', return_type=other, argument_types=(other, DataType.STRING))
+        for label, restored in (('copy', copy.copy(function_type)), ('deepcopy', copy.deepcopy(function_type))):
+            with self.subTest(label):
+                self.assertIs(restored.return_type, DataType.UNDEFINED)
+                self.assertEqual(restored.argument_types, (DataType.UNDEFINED, DataType.STRING))
+                self.assertIs(restored.argument_types[0], DataType.UNDEFINED)
+
 class MetaDataTypeTests(unittest.TestCase):
     def test_data_type_is_iterable(self):
         self.assertGreater(len(DataType), 0)

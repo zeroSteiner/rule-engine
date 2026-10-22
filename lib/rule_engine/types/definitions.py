@@ -34,8 +34,9 @@ from __future__ import annotations
 
 import collections
 import collections.abc
+import operator
 import warnings
-from typing import Any, ClassVar, cast
+from typing import Any, ClassVar, SupportsIndex, cast
 
 from .. import errors
 
@@ -78,6 +79,14 @@ class _DataTypeDef(object):
 class _UndefinedDataTypeDef(_DataTypeDef):
     def __repr__(self) -> str:
         return 'UNDEFINED'
+
+    def __reduce_ex__(self, protocol: SupportsIndex) -> str | tuple[Any, ...]:
+        # restore the module-level instance so identity checks (``is UNDEFINED``) still work after pickle or copy, like
+        # errors.UNDEFINED but only for protocols 2 and up, protocols 0 and 1 still raise TypeError like they do for the
+        # other data types
+        if self is _DATA_TYPE_UNDEFINED and operator.index(protocol) >= 2:
+            return '_DATA_TYPE_UNDEFINED'
+        return super().__reduce_ex__(protocol)
 
 _DATA_TYPE_UNDEFINED = _UndefinedDataTypeDef('UNDEFINED', cast(type, errors.UNDEFINED))
 
@@ -131,6 +140,9 @@ class _NullableDataTypeDef(_DataTypeDef):
     def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar, hash(self.inner_type)))
 
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
+
     @staticmethod
     def unwrap(dt: '_DataTypeDef') -> '_DataTypeDef':
         """Return the inner type of *dt* if it is nullable, otherwise return *dt* unchanged."""
@@ -148,15 +160,24 @@ class _NullableDataTypeDef(_DataTypeDef):
         return _NullableDataTypeDef('NULLABLE', object, inner_type=dt)
 
 def _original_undefined(value: Any) -> Any:
-    # the type checks compare data types to UNDEFINED by identity, so a copy of it is replaced with the original
+    # the type checks compare data types to UNDEFINED by identity, so a copy of it is replaced with the original, this
+    # includes the members of a tuple (FUNCTION argument types) and the values of a dict (OBJECT attributes), which are
+    # only copied when one needs to be replaced
     if isinstance(value, _UndefinedDataTypeDef):
         return _DATA_TYPE_UNDEFINED
+    if isinstance(value, tuple) and any(_is_undefined_copy(item) for item in value):
+        return tuple(_original_undefined(item) for item in value)
+    if isinstance(value, dict) and any(_is_undefined_copy(item) for item in value.values()):
+        return {key: _original_undefined(item) for key, item in value.items()}
     return value
+
+def _is_undefined_copy(value: Any) -> bool:
+    return isinstance(value, _UndefinedDataTypeDef) and value is not _DATA_TYPE_UNDEFINED
 
 def _set_state(instance: _DataTypeDef, state: Any) -> None:
     # restore the state the same way that pickle and copy do by default with two exceptions: slots that the class
     # overrides with a read-only property are skipped (the collection types do this with iterable_type), and copies of
-    # UNDEFINED are replaced with the original
+    # UNDEFINED, like the ones in pickles that earlier versions wrote, are replaced with the original
     slot_state = None
     if isinstance(state, tuple) and len(state) == 2:
         state, slot_state = state
@@ -391,6 +412,9 @@ class _FunctionDataTypeDef(_DataTypeDef):
                 raise ValueError('minimum_arguments can not be greater than the length of argument_types')
         self.argument_types = argument_types
         self.minimum_arguments = minimum_arguments
+
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
 
     def __call__(
             self,

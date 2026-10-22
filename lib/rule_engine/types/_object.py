@@ -45,6 +45,7 @@ from .definitions import (
         _NullableDataTypeDef,
         _ReferenceDataTypeDef,
         _SelfReferenceDataTypeDef,
+        _set_state,
 )
 
 _object_compare_tls = threading.local()
@@ -312,6 +313,9 @@ class _ObjectDataTypeDef(_DataTypeDef):
         # nominal hashing only: hashing the attribute schema would infinite-loop on self-references and provides no
         # benefit over name-based hashing since equality requires a full structural match anyway
         return hash(('OBJECT', self.name))
+
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
 
 # Sentinel used inside OBJECT attribute schemas to denote "the enclosing OBJECT schema". Attached as a class attribute
 # so it is available via ``DataType.OBJECT.self`` without depending on any particular OBJECT instance.

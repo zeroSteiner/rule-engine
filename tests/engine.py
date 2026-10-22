@@ -924,6 +924,31 @@ class ContextSerializationTests(unittest.TestCase):
         self.assertTrue(rule.matches(thing))
         self.assertFalse(rule.matches(dict(thing, tags=('b',))))
 
+    def test_context_pickle_with_undefined_types(self):
+        DataType = types.DataType
+        context = engine.Context(type_resolver={'value': DataType.UNDEFINED})
+        for label, context2 in (('pickle', pickle.loads(pickle.dumps(context))), ('deepcopy', copy.deepcopy(context))):
+            with self.subTest(label):
+                self.assertIs(context2.resolve_type('value'), DataType.UNDEFINED)
+                rule = engine.Rule('[v for v in value]', context=context2)
+                self.assertEqual(rule.evaluate({'value': ('a',)}), ('a',))
+        context = copy.deepcopy(engine.Context(type_resolver={'test': DataType.FUNCTION('test')}))
+        # the function's arguments are UNDEFINED, so they aren't checked
+        engine.Rule('test(1, "two")', context=context)
+
+    def test_context_unpickle_normalizes_undefined_data_type_copies(self):
+        # pickles made before the UNDEFINED data type preserved its identity hold copies of it in the type map
+        DataType = types.DataType
+        stray_undefined = type(DataType.UNDEFINED)('UNDEFINED', errors.UNDEFINED)
+        state = engine.Context(type_resolver={'value': stray_undefined, 'name': DataType.STRING}).__getstate__()
+        context = engine.Context.__new__(engine.Context)
+        context.__setstate__(state)
+        self.assertIs(context.resolve_type('value'), DataType.UNDEFINED)
+        self.assertIs(context.resolve_type('name'), DataType.STRING)
+        self.assertEqual(engine.Rule('[v for v in value]', context=context).evaluate({'value': ('a',)}), ('a',))
+        with self.assertRaises(errors.SymbolResolutionError):
+            context.resolve_type('missing')
+
 class EngineIntMaxDigitsTests(unittest.TestCase):
     def _set_int_max_str_digits(self, int_max_digits):
         if not hasattr(sys, 'set_int_max_str_digits'):

@@ -189,8 +189,12 @@ class DataType(metaclass=DataTypeMeta):
 
         .. versionchanged:: 4.1.0
                 Added support for typehints.
+
+        .. versionchanged:: 5.0.0
+                ``Optional[T]`` and ``T | None`` map to :py:meth:`DataType.NULLABLE`.
         """
-        if not (isinstance(python_type, type) or hasattr(python_type, '__origin__')):
+        # before python 3.14, X | Y is a types.UnionType which has no __origin__
+        if not (isinstance(python_type, (type, pytypes.UnionType)) or hasattr(python_type, '__origin__')):
             raise TypeError('from_type argument 1 must be a type or a type hint, not ' + type(python_type).__name__)
         # Optional[X] / X | None resolve to NULLABLE(from_type(X)); unions of more than one non-None member are
         # unsupported because Rule Engine has no sum type

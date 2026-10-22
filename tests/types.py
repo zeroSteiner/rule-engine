@@ -44,7 +44,14 @@ import rule_engine.errors as errors
 import rule_engine.types as types
 import rule_engine.types.coercion as coercion
 
-__all__ = ('CoercionTests', 'DataTypeTests', 'MetaDataTypeTests', 'ObjectDataTypeTests', 'ValueIsTests')
+__all__ = (
+    'CoercionTests',
+    'DataTypeTests',
+    'MetaDataTypeTests',
+    'NullableDataTypeTests',
+    'ObjectDataTypeTests',
+    'ValueIsTests'
+)
 
 DataType = types.DataType
 

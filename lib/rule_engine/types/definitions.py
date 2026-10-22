@@ -35,7 +35,7 @@ from __future__ import annotations
 import collections
 import collections.abc
 import warnings
-from typing import ClassVar, cast
+from typing import Any, ClassVar, cast
 
 from .. import errors
 
@@ -147,6 +147,27 @@ class _NullableDataTypeDef(_DataTypeDef):
             return dt
         return _NullableDataTypeDef('NULLABLE', object, inner_type=dt)
 
+def _original_undefined(value: Any) -> Any:
+    # the type checks compare data types to UNDEFINED by identity, so a copy of it is replaced with the original
+    if isinstance(value, _UndefinedDataTypeDef):
+        return _DATA_TYPE_UNDEFINED
+    return value
+
+def _set_state(instance: _DataTypeDef, state: Any) -> None:
+    # restore the state the same way that pickle and copy do by default with two exceptions: slots that the class
+    # overrides with a read-only property are skipped (the collection types do this with iterable_type), and copies of
+    # UNDEFINED are replaced with the original
+    slot_state = None
+    if isinstance(state, tuple) and len(state) == 2:
+        state, slot_state = state
+    if state:
+        instance.__dict__.update(state)
+    if slot_state:
+        for name, value in slot_state.items():
+            if isinstance(getattr(type(instance), name, None), property):
+                continue
+            setattr(instance, name, _original_undefined(value))
+
 class _CollectionDataTypeDef(_DataTypeDef):
     __slots__ = ('value_type',)
     value_type: _DataTypeDef
@@ -184,6 +205,9 @@ class _CollectionDataTypeDef(_DataTypeDef):
     @property
     def value_type_nullable(self) -> bool:
         return isinstance(self.value_type, _NullableDataTypeDef)
+
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
 
     def __call__(self, value_type: _DataTypeDef, value_type_nullable: bool | None = None) -> _CollectionDataTypeDef:
         """
@@ -281,6 +305,9 @@ class _MappingDataTypeDef(_DataTypeDef):
     @property
     def value_type_nullable(self) -> bool:
         return isinstance(self.value_type, _NullableDataTypeDef)
+
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
 
     def __call__(
             self,

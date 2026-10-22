@@ -895,6 +895,35 @@ class ContextSerializationTests(unittest.TestCase):
         with self.assertRaises(errors.SymbolResolutionError):
             rule.evaluate({})
 
+    def test_context_pickle_with_compound_types(self):
+        DataType = types.DataType
+        type_map = {
+                'tags': DataType.ARRAY,
+                'names': DataType.ARRAY(DataType.STRING),
+                'ids': DataType.SET(DataType.FLOAT),
+                'scores': DataType.MAPPING(DataType.STRING, DataType.ARRAY(DataType.FLOAT)),
+                'meta': DataType.MAPPING,
+                'hero': DataType.OBJECT('Hero', attributes={'aliases': DataType.ARRAY(DataType.STRING)}),
+        }
+        context = engine.Context(type_resolver=type_map, resolver=engine.resolve_item)
+        text = '"a" in tags and names[0] == "x" and 1 in ids and scores["a"][0] > 1 and meta["k"] == "v"'
+        thing = {'tags': ('a',), 'names': ('x',), 'ids': {1}, 'scores': {'a': (2,)}, 'meta': {'k': 'v'}}
+        restored = [('deepcopy', copy.deepcopy(context))]
+        for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
+            restored.append(('pickle protocol {}'.format(protocol), pickle.loads(pickle.dumps(context, protocol=protocol))))
+        for label, context2 in restored:
+            with self.subTest(label):
+                for name, data_type in type_map.items():
+                    self.assertEqual(context2.resolve_type(name), data_type)
+                self.assertTrue(engine.Rule(text, context=context2).matches(thing))
+                with self.assertRaises(errors.EvaluationError):
+                    engine.Rule('names[0] + 1', context=context2)
+                with self.assertRaises(errors.EvaluationError):
+                    engine.Rule('hero.aliases[0] + 1', context=context2)
+        rule = pickle.loads(pickle.dumps(engine.Rule(text, context=context)))
+        self.assertTrue(rule.matches(thing))
+        self.assertFalse(rule.matches(dict(thing, tags=('b',))))
+
 class EngineIntMaxDigitsTests(unittest.TestCase):
     def _set_int_max_str_digits(self, int_max_digits):
         if not hasattr(sys, 'set_int_max_str_digits'):

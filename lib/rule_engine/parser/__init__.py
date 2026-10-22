@@ -90,6 +90,8 @@ class Parser(ParserBase):
     causing :py:exc:`~rule_engine.errors.EvaluationError` exceptions to be
     raised during parsing.
     """
+    # normalize the grammar so the packaged tables are valid on every python version
+    _normalize_grammar = True
     op_names = {
             # arithmetic operators
             '+':   'ADD',   '-':  'SUB',

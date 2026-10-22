@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev
 
+      - name: Generate the parser tables
+        run: uv run invoke tables
+
       - name: Run tests
         run: uv run python -m unittest -v tests
 
@@ -36,6 +39,13 @@ jobs:
         run: |
           uv run coverage run -m unittest -v tests
           uv run coverage report --include="*/rule_engine/*"
+
+      - name: Check the parser tables in the wheel
+        run: |
+          uv build --wheel --python 3.14 --out-dir dist
+          uv venv --python ${{ matrix.python-version }} ${{ runner.temp }}/wheel
+          uv pip install --python ${{ runner.temp }}/wheel/bin/python dist/*.whl
+          ${{ runner.temp }}/wheel/bin/python -m rule_engine.parser --check
 
   test-documentation:
     name: Test building the documentation
@@ -112,7 +122,14 @@ jobs:
         run: uv sync --group dev
 
       - name: Create the distribution
-        run: uv build
+        # the unit-tests job checks a wheel built with this version on every python version
+        run: uv build --python 3.14
+
+      - name: Check the parser tables in the wheel
+        run: |
+          uv venv ${{ runner.temp }}/wheel
+          uv pip install --python ${{ runner.temp }}/wheel/bin/python dist/*.whl
+          ${{ runner.temp }}/wheel/bin/python -m rule_engine.parser --check
 
       - name: Publish the distribution
         uses: pypa/gh-action-pypi-publish@release/v1

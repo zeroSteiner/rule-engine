@@ -271,6 +271,10 @@ permitting :py:class:`NoneType` (``null``) at runtime. ``NULLABLE(T)`` is struct
 - Compound element types (``ARRAY``, ``SET``, ``MAPPING`` values) store ``NULLABLE(T)`` directly when the member may
   be ``None``.
 
+For :py:attr:`~DataType.ARRAY` and :py:attr:`~DataType.SET` symbols, an unwrapped member type does not permit ``None``.
+A symbol typed as ``ARRAY(STRING)`` raises a :py:exc:`~rule_engine.errors.SymbolTypeError` when it resolves to
+``('a', None)``. Type it as ``ARRAY(NULLABLE(STRING))`` to accept that value.
+
 Semantics are Python-style, not SQL three-valued logic. ``None`` flows through expressions as the Python ``None``
 value. Parse-time checking is strict: operators that do not meaningfully accept ``None`` — arithmetic (``+``, ``-``,
 ``*``, ``/``, …), ordered comparisons (``<``, ``<=``, ``>``, ``>=``), the regex operators (``=~``, ``=~~``, ``!~``,

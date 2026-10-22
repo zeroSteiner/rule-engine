@@ -44,6 +44,14 @@ Released :release:`5.0.0` on May 17th, 2026
 * **Breaking:** Removed ``setup.py``; project metadata now lives entirely in ``pyproject.toml`` (PEP 517/621).
 * **Breaking:** The ``rule_engine.ast`` module no longer re-exports names from ``rule_engine.types`` (e.g. ``DataType``,
   ``coerce_value``); import them from ``rule_engine`` or ``rule_engine.types`` directly.
+* **Breaking:** A symbol typed by a *type_resolver* as an :py:attr:`~rule_engine.types.DataType.ARRAY` or
+  :py:attr:`~rule_engine.types.DataType.SET` with a member type no longer accepts ``None`` members unless that type is
+  wrapped in :py:attr:`~rule_engine.types.DataType.NULLABLE`. Before 5.0.0, the ``value_type_nullable`` kwarg defaulted
+  to ``True``, so a symbol typed as ``ARRAY(STRING)`` could resolve to ``('a', None)``. Now that value raises a
+  :py:exc:`~rule_engine.errors.SymbolTypeError` when the symbol is resolved. To accept ``None`` members, use
+  ``ARRAY(NULLABLE(STRING))`` (or the deprecated ``value_type_nullable=True`` until v6.0). Rules must then handle the
+  nullable members, for example with ``??``, before using them with operators that reject ``NULLABLE`` operands. See the
+  :ref:`NULLABLE section<data-types-nullable>` in the Data Types page for details.
 * Migrated the development workflow and CI from pipenv to `uv <https://docs.astral.sh/uv/>`_.
 * Added support for raw STRING literals using the ``r`` prefix (e.g. ``r'\w+'``).
 * Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy

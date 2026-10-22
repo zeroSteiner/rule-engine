@@ -38,6 +38,7 @@ from .errors import *
 from .issues import *
 from .parser import *
 from .parser_tables import *
+from .parser_utilities import *
 from .sqlalchemy import *
 from .suggestions import *
 from .suite import *

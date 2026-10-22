@@ -47,6 +47,7 @@ __all__ = (
         'AddExpressionTests',
         'AddDatetimeExpressionTests',
         'SubtractExpressionTests',
+        'SubtractDatetimeExpressionTests',
         'BitwiseExpressionTests',
         'BitwiseExpressionSetTests',
         'BitwiseShiftExpressionTests',
@@ -273,7 +274,7 @@ class SubtractDatetimeExpressionTests(BinaryExpressionTestsBase):
         )
 
     def test_subtract_timedelta_from_datetime(self):
-        start_datetime = datetime.datetime(year=2022, month=1, day=24, hour=16, minute=19, second=44)
+        start_datetime = datetime.datetime(year=2022, month=1, day=24, hour=16, minute=19, second=44, tzinfo=context.default_timezone)
         start_datetime_expr = ast.DatetimeExpression(context, start_datetime)
         assert_func = functools.partial(self.assertExpressionTests, 'sub')
         td_expr_func = functools.partial(ast.TimedeltaExpression, context)

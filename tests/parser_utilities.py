@@ -1,8 +1,10 @@
 import datetime
 import unittest
 
-import rule_engine._utils as utils
+import rule_engine.parser.utilities as utils
 import rule_engine.errors as errors
+
+__all__ = ('UtilityTests',)
 
 class UtilityTests(unittest.TestCase):
     def test_parse_timedelta(self):

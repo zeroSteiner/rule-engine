@@ -32,6 +32,7 @@
 
 import collections
 import os
+import pkgutil
 import sys
 import unittest
 import unittest.mock
@@ -47,6 +48,17 @@ def _test_ids(suite):
         else:
             yield test.id()
 
+def _module_names(path, prefix):
+    # unlike pkgutil.walk_packages, this doesn't import the packages it finds
+    for module_info in pkgutil.iter_modules(path, prefix):
+        yield module_info.name
+        if module_info.ispkg:
+            package_dir = os.path.join(module_info.module_finder.path, module_info.name.rpartition('.')[2])
+            yield from _module_names([package_dir], module_info.name + '.')
+
+def _test_modules():
+    return [(name, sys.modules[name]) for name in sorted(sys.modules) if name.startswith('tests.')]
+
 class SuiteTests(unittest.TestCase):
     def test_discovery_collects_each_test_once(self):
         test_ids = list(_test_ids(unittest.TestLoader().loadTestsFromName('tests')))
@@ -59,6 +71,27 @@ class SuiteTests(unittest.TestCase):
         with unittest.mock.patch.object(sys, 'path', list(sys.path)):
             discovered = unittest.TestLoader().discover(package_dir, top_level_dir=os.path.dirname(package_dir))
         self.assertCountEqual(_test_ids(discovered), test_ids)
+
+    def test_every_test_class_is_collected(self):
+        # a test class that is missing from its module's __all__ isn't imported by the package, so it never runs
+        loader = unittest.TestLoader()
+        collected = set(_test_ids(loader.loadTestsFromName('tests')))
+        missing = []
+        for name, module in _test_modules():
+            for value in vars(module).values():
+                if not (isinstance(value, type) and issubclass(value, unittest.TestCase) and value.__module__ == name):
+                    continue
+                # base classes run their tests through their subclasses
+                if value.__name__.endswith('Base') and value.__subclasses__():
+                    continue
+                test_ids = _test_ids(loader.loadTestsFromTestCase(value))
+                missing.extend(test_id for test_id in test_ids if test_id not in collected)
+        self.assertEqual(missing, [])
+
+    def test_every_test_module_is_imported(self):
+        # the package imports every test module, a module that it doesn't import never runs
+        package_dir = os.path.dirname(os.path.abspath(tests.__file__))
+        self.assertEqual([name for name in _module_names([package_dir], 'tests.') if name not in sys.modules], [])
 
 if __name__ == '__main__':
     unittest.main()

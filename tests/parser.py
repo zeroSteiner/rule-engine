@@ -538,6 +538,16 @@ class ParserLiteralTests(ParserTestsBase):
             with self.subTest(string=string), self.assertRaises(errors.StringSyntaxError):
                 self._parse(string, self.context)
 
+    def test_parse_string_escapes_octal(self):
+        self.assertStringLiteralEqual(r'"\0\7\101\377"', '\x00\x07A\xff')
+        # escapes above \377 are the characters up to U+01FF, like in python but without the warning
+        self.assertStringLiteralEqual(r'"\400"', '\u0100')
+        self.assertStringLiteralEqual(r'"\777"', '\u01ff')
+        self.assertStringLiteralEqual(r'"\400\.\8"', '\u0100\\.\\8')
+        # an octal escape has at most three digits
+        self.assertStringLiteralEqual(r'"\4001\1234\18"', '\u0100' + '1' + 'S4' + '\x01' + '8')
+        self.assertStringLiteralEqual(r'"\\400\\\400"', '\\400\\\u0100')
+
     def test_parse_string_raw(self):
         self.assertLiteralStatementEqual("r'Alice'", ast.StringExpression, 'Alice')
         self.assertLiteralStatementEqual('r"Alice"', ast.StringExpression, 'Alice')

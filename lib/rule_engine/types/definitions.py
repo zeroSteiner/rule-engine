@@ -422,6 +422,17 @@ class _FunctionDataTypeDef(_DataTypeDef):
         self.argument_types = argument_types
         self.minimum_arguments = minimum_arguments
 
+    def __reduce_ex__(self, protocol: SupportsIndex) -> str | tuple[Any, ...]:
+        # pickle saves the python_type by name and the default one, types.FunctionType, can't be found by its name
+        # (builtins.function), so it's left out of the state and _new_function_data_type sets it instead
+        reduced = super().__reduce_ex__(protocol)
+        if isinstance(reduced, tuple) and len(reduced) > 2 and isinstance(reduced[2], tuple):
+            state, slot_state = reduced[2]
+            if slot_state and slot_state.get('python_type') is _PYTHON_FUNCTION_TYPE:
+                slot_state = {name: value for name, value in slot_state.items() if name != 'python_type'}
+                return (_new_function_data_type, (type(self),), (state, slot_state)) + reduced[3:]
+        return reduced
+
     def __setstate__(self, state: Any) -> None:
         _set_state(self, state)
 
@@ -471,6 +482,13 @@ class _FunctionDataTypeDef(_DataTypeDef):
 
     def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar, hash((self.return_type, self.argument_types, self.minimum_arguments))))
+
+def _new_function_data_type(cls: type[_FunctionDataTypeDef]) -> _FunctionDataTypeDef:
+    # the FUNCTION definitions are pickled with this instead of copyreg.__newobj__ so that versions which can't restore
+    # their python_type fail to load them
+    instance = cls.__new__(cls)
+    instance.python_type = _PYTHON_FUNCTION_TYPE
+    return instance
 
 class _ReferenceDataTypeDef(_DataTypeDef):
     """

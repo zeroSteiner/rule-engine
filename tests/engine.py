@@ -936,6 +936,25 @@ class ContextSerializationTests(unittest.TestCase):
         # the function's arguments are UNDEFINED, so they aren't checked
         engine.Rule('test(1, "two")', context=context)
 
+    def test_context_pickle_with_function_types(self):
+        DataType = types.DataType
+        type_map = {
+                'test': DataType.FUNCTION('test', return_type=DataType.STRING, argument_types=(DataType.FLOAT,)),
+                'anything': DataType.FUNCTION,
+        }
+        context = engine.Context(type_resolver=type_map)
+        thing = {'test': lambda value: str(value), 'anything': lambda: 1}
+        for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
+            with self.subTest(protocol=protocol):
+                context2 = pickle.loads(pickle.dumps(context, protocol=protocol))
+                self.assertEqual(context2.resolve_type('test'), type_map['test'])
+                self.assertIs(context2.resolve_type('anything'), DataType.FUNCTION)
+                self.assertEqual(engine.Rule('test(1)', context=context2).evaluate(thing), '1')
+                with self.assertRaises(errors.FunctionCallError):
+                    engine.Rule('test("one")', context=context2)
+                with self.assertRaises(errors.EvaluationError):
+                    engine.Rule('test(1) + 1', context=context2)
+
     def test_context_unpickle_normalizes_undefined_data_type_copies(self):
         # pickles made before the UNDEFINED data type preserved its identity hold copies of it in the type map
         DataType = types.DataType

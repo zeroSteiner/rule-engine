@@ -136,6 +136,10 @@ class CoercionTests(unittest.TestCase):
             types.coerce_value(10 ** 20, True, 20)
 
 
+class _FunctionDataTypeWithDict(types._FunctionDataTypeDef):
+    # without __slots__, instances of this subclass have a __dict__
+    pass
+
 def _restore_data_type(data_type):
     restored = [('copy', copy.copy(data_type)), ('deepcopy', copy.deepcopy(data_type))]
     for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
@@ -483,6 +487,46 @@ class DataTypeTests(unittest.TestCase):
                     self.assertIsNot(restored, data_type)
                     self.assertIs(type(restored), type(data_type))
                     self.assertEqual(getattr(restored, 'name', 'unset'), getattr(data_type, 'name', 'unset'))
+
+    def test_data_type_pickle_function(self):
+        Hero = DataType.OBJECT('Hero', attributes={
+                'promote': DataType.FUNCTION('promote', return_type=DataType.OBJECT.self, argument_types=(DataType.STRING,)),
+        })
+        for data_type in (
+                DataType.FUNCTION('test'),
+                DataType.FUNCTION('test', return_type=DataType.FLOAT, argument_types=(DataType.STRING, DataType.ARRAY), minimum_arguments=1),
+                DataType.ARRAY(DataType.FUNCTION('test', return_type=DataType.NULLABLE(DataType.STRING))),
+                Hero,
+        ):
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, data_type=data_type):
+                    self.assertEqual(restored, data_type)
+                    self.assertEqual(hash(restored), hash(data_type))
+                    self.assertEqual(repr(restored), repr(data_type))
+        for label, restored in _restore_data_type(Hero):
+            with self.subTest(label):
+                promote = restored.attributes['promote']
+                self.assertIs(promote.python_type, DataType.FUNCTION.python_type)
+                self.assertEqual(promote.value_name, 'promote')
+                if label != 'copy':
+                    self.assertIs(promote.return_type, restored)
+        # a FUNCTION definition with another python_type keeps it
+        function_type = types._FunctionDataTypeDef('FUNCTION', collections.OrderedDict, value_name='test')
+        for label, restored in _restore_data_type(function_type):
+            with self.subTest(label):
+                self.assertEqual(restored, function_type)
+                self.assertIs(restored.python_type, collections.OrderedDict)
+
+    def test_data_type_pickle_function_with_dict(self):
+        for python_type in (DataType.FUNCTION.python_type, collections.OrderedDict):
+            function_type = _FunctionDataTypeWithDict('FUNCTION', python_type, value_name='test')
+            function_type.comment = 'note'
+            for label, restored in _restore_data_type(function_type):
+                with self.subTest(label, python_type=python_type.__name__):
+                    self.assertIs(type(restored), _FunctionDataTypeWithDict)
+                    self.assertIs(restored.python_type, python_type)
+                    self.assertEqual(restored.comment, 'note')
+                    self.assertEqual(restored, function_type)
 
     def test_data_type_pickle_undefined_copies_replaced(self):
         # pickles that earlier versions wrote hold copies of UNDEFINED, wherever a data type can hold one

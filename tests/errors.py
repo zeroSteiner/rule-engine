@@ -38,6 +38,7 @@ import traceback
 import unittest
 
 import rule_engine.errors as errors
+import rule_engine.types as types
 
 __all__ = ('ChainExhaustedErrorTests', 'ResolutionErrorTests', 'UndefinedSentinelTests')
 
@@ -59,6 +60,72 @@ class ResolutionErrorTests(unittest.TestCase):
         symbol_error = errors.SymbolResolutionError('doesnotexist', suggestion=suggestion)
         self.assertIn('suggestion', repr(symbol_error))
         self.assertIn(suggestion, repr(symbol_error))
+
+    def _type_spellings(self):
+        DataType = types.DataType
+        person = DataType.OBJECT('Person', attributes={
+            'name': DataType.STRING,
+            'parent': DataType.NULLABLE(DataType.OBJECT.self),
+            'children': DataType.ARRAY(DataType.OBJECT.self)
+        })
+        big = DataType.OBJECT('Big', attributes={'attribute_' + str(index): DataType.STRING for index in range(500)})
+        return (
+            (DataType.STRING, 'STRING'),
+            (DataType.NULL, 'NULL'),
+            (DataType.UNDEFINED, 'UNDEFINED'),
+            (DataType.ARRAY, 'ARRAY'),
+            (DataType.ARRAY(DataType.STRING), 'ARRAY(STRING)'),
+            (DataType.ARRAY(DataType.NULLABLE(DataType.STRING)), 'ARRAY(NULLABLE(STRING))'),
+            (DataType.ARRAY(DataType.ARRAY(DataType.FLOAT)), 'ARRAY(ARRAY(FLOAT))'),
+            (DataType.SET(DataType.FLOAT), 'SET(FLOAT)'),
+            (DataType.MAPPING, 'MAPPING'),
+            (DataType.MAPPING(DataType.STRING), 'MAPPING(STRING)'),
+            (DataType.MAPPING(DataType.UNDEFINED, DataType.FLOAT), 'MAPPING(UNDEFINED, FLOAT)'),
+            (DataType.MAPPING(DataType.STRING, DataType.FLOAT), 'MAPPING(STRING, FLOAT)'),
+            (
+                DataType.MAPPING(DataType.ARRAY(DataType.STRING), DataType.SET(DataType.FLOAT)),
+                'MAPPING(ARRAY(STRING), SET(FLOAT))'
+            ),
+            (DataType.NULLABLE, 'NULLABLE'),
+            (DataType.NULLABLE(DataType.ARRAY(DataType.STRING)), 'NULLABLE(ARRAY(STRING))'),
+            (
+                DataType.FUNCTION(
+                    'split',
+                    return_type=DataType.ARRAY(DataType.STRING),
+                    argument_types=(DataType.STRING,)
+                ),
+                'FUNCTION'
+            ),
+            (DataType.OBJECT, 'OBJECT'),
+            (person, 'Person'),
+            (big, 'Big'),
+            (DataType.ARRAY(person), 'ARRAY(Person)'),
+            (DataType.MAPPING(DataType.STRING, DataType.NULLABLE(big)), 'MAPPING(STRING, NULLABLE(Big))')
+        )
+
+    def test_attribute_type_error_message(self):
+        FLOAT = types.DataType.FLOAT
+        message = "attribute 'name' resolved to incorrect datatype (is: {}, expected: {})"
+        for data_type, spelling in self._type_spellings():
+            with self.subTest(spelling=spelling):
+                error = errors.AttributeTypeError('name', 'object', is_value=1, is_type=FLOAT, expected_type=data_type)
+                self.assertEqual(error.message, message.format('FLOAT', spelling))
+                self.assertIs(error.expected_type, data_type)
+                error = errors.AttributeTypeError('name', 'object', is_value=1, is_type=data_type, expected_type=FLOAT)
+                self.assertEqual(error.message, message.format(spelling, 'FLOAT'))
+                self.assertIs(error.is_type, data_type)
+
+    def test_symbol_type_error_message(self):
+        FLOAT = types.DataType.FLOAT
+        message = "symbol 'name' resolved to incorrect datatype (is: {}, expected: {})"
+        for data_type, spelling in self._type_spellings():
+            with self.subTest(spelling=spelling):
+                error = errors.SymbolTypeError('name', is_value=1, is_type=FLOAT, expected_type=data_type)
+                self.assertEqual(error.message, message.format('FLOAT', spelling))
+                self.assertIs(error.expected_type, data_type)
+                error = errors.SymbolTypeError('name', is_value=1, is_type=data_type, expected_type=FLOAT)
+                self.assertEqual(error.message, message.format(spelling, 'FLOAT'))
+                self.assertIs(error.is_type, data_type)
 
 class ChainExhaustedErrorTests(unittest.TestCase):
     def test_chain_exhausted_error_attributes(self):

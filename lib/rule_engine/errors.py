@@ -59,6 +59,10 @@ A sentinel value to specify that something is undefined. When evaluated, the val
         The sentinel keeps its identity when it is pickled or copied.
 """
 
+def _format_data_type(data_type: _DataTypeDef) -> str:
+    from .types import definitions  # avoid circular imports
+    return definitions._format_data_type(data_type)
+
 class EngineError(Exception):
     """The base exception class from which other exceptions within this package inherit."""
     def __init__(self, message: str = '') -> None:
@@ -264,8 +268,8 @@ class AttributeTypeError(EvaluationError):
         """The :py:class:`rule-engine type<rule_engine.types.DataType>` that was expected for this attribute."""
         message = "attribute {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(
                 attribute_name,
-                is_type.name,
-                expected_type.name
+                _format_data_type(is_type),
+                _format_data_type(expected_type)
         )
         super(AttributeTypeError, self).__init__(message)
 
@@ -340,8 +344,8 @@ class SymbolTypeError(EvaluationError):
         """The :py:class:`rule-engine type<rule_engine.types.DataType>` that was expected for this symbol."""
         message = "symbol {0!r} resolved to incorrect datatype (is: {1}, expected: {2})".format(
                 symbol_name,
-                is_type.name,
-                expected_type.name
+                _format_data_type(is_type),
+                _format_data_type(expected_type)
         )
         super(SymbolTypeError, self).__init__(message)
 

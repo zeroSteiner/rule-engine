@@ -656,6 +656,32 @@ class EngineRuleTests(unittest.TestCase):
             with self.assertRaises(errors.AttributeResolutionError):
                 rule.evaluate({'a': {}})
 
+    def test_engine_rule_symbol_type_error_message(self):
+        # the message spells out the member types, which tell compound types apart
+        DataType = types.DataType
+        context = engine.Context(type_resolver=engine.type_resolver_from_dict({
+            'names': DataType.ARRAY(DataType.STRING),
+            'scores': DataType.MAPPING(DataType.STRING, DataType.NULLABLE(DataType.FLOAT))
+        }))
+        for text, thing, message in (
+                (
+                    'names[0] == "a"',
+                    {'names': (1, 2)},
+                    "symbol 'names' resolved to incorrect datatype (is: ARRAY(FLOAT), expected: ARRAY(STRING))"
+                ),
+                (
+                    '(scores["a"] ?? 0) > 1',
+                    {'scores': {'a': 'b'}},
+                    "symbol 'scores' resolved to incorrect datatype "
+                    "(is: MAPPING(STRING, STRING), expected: MAPPING(STRING, NULLABLE(FLOAT)))"
+                )
+            ):
+            with self.subTest(text=text):
+                rule = engine.Rule(text, context=context)
+                with self.assertRaises(errors.SymbolTypeError) as error_context:
+                    rule.matches(thing)
+                self.assertEqual(error_context.exception.message, message)
+
     def test_engine_rule_evaluate_any_type_operators(self):
         # ==, !=, and, and or accept values of any type
         context = engine.Context(type_resolver=engine.type_resolver_from_dict({

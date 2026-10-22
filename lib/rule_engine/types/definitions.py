@@ -529,3 +529,26 @@ class _SelfReferenceDataTypeDef(_ReferenceDataTypeDef):
 
     def __repr__(self) -> str:
         return "<{} (self reference placeholder) >".format(self.__class__.__name__)
+
+def _format_data_type(data_type: _DataTypeDef) -> str:
+    """
+    Spell *data_type* the way the documentation does, e.g. ``ARRAY(NULLABLE(STRING))`` or ``MAPPING(STRING, FLOAT)``,
+    so that error messages can tell compound types apart. Member types that are undefined at the end are left out, the
+    same way they can be left out when the type is defined, so a bare ``ARRAY`` is still spelled ``ARRAY``.
+    """
+    members: tuple[_DataTypeDef, ...]
+    if isinstance(data_type, _NullableDataTypeDef):
+        members = (data_type.inner_type,)
+    elif isinstance(data_type, _CollectionDataTypeDef):
+        members = (data_type.value_type,)
+    elif isinstance(data_type, _MappingDataTypeDef):
+        members = (data_type.key_type, data_type.value_type)
+    else:
+        # scalars and FUNCTION and OBJECT types are spelled by their names, OBJECT types are compatible by name and their
+        # attributes can be numerous or refer back to the type itself, and values never infer a FUNCTION signature
+        return data_type.name
+    while members and members[-1] == _DATA_TYPE_UNDEFINED:
+        members = members[:-1]
+    if not members:
+        return data_type.name
+    return "{}({})".format(data_type.name, ', '.join(_format_data_type(member) for member in members))

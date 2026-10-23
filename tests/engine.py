@@ -572,6 +572,21 @@ class EngineTests(unittest.TestCase):
         type_resolver = engine.type_resolver_from_dataclass(Team, strict=False)
         self.assertIs(type_resolver('members'), types.DataType.UNDEFINED)
 
+    def test_engine_type_resolver_from_dataclass_non_strict_reference_in_set(self):
+        type_resolver = engine.type_resolver_from_dataclass(_ResolverSetMember, strict=False)
+        # SET doesn't support OBJECT members, so the field is UNDEFINED and rules using it parse
+        self.assertIs(type_resolver('_ResolverSetTeam').attributes['members'], types.DataType.UNDEFINED)
+        context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
+        rule = engine.Rule('team.members == team.members', context=context)
+        self.assertTrue(rule.matches(_ResolverSetMember('Batman', _ResolverSetTeam('Justice League', frozenset()))))
+        # strict mode still builds it, and raises when the rule is parsed
+        context = engine.Context(
+                resolver=engine.resolve_attribute,
+                type_resolver=engine.type_resolver_from_dataclass(_ResolverSetMember)
+        )
+        with self.assertRaises(errors.EngineError):
+            engine.Rule('team.members == team.members', context=context)
+
     def test_engine_type_resolver_from_dataclass_nullable_evaluates_rule(self):
         context = engine.Context(
                 resolver=engine.resolve_attribute,
@@ -608,6 +623,16 @@ class _ResolverCompany:
 class _ResolverNullableHero:
     name: str | None
     age: int
+
+@dataclasses.dataclass(frozen=True)
+class _ResolverSetMember:
+    name: str
+    team: '_ResolverSetTeam'
+
+@dataclasses.dataclass(frozen=True)
+class _ResolverSetTeam:
+    name: str
+    members: 'set[_ResolverSetMember]'
 
 @dataclasses.dataclass
 class _ResolverNullableCompany:

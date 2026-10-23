@@ -130,8 +130,12 @@ def _resolve_dataclass_field_type(
                     )
                 if origin_type is DataType.SET:
                     value_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict, nested)
-                    # SET rejects OBJECT members, but a self reference only becomes one when the schema is built
-                    if isinstance(_NullableDataTypeDef.unwrap(value_type), _SelfReferenceDataTypeDef):
+                    # SET rejects OBJECT members, but a self reference only becomes one when the schema is built, and a
+                    # reference to another schema when a rule is parsed, which strict mode still allows for now
+                    member_type = _NullableDataTypeDef.unwrap(value_type)
+                    if isinstance(member_type, _SelfReferenceDataTypeDef) or (
+                            isinstance(member_type, _ReferenceDataTypeDef) and not strict
+                    ):
                         raise errors.EngineError('the OBJECT data type may not be used as a SET member')
                     return DataType.SET(value_type)
                 if origin_type is DataType.MAPPING:

@@ -844,6 +844,16 @@ class _PartlyUnresolvableHero:
 class _PartlyUnresolvableSidekick(_PartlyUnresolvableHero):
     rank: 'int' = 0
 
+@dataclasses.dataclass(frozen=True)
+class _SetMember:
+    name: str
+    team: '_SetTeam'
+
+@dataclasses.dataclass(frozen=True)
+class _SetTeam:
+    name: str
+    members: 'set[_SetMember]'
+
 _literal_evaluations = []
 
 def _record_literal_evaluation():
@@ -1427,6 +1437,16 @@ class ObjectDataTypeTests(unittest.TestCase):
         Hero = dataclasses.make_dataclass('Hero', [('nemesis', 'NoSuchHero'), ('broken', 'list[')])
         with self.assertRaisesRegex(NameError, r'NoSuchHero'):
             DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
+
+    def test_object_from_dataclass_reference_in_set(self):
+        # strict mode keeps building the SET of a reference, which raises once a rule using it is parsed
+        result = DataType.OBJECT.from_dataclass('Member', _SetMember)
+        members = result.attributes['team'].attributes['members']
+        self.assertTrue(DataType.is_type(members, DataType.SET))
+        self.assertIsInstance(members.value_type, types._ReferenceDataTypeDef)
+        result = DataType.OBJECT.from_dataclass('Member', _SetMember, strict=False)
+        self.assertIs(result.attributes['team'].attributes['members'], DataType.UNDEFINED)
+        self.assertIs(result.attributes['team'].attributes['name'], DataType.STRING)
 
     def test_object_from_dataclass_literal_values_are_not_evaluated(self):
         @dataclasses.dataclass

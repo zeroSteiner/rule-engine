@@ -115,7 +115,8 @@ def _resolve_dataclass_field_type(
     origin = typing.get_origin(annotation)
     args = typing.get_args(annotation)
     try:
-        if origin is not None and args:
+        # the arguments of a Literal are values, which must not be evaluated as forward references
+        if origin is not None and args and origin is not typing.Literal:
             resolved_args = tuple(_resolve_forward_ref(arg, current_cls) for arg in args)
             contains_dataclass = any(
                 isinstance(arg, type) and dataclasses.is_dataclass(arg) for arg in resolved_args

@@ -828,6 +828,11 @@ class _NullableSetTeam:
     name: str
     members: 'set[_NullableSetMember | None]'
 
+_literal_evaluations = []
+
+def _record_literal_evaluation():
+    _literal_evaluations.append(True)
+
 @dataclasses.dataclass(frozen=True)
 class _ArraySetSelfRefHero:
     name: str
@@ -1383,6 +1388,18 @@ class ObjectDataTypeTests(unittest.TestCase):
                     DataType.OBJECT.from_dataclass('Root', node)
             # one call for each of the 16 dataclasses
             self.assertLessEqual(get_type_hints.call_count, 32)
+
+    def test_object_from_dataclass_literal_values_are_not_evaluated(self):
+        @dataclasses.dataclass
+        class Hero:
+            alignment: typing.Literal['_record_literal_evaluation()', 'neutral']
+
+        del _literal_evaluations[:]
+        with self.assertRaises(TypeError):
+            DataType.OBJECT.from_dataclass('Hero', Hero)
+        result = DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
+        self.assertIs(result.attributes['alignment'], DataType.UNDEFINED)
+        self.assertEqual(_literal_evaluations, [])
 
     def test_object_from_dataclass_unsupported_type_strict(self):
         import uuid

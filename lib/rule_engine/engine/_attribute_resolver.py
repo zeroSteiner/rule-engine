@@ -305,7 +305,12 @@ class _AttributeResolver(object):
         match = re.match(r'^(' + parser.Parser.get_token_regex('FLOAT') + ')$', value)
         if match is None:
             return decimal.Decimal('nan')
-        return parser.literal_eval(match.group(0))
+        literal = match.group(0)
+        if literal.isdigit():
+            # python doesn't allow leading zeros in decimal integers but they are allowed here, like they are in the
+            # forms with a decimal point or exponent (e.g. 01.5 and 01e5)
+            literal = literal.lstrip('0') or '0'
+        return parser.literal_eval(literal)
 
     @attribute('to_int', types.DataType.STRING, result_type=types.DataType.FLOAT)
     def string_to_int(self, value: str) -> decimal.Decimal:

@@ -657,6 +657,13 @@ class EngineRuleTests(unittest.TestCase):
         with self.assertRaises(errors.EvaluationError):
             engine.Rule('b"a" < b"b"')
 
+    def test_engine_rule_string_to_int_leading_zeros(self):
+        rule = engine.Rule('zip.to_int >= 2100 and zip.to_int < 2200')
+        self.assertTrue(rule.matches({'zip': '02134'}))
+        self.assertFalse(rule.matches({'zip': '10001'}))
+        self.assertEqual(engine.Rule('zip.to_int').evaluate({'zip': '02134'}), 2134)
+        self.assertEqual(engine.Rule('zip.to_flt').evaluate({'zip': '02134'}), 2134)
+
     def test_engine_rule_parse_float_invalid_prefixed_no_warnings(self):
         rule = engine.Rule('$parse_float(value)')
         with warnings.catch_warnings(record=True) as caught:

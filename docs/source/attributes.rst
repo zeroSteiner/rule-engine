@@ -103,7 +103,7 @@ The following attributes are builtin to the default :py:class:`~.Context` object
 +-------------------------+-----------------------------------------------+
 | ``to_set``              | :py:attr:`~.DataType.SET`                     |
 +-------------------------+-----------------------------------------------+
-| :py:attr:`~.DataType.STRING` **Attributes**                             |
+| :py:attr:`~.DataType.STRING` **Attributes** :sup:`2`                    |
 +-------------------------+-----------------------------------------------+
 | ``as_lower``            | :py:attr:`~.DataType.STRING`                  |
 +-------------------------+-----------------------------------------------+
@@ -147,6 +147,11 @@ Due to the syntax of floating point literals, the attributes must be accessed us
 
 The ``ceiling`` and ``floor`` attributes raise an :py:class:`~rule_engine.errors.ArithmeticError` if their result would
 have more digits than allowed by the *int_max_digits* parameter of :py:class:`~rule_engine.engine.Context`.
+
+STRING Attributes :sup:`2`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``to_flt`` and ``to_int`` attributes accept leading zeros, unlike :ref:`FLOAT literals<literal-float-values>`. For
+example ``"02134".to_int`` is ``2134``.
 
 Encoding and Decoding
 ^^^^^^^^^^^^^^^^^^^^^

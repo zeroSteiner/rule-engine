@@ -40,6 +40,7 @@ from typing import Any, Callable, cast
 
 from .. import errors
 from .definitions import (
+        _DATA_TYPE_UNDEFINED,
         _DataTypeDef,
         _MappingDataTypeDef,
         _NullableDataTypeDef,
@@ -218,6 +219,43 @@ def _resolve_strict_field_type(annotation: Any, current_cls: type, seen: dict[ty
         raise
 
 
+_UNRESOLVED = object()
+
+def _get_field_type_hints(cls: type, strict: bool) -> dict[str, Any]:
+    """
+    Get the type hints of the fields of *cls* with :py:func:`typing.get_type_hints`. A forward reference that can't
+    be resolved makes it raise a :py:exc:`NameError` for the whole class, so in non-strict mode each field is then
+    evaluated on its own, and the ones that raise a :py:exc:`NameError` map to ``_UNRESOLVED``.
+    """
+    try:
+        return typing.get_type_hints(cls)
+    except NameError as error:
+        if strict:
+            raise
+        name_error = error
+    hints: dict[str, Any] = {}
+    for field in dataclasses.fields(cls):
+        # the most basic class that declares the field, whose namespaces get_type_hints evaluates it in
+        owner = next(
+                (
+                    base for base in reversed(cls.__mro__)
+                    if base.__dict__.get('__dataclass_fields__', {}).get(field.name) is field
+                ),
+                cls
+        )
+        holder = type(owner.__name__, (), {'__annotations__': {field.name: field.type}, '__module__': owner.__module__})
+        module_globals = getattr(sys.modules.get(owner.__module__), '__dict__', {})
+        try:
+            # like get_type_hints does for a class, look names up in the module first, then in the class namespace
+            field_hints = typing.get_type_hints(holder, globalns=dict(vars(owner)), localns=module_globals)
+            hints[field.name] = field_hints[field.name]
+        except NameError:
+            hints[field.name] = _UNRESOLVED
+        except Exception:
+            # a field that fails for another reason keeps the class raising the error it did before
+            raise name_error from None
+    return hints
+
 def _build_object_from_dataclass(
         cls: type,
         name: str,
@@ -228,10 +266,13 @@ def _build_object_from_dataclass(
 ) -> _ObjectDataTypeDef:
     seen = dict(_seen)
     seen[cls] = name
-    type_hints = typing.get_type_hints(cls)
+    type_hints = _get_field_type_hints(cls, strict)
     attributes: dict[str, _DataTypeDef] = {}
     for field in dataclasses.fields(cls):
         annotation = type_hints.get(field.name, field.type)
+        if annotation is _UNRESOLVED:
+            attributes[field.name] = _DATA_TYPE_UNDEFINED
+            continue
         unwrapped, is_nullable = _unwrap_optional(annotation)
         if strict:
             attr_type = _resolve_strict_field_type(unwrapped, cls, seen)

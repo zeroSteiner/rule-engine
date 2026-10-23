@@ -828,6 +828,22 @@ class _NullableSetTeam:
     name: str
     members: 'set[_NullableSetMember | None]'
 
+@dataclasses.dataclass
+class _PartlyUnresolvableHero:
+    name: str
+    nemesis: 'NoSuchHero'  # noqa: F821
+    sidekicks: 'list[_ArraySelfRefHero]'
+    alias: 'typing.Optional[str]'
+    # named like the module, which get_type_hints looks up first
+    datetime: 'datetime.datetime' = datetime.datetime(1939, 5, 1)
+    # a name from the class namespace, which get_type_hints looks up next
+    Title = str
+    title: 'Title' = 'Mr.'
+
+@dataclasses.dataclass
+class _PartlyUnresolvableSidekick(_PartlyUnresolvableHero):
+    rank: 'int' = 0
+
 _literal_evaluations = []
 
 def _record_literal_evaluation():
@@ -1388,6 +1404,29 @@ class ObjectDataTypeTests(unittest.TestCase):
                     DataType.OBJECT.from_dataclass('Root', node)
             # one call for each of the 16 dataclasses
             self.assertLessEqual(get_type_hints.call_count, 32)
+
+    def test_object_from_dataclass_unresolvable_forward_reference(self):
+        for cls in (_UnresolvableHero, _PartlyUnresolvableHero, _PartlyUnresolvableSidekick):
+            with self.assertRaisesRegex(NameError, r'NoSuchHero', msg=cls.__name__):
+                DataType.OBJECT.from_dataclass('Hero', cls)
+        result = DataType.OBJECT.from_dataclass('Hero', _UnresolvableHero, strict=False)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        self.assertIs(result.attributes['nemesis'], DataType.UNDEFINED)
+        result = DataType.OBJECT.from_dataclass('Hero', _PartlyUnresolvableSidekick, strict=False)
+        sidekick = DataType.OBJECT.from_dataclass('_ArraySelfRefHero', _ArraySelfRefHero)
+        self.assertEqual(result.attributes, {
+                'name': DataType.STRING,
+                'nemesis': DataType.UNDEFINED,
+                'sidekicks': DataType.ARRAY(sidekick),
+                'alias': DataType.NULLABLE(DataType.STRING),
+                'datetime': DataType.DATETIME,
+                'title': DataType.STRING,
+                'rank': DataType.FLOAT
+        })
+        # another field that can't be evaluated keeps the class raising the NameError
+        Hero = dataclasses.make_dataclass('Hero', [('nemesis', 'NoSuchHero'), ('broken', 'list[')])
+        with self.assertRaisesRegex(NameError, r'NoSuchHero'):
+            DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
 
     def test_object_from_dataclass_literal_values_are_not_evaluated(self):
         @dataclasses.dataclass

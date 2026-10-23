@@ -37,6 +37,7 @@ import math
 import random
 import string
 import unittest
+import warnings
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
@@ -423,6 +424,29 @@ class ParserLiteralTests(ParserTestsBase):
         for string in ('0x1+1j', '0b1, 2'):
             with self.subTest(string=string), self.assertRaises(errors.FloatSyntaxError):
                 parser.utilities.parse_float(string)
+
+    def test_parse_float_base_invalid_no_warnings(self):
+        # text after the value must not be parsed as Python source code which can warn about things like invalid escapes
+        for string in ("0x1, '\\.'", "0b1, b'\\.'", '0o1or 1', '0x1in[1]'):
+            with self.subTest(string=string), warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always')
+                with self.assertRaises(errors.FloatSyntaxError):
+                    parser.utilities.parse_float(string)
+                self.assertEqual(caught, [])
+
+    def test_parse_float_base_trailing_whitespace(self):
+        # python ignores whitespace, comments and line continuations after the value, these have always been accepted
+        strings = (
+                '0x10 ', '0x10\t', '0x10\n', '0x10\r\n', '0x10\r', '0x10\f', '0x1_0 \n',
+                '0x10 # c', '0x10#c\n', '0x10 \\\n ', '0x10\\\r\n '
+        )
+        for string in strings:
+            with self.subTest(string=string):
+                self.assertEqual(parser.utilities.parse_float(string), decimal.Decimal(16))
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
+            self.assertEqual(parser.utilities.parse_float("0x10 # '\\.'"), decimal.Decimal(16))
+        self.assertEqual(caught, [])
 
     def test_parse_float_inf(self):
         self.assertLiteralStatementEqual('inf', ast.FloatExpression, decimal.Decimal('inf'))

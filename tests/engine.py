@@ -657,6 +657,15 @@ class EngineRuleTests(unittest.TestCase):
         with self.assertRaises(errors.EvaluationError):
             engine.Rule('b"a" < b"b"')
 
+    def test_engine_rule_parse_float_invalid_prefixed_no_warnings(self):
+        rule = engine.Rule('$parse_float(value)')
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
+            with self.assertRaises(errors.FunctionCallError) as raised:
+                rule.evaluate({'value': "0x1, '\\.'"})
+        self.assertIsInstance(raised.exception.error, errors.FloatSyntaxError)
+        self.assertEqual(caught, [])
+
     def test_engine_rule_debug_parser(self):
         with open(os.devnull, 'w') as file_h:
             original_stderr = sys.stderr

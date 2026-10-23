@@ -781,6 +781,36 @@ class _MappingSelfRefHero:
     name: str
     allies: dict[str, '_MappingSelfRefHero'] = dataclasses.field(default_factory=dict)
 
+@dataclasses.dataclass
+class _NullableArraySelfRefHero:
+    name: str
+    sidekicks: list[typing.Optional['_NullableArraySelfRefHero']] = dataclasses.field(default_factory=list)
+
+@dataclasses.dataclass
+class _UnresolvableHero:
+    name: str
+    nemesis: 'NoSuchHero'  # noqa: F821
+
+@dataclasses.dataclass(frozen=True)
+class _NullableSetMember:
+    name: str
+    team: '_NullableSetTeam'
+
+@dataclasses.dataclass(frozen=True)
+class _NullableSetTeam:
+    name: str
+    members: 'set[_NullableSetMember | None]'
+
+@dataclasses.dataclass(frozen=True)
+class _ArraySetSelfRefHero:
+    name: str
+    teams: list[set['_ArraySetSelfRefHero']] = dataclasses.field(default_factory=list)
+
+@dataclasses.dataclass(frozen=True)
+class _MappingSetSelfRefHero:
+    name: str
+    teams: dict[str, set['_MappingSetSelfRefHero']] = dataclasses.field(default_factory=dict)
+
 @dataclasses.dataclass(frozen=True)
 class _SetSelfRefHero:
     name: str
@@ -1244,6 +1274,88 @@ class ObjectDataTypeTests(unittest.TestCase):
         nested = address.inner_type
         self.assertIsInstance(nested, types._ObjectDataTypeDef)
         self.assertEqual(nested.name, 'Address')
+
+    def test_object_from_dataclass_nested_in_nullable_members(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        @dataclasses.dataclass
+        class Person:
+            homes: list[Address | None]
+            offices: typing.List[typing.Optional[Address]]
+            by_city: dict[str, Address | None]
+            history: list[list[Address]]
+            previous: typing.Optional[list[Address | None]]
+
+        result = DataType.OBJECT.from_dataclass('Person', Person)
+        address = DataType.OBJECT.from_dataclass('Address', Address)
+        nullable_address = DataType.NULLABLE(address)
+        self.assertEqual(result.attributes['homes'], DataType.ARRAY(nullable_address))
+        self.assertEqual(result.attributes['offices'], DataType.ARRAY(nullable_address))
+        self.assertEqual(result.attributes['by_city'], DataType.MAPPING(DataType.STRING, nullable_address))
+        self.assertEqual(result.attributes['history'], DataType.ARRAY(DataType.ARRAY(address)))
+        self.assertEqual(result.attributes['previous'], DataType.NULLABLE(DataType.ARRAY(nullable_address)))
+        # non-strict mode keeps mapping them to UNDEFINED
+        result = DataType.OBJECT.from_dataclass('Person', Person, strict=False)
+        for attribute, attribute_type in result.attributes.items():
+            self.assertIs(attribute_type, DataType.UNDEFINED, msg=attribute)
+
+    def test_object_from_dataclass_self_reference_in_nullable_array(self):
+        result = DataType.OBJECT.from_dataclass('Hero', _NullableArraySelfRefHero)
+        sidekicks = result.attributes['sidekicks']
+        self.assertIsInstance(sidekicks, types._ArrayDataTypeDef)
+        self.assertIsInstance(sidekicks.value_type, types._NullableDataTypeDef)
+        self.assertIs(sidekicks.value_type.inner_type, result)
+        result = DataType.OBJECT.from_dataclass('Hero', _NullableArraySelfRefHero, strict=False)
+        self.assertIs(result.attributes['sidekicks'], DataType.UNDEFINED)
+
+    def test_object_from_dataclass_forward_reference_members(self):
+        # Python 3.10 leaves the string arguments of list[...] and dict[...] unevaluated
+        @dataclasses.dataclass
+        class Scores:
+            values: list['int']
+            by_name: dict[str, 'int | None']
+
+        result = DataType.OBJECT.from_dataclass('Scores', Scores)
+        self.assertEqual(result.attributes['values'], DataType.ARRAY(DataType.FLOAT))
+        self.assertEqual(result.attributes['by_name'], DataType.MAPPING(DataType.STRING, DataType.NULLABLE(DataType.FLOAT)))
+
+    def test_object_from_dataclass_nested_in_unsupported_member(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        # strict mode raises the same errors it did before it mapped the nested members
+        for annotation in (set[Address | None], dict[Address | None, int], dict[Address, list[Address | None]]):
+            Person = dataclasses.make_dataclass('Person', [('value', annotation)])
+            with self.assertRaisesRegex(ValueError, r'^can not map python type \'Address\'', msg=repr(annotation)):
+                DataType.OBJECT.from_dataclass('Person', Person)
+            result = DataType.OBJECT.from_dataclass('Person', Person, strict=False)
+            self.assertIs(result.attributes['value'], DataType.UNDEFINED, msg=repr(annotation))
+        Person = dataclasses.make_dataclass('Person', [('heroes', list[_UnresolvableHero | None])])
+        with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnresolvableHero\''):
+            DataType.OBJECT.from_dataclass('Person', Person)
+        with self.assertRaisesRegex(ValueError, r'^can not map python type \'_NullableSetMember\''):
+            DataType.OBJECT.from_dataclass('Member', _NullableSetMember)
+        # a set of the dataclass itself, nested in a list or a dict, raises what it did before rather than the
+        # EngineError the SET would raise once the schema is built (Python 3.10 leaves the string unevaluated)
+        error_type = TypeError if sys.version_info < (3, 11) else ValueError
+        for cls in (_ArraySetSelfRefHero, _MappingSetSelfRefHero):
+            with self.assertRaises(error_type, msg=cls.__name__):
+                DataType.OBJECT.from_dataclass('Hero', cls)
+
+    def test_object_from_dataclass_deep_unsupported_member(self):
+        # a schema that fails deep down raises without resolving every level again
+        for spelling in (lambda cls: list[cls], lambda cls: list[cls | None]):
+            node = dataclasses.make_dataclass('Leaf', [('context', decimal.Context)])
+            for index in range(15):
+                node = dataclasses.make_dataclass('Node{}'.format(index), [('children', spelling(node))])
+            with unittest.mock.patch('typing.get_type_hints', wraps=typing.get_type_hints) as get_type_hints:
+                with self.assertRaisesRegex(ValueError, r'^can not map python type \'(Context|Node13)\''):
+                    DataType.OBJECT.from_dataclass('Root', node)
+            # one call for each of the 16 dataclasses
+            self.assertLessEqual(get_type_hints.call_count, 32)
 
     def test_object_from_dataclass_unsupported_type_strict(self):
         import uuid

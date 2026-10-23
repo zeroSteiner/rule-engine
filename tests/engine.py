@@ -551,6 +551,27 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(type_resolver('nicknames'), types.DataType.MAPPING(types.DataType.STRING, nullable_string))
         self.assertEqual(type_resolver('tags'), types.DataType.SET(nullable_string))
 
+    def test_engine_type_resolver_from_dataclass_nested_in_nullable_members(self):
+        @dataclasses.dataclass
+        class Team:
+            name: str
+            members: list[_ResolverFlatHero | None]
+
+        type_resolver = engine.type_resolver_from_dataclass(Team)
+        hero = type_resolver('_ResolverFlatHero')
+        self.assertIsInstance(hero, types._ObjectDataTypeDef)
+        self.assertEqual(type_resolver('members'), types.DataType.ARRAY(types.DataType.NULLABLE(hero)))
+        context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
+        rule = engine.Rule('members[0]&.name == "Batman"', context=context)
+        self.assertTrue(rule.matches(Team('Justice League', [_ResolverFlatHero('Batman', 85), None])))
+        self.assertFalse(rule.matches(Team('Justice League', [None])))
+        # the members may be null, so they need to be discharged like other NULLABLE values
+        with self.assertRaises(errors.EvaluationError):
+            engine.Rule('members[0].name == "Batman"', context=context)
+        # non-strict mode keeps mapping the field to UNDEFINED
+        type_resolver = engine.type_resolver_from_dataclass(Team, strict=False)
+        self.assertIs(type_resolver('members'), types.DataType.UNDEFINED)
+
     def test_engine_type_resolver_from_dataclass_nullable_evaluates_rule(self):
         context = engine.Context(
                 resolver=engine.resolve_attribute,

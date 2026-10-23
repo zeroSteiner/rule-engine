@@ -165,7 +165,9 @@ The derived schema reflects three behaviors automatically:
   unwrapped. See :ref:`the NULLABLE section<data-types-nullable>` for how to work with nullable attributes in rules.
 - **Nested dataclasses**: a field whose annotation is itself a dataclass becomes a nested ``OBJECT`` (recursively).
   Generic containers (e.g. ``list[Address]``, ``dict[str, Address]``) are walked so nested dataclasses inside
-  ``ARRAY``, ``SET``, and ``MAPPING`` types are also expanded.
+  ``ARRAY``, ``SET``, and ``MAPPING`` types are also expanded. In strict mode this includes a dataclass nested inside
+  a union or a container's member type, such as ``list[Address | None]`` or ``list[list[Address]]``; with
+  ``strict=False`` those fields map to :py:attr:`~DataType.UNDEFINED`.
 - **Self and mutual recursion**: a field whose annotation refers back to the enclosing dataclass becomes
   :py:attr:`DataType.OBJECT.self`; cycles between sibling dataclasses produce
   :py:meth:`DataType.OBJECT.reference` placeholders that resolve at rule parse time when both schemas are reachable

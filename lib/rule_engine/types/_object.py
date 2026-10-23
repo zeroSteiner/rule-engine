@@ -218,6 +218,10 @@ class _ObjectDataTypeDef(_DataTypeDef):
         :param bool strict: When ``True`` (the default), a field annotated with a type that cannot be mapped to a
             Rule Engine data type raises :py:exc:`ValueError`. When ``False``, such fields fall back to
             :py:attr:`DataType.UNDEFINED` so the attribute remains selectable without parse-time type checking.
+            Only strict mode maps a dataclass nested inside a union or inside a container's member type, such as
+            ``list[Address | None]`` or ``list[list[Address]]``, and, on Python 3.10, a string forward reference
+            inside ``list[...]``, ``set[...]`` or ``dict[...]``. With ``strict=False`` those fields are
+            :py:attr:`DataType.UNDEFINED`.
         """
         import dataclasses
         from .dataclass import _build_object_from_dataclass

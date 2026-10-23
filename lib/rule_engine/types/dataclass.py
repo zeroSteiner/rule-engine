@@ -89,7 +89,8 @@ def _resolve_dataclass_field_type(
         annotation: Any,
         current_cls: type,
         seen: dict[type, str],
-        strict: bool
+        strict: bool,
+        nested: bool = False
 ) -> _DataTypeDef:
     """
     Translate a dataclass field annotation into a :py:class:`_DataTypeDef`, recursing into nested dataclasses.
@@ -97,7 +98,9 @@ def _resolve_dataclass_field_type(
     :py:class:`_SelfReferenceDataTypeDef` for direct self-references). *seen* maps each ancestor dataclass on the
     build stack to the OBJECT name it will be registered under (used to emit unresolved references for mutual
     recursion). When *strict* is ``False``, annotations that cannot be mapped to a Rule Engine type fall back to
-    :py:attr:`DataType.UNDEFINED` instead of raising.
+    :py:attr:`DataType.UNDEFINED` instead of raising. When *nested* is ``True``, which only
+    :py:func:`_resolve_strict_field_type` does, dataclasses and forward references nested inside unions and
+    containers are mapped too.
     """
     # deferred to avoid the dataclass.py -> datatype.py import cycle
     from .datatype import DataType
@@ -120,24 +123,98 @@ def _resolve_dataclass_field_type(
             if contains_dataclass:
                 origin_type = DataType.from_type(origin)
                 if origin_type is DataType.ARRAY:
-                    return DataType.ARRAY(_resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict))
+                    return DataType.ARRAY(
+                            _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict, nested)
+                    )
                 if origin_type is DataType.SET:
-                    value_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict)
+                    value_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict, nested)
                     # SET rejects OBJECT members, but a self reference only becomes one when the schema is built
                     if isinstance(_NullableDataTypeDef.unwrap(value_type), _SelfReferenceDataTypeDef):
                         raise errors.EngineError('the OBJECT data type may not be used as a SET member')
                     return DataType.SET(value_type)
                 if origin_type is DataType.MAPPING:
-                    key_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict)
-                    value_type = _resolve_dataclass_field_type(resolved_args[1], current_cls, seen, strict)
+                    key_type = _resolve_dataclass_field_type(resolved_args[0], current_cls, seen, strict, nested)
+                    value_type = _resolve_dataclass_field_type(resolved_args[1], current_cls, seen, strict, nested)
                     return cast(_MappingDataTypeDef, DataType.MAPPING(key_type, value_type))
         return DataType.from_type(annotation)
     except (errors.EngineError, TypeError, ValueError):
+        if nested and _contains_nested_member(annotation):
+            return _resolve_nested_member_type(annotation, current_cls, seen)
         # data types raise EngineError for member types they reject, such as a NULLABLE mapping key or an OBJECT set
         # member
         if strict:
             raise
         return DataType.UNDEFINED
+
+def _contains_nested_member(annotation: Any) -> bool:
+    """
+    Check whether *annotation* is, or has among its arguments at any depth, a dataclass or a forward reference. On
+    Python 3.10, :py:func:`typing.get_type_hints` leaves the string arguments of PEP 585 generics unevaluated.
+    """
+    if isinstance(annotation, (str, typing.ForwardRef)):
+        return True
+    if isinstance(annotation, type) and dataclasses.is_dataclass(annotation):
+        return True
+    # the arguments of a Literal are values, not type hints
+    if typing.get_origin(annotation) is typing.Literal:
+        return False
+    return any(_contains_nested_member(arg) for arg in typing.get_args(annotation))
+
+def _resolve_nested_member_type(annotation: Any, current_cls: type, seen: dict[type, str]) -> _DataTypeDef:
+    """
+    Map an ``Optional`` union or a ``list``, ``set`` or ``dict`` whose arguments hold a dataclass or a forward reference
+    that :py:meth:`DataType.from_type` can't map, such as ``list[Address | None]``, by resolving each argument in strict
+    mode. Raises when *annotation* can't be mapped this way.
+    """
+    from .datatype import DataType
+    member, is_nullable = _unwrap_optional(annotation)
+    if is_nullable and member is not annotation:
+        return _NullableDataTypeDef.wrap(_resolve_dataclass_field_type(member, current_cls, seen, True, True))
+    origin = typing.get_origin(annotation)
+    if origin in (list, set, dict):
+        args = tuple(_resolve_forward_ref(arg, current_cls) for arg in typing.get_args(annotation))
+        if origin is list and len(args) == 1:
+            return DataType.ARRAY(_resolve_dataclass_field_type(args[0], current_cls, seen, True, True))
+        if origin is set and len(args) == 1:
+            value_type = _resolve_dataclass_field_type(args[0], current_cls, seen, True, True)
+            # SET rejects OBJECT members, and references only become OBJECTs later
+            if isinstance(_NullableDataTypeDef.unwrap(value_type), _ReferenceDataTypeDef):
+                raise errors.EngineError('the OBJECT data type may not be used as a SET member')
+            return DataType.SET(value_type)
+        if origin is dict and len(args) == 2:
+            key_type = _resolve_dataclass_field_type(args[0], current_cls, seen, True, True)
+            value_type = _resolve_dataclass_field_type(args[1], current_cls, seen, True, True)
+            return cast(_MappingDataTypeDef, DataType.MAPPING(key_type, value_type))
+    raise ValueError("can not map python type {0!r} to a compatible data type".format(annotation))
+
+def _raised_while_building(error: BaseException) -> bool:
+    """Check whether *error* was raised while a nested dataclass was being built, below the frame that caught it."""
+    traceback = error.__traceback__
+    while traceback is not None:
+        if traceback.tb_frame.f_code is _build_object_from_dataclass.__code__:
+            return True
+        traceback = traceback.tb_next
+    return False
+
+def _resolve_strict_field_type(annotation: Any, current_cls: type, seen: dict[type, str]) -> _DataTypeDef:
+    """
+    Resolve a field annotation in strict mode. When it raises, the field is resolved again with the dataclasses and
+    forward references nested inside unions and containers mapped too. If that fails as well, the first error is
+    raised, so a field that can't be mapped raises the same exception it did before nested members were mapped.
+
+    An error from building a nested dataclass is raised right away: the second try would build it the same way and
+    fail the same way, and retrying at every level of a deep schema would take exponential time.
+    """
+    try:
+        return _resolve_dataclass_field_type(annotation, current_cls, seen, True)
+    except (errors.EngineError, TypeError, ValueError) as error:
+        if _raised_while_building(error):
+            raise
+        try:
+            return _resolve_dataclass_field_type(annotation, current_cls, seen, True, True)
+        except Exception:
+            pass
+        raise
 
 
 def _build_object_from_dataclass(
@@ -155,7 +232,12 @@ def _build_object_from_dataclass(
     for field in dataclasses.fields(cls):
         annotation = type_hints.get(field.name, field.type)
         unwrapped, is_nullable = _unwrap_optional(annotation)
-        attr_type = _resolve_dataclass_field_type(unwrapped, cls, seen, strict)
+        if strict:
+            attr_type = _resolve_strict_field_type(unwrapped, cls, seen)
+        else:
+            # non-strict mode keeps mapping the nested members that only strict mode maps to UNDEFINED, because typing
+            # them would change fields that resolve today
+            attr_type = _resolve_dataclass_field_type(unwrapped, cls, seen, False)
         if is_nullable:
             attr_type = _NullableDataTypeDef.wrap(attr_type)
         attributes[field.name] = attr_type

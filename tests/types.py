@@ -306,6 +306,33 @@ class DataTypeTests(unittest.TestCase):
             DataType.from_type(self._UnsupportedType())
         with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
             DataType.from_type(self._UnsupportedType)
+        # the class of a type hint has a descriptor for its __origin__
+        with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be a type or a type hint, not the type hint class '):
+            DataType.from_type(type(list[int]))
+        if sys.version_info >= (3, 14):
+            with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be a type or a type hint, not the type hint class '):
+                DataType.from_type(typing.Union)
+
+    def test_data_type_from_type_error_types(self):
+        # the exceptions documented by from_type
+        for hint in (
+                None, 'int', typing.ForwardRef('int'), typing.Literal[1], typing.ClassVar[int], typing.Final[int],
+                typing.Union, typing.TypeVar('T'), typing.NewType('UserId', int), typing.NoReturn, list[typing.Literal[1]],
+                typing.Optional[typing.Literal[1]], dict[str | None, typing.Literal[1]]
+        ):
+            with self.assertRaises(TypeError, msg=repr(hint)):
+                DataType.from_type(hint)
+        for hint in (dict[str | None, int], dict[set[int], int], typing.Dict[typing.Optional[str], int]):
+            with self.assertRaises(errors.EngineError, msg=repr(hint)):
+                DataType.from_type(hint)
+        for hint in (
+                decimal.Context, frozenset[int], typing.Callable[[int], str], str | int, typing.Union[int, typing.Literal[1]],
+                dict[set[int], decimal.Context]
+        ):
+            with self.assertRaises(ValueError, msg=repr(hint)):
+                DataType.from_type(hint)
+        with self.assertRaises(TypeError if sys.version_info < (3, 11) else ValueError):
+            DataType.from_type(typing.Any)
 
     def test_data_type_from_value_compound_array(self):
         for value in [list(), range(0), tuple()]:

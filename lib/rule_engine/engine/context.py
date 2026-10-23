@@ -166,8 +166,10 @@ def type_resolver_from_dataclass(cls: type, *, strict: bool = True) -> Callable[
 
     :param type cls: A class decorated with :py:func:`~dataclasses.dataclass`.
     :param bool strict: Forwarded to :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass`. When ``True``
-            (the default), a field annotated with a type that cannot be mapped to a Rule Engine data type raises
-            :py:exc:`ValueError`. When ``False``, such fields fall back to
+            (the default), a field annotated with a type that cannot be mapped to a Rule Engine data type raises an
+            exception, usually a :py:exc:`ValueError` (see
+            :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` for the others). When ``False``, such fields
+            fall back to
             :py:attr:`~rule_engine.types.DataType.UNDEFINED`.
     :return: The callback function.
     :rtype: function

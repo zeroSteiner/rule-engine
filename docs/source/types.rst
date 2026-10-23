@@ -173,9 +173,12 @@ The derived schema reflects three behaviors automatically:
   :py:meth:`DataType.OBJECT.reference` placeholders that resolve at rule parse time when both schemas are reachable
   through the :py:class:`~rule_engine.engine.Context` ``type_resolver``.
 
-By default (``strict=True``) a field whose annotation cannot be mapped to a Rule Engine data type raises
-:py:exc:`ValueError` so the schema mistake is caught early. Pass ``strict=False`` to instead map the offending
-field to :py:attr:`~DataType.UNDEFINED`, leaving it selectable but not type-checked at parse time.
+By default (``strict=True``) a field whose annotation cannot be mapped to a Rule Engine data type raises an
+exception so the schema mistake is caught early. That's usually a :py:exc:`ValueError`, but it can also be a
+:py:exc:`TypeError`, an :py:exc:`~rule_engine.errors.EngineError` or a :py:exc:`NameError`; see
+:py:meth:`DataType.OBJECT.from_dataclass` and :py:meth:`DataType.from_type` for when. Pass ``strict=False`` to
+instead map the offending field to :py:attr:`~DataType.UNDEFINED`, leaving it selectable but not type-checked at
+parse time.
 
 For the common case of building a :py:class:`~rule_engine.engine.Context` directly from a dataclass, the
 :py:func:`~rule_engine.engine.type_resolver_from_dataclass` helper produces a resolver whose top-level fields are the

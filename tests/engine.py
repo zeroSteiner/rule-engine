@@ -682,6 +682,59 @@ class EngineRuleTests(unittest.TestCase):
                     rule.matches(thing)
                 self.assertEqual(error_context.exception.message, message)
 
+    def test_engine_rule_symbol_type_error_null_members(self):
+        # null members are only allowed by a NULLABLE member type, the error's type includes them to show what differs
+        DataType = types.DataType
+        context = engine.Context(type_resolver=engine.type_resolver_from_dict({
+            'name': DataType.STRING,
+            'names': DataType.ARRAY(DataType.STRING),
+            'tags': DataType.SET(DataType.STRING)
+        }))
+        for text, thing, is_type, message in (
+                (
+                    'names[0] == "a"',
+                    {'names': ('a', None)},
+                    DataType.ARRAY(DataType.NULLABLE(DataType.STRING)),
+                    "symbol 'names' resolved to incorrect datatype (is: ARRAY(NULLABLE(STRING)), expected: ARRAY(STRING))"
+                ),
+                (
+                    '"a" in tags',
+                    {'tags': {'a', None}},
+                    DataType.SET(DataType.NULLABLE(DataType.STRING)),
+                    "symbol 'tags' resolved to incorrect datatype (is: SET(NULLABLE(STRING)), expected: SET(STRING))"
+                ),
+                # the members that aren't null have the wrong type too
+                (
+                    'names[0] == "a"',
+                    {'names': (1, None)},
+                    DataType.ARRAY(DataType.NULLABLE(DataType.FLOAT)),
+                    "symbol 'names' resolved to incorrect datatype "
+                    "(is: ARRAY(NULLABLE(FLOAT)), expected: ARRAY(STRING))"
+                ),
+                (
+                    'name == "a"',
+                    {'name': (1, None)},
+                    DataType.ARRAY(DataType.NULLABLE(DataType.FLOAT)),
+                    "symbol 'name' resolved to incorrect datatype (is: ARRAY(NULLABLE(FLOAT)), expected: STRING)"
+                ),
+                # the member type is unknown when every member is null
+                (
+                    'name == "a"',
+                    {'name': (None, None)},
+                    DataType.ARRAY,
+                    "symbol 'name' resolved to incorrect datatype (is: ARRAY, expected: STRING)"
+                )
+            ):
+            with self.subTest(text=text, thing=thing):
+                rule = engine.Rule(text, context=context)
+                with self.assertRaises(errors.SymbolTypeError) as error_context:
+                    rule.matches(thing)
+                error = error_context.exception
+                self.assertEqual(error.message, message)
+                self.assertEqual(error.is_type, is_type)
+                self.assertEqual(error.expected_type, context.resolve_type(error.symbol_name))
+                self.assertEqual(error.is_value, tuple(thing.values())[0])
+
     def test_engine_rule_errors_str_and_pickle(self):
         context = engine.Context(type_resolver=engine.type_resolver_from_dict({'name': types.DataType.STRING}))
         for text, thing, error_class, message in (

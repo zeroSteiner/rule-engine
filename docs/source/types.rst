@@ -308,6 +308,15 @@ The legacy ``attributes_nullable`` / ``value_type_nullable`` kwargs on :py:class
 constructors are still accepted in v5 for backward compatibility but emit a :py:class:`DeprecationWarning` and will
 be removed in v6.0. Wrap the attribute or element type in :py:attr:`~DataType.NULLABLE` directly instead.
 
+.. deprecated:: 5.1.1
+   A typed symbol whose value has a ``None`` member where the member type is not nullable is still accepted, but emits a
+   :py:class:`DeprecationWarning` once per :py:class:`~rule_engine.engine.Context` and symbol. Examples are
+   ``{'a': None}`` for ``MAPPING(STRING, STRING)`` and ``(None,)`` for ``ARRAY(STRING)``. Nested members are checked
+   too, as are :py:attr:`~DataType.MAPPING` keys, which are checked against the key type. In v6.0 these values will
+   raise :py:class:`~rule_engine.errors.SymbolTypeError`. Wrap the member type in :py:attr:`~DataType.NULLABLE` to
+   allow ``None``. Mapping keys can not be nullable, so use an :py:attr:`~DataType.UNDEFINED` key type to allow
+   ``None`` keys.
+
 FLOAT
 -----
 See :ref:`literal-float-values` for syntax.

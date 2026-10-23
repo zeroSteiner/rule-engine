@@ -770,6 +770,18 @@ class ContextSerializationTests(unittest.TestCase):
         context2 = pickle.loads(pickle.dumps(context))
         self.assertTrue(context2._mapping_fallback_warned)
 
+    def test_context_pickle_null_member_warned_state(self):
+        context = engine.Context()
+        context._null_member_warned.add((None, 'thing'))
+        context2 = pickle.loads(pickle.dumps(context))
+        self.assertEqual(context2._null_member_warned, {(None, 'thing')})
+        # contexts pickled before the state was added warn again
+        state = context.__getstate__()
+        del state['_null_member_warned']
+        context3 = engine.Context.__new__(engine.Context)
+        context3.__setstate__(state)
+        self.assertEqual(context3._null_member_warned, set())
+
     def test_context_pickle_builtins_functional(self):
         context = engine.Context()
         context2 = pickle.loads(pickle.dumps(context))

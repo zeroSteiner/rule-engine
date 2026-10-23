@@ -37,6 +37,7 @@ import random
 import sys
 import threading
 import unittest
+import unittest.mock
 import weakref
 
 import rule_engine.ast as ast
@@ -95,6 +96,22 @@ class ThreadSafetyTests(unittest.TestCase):
             self.assertTrue(rule.evaluate({'words': 'MainThread Test'}))
             lock.release()
         self.assertFalse(thread.join())
+
+    def test_null_member_deprecation_warns_once(self):
+        context = engine.Context(type_resolver={'thing': types.DataType.ARRAY(types.DataType.STRING)})
+        rule = engine.Rule('thing', context=context)
+        barrier = threading.Barrier(8)
+        def evaluate():
+            barrier.wait()
+            for _ in range(50):
+                rule.evaluate({'thing': (None,)})
+        with unittest.mock.patch('warnings.warn') as warn:
+            threads = [threading.Thread(target=evaluate) for _ in range(8)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+        self.assertEqual(warn.call_count, 1)
 
 class _ResultThread(threading.Thread):
     def __init__(self, function, *function_args):

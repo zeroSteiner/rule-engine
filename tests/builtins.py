@@ -37,6 +37,7 @@ import pickle
 import random
 import string
 import unittest
+import warnings
 
 import rule_engine.builtins as builtins
 import rule_engine.types as types
@@ -273,7 +274,9 @@ class BuiltinsTests(unittest.TestCase):
         })
         rule = engine.Rule(r'word =~ "(a)(c)?b" and [x for x in [$re_groups, obj["k"]]]', context=context)
         self.assertTrue(rule.matches({'word': 'acb', 'obj': {'k': ('b',)}}))
-        with self.assertRaises(errors.SymbolTypeError):
+        with self.assertRaises(errors.SymbolTypeError), warnings.catch_warnings():
+            # obj itself is accepted with a deprecation warning for its None member
+            warnings.simplefilter('ignore', DeprecationWarning)
             rule.evaluate({'word': 'acb', 'obj': {'k': ('a', None)}})
 
     def test_builtins_recursive(self):

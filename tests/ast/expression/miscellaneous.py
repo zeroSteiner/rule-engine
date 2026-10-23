@@ -30,12 +30,14 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import collections
 import datetime
 import decimal
 import itertools
 import random
 import string
 import unittest
+import warnings
 
 from .literal import context, trueish, falseish
 import rule_engine.ast as ast
@@ -348,6 +350,137 @@ class SymbolExpressionTests(unittest.TestCase):
         ):
             with self.assertRaises(errors.SymbolTypeError):
                 evaluate(data_type, value)
+
+    def _evaluate_recording_warnings(self, rule, thing):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
+            result = rule.evaluate(thing)
+        return result, [warning for warning in caught if issubclass(warning.category, DeprecationWarning)]
+
+    def test_ast_expression_symbol_type_null_member_deprecation(self):
+        DataType = types.DataType
+        S = DataType.STRING
+        cases = (
+                # (data type, value, kind of member, its type)
+                (DataType.MAPPING(S, S), {'a': None}, 'value', 'STRING'),
+                (DataType.MAPPING(S, S), {'a': None, 'b': 'c'}, 'value', 'STRING'),
+                (DataType.MAPPING(S, DataType.NULLABLE(S)), {None: 'b'}, 'key', 'STRING'),
+                (DataType.MAPPING(S), {None: 'b'}, 'key', 'STRING'),
+                (DataType.MAPPING(DataType.FLOAT, S), {1: None}, 'value', 'STRING'),
+                (DataType.NULLABLE(DataType.MAPPING(S, S)), {'a': None}, 'value', 'STRING'),
+                (DataType.ARRAY(S), (None,), 'member', 'STRING'),
+                (DataType.ARRAY(S), ('a', 1, None), 'member', 'STRING'),
+                (DataType.SET(S), {None}, 'member', 'STRING'),
+                (DataType.MAPPING(S, DataType.ARRAY(S)), {'a': None}, 'value', 'ARRAY'),
+                (DataType.MAPPING(S, DataType.ARRAY(S)), {'a': ('x', None)}, 'member', 'STRING'),
+                (DataType.MAPPING(S, DataType.MAPPING(S, S)), {'a': {None: 'c'}}, 'key', 'STRING'),
+                (DataType.MAPPING(DataType.ARRAY(S), S), {('a', None): 'b'}, 'member', 'STRING'),
+                (DataType.ARRAY(DataType.ARRAY(S)), ((None,),), 'member', 'STRING'),
+                (DataType.ARRAY(DataType.NULLABLE(DataType.ARRAY(S))), (('x', None),), 'member', 'STRING'),
+                (DataType.ARRAY(DataType.MAPPING(S, S)), ({'a': None, 'b': 'c'},), 'value', 'STRING'),
+                (DataType.SET(DataType.ARRAY(S)), {('x', None)}, 'member', 'STRING'),
+                # sequences that aren't coerced to tuples
+                (DataType.ARRAY(S), collections.deque([None]), 'member', 'STRING'),
+                (DataType.ARRAY(S), collections.UserList([None, None]), 'member', 'STRING'),
+                (DataType.MAPPING(S, DataType.ARRAY(S)), {'a': collections.deque(['x', None])}, 'member', 'STRING'),
+        )
+        for data_type, value, kind, member_type_name in cases:
+            with self.subTest(data_type=data_type, value=value):
+                context = engine.Context(type_resolver={'thing': data_type})
+                result, caught = self._evaluate_recording_warnings(engine.Rule('thing', context=context), {'thing': value})
+                self.assertEqual(result, value)
+                self.assertEqual(len(caught), 1)
+                message = str(caught[0].message)
+                self.assertIn("symbol 'thing' resolved to a value with a null {0} where the {0} type ({1})".format(kind, member_type_name), message)
+                self.assertIn('will raise SymbolTypeError in v6.0', message)
+                self.assertIn('UNDEFINED' if kind == 'key' else 'DataType.NULLABLE(...)', message)
+                # the warning points at the code that evaluated the rule
+                self.assertEqual(caught[0].filename, __file__)
+
+    def test_ast_expression_symbol_type_null_member_deprecation_once(self):
+        DataType = types.DataType
+        type_resolver = {'one': DataType.ARRAY(DataType.STRING), 'two': DataType.ARRAY(DataType.STRING)}
+        context = engine.Context(type_resolver=type_resolver)
+        rule = engine.Rule('one', context=context)
+        self.assertEqual(len(self._evaluate_recording_warnings(rule, {'one': (None,)})[1]), 1)
+        self.assertEqual(len(self._evaluate_recording_warnings(rule, {'one': (None,)})[1]), 0)
+        self.assertEqual(len(self._evaluate_recording_warnings(engine.Rule('one == one', context=context), {'one': (None,)})[1]), 0)
+        # another symbol and another context are warned about separately
+        self.assertEqual(len(self._evaluate_recording_warnings(engine.Rule('two', context=context), {'two': (None,)})[1]), 1)
+        context = engine.Context(type_resolver=type_resolver)
+        self.assertEqual(len(self._evaluate_recording_warnings(engine.Rule('one', context=context), {'one': (None,)})[1]), 1)
+        # the context checks again under its lock, for symbols evaluated in more than one thread at once
+        context = engine.Context()
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter('always')
+            context._warn_null_member('one', None, 'member', DataType.STRING)
+            context._warn_null_member('one', None, 'member', DataType.STRING)
+        self.assertEqual(len(caught), 1)
+
+    def test_ast_expression_symbol_type_null_member_deprecation_as_error(self):
+        # when the warning is turned into an error, every evaluation raises it, like the standard library's warnings
+        context = engine.Context(type_resolver={'thing': types.DataType.ARRAY(types.DataType.STRING)})
+        rule = engine.Rule('thing', context=context)
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', DeprecationWarning)
+            for _ in range(2):
+                with self.assertRaises(DeprecationWarning):
+                    rule.evaluate({'thing': (None,)})
+        self.assertEqual(context._null_member_warned, set())
+
+    def test_ast_expression_symbol_type_null_member_deprecation_assignments(self):
+        # variables assigned by a comprehension aren't walked again, so only the symbol the value came from warns
+        DataType = types.DataType
+        type_resolver = {'thing': DataType.ARRAY(DataType.ARRAY(DataType.STRING)), 'v': DataType.ARRAY(DataType.STRING)}
+        context = engine.Context(type_resolver=type_resolver)
+        rule = engine.Rule('[v for v in thing]', context=context)
+        result, caught = self._evaluate_recording_warnings(rule, {'thing': ((None,),)})
+        self.assertEqual(result, ((None,),))
+        self.assertEqual(len(caught), 1)
+        self.assertIn("symbol 'thing'", str(caught[0].message))
+        # and a top-level symbol of the same name is still warned about
+        result, caught = self._evaluate_recording_warnings(engine.Rule('v', context=context), {'v': (None,)})
+        self.assertEqual(len(caught), 1)
+        self.assertIn("symbol 'v'", str(caught[0].message))
+
+    def test_ast_expression_symbol_type_null_member_no_deprecation(self):
+        DataType = types.DataType
+        S = DataType.STRING
+        cases = (
+                (DataType.MAPPING(S, S), {'a': 'b'}),
+                (DataType.MAPPING(S, S), {}),
+                (DataType.MAPPING(S, DataType.NULLABLE(S)), {'a': None}),
+                (DataType.MAPPING(DataType.UNDEFINED, S), {None: 'b'}),
+                (DataType.MAPPING(S), {'a': None}),
+                (DataType.MAPPING, {None: None}),
+                (DataType.ARRAY(S), ('a', 1)),
+                (DataType.ARRAY(DataType.NULLABLE(S)), ('a', None)),
+                (DataType.ARRAY(DataType.NULL), (None,)),
+                (DataType.ARRAY(DataType.ARRAY(DataType.NULLABLE(S))), (('a', None),)),
+                (DataType.ARRAY(DataType.NULLABLE(DataType.ARRAY(S))), (None,)),
+                (DataType.ARRAY, (None,)),
+                (DataType.ARRAY(S), None),
+        )
+        for data_type, value in cases:
+            with self.subTest(data_type=data_type, value=value):
+                context = engine.Context(type_resolver={'thing': data_type})
+                result, caught = self._evaluate_recording_warnings(engine.Rule('thing', context=context), {'thing': value})
+                self.assertEqual(result, value)
+                self.assertEqual(caught, [])
+        # untyped symbols
+        result, caught = self._evaluate_recording_warnings(engine.Rule('thing'), {'thing': {'a': None, None: 'b'}})
+        self.assertEqual(caught, [])
+        # values that are rejected raise instead
+        context = engine.Context(type_resolver={'thing': DataType.ARRAY(S)})
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
+            with self.assertRaises(errors.SymbolTypeError):
+                engine.Rule('thing', context=context).evaluate({'thing': ('a', None)})
+        # $re_groups is exempt, including when every group is None
+        rule = engine.Rule(r'word =~ "(c)?b" and $re_groups[0] == null')
+        result, caught = self._evaluate_recording_warnings(rule, {'word': 'b'})
+        self.assertTrue(result)
+        self.assertEqual(caught, [])
 
 class SymbolExpressionConversionTests(unittest.TestCase):
     def setUp(self):

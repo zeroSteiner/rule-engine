@@ -342,9 +342,9 @@ Literal FLOAT Values
 :py:attr:`~.DataType.FLOAT` literals may be expressed in either binary, octal, decimal, or hexadecimal formats. The
 binary, octal and hexadecimal formats use the ``0b``, ``0o``, and ``0x`` prefixes respectively. Values in the decimal
 format require no prefix and is the default base in which values are represented. Only base-10, decimal values may
-include a decimal place component. Binary, octal and hexadecimal values with more digits, once converted to base-10,
-than allowed by the *int_max_digits* parameter of :py:class:`~rule_engine.engine.Context` raise an
-:py:class:`~rule_engine.errors.ArithmeticError`.
+include a decimal place component. Decimal values may not have leading zeros, e.g. ``01`` is invalid. Binary, octal and
+hexadecimal values with more digits, once converted to base-10, than allowed by the *int_max_digits* parameter of
+:py:class:`~rule_engine.engine.Context` raise an :py:class:`~rule_engine.errors.ArithmeticError`.
 
 Example rules showing equivalent literal expressions:
 

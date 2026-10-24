@@ -37,6 +37,7 @@ import math
 import random
 import string
 import unittest
+import warnings
 
 import rule_engine.ast as ast
 import rule_engine.engine as engine
@@ -423,6 +424,48 @@ class ParserLiteralTests(ParserTestsBase):
         for string in ('0x1+1j', '0b1, 2'):
             with self.subTest(string=string), self.assertRaises(errors.FloatSyntaxError):
                 parser.utilities.parse_float(string)
+
+    def test_parse_float_base_invalid_no_warnings(self):
+        # text after the value must not be parsed as Python source code which can warn about things like invalid escapes
+        for string in ("0x1, '\\.'", "0b1, b'\\.'", '0o1or 1', '0x1in[1]'):
+            with self.subTest(string=string), warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always')
+                with self.assertRaises(errors.FloatSyntaxError):
+                    parser.utilities.parse_float(string)
+                self.assertEqual(caught, [])
+
+    def test_parse_float_base_trailing_whitespace(self):
+        # trailing whitespace has always been accepted, except for a last line that ends with a space or tab
+        strings = (
+                '0x10 ', '0x10\t', '0x10\n', '0x10\r\n', '0x10\r', '0x10\f', '0x1_0 \n', '0x10\n\n', '0x10 \n \n',
+                '0x10\n \f', '0x10\t\f\r\n'
+        )
+        for string in strings:
+            with self.subTest(string=string):
+                self.assertEqual(parser.utilities.parse_float(string), decimal.Decimal(16))
+        for string in ('0x10\n ', '0x10 \r\n\t', '0x10\v', '0x10\xa0', '0x10 '):
+            with self.subTest(string=string), self.assertRaises(errors.FloatSyntaxError):
+                parser.utilities.parse_float(string)
+
+    def test_parse_float_base_digits(self):
+        for string, value in (('0x0010', 16), ('0xAbC', 0xabc), ('0x_1_0', 16), ('0b0_1', 1), ('0o1_7', 15)):
+            with self.subTest(string=string):
+                self.assertEqual(parser.utilities.parse_float(string), decimal.Decimal(value))
+        # int() accepts all of these, they must still be rejected
+        for string in ('0X10', '0B1', '0O1', '-0x10', '+0x10', ' 0x10', '0x1__0', '0x10_', '0x١٠', '0b１', '0x１'):
+            with self.subTest(string=string), self.assertRaises(errors.FloatSyntaxError):
+                parser.utilities.parse_float(string)
+
+    def test_parse_float_base_comments_and_continuations(self):
+        # these were accepted when the value was parsed as Python source code, comments and line continuations are not
+        # part of a numeric literal
+        strings = ('0x10 # c', '0x10#c\n', '0x10\n# c', '0x10 \\\n ', '0x10\\\r\n ', "0x10 # '\\.'")
+        for string in strings:
+            with self.subTest(string=string), warnings.catch_warnings(record=True) as caught:
+                warnings.simplefilter('always')
+                with self.assertRaises(errors.FloatSyntaxError):
+                    parser.utilities.parse_float(string)
+                self.assertEqual(caught, [])
 
     def test_parse_float_inf(self):
         self.assertLiteralStatementEqual('inf', ast.FloatExpression, decimal.Decimal('inf'))

@@ -452,5 +452,27 @@ class GetAttributeExpressionTests(unittest.TestCase):
         expression = ast.GetAttributeExpression(context, ast.StringExpression(context, 'inf'), 'to_flt')
         self.assertEqual(expression.evaluate(None), float('inf'))
 
+    def test_ast_expression_string_attributes_leading_zeros(self):
+        combos = (
+                ('02134', '2134'),
+                ('01', '1'),
+                ('007', '7'),
+                (' 0042\n', '42'),
+                ('0' * 5000 + '1', '1'),
+                # these already worked and must keep their exact values
+                ('00', '0'),
+                ('0', '0'),
+                ('01e5', '100000.0'),
+        )
+        for str_value, result in combos:
+            for attribute_name in ('to_flt', 'to_int'):
+                with self.subTest(value=str_value, attribute=attribute_name):
+                    expression = ast.GetAttributeExpression(context, ast.StringExpression(context, str_value), attribute_name)
+                    value = expression.evaluate(None)
+                    self.assertIsInstance(value, decimal.Decimal)
+                    self.assertEqual(str(value), result)
+        expression = ast.GetAttributeExpression(context, ast.StringExpression(context, '01.5'), 'to_flt')
+        self.assertEqual(str(expression.evaluate(None)), '1.5')
+
 if __name__ == '__main__':
     unittest.main()

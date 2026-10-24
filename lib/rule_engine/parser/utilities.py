@@ -30,11 +30,9 @@
 #  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import ast as pyast
 import binascii
 import datetime
 import decimal
-import operator
 import re
 
 from . import errors
@@ -70,27 +68,25 @@ def parse_datetime(string: str, default_timezone: datetime.tzinfo) -> datetime.d
         dt = dt.replace(tzinfo=default_timezone)
     return dt
 
-# a binary, octal or hexadecimal literal followed by only the whitespace, comments and line continuations that
-# ast.literal_eval may ignore, each string can only be matched one way so that a failed match can not cause catastrophic
-# backtracking, i.e. the lookahead keeps a comment from ending before the end of its line and the \n of a \r\n line
-# continuation is always matched as whitespace
+# a binary, octal or hexadecimal literal with the same digits and underscores that Python allows, followed by the
+# trailing whitespace that was accepted when these values were parsed with ast.literal_eval: any spaces, tabs, form feeds
+# and line breaks, except that Python rejected a last line, after a line break, that ends with a space or tab. The
+# character classes are ASCII only, so int() never sees the other digits and whitespace that it accepts.
 _prefixed_int_regex = re.compile(
-        r'0(?:b(?:_?[01])+|o(?:_?[0-7])+|x(?:_?[0-9a-fA-F])+)'
-        r'(?:[ \t\f\r\n]|\\[\r\n]|#[^\r\n]*(?=[\r\n]|\Z))*'
+        r'(0(?:b(?:_?[01])+|o(?:_?[0-7])+|x(?:_?[0-9a-fA-F])+))'
+        r'[ \t\f]*(?:[\r\n](?:[ \t\f]*[\r\n])*(?:[ \t\f]*\f)?)?'
 )
 
 def _parse_float(string: str) -> decimal.Decimal | int:
     # binary, octal and hexadecimal values are returned as an int so the caller can convert it using the correct limit
     if re.match('^0[0-9]', string):
         raise errors.FloatSyntaxError('invalid floating point literal (leading zeros in decimal literals are not permitted)', string)
-    # any other text would be parsed as Python source code by ast.literal_eval which can emit warnings for things like
-    # invalid escape sequences in strings, it can never be an integer so reject it here, literal_eval still decides
-    # whether the remaining strings are valid
-    if re.match('^0[box]', string) and _prefixed_int_regex.fullmatch(string) is None:
-        raise errors.FloatSyntaxError('invalid floating point literal', string)
+    if re.match('^0[box]', string):
+        match = _prefixed_int_regex.fullmatch(string)
+        if match is None:
+            raise errors.FloatSyntaxError('invalid floating point literal', string)
+        return int(match.group(1), 0)
     try:
-        if re.match('^0[box]', string):
-            return operator.index(pyast.literal_eval(string))
         return decimal.Decimal(string)
     except Exception:
         raise errors.FloatSyntaxError('invalid floating point literal', string) from None

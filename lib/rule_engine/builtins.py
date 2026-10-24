@@ -92,6 +92,11 @@ def _builtins_split(string: str, sep: str | None = None, maxsplit: Any = None) -
         raise errors.FunctionCallError('argument #3 (maxsplit) must be a natural number')
     return tuple(string.split(sep=sep, maxsplit=maxsplit))
 
+# The type of the $re_groups symbol that Context provides. A group that did not participate in the match is None, but
+# the members are typed as STRING rather than NULLABLE(STRING) so that rules using them as strings (e.g.
+# $re_groups[0] =~ "...") keep parsing. SymbolExpression checks for this exact object and allows None members for it.
+_RE_GROUPS_TYPE = types.DataType.ARRAY(types.DataType.STRING)
+
 class BuiltinValueGenerator(object):
     """
     A class used as a wrapper for builtin values to differentiate between a value that is a function and a value that

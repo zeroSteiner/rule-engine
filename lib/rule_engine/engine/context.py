@@ -37,6 +37,8 @@ import dataclasses
 import datetime
 import decimal
 import functools
+import os
+import sys
 import threading
 import warnings
 from typing import Any, Callable, Iterator
@@ -51,6 +53,18 @@ from ..types import DataType, _DataTypeDef
 from ._attribute_resolver import _AttributeResolver
 
 import dateutil.tz
+
+_PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep
+
+def _external_stacklevel() -> int:
+    # the stacklevel for a warnings.warn() call made by the caller of this function that attributes the warning to the
+    # first frame outside of this package, i.e. the code that evaluated the rule
+    frame = sys._getframe(1)
+    stacklevel = 1
+    while frame.f_back is not None and frame.f_code.co_filename.startswith(_PACKAGE_DIRECTORY):
+        frame = frame.f_back
+        stacklevel += 1
+    return stacklevel
 
 def _tls_getter(thread_local: threading.local, key: str, _builtins: Any) -> Any:
     # a function stub to be used with functools.partial for retrieving thread-local values
@@ -208,7 +222,7 @@ class _ThreadLocalStorage(object):
     """
     __slots__ = ('assignment_scopes', 'regex_groups')
     assignment_scopes: 'collections.deque[dict[str, ast.Assignment]]'
-    regex_groups: tuple[str, ...] | None
+    regex_groups: tuple[str | None, ...] | None
     def __init__(self) -> None:
         self.assignment_scopes = collections.deque()
         self.regex_groups = None
@@ -306,7 +320,7 @@ class Context(object):
         """The *default_value* parameter from :py:meth:`~__init__`"""
         self.builtins = builtins.Builtins.from_defaults(
                 values={'re_groups': builtins.BuiltinValueGenerator(functools.partial(_tls_getter, self._thread_local, 'regex_groups'))},
-                value_types={'re_groups': types.DataType.ARRAY(types.DataType.STRING)},
+                value_types={'re_groups': builtins._RE_GROUPS_TYPE},
                 timezone=default_timezone
         )
         """An instance of :py:class:`~rule_engine.builtins.Builtins` to provided a default set of builtin symbol values."""
@@ -327,6 +341,8 @@ class Context(object):
         """The *int_max_digits* parameter from :py:meth:`~__init__`."""
         self._mapping_fallback_lock = threading.Lock()
         self._mapping_fallback_warned = False
+        self._null_member_lock = threading.Lock()
+        self._null_member_warned: set[tuple[str | None, str]] = set()
 
     def __getstate__(self) -> dict[str, Any]:
         return {
@@ -338,6 +354,7 @@ class Context(object):
                 'mapping_attribute_lookup': self.mapping_attribute_lookup,
                 'int_max_digits': self.int_max_digits,
                 '_mapping_fallback_warned': self._mapping_fallback_warned,
+                '_null_member_warned': self._null_member_warned,
                 '_Context__type_resolver': self.__type_resolver,
                 '_Context__resolver': self.__resolver,
         }
@@ -355,14 +372,17 @@ class Context(object):
         # pickles created before 5.1.1 don't include int_max_digits
         self.int_max_digits = state.get('int_max_digits')
         self._mapping_fallback_warned = state['_mapping_fallback_warned']
+        # pickles created before 5.1.1 don't include _null_member_warned
+        self._null_member_warned = set(state.get('_null_member_warned', ()))
         self.__type_resolver = state['_Context__type_resolver']
         self.__resolver = state['_Context__resolver']
         # recreate transient objects that can not be pickled
         self._thread_local = threading.local()
         self._mapping_fallback_lock = threading.Lock()
+        self._null_member_lock = threading.Lock()
         self.builtins = builtins.Builtins.from_defaults(
                 values={'re_groups': builtins.BuiltinValueGenerator(functools.partial(_tls_getter, self._thread_local, 'regex_groups'))},
-                value_types={'re_groups': types.DataType.ARRAY(types.DataType.STRING)},
+                value_types={'re_groups': builtins._RE_GROUPS_TYPE},
                 timezone=self.default_timezone
         )
 
@@ -443,6 +463,31 @@ class Context(object):
                 "rule_engine.errors.MappingAttributeLookupDeprecation to silence this warning."
         ).format(attribute_name)
         warnings.warn(errors.MappingAttributeLookupDeprecation(message), stacklevel=2)
+
+    def _is_assigned(self, name: str) -> bool:
+        # whether resolve() would return *name* from an assignment scope, i.e. it's a variable assigned by an expression
+        return any(name in assignments for assignments in self._tls.assignment_scopes)
+
+    def _warn_null_member(self, symbol_name: str, scope: str | None, kind: str, member_type: _DataTypeDef) -> None:
+        with self._null_member_lock:
+            if (scope, symbol_name) in self._null_member_warned:
+                return
+            self._null_member_warned.add((scope, symbol_name))
+        if kind == 'key':
+            remedy = 'MAPPING keys can not be NULLABLE, so use a key type of UNDEFINED to allow null keys'
+        else:
+            remedy = 'wrap the {0} type in DataType.NULLABLE(...) to allow null {0}s'.format(kind)
+        message = (
+                "symbol {0!r} resolved to a value with a null {1} where the {1} type ({2}) does not allow null; this is "
+                "deprecated and will raise SymbolTypeError in v6.0, {3}"
+        ).format(symbol_name, kind, member_type.name, remedy)
+        try:
+            warnings.warn(message, DeprecationWarning, stacklevel=_external_stacklevel())
+        except BaseException:
+            # the warning was turned into an error (e.g. with -W error), so raise it again the next time too
+            with self._null_member_lock:
+                self._null_member_warned.discard((scope, symbol_name))
+            raise
 
     def resolve_type(self, name: str, scope: str | None = None) -> _DataTypeDef:
         """

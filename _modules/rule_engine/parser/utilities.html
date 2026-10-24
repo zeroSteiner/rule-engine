@@ -109,11 +109,9 @@
 <span class="c1">#  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 <span class="c1">#</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pyast</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">binascii</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">decimal</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">errors</span>
@@ -152,13 +150,25 @@
     <span class="k">return</span> <span class="n">dt</span></div>
 
 
+<span class="c1"># a binary, octal or hexadecimal literal with the same digits and underscores that Python allows, followed by the</span>
+<span class="c1"># trailing whitespace that was accepted when these values were parsed with ast.literal_eval: any spaces, tabs, form feeds</span>
+<span class="c1"># and line breaks, except that Python rejected a last line, after a line break, that ends with a space or tab. The</span>
+<span class="c1"># character classes are ASCII only, so int() never sees the other digits and whitespace that it accepts.</span>
+<span class="n">_prefixed_int_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="sa">r</span><span class="s1">&#39;(0(?:b(?:_?[01])+|o(?:_?[0-7])+|x(?:_?[0-9a-fA-F])+))&#39;</span>
+        <span class="sa">r</span><span class="s1">&#39;[ \t\f]*(?:[\r\n](?:[ \t\f]*[\r\n])*(?:[ \t\f]*\f)?)?&#39;</span>
+<span class="p">)</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_parse_float</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span> <span class="o">|</span> <span class="nb">int</span><span class="p">:</span>
     <span class="c1"># binary, octal and hexadecimal values are returned as an int so the caller can convert it using the correct limit</span>
     <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[0-9]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal (leading zeros in decimal literals are not permitted)&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[box]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">_prefixed_int_regex</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;^0[box]&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">operator</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">pyast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FloatSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid floating point literal&#39;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>

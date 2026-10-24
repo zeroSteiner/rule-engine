@@ -51,6 +51,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Data Attributes</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#builtin-attributes">Builtin Attributes</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#float-attributes-1">FLOAT Attributes <sup>1</sup></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#string-attributes-2">STRING Attributes <sup>2</sup></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#encoding-and-decoding">Encoding and Decoding</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#object-attribute-access">OBJECT Attribute Access</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#object-methods">Object Methods</a></li>
@@ -226,7 +227,7 @@ submembers. If the resolver function fails, the attribute will be checked to det
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">to_set</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.SET" title="rule_engine.types.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a></p></td>
 </tr>
-<tr class="row-even"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> <strong>Attributes</strong></p></td>
+<tr class="row-even"><td colspan="2"><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> <strong>Attributes</strong> <sup>2</sup></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">as_lower</span></code></p></td>
 <td><p><a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a></p></td>
@@ -286,6 +287,11 @@ submembers. If the resolver function fails, the attribute will be checked to det
 <code class="docutils literal notranslate"><span class="pre">3.14.to_str</span></code> is invalid while <code class="docutils literal notranslate"><span class="pre">(3.14).to_str</span></code> is valid.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">ceiling</span></code> and <code class="docutils literal notranslate"><span class="pre">floor</span></code> attributes raise an <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.ArithmeticError" title="rule_engine.errors.ArithmeticError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArithmeticError</span></code></a> if their result would
 have more digits than allowed by the <em>int_max_digits</em> parameter of <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>.</p>
+</section>
+<section id="string-attributes-2">
+<h3>STRING Attributes <sup>2</sup><a class="headerlink" href="#string-attributes-2" title="Link to this heading"></a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">to_flt</span></code> and <code class="docutils literal notranslate"><span class="pre">to_int</span></code> attributes accept leading zeros, unlike <a class="reference internal" href="syntax.html#literal-float-values"><span class="std std-ref">FLOAT literals</span></a>. For
+example <code class="docutils literal notranslate"><span class="pre">&quot;02134&quot;.to_int</span></code> is <code class="docutils literal notranslate"><span class="pre">2134</span></code>.</p>
 </section>
 <section id="encoding-and-decoding">
 <h3>Encoding and Decoding<a class="headerlink" href="#encoding-and-decoding" title="Link to this heading"></a></h3>

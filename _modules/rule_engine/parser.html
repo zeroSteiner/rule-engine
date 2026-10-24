@@ -170,6 +170,8 @@
 <span class="sd">    causing :py:exc:`~rule_engine.errors.EvaluationError` exceptions to be</span>
 <span class="sd">    raised during parsing.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># normalize the grammar so the packaged tables are valid on every python version</span>
+    <span class="n">_normalize_grammar</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">op_names</span> <span class="o">=</span> <span class="p">{</span>
             <span class="c1"># arithmetic operators</span>
             <span class="s1">&#39;+&#39;</span><span class="p">:</span>   <span class="s1">&#39;ADD&#39;</span><span class="p">,</span>   <span class="s1">&#39;-&#39;</span><span class="p">:</span>  <span class="s1">&#39;SUB&#39;</span><span class="p">,</span>

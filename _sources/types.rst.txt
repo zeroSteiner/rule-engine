@@ -342,6 +342,10 @@ Additional functions must be defined in Python and can either be added to the ev
 :ref:`extending the builtin symbols<changing-builtin-symbols>`. It is only possible to call a function from within the
 rule text. Functions can not be defined by rule authors as other data types can be.
 
+Functions can be compared with the ``==`` and ``!=`` operators, which check whether both sides are the same function.
+Attributes that evaluate to a function, such as :py:attr:`~DataType.BYTES` values' ``decode``, create a new function
+each time they are accessed, so ``value.decode == value.decode`` is false.
+
 TIMEDELTA
 ---------
 See :ref:`literal-timedelta-values` for syntax.

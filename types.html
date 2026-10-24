@@ -421,6 +421,9 @@ to rule authors. Rule Engine contains a few <a class="reference internal" href="
 Additional functions must be defined in Python and can either be added to the evaluated object or by
 <a class="reference internal" href="getting_started.html#changing-builtin-symbols"><span class="std std-ref">extending the builtin symbols</span></a>. It is only possible to call a function from within the
 rule text. Functions can not be defined by rule authors as other data types can be.</p>
+<p>Functions can be compared with the <code class="docutils literal notranslate"><span class="pre">==</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code> operators, which check whether both sides are the same function.
+Attributes that evaluate to a function, such as <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BYTES" title="rule_engine.types.DataType.BYTES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BYTES</span></code></a> values’ <code class="docutils literal notranslate"><span class="pre">decode</span></code>, create a new function
+each time they are accessed, so <code class="docutils literal notranslate"><span class="pre">value.decode</span> <span class="pre">==</span> <span class="pre">value.decode</span></code> is false.</p>
 </section>
 <section id="timedelta">
 <h2>TIMEDELTA<a class="headerlink" href="#timedelta" title="Link to this heading"></a></h2>

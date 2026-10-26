@@ -257,11 +257,11 @@ class SymbolExpressionTests(unittest.TestCase):
 
     def _type_resolver(self, name):
         if name == self.sym_aryname:
-            return types.DataType.ARRAY(types.DataType.FLOAT, value_type_nullable=False)
+            return types.DataType.ARRAY(types.DataType.FLOAT)
         elif name == self.sym_aryname_nontyped:
             return types.DataType.ARRAY
         elif name == self.sym_aryname_nullable:
-            return types.DataType.ARRAY(types.DataType.FLOAT, value_type_nullable=True)
+            return types.DataType.ARRAY(types.DataType.NULLABLE(types.DataType.FLOAT))
         elif name == self.sym_strname:
             return types.DataType.STRING
         return types.DataType.UNDEFINED

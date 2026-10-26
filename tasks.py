@@ -48,10 +48,10 @@ def tables(c, debug=False):
 def tests(c, coverage=False):
     """Run unit tests."""
     if coverage:
-        c.run('uv run python -m coverage run -m unittest -v', pty=True)
+        c.run('uv run python -m coverage run -m unittest -v tests', pty=True)
         c.run('uv run python -m coverage report')
     else:
-        c.run('uv run python -m unittest -v', pty=True)
+        c.run('uv run python -m unittest -v tests', pty=True)
 
 @task(aliases=['checktypes'])
 def typechecks(c):

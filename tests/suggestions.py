@@ -36,6 +36,8 @@ import unittest
 
 import rule_engine.suggestions as suggestions
 
+__all__ = ('JaroWinklerTests',)
+
 # JARO_WINKLER_TEST_CASES taken from the original whitepaper: see page 13, table 4
 # https://www.census.gov/srd/papers/pdf/rr91-9.pdf
 # not all JARO_WINKLER_TEST_CASES are a perfect match, so the table is a selection of those that are

@@ -31,8 +31,10 @@
 #
 
 import collections
+import contextlib
 import copy
 import enum
+import io
 import pickle
 import unittest
 
@@ -217,7 +219,9 @@ class ChainTests(unittest.TestCase):
         self.assertEqual(chain.context.symbols, {'port'})
 
     def test_chain_accepts_debug_rule(self):
-        rule = engine.DebugRule('port == 22')
+        # the debug parser prints ply's debug output
+        with contextlib.redirect_stderr(io.StringIO()):
+            rule = engine.DebugRule('port == 22')
         chain = engine.Chain([(rule, Action.ACCEPT)])
         self.assertIs(chain[0].rule, rule)
         self.assertIs(chain.evaluate({'port': 22}), Action.ACCEPT)

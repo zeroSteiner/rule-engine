@@ -37,6 +37,9 @@ from .function_call import *
 from .binary import *
 from .literal import *
 from .miscellaneous import *
+from . import attribute, binary, function_call, literal, miscellaneous
+
+__all__ = attribute.__all__ + binary.__all__ + function_call.__all__ + literal.__all__ + miscellaneous.__all__
 
 if __name__ == '__main__':
     unittest.main()

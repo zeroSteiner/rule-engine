@@ -38,7 +38,13 @@ from .errors import *
 from .issues import *
 from .parser import *
 from .parser_tables import *
+from .parser_utilities import *
 from .sqlalchemy import *
 from .suggestions import *
+from .suite import *
 from .thread_safety import *
 from .types import *
+
+def load_tests(loader, standard_tests, pattern):
+    # every test module is imported above, so stop discovery from loading the subpackages and their tests again
+    return standard_tests

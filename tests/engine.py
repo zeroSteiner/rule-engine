@@ -31,11 +31,12 @@
 #
 
 import collections
+import contextlib
 import copy
 import dataclasses
 import datetime
 import decimal
-import os
+import io
 import pickle
 import re
 import sys
@@ -57,6 +58,16 @@ except ImportError:
     has_graphviz = False
 else:
     has_graphviz = True
+
+__all__ = (
+    'ContextSerializationTests',
+    'ContextTests',
+    'EngineDatetimeRuleTests',
+    'EngineIntMaxDigitsTests',
+    'EngineRuleTests',
+    'EngineTests',
+    'ObjectTypeTests',
+)
 
 class ContextTests(unittest.TestCase):
     def test_context_default_timezone(self):
@@ -514,6 +525,19 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(type_resolver('name'), types.DataType.NULLABLE(types.DataType.STRING))
         self.assertIs(type_resolver('age'), types.DataType.FLOAT)
 
+    def test_engine_type_resolver_from_dataclass_nullable_members(self):
+        @dataclasses.dataclass
+        class Team:
+            scores: list[int | None]
+            nicknames: dict[str, str | None]
+            tags: set[str | None]
+
+        type_resolver = engine.type_resolver_from_dataclass(Team)
+        nullable_string = types.DataType.NULLABLE(types.DataType.STRING)
+        self.assertEqual(type_resolver('scores'), types.DataType.ARRAY(types.DataType.NULLABLE(types.DataType.FLOAT)))
+        self.assertEqual(type_resolver('nicknames'), types.DataType.MAPPING(types.DataType.STRING, nullable_string))
+        self.assertEqual(type_resolver('tags'), types.DataType.SET(nullable_string))
+
     def test_engine_type_resolver_from_dataclass_nullable_evaluates_rule(self):
         context = engine.Context(
                 resolver=engine.resolve_attribute,
@@ -674,11 +698,9 @@ class EngineRuleTests(unittest.TestCase):
         self.assertEqual(caught, [])
 
     def test_engine_rule_debug_parser(self):
-        with open(os.devnull, 'w') as file_h:
-            original_stderr = sys.stderr
-            sys.stderr = file_h
+        # the debug parser prints ply's debug output
+        with contextlib.redirect_stderr(io.StringIO()):
             debug_rule = engine.DebugRule(self.rule_text)
-            sys.stderr = original_stderr
         self.test_engine_rule_matches(rule=debug_rule)
         self.test_engine_rule_filter(rule=debug_rule)
 

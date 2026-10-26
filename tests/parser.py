@@ -47,6 +47,8 @@ import rule_engine.types as types
 
 import dateutil.tz
 
+__all__ = ('ParserLeftOperatorRightTests', 'ParserLiteralTests', 'ParserTests')
+
 class ParserTestsBase(unittest.TestCase):
     _parser = parser.Parser()
     context = engine.Context()

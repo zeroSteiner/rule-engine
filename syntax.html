@@ -740,8 +740,9 @@ $split(&quot;A    B&quot;, &#39; &#39;) # =&gt; (&#39;A&#39;, &#39;&#39;, &#39;&
 <h3>Regular Expression Related<a class="headerlink" href="#regular-expression-related" title="Link to this heading"></a></h3>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">re_groups</span></code> (type: <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>) – An array of strings from the last regular expression match as
-defined by the regular expression itself. See documentation on <a class="reference external" href="https://docs.python.org/3/howto/regex.html#grouping">grouping</a> for more information. If no match has taken
-place, this value is <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>.</p>
+defined by the regular expression itself. See documentation on <a class="reference external" href="https://docs.python.org/3/howto/regex.html#grouping">grouping</a> for more information. A group that did not
+participate in the match, such as an optional group, is <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>. If no match has taken place, this
+value is <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For technical reasons, this symbol is provided by the default <a class="reference internal" href="rule_engine/engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Context</span></code></a> and is not included

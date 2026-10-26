@@ -115,6 +115,8 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">decimal</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span>
@@ -129,6 +131,18 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">._attribute_resolver</span><span class="w"> </span><span class="kn">import</span> <span class="n">_AttributeResolver</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">dateutil.tz</span>
+
+<span class="n">_PACKAGE_DIRECTORY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_external_stacklevel</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="c1"># the stacklevel for a warnings.warn() call made by the caller of this function that attributes the warning to the</span>
+    <span class="c1"># first frame outside of this package, i.e. the code that evaluated the rule</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">stacklevel</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_PACKAGE_DIRECTORY</span><span class="p">):</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span>
+        <span class="n">stacklevel</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">stacklevel</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_tls_getter</span><span class="p">(</span><span class="n">thread_local</span><span class="p">:</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_builtins</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
     <span class="c1"># a function stub to be used with functools.partial for retrieving thread-local values</span>
@@ -301,7 +315,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;assignment_scopes&#39;</span><span class="p">,</span> <span class="s1">&#39;regex_groups&#39;</span><span class="p">)</span>
     <span class="n">assignment_scopes</span><span class="p">:</span> <span class="s1">&#39;collections.deque[dict[str, ast.Assignment]]&#39;</span>
-    <span class="n">regex_groups</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">regex_groups</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assignment_scopes</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">regex_groups</span> <span class="o">=</span> <span class="kc">None</span>
@@ -403,7 +417,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The *default_value* parameter from :py:meth:`~__init__`&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span>
                 <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">BuiltinValueGenerator</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_tls_getter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="p">,</span> <span class="s1">&#39;regex_groups&#39;</span><span class="p">))},</span>
-                <span class="n">value_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)},</span>
+                <span class="n">value_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">_RE_GROUPS_TYPE</span><span class="p">},</span>
                 <span class="n">timezone</span><span class="o">=</span><span class="n">default_timezone</span>
         <span class="p">)</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;An instance of :py:class:`~rule_engine.builtins.Builtins` to provided a default set of builtin symbol values.&quot;&quot;&quot;</span>
@@ -423,7 +437,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">int_max_digits</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The *int_max_digits* parameter from :py:meth:`~__init__`.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="kc">False</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_warned</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -436,6 +452,7 @@
                 <span class="s1">&#39;mapping_attribute_lookup&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span><span class="p">,</span>
                 <span class="s1">&#39;int_max_digits&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">int_max_digits</span><span class="p">,</span>
                 <span class="s1">&#39;_mapping_fallback_warned&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span><span class="p">,</span>
+                <span class="s1">&#39;_null_member_warned&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_warned</span><span class="p">,</span>
                 <span class="s1">&#39;_Context__type_resolver&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span><span class="p">,</span>
                 <span class="s1">&#39;_Context__resolver&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span><span class="p">,</span>
         <span class="p">}</span>
@@ -453,14 +470,17 @@
         <span class="c1"># pickles created before 5.1.1 don&#39;t include int_max_digits</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;int_max_digits&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_mapping_fallback_warned&#39;</span><span class="p">]</span>
+        <span class="c1"># pickles created before 5.1.1 don&#39;t include _null_member_warned</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_warned</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_null_member_warned&#39;</span><span class="p">,</span> <span class="p">()))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__type_resolver&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__resolver&#39;</span><span class="p">]</span>
         <span class="c1"># recreate transient objects that can not be pickled</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">builtins</span> <span class="o">=</span> <span class="n">builtins</span><span class="o">.</span><span class="n">Builtins</span><span class="o">.</span><span class="n">from_defaults</span><span class="p">(</span>
                 <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">BuiltinValueGenerator</span><span class="p">(</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">_tls_getter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span><span class="p">,</span> <span class="s1">&#39;regex_groups&#39;</span><span class="p">))},</span>
-                <span class="n">value_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)},</span>
+                <span class="n">value_types</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;re_groups&#39;</span><span class="p">:</span> <span class="n">builtins</span><span class="o">.</span><span class="n">_RE_GROUPS_TYPE</span><span class="p">},</span>
                 <span class="n">timezone</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">default_timezone</span>
         <span class="p">)</span>
 
@@ -550,6 +570,31 @@
                 <span class="s2">&quot;rule_engine.errors.MappingAttributeLookupDeprecation to silence this warning.&quot;</span>
         <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">)</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">errors</span><span class="o">.</span><span class="n">MappingAttributeLookupDeprecation</span><span class="p">(</span><span class="n">message</span><span class="p">),</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_assigned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># whether resolve() would return *name* from an assignment scope, i.e. it&#39;s a variable assigned by an expression</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="n">assignments</span> <span class="k">for</span> <span class="n">assignments</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">assignment_scopes</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_warn_null_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scope</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">member_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_warned</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_warned</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">scope</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;key&#39;</span><span class="p">:</span>
+            <span class="n">remedy</span> <span class="o">=</span> <span class="s1">&#39;MAPPING keys can not be NULLABLE, so use a key type of UNDEFINED to allow null keys&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">remedy</span> <span class="o">=</span> <span class="s1">&#39;wrap the </span><span class="si">{0}</span><span class="s1"> type in DataType.NULLABLE(...) to allow null </span><span class="si">{0}</span><span class="s1">s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;symbol </span><span class="si">{0!r}</span><span class="s2"> resolved to a value with a null </span><span class="si">{1}</span><span class="s2"> where the </span><span class="si">{1}</span><span class="s2"> type (</span><span class="si">{2}</span><span class="s2">) does not allow null; this is &quot;</span>
+                <span class="s2">&quot;deprecated and will raise SymbolTypeError in v6.0, </span><span class="si">{3}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol_name</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">member_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">remedy</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="n">_external_stacklevel</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="c1"># the warning was turned into an error (e.g. with -W error), so raise it again the next time too</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_lock</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_warned</span><span class="o">.</span><span class="n">discard</span><span class="p">((</span><span class="n">scope</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">))</span>
+            <span class="k">raise</span>
 
 <div class="viewcode-block" id="Context.resolve_type">
 <a class="viewcode-back" href="../../../rule_engine/engine.html#rule_engine.engine.Context.resolve_type">[docs]</a>

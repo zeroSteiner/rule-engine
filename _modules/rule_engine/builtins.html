@@ -170,6 +170,11 @@
         <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">FunctionCallError</span><span class="p">(</span><span class="s1">&#39;argument #3 (maxsplit) must be a natural number&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="n">maxsplit</span><span class="p">))</span>
 
+<span class="c1"># The type of the $re_groups symbol that Context provides. A group that did not participate in the match is None, but</span>
+<span class="c1"># the members are typed as STRING rather than NULLABLE(STRING) so that rules using them as strings (e.g.</span>
+<span class="c1"># $re_groups[0] =~ &quot;...&quot;) keep parsing. SymbolExpression checks for this exact object and allows None members for it.</span>
+<span class="n">_RE_GROUPS_TYPE</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">ARRAY</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="o">.</span><span class="n">STRING</span><span class="p">)</span>
+
 <span class="k">class</span><span class="w"> </span><span class="nc">BuiltinValueGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A class used as a wrapper for builtin values to differentiate between a value that is a function and a value that</span>

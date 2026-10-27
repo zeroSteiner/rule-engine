@@ -293,7 +293,7 @@ class Context(object):
         .. versionchanged:: 5.0.0
                 Added the *mapping_attribute_lookup* parameter.
 
-        .. versionchanged:: 5.1.1
+        .. versionchanged:: 5.2.0
                 Added the *int_max_digits* parameter.
         """
         self.regex_flags = regex_flags
@@ -370,10 +370,10 @@ class Context(object):
             self.default_value = errors.UNDEFINED
         self.decimal_context = state['decimal_context']
         self.mapping_attribute_lookup = state['mapping_attribute_lookup']
-        # pickles created before 5.1.1 don't include int_max_digits
+        # pickles created before 5.2.0 don't include int_max_digits
         self.int_max_digits = state.get('int_max_digits')
         self._mapping_fallback_warned = state['_mapping_fallback_warned']
-        # pickles created before 5.1.1 don't include _null_member_warned
+        # pickles created before 5.2.0 don't include _null_member_warned
         self._null_member_warned = set(state.get('_null_member_warned', ()))
         type_resolver = state['_Context__type_resolver']
         if isinstance(type_resolver, functools.partial) and type_resolver.func is _type_resolver and type_resolver.args:

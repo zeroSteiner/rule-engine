@@ -868,7 +868,7 @@ class ContextSerializationTests(unittest.TestCase):
             engine.Rule('$parse_float(value) > 0', context=context).matches({'value': hex(10 ** 20)})
 
     def test_context_unpickle_without_int_max_digits(self):
-        # pickles created before 5.1.1 don't include int_max_digits
+        # pickles created before 5.2.0 don't include int_max_digits
         state = engine.Context().__getstate__()
         del state['int_max_digits']
         context = engine.Context.__new__(engine.Context)

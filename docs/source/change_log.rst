@@ -7,6 +7,40 @@ this list is curated by the development team for note worthy changes.
 Version 5.x.x
 -------------
 
+Version 5.2.0
+^^^^^^^^^^^^^
+
+Released :release:`5.2.0` on October 28th, 2026
+
+* Added the *int_max_digits* parameter to :py:class:`~rule_engine.engine.Context` to limit the number of digits an
+  integer can have when it is converted to a ``FLOAT`` value. The conversion takes time that grows quadratically with
+  the size of the integer, so a short rule could hang the process. Larger integers now raise an
+  :py:exc:`~rule_engine.errors.ArithmeticError`. The default of ``None`` uses the interpreter's limit from
+  :py:func:`sys.get_int_max_str_digits` and ``0`` disables the limit. :py:func:`~rule_engine.types.coerce_value` and
+  :py:func:`~rule_engine.parser.utilities.parse_float` accept it as a keyword-only argument.
+* The parser tables are now generated when the wheel is built and are shipped in it, instead of being generated at
+  runtime. Nothing is written to the installation directory, so installs work the same way for root and non-root
+  users. Building the package now requires ``python-dateutil``.
+* The ``==``, ``!=``, ``and`` and ``or`` operators now accept ``BYTES`` and ``FUNCTION`` values, and ``and`` and ``or``
+  now accept ``OBJECT`` values, as documented. Rules such as ``b"ab" == b"ab"`` previously raised an
+  :py:exc:`~rule_engine.errors.EvaluationError`.
+* :py:meth:`~rule_engine.types.DataType.from_type` now maps ``T | None`` type hints to ``NULLABLE(T)`` on Python
+  versions 3.10 to 3.13, where it previously raised a :py:exc:`TypeError`.
+* The ``to_int`` and ``to_flt`` attributes of ``STRING`` values now accept leading zeros, e.g. ``"02134".to_int`` is
+  ``2134``, where they previously raised Python's :py:exc:`SyntaxError`.
+* :py:func:`~rule_engine.parser.utilities.parse_float` and the ``$parse_float`` builtin function now raise a
+  :py:exc:`~rule_engine.errors.FloatSyntaxError` for binary, octal and hexadecimal values followed by a comment or line
+  continuation, such as ``"0x10 # c"``, and no longer cause Python to emit warnings for invalid strings.
+* The ``$re_groups`` builtin symbol no longer raises a :py:exc:`~rule_engine.errors.SymbolTypeError` when an optional
+  group didn't take part in the match. The member for that group is null.
+* The ``ARRAY``, ``SET``, ``MAPPING`` and ``FUNCTION`` data types can now be pickled and copied, as can the ``OBJECT``
+  types, :py:class:`~rule_engine.engine.Context` and :py:class:`~rule_engine.engine.Rule` objects that contain them.
+  The :py:class:`~rule_engine.types.DataType` constants keep their identity when they are pickled or copied.
+* **Deprecated:** A typed symbol whose value has a ``None`` member where the member type is not nullable, such as
+  ``{'a': None}`` for ``MAPPING(STRING, STRING)``, now emits a :py:class:`DeprecationWarning`. These values will raise
+  a :py:exc:`~rule_engine.errors.SymbolTypeError` in v6.0. Wrap the member type in
+  :py:attr:`~rule_engine.types.DataType.NULLABLE` to allow ``None``.
+
 Version 5.1.0
 ^^^^^^^^^^^^^
 

@@ -122,7 +122,7 @@ def coerce_value(value: Any, verify_type: bool = True, *, int_max_digits: int | 
 
     .. versionadded:: 2.0.0
 
-    .. versionchanged:: 5.1.1
+    .. versionchanged:: 5.2.0
             Added the *int_max_digits* parameter.
 
     :param value: The value to convert.

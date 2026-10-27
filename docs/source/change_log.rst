@@ -36,6 +36,24 @@ Released :release:`5.2.0` on October 28th, 2026
 * The ``ARRAY``, ``SET``, ``MAPPING`` and ``FUNCTION`` data types can now be pickled and copied, as can the ``OBJECT``
   types, :py:class:`~rule_engine.engine.Context` and :py:class:`~rule_engine.engine.Rule` objects that contain them.
   The :py:class:`~rule_engine.types.DataType` constants keep their identity when they are pickled or copied.
+* Fixed some edge cases of :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` and
+  :py:func:`~rule_engine.engine.type_resolver_from_dataclass`
+
+    * With ``strict=True``, dataclasses nested in the members of a field, such as ``list[Hero | None]`` and
+      ``list[list[Address]]``, are now mapped, where they previously raised a :py:exc:`ValueError`.
+    * With ``strict=False``, fields that can't be mapped now map to :py:attr:`~rule_engine.types.DataType.UNDEFINED` as
+      documented, where some of them previously raised. These include unsupported member types such as
+      ``set[Address]``, forward references that can't be resolved and sets of dataclasses that the schema refers to.
+    * The values of ``Literal`` type hints are no longer evaluated as code in the dataclass's module.
+
+* :py:exc:`~rule_engine.errors.SymbolTypeError` and :py:exc:`~rule_engine.errors.AttributeTypeError` messages now spell
+  out compound data types, e.g. ``ARRAY(FLOAT)`` instead of ``ARRAY``. When an ``ARRAY`` or ``SET`` value has ``None``
+  members, the ``is_type`` attribute of a :py:exc:`~rule_engine.errors.SymbolTypeError` now wraps the member type in
+  :py:attr:`~rule_engine.types.DataType.NULLABLE`.
+* Calling ``str()`` on a :py:exc:`~rule_engine.errors.EngineError` now returns its message instead of the
+  arguments it was created with. :py:exc:`~rule_engine.errors.SymbolTypeError`,
+  :py:exc:`~rule_engine.errors.AttributeTypeError` and :py:exc:`~rule_engine.errors.RegexSyntaxError` errors can now
+  be pickled and copied.
 * **Deprecated:** A typed symbol whose value has a ``None`` member where the member type is not nullable, such as
   ``{'a': None}`` for ``MAPPING(STRING, STRING)``, now emits a :py:class:`DeprecationWarning`. These values will raise
   a :py:exc:`~rule_engine.errors.SymbolTypeError` in v6.0. Wrap the member type in

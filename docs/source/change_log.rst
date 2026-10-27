@@ -78,6 +78,14 @@ Released :release:`5.0.0` on May 17th, 2026
 * **Breaking:** Removed ``setup.py``; project metadata now lives entirely in ``pyproject.toml`` (PEP 517/621).
 * **Breaking:** The ``rule_engine.ast`` module no longer re-exports names from ``rule_engine.types`` (e.g. ``DataType``,
   ``coerce_value``); import them from ``rule_engine`` or ``rule_engine.types`` directly.
+* **Breaking:** A symbol typed by a *type_resolver* as an :py:attr:`~rule_engine.types.DataType.ARRAY` or
+  :py:attr:`~rule_engine.types.DataType.SET` with a member type no longer accepts ``None`` members unless that type is
+  wrapped in :py:attr:`~rule_engine.types.DataType.NULLABLE`. Before 5.0.0, the ``value_type_nullable`` kwarg defaulted
+  to ``True``, so a symbol typed as ``ARRAY(STRING)`` could resolve to ``('a', None)``. Now that value raises a
+  :py:exc:`~rule_engine.errors.SymbolTypeError` when the symbol is resolved. To accept ``None`` members, use
+  ``ARRAY(NULLABLE(STRING))`` (or the deprecated ``value_type_nullable=True`` until v6.0). Rules must then handle the
+  nullable members, for example with ``??``, before using them with operators that reject ``NULLABLE`` operands. See the
+  :ref:`NULLABLE section<data-types-nullable>` in the Data Types page for details.
 * Migrated the development workflow and CI from pipenv to `uv <https://docs.astral.sh/uv/>`_.
 * Added support for raw STRING literals using the ``r`` prefix (e.g. ``r'\w+'``).
 * Vendored the PLY dependency under ``rule_engine._vendor.ply`` — the upstream project is unmaintained, so the copy
@@ -135,11 +143,10 @@ Released :release:`5.0.0` on May 17th, 2026
       (``and``, ``or``, ``not``), ternary expressions, and safe-navigation operators remain lenient.
     * A new null-coalesce operator ``left ?? right`` discharges ``NULLABLE(T)`` to ``T``. Existing safe attribute
       (``&.``) and item (``&[``) accessors still apply to nullable receivers and are the only access forms that do.
-* **Deprecated:** The ``attributes_nullable`` kwarg on :py:attr:`~rule_engine.types.DataType.OBJECT` and the
-  ``value_type_nullable`` kwarg on :py:attr:`~rule_engine.types.DataType.ARRAY`, :py:attr:`~rule_engine.types.DataType.SET`,
-  and :py:attr:`~rule_engine.types.DataType.MAPPING` now emit :py:class:`DeprecationWarning`. Wrap the relevant
-  attribute or element type in :py:attr:`~rule_engine.types.DataType.NULLABLE` instead. The kwargs will be removed
-  in v6.0.
+* **Deprecated:** The ``value_type_nullable`` kwarg on :py:attr:`~rule_engine.types.DataType.ARRAY`,
+  :py:attr:`~rule_engine.types.DataType.SET`, and :py:attr:`~rule_engine.types.DataType.MAPPING` now emits
+  :py:class:`DeprecationWarning`. Wrap the relevant element or value type in
+  :py:attr:`~rule_engine.types.DataType.NULLABLE` instead. The kwarg will be removed in v6.0.
 * **Deprecated:** Accessing :py:attr:`~rule_engine.types.DataType.MAPPING` keys via dot syntax (``mapping.key``) now
   emits a :py:class:`~rule_engine.errors.MappingAttributeLookupDeprecation` warning. Use bracket syntax
   (``mapping["key"]``) instead. This fallback will be removed in v6.0. Set ``Context(mapping_attribute_lookup=False)``

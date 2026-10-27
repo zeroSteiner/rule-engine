@@ -271,6 +271,10 @@ permitting :py:class:`NoneType` (``null``) at runtime. ``NULLABLE(T)`` is struct
 - Compound element types (``ARRAY``, ``SET``, ``MAPPING`` values) store ``NULLABLE(T)`` directly when the member may
   be ``None``.
 
+For :py:attr:`~DataType.ARRAY` and :py:attr:`~DataType.SET` symbols, an unwrapped member type does not permit ``None``.
+A symbol typed as ``ARRAY(STRING)`` raises a :py:exc:`~rule_engine.errors.SymbolTypeError` when it resolves to
+``('a', None)``. Type it as ``ARRAY(NULLABLE(STRING))`` to accept that value.
+
 Semantics are Python-style, not SQL three-valued logic. ``None`` flows through expressions as the Python ``None``
 value. Parse-time checking is strict: operators that do not meaningfully accept ``None`` — arithmetic (``+``, ``-``,
 ``*``, ``/``, …), ordered comparisons (``<``, ``<=``, ``>``, ``>=``), the regex operators (``=~``, ``=~~``, ``!~``,
@@ -304,9 +308,10 @@ A few Python-style edge cases worth knowing:
 - ``non_nullable_value ?? null`` gives a ``NULLABLE`` result type. The static analysis conservatively wraps the
   result whenever the right operand is ``null``, even if the left can never be ``None`` at runtime.
 
-The legacy ``attributes_nullable`` / ``value_type_nullable`` kwargs on :py:class:`~DataType.OBJECT` and compound-type
-constructors are still accepted in v5 for backward compatibility but emit a :py:class:`DeprecationWarning` and will
-be removed in v6.0. Wrap the attribute or element type in :py:attr:`~DataType.NULLABLE` directly instead.
+The legacy ``value_type_nullable`` kwarg on the :py:attr:`~DataType.ARRAY`, :py:attr:`~DataType.SET`, and
+:py:attr:`~DataType.MAPPING` constructors is still accepted in v5 for backward compatibility but emits a
+:py:class:`DeprecationWarning` and will be removed in v6.0. Wrap the element or value type in
+:py:attr:`~DataType.NULLABLE` directly instead.
 
 .. deprecated:: 5.2.0
    A typed symbol whose value has a ``None`` member where the member type is not nullable is still accepted, but emits a

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>types &mdash; Rule Engine 5.1.1 documentation</title>
+  <title>types &mdash; Rule Engine 5.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=1bd908e2"></script>
+      <script src="../_static/documentation_options.js?v=2dde5210"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -121,7 +121,7 @@ when resolving a symbol from an object external to the engine.</p>
 <p><span class="versionmodified added">Added in version 2.0.0.</span></p>
 </div>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 5.1.1: </span>Added the <em>int_max_digits</em> parameter.</p>
+<p><span class="versionmodified changed">Changed in version 5.2.0: </span>Added the <em>int_max_digits</em> parameter.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -266,6 +266,9 @@ knows <em>dt</em> is a <code class="xref py py-class docutils literal notranslat
 this ensures that the member types are either the same or <a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
 </dd>
 </dl>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 5.2.0: </span>The constants keep their identity when they are pickled or copied.</p>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.types.DataType.ARRAY">
 <span class="sig-name descname"><span class="pre">ARRAY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_type_nullable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_CollectionDataTypeDef</span></span></span><a class="headerlink" href="#rule_engine.types.DataType.ARRAY" title="Link to this definition"></a></dt>
@@ -411,8 +414,16 @@ placeholders that the caller must resolve via the <a class="reference internal" 
 <li><p><strong>accessor</strong> – An optional accessor callable forwarded to the new schema. Defaults to <a class="reference external" href="https://docs.python.org/3.12/library/functions.html#getattr" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">getattr()</span></code></a>,
 which matches normal dataclass attribute access.</p></li>
 <li><p><strong>strict</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – When <code class="docutils literal notranslate"><span class="pre">True</span></code> (the default), a field annotated with a type that cannot be mapped to a
-Rule Engine data type raises <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, such fields fall back to
-<a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataType.UNDEFINED</span></code></a> so the attribute remains selectable without parse-time type checking.</p></li>
+Rule Engine data type raises an exception. That’s usually a <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>, but it can also be a
+<a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#TypeError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> for the type hints that <a class="reference internal" href="#rule_engine.types.DataType.from_type" title="rule_engine.types.DataType.from_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataType.from_type()</span></code></a> raises it for or for a union of
+a dataclass and another type, an <a class="reference internal" href="errors.html#rule_engine.errors.EngineError" title="rule_engine.errors.EngineError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EngineError</span></code></a> for a member type that a data
+type rejects, such as a <code class="docutils literal notranslate"><span class="pre">NULLABLE</span></code> mapping key or a dataclass set member, or a <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#NameError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NameError</span></code></a> for
+a forward reference that can’t be resolved. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, such fields fall back to
+<a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataType.UNDEFINED</span></code></a> so the attribute remains selectable without parse-time type checking.
+Only strict mode maps a dataclass nested inside a union or inside a container’s member type, such as
+<code class="docutils literal notranslate"><span class="pre">list[Address</span> <span class="pre">|</span> <span class="pre">None]</span></code> or <code class="docutils literal notranslate"><span class="pre">list[list[Address]]</span></code>, and, on Python 3.10, a string forward reference
+inside <code class="docutils literal notranslate"><span class="pre">list[...]</span></code>, <code class="docutils literal notranslate"><span class="pre">set[...]</span></code> or <code class="docutils literal notranslate"><span class="pre">dict[...]</span></code>. With <code class="docutils literal notranslate"><span class="pre">strict=False</span></code> those fields are
+<a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataType.UNDEFINED</span></code></a>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -529,6 +540,9 @@ be removed in v6.0.0.</p>
 <span class="sig-name descname"><span class="pre">UNDEFINED</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">UNDEFINED</span></span><a class="headerlink" href="#rule_engine.types.DataType.UNDEFINED" title="Link to this definition"></a></dt>
 <dd><p>Undefined values. This constant can be used to indicate that a particular symbol is valid, but it’s data type is
 currently unknown.</p>
+<div class="versionchanged">
+<p><span class="versionmodified changed">Changed in version 5.2.0: </span>The constant keeps its identity when it is pickled or copied.</p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -551,9 +565,26 @@ currently unknown.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="rule_engine.types.DataType.from_type">
 <span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">python_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">_DataTypeDef</span></span></span><a class="reference internal" href="../_modules/rule_engine/types/datatype.html#DataType.from_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.types.DataType.from_type" title="Link to this definition"></a></dt>
-<dd><p>Get the supported data type constant for the specified Python type/type hint. If the type or typehint can not be
-mapped to a supported data type, then a <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> exception will be raised. This function will not
-return <a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p>
+<dd><p>Get the supported data type constant for the specified Python type/type hint. This function will not return
+<a class="reference internal" href="#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>. If the type or type hint can not be mapped to a supported data type, an exception is
+raised:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#TypeError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> when <em>python_type</em> is not a type or a type hint, and for the type hints that are neither
+a class nor a generic alias of one: <code class="docutils literal notranslate"><span class="pre">None</span></code> (use <code class="docutils literal notranslate"><span class="pre">type(None)</span></code>, which maps to <a class="reference internal" href="#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>), string and
+<a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.ForwardRef" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.ForwardRef</span></code></a> forward references, special forms such as <code class="docutils literal notranslate"><span class="pre">typing.Literal[...]</span></code>,
+<code class="docutils literal notranslate"><span class="pre">typing.ClassVar[...]</span></code>, <code class="docutils literal notranslate"><span class="pre">typing.Final[...]</span></code>, <code class="docutils literal notranslate"><span class="pre">typing.Never</span></code>, <code class="docutils literal notranslate"><span class="pre">typing.Self</span></code> and an unsubscripted
+<code class="docutils literal notranslate"><span class="pre">typing.Union</span></code>, type variables, <code class="xref py py-func docutils literal notranslate"><span class="pre">typing.NewType()</span></code> types and <code class="docutils literal notranslate"><span class="pre">type</span></code> statement aliases. The classes
+of type hints themselves, such as <code class="docutils literal notranslate"><span class="pre">types.GenericAlias</span></code>, raise it too, and so does <code class="docutils literal notranslate"><span class="pre">types.UnionType</span></code> on
+Python 3.14, where it is <code class="docutils literal notranslate"><span class="pre">typing.Union</span></code>. <code class="docutils literal notranslate"><span class="pre">typing.Any</span></code> raises <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#TypeError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> on Python 3.10 and
+<a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> on later versions, where it is a class.</p></li>
+<li><p><a class="reference internal" href="errors.html#rule_engine.errors.EngineError" title="rule_engine.errors.EngineError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">EngineError</span></code></a> for a <code class="docutils literal notranslate"><span class="pre">dict</span></code> whose key type maps to <a class="reference internal" href="#rule_engine.types.DataType.NULLABLE" title="rule_engine.types.DataType.NULLABLE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULLABLE</span></code></a> or to a
+compound type other than <a class="reference internal" href="#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>, such as <code class="docutils literal notranslate"><span class="pre">dict[str</span> <span class="pre">|</span> <span class="pre">None,</span> <span class="pre">int]</span></code> or <code class="docutils literal notranslate"><span class="pre">dict[set[int],</span> <span class="pre">int]</span></code>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> for any other type or type hint, such as <code class="docutils literal notranslate"><span class="pre">uuid.UUID</span></code>, <code class="docutils literal notranslate"><span class="pre">frozenset[int]</span></code>,
+<code class="docutils literal notranslate"><span class="pre">typing.Callable[[int],</span> <span class="pre">str]</span></code> or a union of more than one type other than <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+<p>A union of more than one type other than <code class="docutils literal notranslate"><span class="pre">None</span></code> raises <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> without its members being
+checked. In other type hints with arguments, such as <code class="docutils literal notranslate"><span class="pre">list[typing.Literal[1]]</span></code>, the first argument that can’t
+be mapped decides the exception.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>python_type</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#type" title="(in Python v3.12)"><em>type</em></a>) – The native Python type or type hint to retrieve the corresponding type constant for.</p>

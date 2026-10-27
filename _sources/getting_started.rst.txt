@@ -102,7 +102,7 @@ Basic Usage
 
          rule = rule_engine.Rule(
            # match books with a title starting with 'Captain '
-           'title =~ "Captain\s\S+"'
+           r'title =~ "Captain\s\S+"'
          )
 
 #. Once the rule object has been defined, it can be applied to target object(s). Two primary methods are available for
@@ -483,12 +483,17 @@ specify member type information by calling their respective type. For example, a
 ``DataType.MAPPING(DataType.STRING, DataType.FLOAT)``. For more information, see the documentation for the
 :py:attr:`~.DataType.ARRAY`, :py:attr:`~.DataType.MAPPING` functions.
 
-Compound member types can only be a single data type. In some cases the data type can optionally be nullable which means
-that the member value can be either the specified type or :py:attr:`~.DataType.NULL`. For example, a
-:py:attr:`~.DataType.MAPPING` type whose values are all nullable strings may be defined, while a
-:py:attr:`~.DataType.MAPPING` type with one value type of a :py:attr:`~.DataType.STRING` and another of a
-:py:attr:`~.DataType.BOOLEAN` may not be defined. In this case, the key type may be defined while the value type is set
-to :py:attr:`~.DataType.UNDEFINED` which is the default value.
+Compound member types can only be a single data type. The data type can optionally be made nullable by wrapping it in
+:py:attr:`~.DataType.NULLABLE`, which means that the member value can be either the specified type or
+:py:attr:`~.DataType.NULL`. For example, a :py:attr:`~.DataType.MAPPING` type whose values are all nullable strings may
+be defined, while a :py:attr:`~.DataType.MAPPING` type with one value type of a :py:attr:`~.DataType.STRING` and another
+of a :py:attr:`~.DataType.BOOLEAN` may not be defined. In this case, the key type may be defined while the value type is
+set to :py:attr:`~.DataType.UNDEFINED` which is the default value.
+
+For :py:attr:`~.DataType.ARRAY` and :py:attr:`~.DataType.SET` symbols, an unwrapped member type does not permit
+:py:attr:`~.DataType.NULL` members. A symbol typed as ``DataType.ARRAY(DataType.STRING)`` raises a
+:py:class:`~errors.SymbolTypeError` when it resolves to ``('a', None)``, while
+``DataType.ARRAY(DataType.NULLABLE(DataType.STRING))`` accepts it.
 
 Function Data Types
 """""""""""""""""""

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.parser &mdash; Rule Engine 5.1.1 documentation</title>
+  <title>rule_engine.parser &mdash; Rule Engine 5.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/theme_overrides.css?v=0c24fe83" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=1bd908e2"></script>
+      <script src="../../_static/documentation_options.js?v=2dde5210"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -135,6 +135,22 @@
             <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">table</span><span class="p">[</span><span class="n">token</span><span class="p">]</span>
+
+<span class="c1"># an escaped backslash, an octal escape above \377, or a backslash followed by a character that the unicode-escape codec</span>
+<span class="c1"># doesn&#39;t know as an escape</span>
+<span class="n">_STRING_ESCAPE_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">(</span><span class="se">\\</span><span class="s1">|[4-7][0-7]</span><span class="si">{2}</span><span class="s1">|[^</span><span class="se">\&#39;</span><span class="s1">&quot;abfnrtvxNuU0-7])&#39;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_repl_string_escape</span><span class="p">(</span><span class="n">match</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">Match</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># escaped backslashes are matched so that the backslash after one isn&#39;t taken as the start of an escape</span>
+    <span class="k">if</span> <span class="n">token</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># the unicode-escape codec warns about octal escapes above \377, so use the \u escape of the same character</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">u</span><span class="si">{:04x}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="c1"># the unicode-escape codec keeps the backslash of an escape it doesn&#39;t know but warns that this will stop working,</span>
+    <span class="c1"># so escape the backslash to get the same value without the warning</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_DeferredAstNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;cls&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="s1">&#39;kwargs&#39;</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">)</span>
@@ -588,6 +604,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;unicode-escape&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">_STRING_ESCAPE_RE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">_repl_string_escape</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;unicode-escape&#39;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">UnicodeError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">StringSyntaxError</span><span class="p">(</span><span class="s1">&#39;invalid string literal&#39;</span><span class="p">,</span> <span class="n">literal</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="kn">from</span><span class="w"> </span><span class="kc">None</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rule Syntax &mdash; Rule Engine 5.1.1 documentation</title>
+  <title>Rule Syntax &mdash; Rule Engine 5.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=1bd908e2"></script>
+      <script src="_static/documentation_options.js?v=2dde5210"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -473,9 +473,16 @@ difference comes in an optional leading character before the opening quote. Eith
 <code class="docutils literal notranslate"><span class="pre">s</span></code> will specify a standard <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> value, a single <code class="docutils literal notranslate"><span class="pre">r</span></code> will specify a raw
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> value in which backslashes are treated literally, while a single <code class="docutils literal notranslate"><span class="pre">d</span></code> will specify a
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.DATETIME" title="rule_engine.types.DataType.DATETIME"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DATETIME</span></code></a> value, and a single <code class="docutils literal notranslate"><span class="pre">t</span></code> will specify a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.TIMEDELTA" title="rule_engine.types.DataType.TIMEDELTA"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TIMEDELTA</span></code></a> value.</p>
+<p>The contents of a standard <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> literal may use Python-style escape sequences by specifying
+<code class="docutils literal notranslate"><span class="pre">\</span></code> followed by a single selection of <code class="docutils literal notranslate"><span class="pre">\'&quot;abfnrtv</span></code>, one to three octal digits, <code class="docutils literal notranslate"><span class="pre">x</span></code> followed by two hexadecimal
+digits, <code class="docutils literal notranslate"><span class="pre">u</span></code> followed by four, <code class="docutils literal notranslate"><span class="pre">U</span></code> followed by eight, or <code class="docutils literal notranslate"><span class="pre">N{name}</span></code> with the name of a Unicode character. A
+backslash followed by any other printable ASCII character is kept as a literal backslash, so <code class="docutils literal notranslate"><span class="pre">&quot;\.&quot;</span></code> is the same two
+character string as <code class="docutils literal notranslate"><span class="pre">r&quot;\.&quot;</span></code>. An invalid escape sequence, such as <code class="docutils literal notranslate"><span class="pre">\x</span></code> without two hexadecimal digits or <code class="docutils literal notranslate"><span class="pre">\N{...}</span></code>
+with an unknown name, raises a <a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.StringSyntaxError" title="rule_engine.errors.StringSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">StringSyntaxError</span></code></a>. Because <code class="docutils literal notranslate"><span class="pre">\b</span></code> is a backspace in a
+standard string, regular expressions are easier to write as raw strings.</p>
 <p>Raw string literals (<code class="docutils literal notranslate"><span class="pre">r'...'</span></code> / <code class="docutils literal notranslate"><span class="pre">r&quot;...&quot;</span></code>) are useful when writing values that contain backslashes such as regular
 expressions or Windows-style paths. In a raw string, <code class="docutils literal notranslate"><span class="pre">\</span></code> is always a literal backslash — no escape sequences are
-processed. For example, <code class="docutils literal notranslate"><span class="pre">r'\w+'</span></code> is a four character string identical to <code class="docutils literal notranslate"><span class="pre">'\\w+'</span></code>. As in Python, a backslash
+processed. For example, <code class="docutils literal notranslate"><span class="pre">r'\w+'</span></code> is a three character string identical to <code class="docutils literal notranslate"><span class="pre">'\\w+'</span></code>. As in Python, a backslash
 still prevents the following quote character from terminating the string, but the backslash itself is retained, so
 <code class="docutils literal notranslate"><span class="pre">r'it\'s'</span></code> is the five character string <code class="docutils literal notranslate"><span class="pre">it\'s</span></code>. A raw string literal cannot end with an odd number of trailing
 backslashes.</p>

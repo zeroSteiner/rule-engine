@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started &mdash; Rule Engine 5.1.1 documentation</title>
+  <title>Getting Started &mdash; Rule Engine 5.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=1bd908e2"></script>
+      <script src="_static/documentation_options.js?v=2dde5210"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -228,7 +228,7 @@ hand side of the operator is the regular expression, while the left is the strin
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="n">rule_engine</span><span class="o">.</span><span class="n">Rule</span><span class="p">(</span>
   <span class="c1"># match books with a title starting with &#39;Captain &#39;</span>
-  <span class="s1">&#39;title =~ &quot;Captain\s\S+&quot;&#39;</span>
+  <span class="sa">r</span><span class="s1">&#39;title =~ &quot;Captain\s\S+&quot;&#39;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -584,12 +584,16 @@ specify member type information by calling their respective type. For example, a
 <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code> while a mapping with string keys and float values would be defined as
 <code class="docutils literal notranslate"><span class="pre">DataType.MAPPING(DataType.STRING,</span> <span class="pre">DataType.FLOAT)</span></code>. For more information, see the documentation for the
 <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a>, <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> functions.</p>
-<p>Compound member types can only be a single data type. In some cases the data type can optionally be nullable which means
-that the member value can be either the specified type or <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>. For example, a
-<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type whose values are all nullable strings may be defined, while a
-<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type with one value type of a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> and another of a
-<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a> may not be defined. In this case, the key type may be defined while the value type is set
-to <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> which is the default value.</p>
+<p>Compound member types can only be a single data type. The data type can optionally be made nullable by wrapping it in
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULLABLE" title="rule_engine.types.DataType.NULLABLE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULLABLE</span></code></a>, which means that the member value can be either the specified type or
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a>. For example, a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type whose values are all nullable strings may
+be defined, while a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.MAPPING" title="rule_engine.types.DataType.MAPPING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">MAPPING</span></code></a> type with one value type of a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> and another
+of a <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.BOOLEAN" title="rule_engine.types.DataType.BOOLEAN"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BOOLEAN</span></code></a> may not be defined. In this case, the key type may be defined while the value type is
+set to <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a> which is the default value.</p>
+<p>For <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.ARRAY" title="rule_engine.types.DataType.ARRAY"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ARRAY</span></code></a> and <a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.SET" title="rule_engine.types.DataType.SET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">SET</span></code></a> symbols, an unwrapped member type does not permit
+<a class="reference internal" href="rule_engine/types.html#rule_engine.types.DataType.NULL" title="rule_engine.types.DataType.NULL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">NULL</span></code></a> members. A symbol typed as <code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.STRING)</span></code> raises a
+<a class="reference internal" href="rule_engine/errors.html#rule_engine.errors.SymbolTypeError" title="rule_engine.errors.SymbolTypeError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolTypeError</span></code></a> when it resolves to <code class="docutils literal notranslate"><span class="pre">('a',</span> <span class="pre">None)</span></code>, while
+<code class="docutils literal notranslate"><span class="pre">DataType.ARRAY(DataType.NULLABLE(DataType.STRING))</span></code> accepts it.</p>
 </section>
 <section id="function-data-types">
 <h4>Function Data Types<a class="headerlink" href="#function-data-types" title="Link to this heading"></a></h4>

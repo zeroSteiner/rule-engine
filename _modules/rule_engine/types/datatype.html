@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.types.datatype &mdash; Rule Engine 5.1.1 documentation</title>
+  <title>rule_engine.types.datatype &mdash; Rule Engine 5.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=0c24fe83" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=1bd908e2"></script>
+      <script src="../../../_static/documentation_options.js?v=2dde5210"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -224,6 +224,9 @@
 
 <span class="sd">      This checks that the types are compatible without any kind of conversion. When dealing with compound data types,</span>
 <span class="sd">      this ensures that the member types are either the same or :py:attr:`~.UNDEFINED`.</span>
+
+<span class="sd">    .. versionchanged:: 5.2.0</span>
+<span class="sd">            The constants keep their identity when they are pickled or copied.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ARRAY</span> <span class="o">=</span> <span class="n">_ArrayDataTypeDef</span><span class="p">(</span><span class="s1">&#39;ARRAY&#39;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
     <span class="n">BYTES</span> <span class="o">=</span> <span class="n">_DataTypeDef</span><span class="p">(</span><span class="s1">&#39;BYTES&#39;</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
@@ -242,6 +245,9 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Undefined values. This constant can be used to indicate that a particular symbol is valid, but it&#39;s data type is</span>
 <span class="sd">    currently unknown.</span>
+
+<span class="sd">    .. versionchanged:: 5.2.0</span>
+<span class="sd">            The constant keeps its identity when it is pickled or copied.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="DataType.from_name">
 <a class="viewcode-back" href="../../../rule_engine/types.html#rule_engine.types.DataType.from_name">[docs]</a>
@@ -268,9 +274,26 @@
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">python_type</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_DataTypeDef</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the supported data type constant for the specified Python type/type hint. If the type or typehint can not be</span>
-<span class="sd">        mapped to a supported data type, then a :py:exc:`ValueError` exception will be raised. This function will not</span>
-<span class="sd">        return :py:attr:`.UNDEFINED`.</span>
+<span class="sd">        Get the supported data type constant for the specified Python type/type hint. This function will not return</span>
+<span class="sd">        :py:attr:`.UNDEFINED`. If the type or type hint can not be mapped to a supported data type, an exception is</span>
+<span class="sd">        raised:</span>
+
+<span class="sd">        * :py:exc:`TypeError` when *python_type* is not a type or a type hint, and for the type hints that are neither</span>
+<span class="sd">          a class nor a generic alias of one: ``None`` (use ``type(None)``, which maps to :py:attr:`.NULL`), string and</span>
+<span class="sd">          :py:class:`typing.ForwardRef` forward references, special forms such as ``typing.Literal[...]``,</span>
+<span class="sd">          ``typing.ClassVar[...]``, ``typing.Final[...]``, ``typing.Never``, ``typing.Self`` and an unsubscripted</span>
+<span class="sd">          ``typing.Union``, type variables, :py:func:`typing.NewType` types and ``type`` statement aliases. The classes</span>
+<span class="sd">          of type hints themselves, such as ``types.GenericAlias``, raise it too, and so does ``types.UnionType`` on</span>
+<span class="sd">          Python 3.14, where it is ``typing.Union``. ``typing.Any`` raises :py:exc:`TypeError` on Python 3.10 and</span>
+<span class="sd">          :py:exc:`ValueError` on later versions, where it is a class.</span>
+<span class="sd">        * :py:exc:`~rule_engine.errors.EngineError` for a ``dict`` whose key type maps to :py:attr:`.NULLABLE` or to a</span>
+<span class="sd">          compound type other than :py:attr:`.ARRAY`, such as ``dict[str | None, int]`` or ``dict[set[int], int]``.</span>
+<span class="sd">        * :py:exc:`ValueError` for any other type or type hint, such as ``uuid.UUID``, ``frozenset[int]``,</span>
+<span class="sd">          ``typing.Callable[[int], str]`` or a union of more than one type other than ``None``.</span>
+
+<span class="sd">        A union of more than one type other than ``None`` raises :py:exc:`ValueError` without its members being</span>
+<span class="sd">        checked. In other type hints with arguments, such as ``list[typing.Literal[1]]``, the first argument that can&#39;t</span>
+<span class="sd">        be mapped decides the exception.</span>
 
 <span class="sd">        :param type python_type: The native Python type or type hint to retrieve the corresponding type constant for.</span>
 <span class="sd">        :return: One of the constants.</span>
@@ -317,6 +340,17 @@
             <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FUNCTION</span>
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="s2">&quot;__origin__&quot;</span><span class="p">):</span>
             <span class="n">origin_python_type</span> <span class="o">=</span> <span class="n">python_type</span><span class="o">.</span><span class="n">__origin__</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+                    <span class="n">origin_python_type</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">pytypes</span><span class="o">.</span><span class="n">GetSetDescriptorType</span><span class="p">,</span> <span class="n">pytypes</span><span class="o">.</span><span class="n">MemberDescriptorType</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="c1"># the class of a type hint, such as types.GenericAlias, whose __origin__ is a descriptor for its</span>
+                <span class="c1"># instances, on python 3.14 that includes typing.Union</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s1">&#39;from_type argument 1 must be a type or a type hint, not the type hint class </span><span class="si">{0!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">python_type</span>
+                        <span class="p">)</span>
+                <span class="p">)</span>
             <span class="n">maintype</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_type</span><span class="p">(</span><span class="n">origin_python_type</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">origin_python_type</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">python_type</span><span class="p">,</span> <span class="s2">&quot;__args__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">origin_python_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">tuple</span><span class="p">:</span>

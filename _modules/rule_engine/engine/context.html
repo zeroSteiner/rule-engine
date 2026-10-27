@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rule_engine.engine.context &mdash; Rule Engine 5.1.1 documentation</title>
+  <title>rule_engine.engine.context &mdash; Rule Engine 5.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/theme_overrides.css?v=0c24fe83" />
@@ -13,7 +13,7 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=1bd908e2"></script>
+      <script src="../../../_static/documentation_options.js?v=2dde5210"></script>
       <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -127,6 +127,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">types</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..suggestions</span><span class="w"> </span><span class="kn">import</span> <span class="n">suggest_symbol</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">_DataTypeDef</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..types.definitions</span><span class="w"> </span><span class="kn">import</span> <span class="n">_original_undefined</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">._attribute_resolver</span><span class="w"> </span><span class="kn">import</span> <span class="n">_AttributeResolver</span>
 
@@ -254,8 +255,10 @@
 
 <span class="sd">    :param type cls: A class decorated with :py:func:`~dataclasses.dataclass`.</span>
 <span class="sd">    :param bool strict: Forwarded to :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass`. When ``True``</span>
-<span class="sd">            (the default), a field annotated with a type that cannot be mapped to a Rule Engine data type raises</span>
-<span class="sd">            :py:exc:`ValueError`. When ``False``, such fields fall back to</span>
+<span class="sd">            (the default), a field annotated with a type that cannot be mapped to a Rule Engine data type raises an</span>
+<span class="sd">            exception, usually a :py:exc:`ValueError` (see</span>
+<span class="sd">            :py:meth:`~rule_engine.types.DataType.OBJECT.from_dataclass` for the others). When ``False``, such fields</span>
+<span class="sd">            fall back to</span>
 <span class="sd">            :py:attr:`~rule_engine.types.DataType.UNDEFINED`.</span>
 <span class="sd">    :return: The callback function.</span>
 <span class="sd">    :rtype: function</span>
@@ -389,7 +392,7 @@
 <span class="sd">        .. versionchanged:: 5.0.0</span>
 <span class="sd">                Added the *mapping_attribute_lookup* parameter.</span>
 
-<span class="sd">        .. versionchanged:: 5.1.1</span>
+<span class="sd">        .. versionchanged:: 5.2.0</span>
 <span class="sd">                Added the *int_max_digits* parameter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">regex_flags</span> <span class="o">=</span> <span class="n">regex_flags</span>
@@ -467,12 +470,23 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">UNDEFINED</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">decimal_context</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;decimal_context&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mapping_attribute_lookup</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;mapping_attribute_lookup&#39;</span><span class="p">]</span>
-        <span class="c1"># pickles created before 5.1.1 don&#39;t include int_max_digits</span>
+        <span class="c1"># pickles created before 5.2.0 don&#39;t include int_max_digits</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">int_max_digits</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;int_max_digits&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mapping_fallback_warned</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_mapping_fallback_warned&#39;</span><span class="p">]</span>
-        <span class="c1"># pickles created before 5.1.1 don&#39;t include _null_member_warned</span>
+        <span class="c1"># pickles created before 5.2.0 don&#39;t include _null_member_warned</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_null_member_warned</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_null_member_warned&#39;</span><span class="p">,</span> <span class="p">()))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__type_resolver&#39;</span><span class="p">]</span>
+        <span class="n">type_resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__type_resolver&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">type_resolver</span><span class="p">,</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">)</span> <span class="ow">and</span> <span class="n">type_resolver</span><span class="o">.</span><span class="n">func</span> <span class="ow">is</span> <span class="n">_type_resolver</span> <span class="ow">and</span> <span class="n">type_resolver</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="c1"># pickles created before the UNDEFINED data type preserved its identity restore copies of it in the type map</span>
+            <span class="n">type_map</span> <span class="o">=</span> <span class="n">_original_undefined</span><span class="p">(</span><span class="n">type_resolver</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">type_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">type_resolver</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">type_resolver</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+                        <span class="n">_type_resolver</span><span class="p">,</span>
+                        <span class="n">type_map</span><span class="p">,</span>
+                        <span class="o">*</span><span class="n">type_resolver</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                        <span class="o">**</span><span class="n">type_resolver</span><span class="o">.</span><span class="n">keywords</span>
+                <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type_resolver</span> <span class="o">=</span> <span class="n">type_resolver</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__resolver</span> <span class="o">=</span> <span class="n">state</span><span class="p">[</span><span class="s1">&#39;_Context__resolver&#39;</span><span class="p">]</span>
         <span class="c1"># recreate transient objects that can not be pickled</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_thread_local</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>

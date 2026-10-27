@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ast &mdash; Rule Engine 5.1.1 documentation</title>
+  <title>ast &mdash; Rule Engine 5.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=1bd908e2"></script>
+      <script src="../_static/documentation_options.js?v=2dde5210"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -169,10 +169,42 @@ an API breaking way in order to add new features.</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="rule_engine.ast.BinaryExpressionBase">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">BinaryExpressionBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><span class="pre">ExpressionBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><span class="pre">ExpressionBase</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast/binary/base.html#BinaryExpressionBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BinaryExpressionBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a></p>
+<p>A base class for representing complex expressions composed of a left side and a right side, separated by an
+operator.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rule_engine.ast.BinaryExpressionBase.compatible_types">
+<span class="sig-name descname"><span class="pre">compatible_types</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">_DataTypeDef</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#rule_engine.ast.BinaryExpressionBase.compatible_types" title="Link to this definition"></a></dt>
+<dd><p>A tuple containing the compatible data types that the left and right expressions must return. This can for example
+be used to indicate that arithmetic operations are compatible with <a class="reference internal" href="types.html#rule_engine.types.DataType.FLOAT" title="rule_engine.types.DataType.FLOAT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FLOAT</span></code></a> but not
+<a class="reference internal" href="types.html#rule_engine.types.DataType.STRING" title="rule_engine.types.DataType.STRING"><code class="xref py py-attr docutils literal notranslate"><span class="pre">STRING</span></code></a> values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="rule_engine.ast.BinaryExpressionBase.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><span class="pre">ExpressionBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><span class="pre">ExpressionBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.12/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/rule_engine/ast/binary/base.html#BinaryExpressionBase.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BinaryExpressionBase.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> (<a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>) – The context to use for evaluating the expression.</p></li>
+<li><p><strong>type</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The grammar type of operator at the center of the expression. Subclasses must define operator
+methods to handle evaluation based on this value.</p></li>
+<li><p><strong>left</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the left of the operator.</p></li>
+<li><p><strong>right</strong> (<a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.ExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpressionBase</span></code></a>) – The expression to the right of the operator.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.LeftOperatorRightExpressionBase">
 <span class="sig-name descname"><span class="pre">LeftOperatorRightExpressionBase</span></span><a class="headerlink" href="#rule_engine.ast.LeftOperatorRightExpressionBase" title="Link to this definition"></a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></p>
+<dd><p>alias of <a class="reference internal" href="#rule_engine.ast.BinaryExpressionBase" title="rule_engine.ast.binary.base.BinaryExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></a></p>
 </dd></dl>
 
 <dl class="py class">
@@ -201,7 +233,7 @@ an API breaking way in order to add new features.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.AddExpression">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">AddExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast/binary/arithmetic.html#AddExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.AddExpression" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.BinaryExpressionBase" title="rule_engine.ast.binary.base.BinaryExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></a></p>
 <p>A class for representing addition expressions from the grammar text.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.AddExpression.result_type">
@@ -214,7 +246,7 @@ an API breaking way in order to add new features.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.SubtractExpression">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SubtractExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast/binary/arithmetic.html#SubtractExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.SubtractExpression" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.BinaryExpressionBase" title="rule_engine.ast.binary.base.BinaryExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></a></p>
 <p>A class for representing subtraction expressions from the grammar text.</p>
 <div class="versionadded">
 <p><span class="versionmodified added">Added in version 3.5.0.</span></p>
@@ -230,7 +262,7 @@ an API breaking way in order to add new features.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ArithmeticExpression">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ArithmeticExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast/binary/arithmetic.html#ArithmeticExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ArithmeticExpression" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.BinaryExpressionBase" title="rule_engine.ast.binary.base.BinaryExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></a></p>
 <p>A class for representing arithmetic expressions from the grammar text such as multiplication and division.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ArithmeticExpression.result_type">
@@ -257,7 +289,7 @@ greater-than.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.BitwiseExpression">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">BitwiseExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast/binary/arithmetic.html#BitwiseExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.BitwiseExpression" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.BinaryExpressionBase" title="rule_engine.ast.binary.base.BinaryExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></a></p>
 <p>A class for representing bitwise arithmetic expressions from the grammar text such as XOR and shifting operations.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.BitwiseExpression.result_type">
@@ -282,7 +314,7 @@ greater-than.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.ComparisonExpression">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ComparisonExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><span class="pre">ExpressionBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><span class="pre">ExpressionBase</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast/binary/comparison.html#ComparisonExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.ComparisonExpression" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.BinaryExpressionBase" title="rule_engine.ast.binary.base.BinaryExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></a></p>
 <p>A class for representing comparison expressions from the grammar text such as equality checks.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.ComparisonExpression.result_type">
@@ -295,7 +327,7 @@ greater-than.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="rule_engine.ast.LogicExpression">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">LogicExpression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="engine.html#rule_engine.engine.Context" title="rule_engine.engine.Context"><span class="pre">Context</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.12/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">left</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><span class="pre">ExpressionBase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">right</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#rule_engine.ast.ExpressionBase" title="rule_engine.ast.base.ExpressionBase"><span class="pre">ExpressionBase</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/rule_engine/ast/binary/comparison.html#LogicExpression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rule_engine.ast.LogicExpression" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#rule_engine.ast.BinaryExpressionBase" title="rule_engine.ast.binary.base.BinaryExpressionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExpressionBase</span></code></a></p>
 <p>A class for representing logical expressions from the grammar text such as “and” and “or”.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="rule_engine.ast.LogicExpression.result_type">

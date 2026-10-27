@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>engine &mdash; Rule Engine 5.1.1 documentation</title>
+  <title>engine &mdash; Rule Engine 5.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/theme_overrides.css?v=0c24fe83" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=1bd908e2"></script>
+      <script src="../_static/documentation_options.js?v=2dde5210"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -173,8 +173,10 @@ dataclasses and self/mutual recursion). Nullable fields (annotated <code class="
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>cls</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#type" title="(in Python v3.12)"><em>type</em></a>) – A class decorated with <a class="reference external" href="https://docs.python.org/3.12/library/dataclasses.html#dataclasses.dataclass" title="(in Python v3.12)"><code class="xref py py-func docutils literal notranslate"><span class="pre">dataclass()</span></code></a>.</p></li>
 <li><p><strong>strict</strong> (<a class="reference external" href="https://docs.python.org/3.12/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Forwarded to <a class="reference internal" href="types.html#rule_engine.types.DataType.OBJECT.from_dataclass" title="rule_engine.types.DataType.OBJECT.from_dataclass"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_dataclass()</span></code></a>. When <code class="docutils literal notranslate"><span class="pre">True</span></code>
-(the default), a field annotated with a type that cannot be mapped to a Rule Engine data type raises
-<a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a>. When <code class="docutils literal notranslate"><span class="pre">False</span></code>, such fields fall back to
+(the default), a field annotated with a type that cannot be mapped to a Rule Engine data type raises an
+exception, usually a <a class="reference external" href="https://docs.python.org/3.12/library/exceptions.html#ValueError" title="(in Python v3.12)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> (see
+<a class="reference internal" href="types.html#rule_engine.types.DataType.OBJECT.from_dataclass" title="rule_engine.types.DataType.OBJECT.from_dataclass"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_dataclass()</span></code></a> for the others). When <code class="docutils literal notranslate"><span class="pre">False</span></code>, such fields
+fall back to
 <a class="reference internal" href="types.html#rule_engine.types.DataType.UNDEFINED" title="rule_engine.types.DataType.UNDEFINED"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a>.</p></li>
 </ul>
 </dd>
@@ -509,7 +511,7 @@ and the result will be used as the callback.</p>
 <p><span class="versionmodified changed">Changed in version 5.0.0: </span>Added the <em>mapping_attribute_lookup</em> parameter.</p>
 </div>
 <div class="versionchanged">
-<p><span class="versionmodified changed">Changed in version 5.1.1: </span>Added the <em>int_max_digits</em> parameter.</p>
+<p><span class="versionmodified changed">Changed in version 5.2.0: </span>Added the <em>int_max_digits</em> parameter.</p>
 </div>
 </dd></dl>
 

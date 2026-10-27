@@ -520,6 +520,19 @@ class EngineTests(unittest.TestCase):
         self.assertIs(type_resolver('name'), types.DataType.STRING)
         self.assertIs(type_resolver('identifier'), types.DataType.UNDEFINED)
 
+    def test_engine_type_resolver_from_dataclass_non_strict_unsupported_member_type(self):
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            # MAPPING rejects NULLABLE keys
+            scores: dict[str | None, int]
+
+        type_resolver = engine.type_resolver_from_dataclass(Hero, strict=False)
+        self.assertIs(type_resolver('name'), types.DataType.STRING)
+        self.assertIs(type_resolver('scores'), types.DataType.UNDEFINED)
+        context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
+        self.assertTrue(engine.Rule('scores["round 1"] == 10', context=context).matches(Hero('Batman', {'round 1': 10})))
+
     def test_engine_type_resolver_from_dataclass_preserves_nullable(self):
         type_resolver = engine.type_resolver_from_dataclass(_ResolverNullableHero)
         self.assertEqual(type_resolver('name'), types.DataType.NULLABLE(types.DataType.STRING))
@@ -537,6 +550,42 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(type_resolver('scores'), types.DataType.ARRAY(types.DataType.NULLABLE(types.DataType.FLOAT)))
         self.assertEqual(type_resolver('nicknames'), types.DataType.MAPPING(types.DataType.STRING, nullable_string))
         self.assertEqual(type_resolver('tags'), types.DataType.SET(nullable_string))
+
+    def test_engine_type_resolver_from_dataclass_nested_in_nullable_members(self):
+        @dataclasses.dataclass
+        class Team:
+            name: str
+            members: list[_ResolverFlatHero | None]
+
+        type_resolver = engine.type_resolver_from_dataclass(Team)
+        hero = type_resolver('_ResolverFlatHero')
+        self.assertIsInstance(hero, types._ObjectDataTypeDef)
+        self.assertEqual(type_resolver('members'), types.DataType.ARRAY(types.DataType.NULLABLE(hero)))
+        context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
+        rule = engine.Rule('members[0]&.name == "Batman"', context=context)
+        self.assertTrue(rule.matches(Team('Justice League', [_ResolverFlatHero('Batman', 85), None])))
+        self.assertFalse(rule.matches(Team('Justice League', [None])))
+        # the members may be null, so they need to be discharged like other NULLABLE values
+        with self.assertRaises(errors.EvaluationError):
+            engine.Rule('members[0].name == "Batman"', context=context)
+        # non-strict mode keeps mapping the field to UNDEFINED
+        type_resolver = engine.type_resolver_from_dataclass(Team, strict=False)
+        self.assertIs(type_resolver('members'), types.DataType.UNDEFINED)
+
+    def test_engine_type_resolver_from_dataclass_non_strict_reference_in_set(self):
+        type_resolver = engine.type_resolver_from_dataclass(_ResolverSetMember, strict=False)
+        # SET doesn't support OBJECT members, so the field is UNDEFINED and rules using it parse
+        self.assertIs(type_resolver('_ResolverSetTeam').attributes['members'], types.DataType.UNDEFINED)
+        context = engine.Context(resolver=engine.resolve_attribute, type_resolver=type_resolver)
+        rule = engine.Rule('team.members == team.members', context=context)
+        self.assertTrue(rule.matches(_ResolverSetMember('Batman', _ResolverSetTeam('Justice League', frozenset()))))
+        # strict mode still builds it, and raises when the rule is parsed
+        context = engine.Context(
+                resolver=engine.resolve_attribute,
+                type_resolver=engine.type_resolver_from_dataclass(_ResolverSetMember)
+        )
+        with self.assertRaises(errors.EngineError):
+            engine.Rule('team.members == team.members', context=context)
 
     def test_engine_type_resolver_from_dataclass_nullable_evaluates_rule(self):
         context = engine.Context(
@@ -574,6 +623,16 @@ class _ResolverCompany:
 class _ResolverNullableHero:
     name: str | None
     age: int
+
+@dataclasses.dataclass(frozen=True)
+class _ResolverSetMember:
+    name: str
+    team: '_ResolverSetTeam'
+
+@dataclasses.dataclass(frozen=True)
+class _ResolverSetTeam:
+    name: str
+    members: 'set[_ResolverSetMember]'
 
 @dataclasses.dataclass
 class _ResolverNullableCompany:

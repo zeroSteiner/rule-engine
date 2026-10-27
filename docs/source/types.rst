@@ -165,15 +165,20 @@ The derived schema reflects three behaviors automatically:
   unwrapped. See :ref:`the NULLABLE section<data-types-nullable>` for how to work with nullable attributes in rules.
 - **Nested dataclasses**: a field whose annotation is itself a dataclass becomes a nested ``OBJECT`` (recursively).
   Generic containers (e.g. ``list[Address]``, ``dict[str, Address]``) are walked so nested dataclasses inside
-  ``ARRAY``, ``SET``, and ``MAPPING`` types are also expanded.
+  ``ARRAY``, ``SET``, and ``MAPPING`` types are also expanded. In strict mode this includes a dataclass nested inside
+  a union or a container's member type, such as ``list[Address | None]`` or ``list[list[Address]]``; with
+  ``strict=False`` those fields map to :py:attr:`~DataType.UNDEFINED`.
 - **Self and mutual recursion**: a field whose annotation refers back to the enclosing dataclass becomes
   :py:attr:`DataType.OBJECT.self`; cycles between sibling dataclasses produce
   :py:meth:`DataType.OBJECT.reference` placeholders that resolve at rule parse time when both schemas are reachable
   through the :py:class:`~rule_engine.engine.Context` ``type_resolver``.
 
-By default (``strict=True``) a field whose annotation cannot be mapped to a Rule Engine data type raises
-:py:exc:`ValueError` so the schema mistake is caught early. Pass ``strict=False`` to instead map the offending
-field to :py:attr:`~DataType.UNDEFINED`, leaving it selectable but not type-checked at parse time.
+By default (``strict=True``) a field whose annotation cannot be mapped to a Rule Engine data type raises an
+exception so the schema mistake is caught early. That's usually a :py:exc:`ValueError`, but it can also be a
+:py:exc:`TypeError`, an :py:exc:`~rule_engine.errors.EngineError` or a :py:exc:`NameError`; see
+:py:meth:`DataType.OBJECT.from_dataclass` and :py:meth:`DataType.from_type` for when. Pass ``strict=False`` to
+instead map the offending field to :py:attr:`~DataType.UNDEFINED`, leaving it selectable but not type-checked at
+parse time.
 
 For the common case of building a :py:class:`~rule_engine.engine.Context` directly from a dataclass, the
 :py:func:`~rule_engine.engine.type_resolver_from_dataclass` helper produces a resolver whose top-level fields are the

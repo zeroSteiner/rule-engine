@@ -186,9 +186,26 @@ class DataType(metaclass=DataTypeMeta):
     @classmethod
     def from_type(cls, python_type: Any) -> _DataTypeDef:
         """
-        Get the supported data type constant for the specified Python type/type hint. If the type or typehint can not be
-        mapped to a supported data type, then a :py:exc:`ValueError` exception will be raised. This function will not
-        return :py:attr:`.UNDEFINED`.
+        Get the supported data type constant for the specified Python type/type hint. This function will not return
+        :py:attr:`.UNDEFINED`. If the type or type hint can not be mapped to a supported data type, an exception is
+        raised:
+
+        * :py:exc:`TypeError` when *python_type* is not a type or a type hint, and for the type hints that are neither
+          a class nor a generic alias of one: ``None`` (use ``type(None)``, which maps to :py:attr:`.NULL`), string and
+          :py:class:`typing.ForwardRef` forward references, special forms such as ``typing.Literal[...]``,
+          ``typing.ClassVar[...]``, ``typing.Final[...]``, ``typing.Never``, ``typing.Self`` and an unsubscripted
+          ``typing.Union``, type variables, :py:func:`typing.NewType` types and ``type`` statement aliases. The classes
+          of type hints themselves, such as ``types.GenericAlias``, raise it too, and so does ``types.UnionType`` on
+          Python 3.14, where it is ``typing.Union``. ``typing.Any`` raises :py:exc:`TypeError` on Python 3.10 and
+          :py:exc:`ValueError` on later versions, where it is a class.
+        * :py:exc:`~rule_engine.errors.EngineError` for a ``dict`` whose key type maps to :py:attr:`.NULLABLE` or to a
+          compound type other than :py:attr:`.ARRAY`, such as ``dict[str | None, int]`` or ``dict[set[int], int]``.
+        * :py:exc:`ValueError` for any other type or type hint, such as ``uuid.UUID``, ``frozenset[int]``,
+          ``typing.Callable[[int], str]`` or a union of more than one type other than ``None``.
+
+        A union of more than one type other than ``None`` raises :py:exc:`ValueError` without its members being
+        checked. In other type hints with arguments, such as ``list[typing.Literal[1]]``, the first argument that can't
+        be mapped decides the exception.
 
         :param type python_type: The native Python type or type hint to retrieve the corresponding type constant for.
         :return: One of the constants.
@@ -235,6 +252,17 @@ class DataType(metaclass=DataTypeMeta):
             return cls.FUNCTION
         elif hasattr(python_type, "__origin__"):
             origin_python_type = python_type.__origin__
+            if isinstance(python_type, type) and isinstance(
+                    origin_python_type,
+                    (pytypes.GetSetDescriptorType, pytypes.MemberDescriptorType)
+            ):
+                # the class of a type hint, such as types.GenericAlias, whose __origin__ is a descriptor for its
+                # instances, on python 3.14 that includes typing.Union
+                raise TypeError(
+                        'from_type argument 1 must be a type or a type hint, not the type hint class {0!r}'.format(
+                                python_type
+                        )
+                )
             maintype = cls.from_type(origin_python_type)
             if origin_python_type in (list, tuple, set):
                 if hasattr(python_type, "__args__") and origin_python_type is not tuple:

@@ -216,8 +216,16 @@ class _ObjectDataTypeDef(_DataTypeDef):
         :param accessor: An optional accessor callable forwarded to the new schema. Defaults to :py:func:`getattr`,
             which matches normal dataclass attribute access.
         :param bool strict: When ``True`` (the default), a field annotated with a type that cannot be mapped to a
-            Rule Engine data type raises :py:exc:`ValueError`. When ``False``, such fields fall back to
+            Rule Engine data type raises an exception. That's usually a :py:exc:`ValueError`, but it can also be a
+            :py:exc:`TypeError` for the type hints that :py:meth:`DataType.from_type` raises it for or for a union of
+            a dataclass and another type, an :py:exc:`~rule_engine.errors.EngineError` for a member type that a data
+            type rejects, such as a ``NULLABLE`` mapping key or a dataclass set member, or a :py:exc:`NameError` for
+            a forward reference that can't be resolved. When ``False``, such fields fall back to
             :py:attr:`DataType.UNDEFINED` so the attribute remains selectable without parse-time type checking.
+            Only strict mode maps a dataclass nested inside a union or inside a container's member type, such as
+            ``list[Address | None]`` or ``list[list[Address]]``, and, on Python 3.10, a string forward reference
+            inside ``list[...]``, ``set[...]`` or ``dict[...]``. With ``strict=False`` those fields are
+            :py:attr:`DataType.UNDEFINED`.
         """
         import dataclasses
         from .dataclass import _build_object_from_dataclass

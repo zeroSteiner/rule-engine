@@ -306,6 +306,33 @@ class DataTypeTests(unittest.TestCase):
             DataType.from_type(self._UnsupportedType())
         with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnsupportedType\' to a compatible data type$'):
             DataType.from_type(self._UnsupportedType)
+        # the class of a type hint has a descriptor for its __origin__
+        with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be a type or a type hint, not the type hint class '):
+            DataType.from_type(type(list[int]))
+        if sys.version_info >= (3, 14):
+            with self.assertRaisesRegex(TypeError, r'^from_type argument 1 must be a type or a type hint, not the type hint class '):
+                DataType.from_type(typing.Union)
+
+    def test_data_type_from_type_error_types(self):
+        # the exceptions documented by from_type
+        for hint in (
+                None, 'int', typing.ForwardRef('int'), typing.Literal[1], typing.ClassVar[int], typing.Final[int],
+                typing.Union, typing.TypeVar('T'), typing.NewType('UserId', int), typing.NoReturn, list[typing.Literal[1]],
+                typing.Optional[typing.Literal[1]], dict[str | None, typing.Literal[1]]
+        ):
+            with self.assertRaises(TypeError, msg=repr(hint)):
+                DataType.from_type(hint)
+        for hint in (dict[str | None, int], dict[set[int], int], typing.Dict[typing.Optional[str], int]):
+            with self.assertRaises(errors.EngineError, msg=repr(hint)):
+                DataType.from_type(hint)
+        for hint in (
+                decimal.Context, frozenset[int], typing.Callable[[int], str], str | int, typing.Union[int, typing.Literal[1]],
+                dict[set[int], decimal.Context]
+        ):
+            with self.assertRaises(ValueError, msg=repr(hint)):
+                DataType.from_type(hint)
+        with self.assertRaises(TypeError if sys.version_info < (3, 11) else ValueError):
+            DataType.from_type(typing.Any)
 
     def test_data_type_from_value_compound_array(self):
         for value in [list(), range(0), tuple()]:
@@ -782,6 +809,72 @@ class _MappingSelfRefHero:
     allies: dict[str, '_MappingSelfRefHero'] = dataclasses.field(default_factory=dict)
 
 @dataclasses.dataclass
+class _NullableArraySelfRefHero:
+    name: str
+    sidekicks: list[typing.Optional['_NullableArraySelfRefHero']] = dataclasses.field(default_factory=list)
+
+@dataclasses.dataclass
+class _UnresolvableHero:
+    name: str
+    nemesis: 'NoSuchHero'  # noqa: F821
+
+@dataclasses.dataclass(frozen=True)
+class _NullableSetMember:
+    name: str
+    team: '_NullableSetTeam'
+
+@dataclasses.dataclass(frozen=True)
+class _NullableSetTeam:
+    name: str
+    members: 'set[_NullableSetMember | None]'
+
+@dataclasses.dataclass
+class _PartlyUnresolvableHero:
+    name: str
+    nemesis: 'NoSuchHero'  # noqa: F821
+    sidekicks: 'list[_ArraySelfRefHero]'
+    alias: 'typing.Optional[str]'
+    # named like the module, which get_type_hints looks up first
+    datetime: 'datetime.datetime' = datetime.datetime(1939, 5, 1)
+    # a name from the class namespace, which get_type_hints looks up next
+    Title = str
+    title: 'Title' = 'Mr.'
+
+@dataclasses.dataclass
+class _PartlyUnresolvableSidekick(_PartlyUnresolvableHero):
+    rank: 'int' = 0
+
+@dataclasses.dataclass(frozen=True)
+class _SetMember:
+    name: str
+    team: '_SetTeam'
+
+@dataclasses.dataclass(frozen=True)
+class _SetTeam:
+    name: str
+    members: 'set[_SetMember]'
+
+_literal_evaluations = []
+
+def _record_literal_evaluation():
+    _literal_evaluations.append(True)
+
+@dataclasses.dataclass(frozen=True)
+class _ArraySetSelfRefHero:
+    name: str
+    teams: list[set['_ArraySetSelfRefHero']] = dataclasses.field(default_factory=list)
+
+@dataclasses.dataclass(frozen=True)
+class _MappingSetSelfRefHero:
+    name: str
+    teams: dict[str, set['_MappingSetSelfRefHero']] = dataclasses.field(default_factory=dict)
+
+@dataclasses.dataclass(frozen=True)
+class _SetSelfRefHero:
+    name: str
+    allies: set['_SetSelfRefHero'] = dataclasses.field(default_factory=set)
+
+@dataclasses.dataclass
 class _MutualPerson:
     name: str
     employer: '_MutualCompany'
@@ -1240,6 +1333,133 @@ class ObjectDataTypeTests(unittest.TestCase):
         self.assertIsInstance(nested, types._ObjectDataTypeDef)
         self.assertEqual(nested.name, 'Address')
 
+    def test_object_from_dataclass_nested_in_nullable_members(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        @dataclasses.dataclass
+        class Person:
+            homes: list[Address | None]
+            offices: typing.List[typing.Optional[Address]]
+            by_city: dict[str, Address | None]
+            history: list[list[Address]]
+            previous: typing.Optional[list[Address | None]]
+
+        result = DataType.OBJECT.from_dataclass('Person', Person)
+        address = DataType.OBJECT.from_dataclass('Address', Address)
+        nullable_address = DataType.NULLABLE(address)
+        self.assertEqual(result.attributes['homes'], DataType.ARRAY(nullable_address))
+        self.assertEqual(result.attributes['offices'], DataType.ARRAY(nullable_address))
+        self.assertEqual(result.attributes['by_city'], DataType.MAPPING(DataType.STRING, nullable_address))
+        self.assertEqual(result.attributes['history'], DataType.ARRAY(DataType.ARRAY(address)))
+        self.assertEqual(result.attributes['previous'], DataType.NULLABLE(DataType.ARRAY(nullable_address)))
+        # non-strict mode keeps mapping them to UNDEFINED
+        result = DataType.OBJECT.from_dataclass('Person', Person, strict=False)
+        for attribute, attribute_type in result.attributes.items():
+            self.assertIs(attribute_type, DataType.UNDEFINED, msg=attribute)
+
+    def test_object_from_dataclass_self_reference_in_nullable_array(self):
+        result = DataType.OBJECT.from_dataclass('Hero', _NullableArraySelfRefHero)
+        sidekicks = result.attributes['sidekicks']
+        self.assertIsInstance(sidekicks, types._ArrayDataTypeDef)
+        self.assertIsInstance(sidekicks.value_type, types._NullableDataTypeDef)
+        self.assertIs(sidekicks.value_type.inner_type, result)
+        result = DataType.OBJECT.from_dataclass('Hero', _NullableArraySelfRefHero, strict=False)
+        self.assertIs(result.attributes['sidekicks'], DataType.UNDEFINED)
+
+    def test_object_from_dataclass_forward_reference_members(self):
+        # Python 3.10 leaves the string arguments of list[...] and dict[...] unevaluated
+        @dataclasses.dataclass
+        class Scores:
+            values: list['int']
+            by_name: dict[str, 'int | None']
+
+        result = DataType.OBJECT.from_dataclass('Scores', Scores)
+        self.assertEqual(result.attributes['values'], DataType.ARRAY(DataType.FLOAT))
+        self.assertEqual(result.attributes['by_name'], DataType.MAPPING(DataType.STRING, DataType.NULLABLE(DataType.FLOAT)))
+
+    def test_object_from_dataclass_nested_in_unsupported_member(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        # strict mode raises the same errors it did before it mapped the nested members
+        for annotation in (set[Address | None], dict[Address | None, int], dict[Address, list[Address | None]]):
+            Person = dataclasses.make_dataclass('Person', [('value', annotation)])
+            with self.assertRaisesRegex(ValueError, r'^can not map python type \'Address\'', msg=repr(annotation)):
+                DataType.OBJECT.from_dataclass('Person', Person)
+            result = DataType.OBJECT.from_dataclass('Person', Person, strict=False)
+            self.assertIs(result.attributes['value'], DataType.UNDEFINED, msg=repr(annotation))
+        Person = dataclasses.make_dataclass('Person', [('heroes', list[_UnresolvableHero | None])])
+        with self.assertRaisesRegex(ValueError, r'^can not map python type \'_UnresolvableHero\''):
+            DataType.OBJECT.from_dataclass('Person', Person)
+        with self.assertRaisesRegex(ValueError, r'^can not map python type \'_NullableSetMember\''):
+            DataType.OBJECT.from_dataclass('Member', _NullableSetMember)
+        # a set of the dataclass itself, nested in a list or a dict, raises what it did before rather than the
+        # EngineError the SET would raise once the schema is built (Python 3.10 leaves the string unevaluated)
+        error_type = TypeError if sys.version_info < (3, 11) else ValueError
+        for cls in (_ArraySetSelfRefHero, _MappingSetSelfRefHero):
+            with self.assertRaises(error_type, msg=cls.__name__):
+                DataType.OBJECT.from_dataclass('Hero', cls)
+
+    def test_object_from_dataclass_deep_unsupported_member(self):
+        # a schema that fails deep down raises without resolving every level again
+        for spelling in (lambda cls: list[cls], lambda cls: list[cls | None]):
+            node = dataclasses.make_dataclass('Leaf', [('context', decimal.Context)])
+            for index in range(15):
+                node = dataclasses.make_dataclass('Node{}'.format(index), [('children', spelling(node))])
+            with unittest.mock.patch('typing.get_type_hints', wraps=typing.get_type_hints) as get_type_hints:
+                with self.assertRaisesRegex(ValueError, r'^can not map python type \'(Context|Node13)\''):
+                    DataType.OBJECT.from_dataclass('Root', node)
+            # one call for each of the 16 dataclasses
+            self.assertLessEqual(get_type_hints.call_count, 32)
+
+    def test_object_from_dataclass_unresolvable_forward_reference(self):
+        for cls in (_UnresolvableHero, _PartlyUnresolvableHero, _PartlyUnresolvableSidekick):
+            with self.assertRaisesRegex(NameError, r'NoSuchHero', msg=cls.__name__):
+                DataType.OBJECT.from_dataclass('Hero', cls)
+        result = DataType.OBJECT.from_dataclass('Hero', _UnresolvableHero, strict=False)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        self.assertIs(result.attributes['nemesis'], DataType.UNDEFINED)
+        result = DataType.OBJECT.from_dataclass('Hero', _PartlyUnresolvableSidekick, strict=False)
+        sidekick = DataType.OBJECT.from_dataclass('_ArraySelfRefHero', _ArraySelfRefHero)
+        self.assertEqual(result.attributes, {
+                'name': DataType.STRING,
+                'nemesis': DataType.UNDEFINED,
+                'sidekicks': DataType.ARRAY(sidekick),
+                'alias': DataType.NULLABLE(DataType.STRING),
+                'datetime': DataType.DATETIME,
+                'title': DataType.STRING,
+                'rank': DataType.FLOAT
+        })
+        # another field that can't be evaluated keeps the class raising the NameError
+        Hero = dataclasses.make_dataclass('Hero', [('nemesis', 'NoSuchHero'), ('broken', 'list[')])
+        with self.assertRaisesRegex(NameError, r'NoSuchHero'):
+            DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
+
+    def test_object_from_dataclass_reference_in_set(self):
+        # strict mode keeps building the SET of a reference, which raises once a rule using it is parsed
+        result = DataType.OBJECT.from_dataclass('Member', _SetMember)
+        members = result.attributes['team'].attributes['members']
+        self.assertTrue(DataType.is_type(members, DataType.SET))
+        self.assertIsInstance(members.value_type, types._ReferenceDataTypeDef)
+        result = DataType.OBJECT.from_dataclass('Member', _SetMember, strict=False)
+        self.assertIs(result.attributes['team'].attributes['members'], DataType.UNDEFINED)
+        self.assertIs(result.attributes['team'].attributes['name'], DataType.STRING)
+
+    def test_object_from_dataclass_literal_values_are_not_evaluated(self):
+        @dataclasses.dataclass
+        class Hero:
+            alignment: typing.Literal['_record_literal_evaluation()', 'neutral']
+
+        del _literal_evaluations[:]
+        with self.assertRaises(TypeError):
+            DataType.OBJECT.from_dataclass('Hero', Hero)
+        result = DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
+        self.assertIs(result.attributes['alignment'], DataType.UNDEFINED)
+        self.assertEqual(_literal_evaluations, [])
+
     def test_object_from_dataclass_unsupported_type_strict(self):
         import uuid
         @dataclasses.dataclass
@@ -1293,6 +1513,46 @@ class ObjectDataTypeTests(unittest.TestCase):
                     self.assertEqual(restored, data_type)
                     self.assertEqual(hash(restored), hash(data_type))
                     self.assertEqual(repr(restored), repr(data_type))
+
+    def test_object_from_dataclass_unsupported_member_type_strict(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        # the data types reject these member types with an EngineError
+        for annotation in (dict[str | None, str], set[Address], dict[Address, int]):
+            Hero = dataclasses.make_dataclass('Hero', [('name', str), ('value', annotation)])
+            with self.assertRaises(errors.EngineError, msg=repr(annotation)):
+                DataType.OBJECT.from_dataclass('Hero', Hero)
+        for annotation in (frozenset[Address], Address | int):
+            Hero = dataclasses.make_dataclass('Hero', [('name', str), ('value', annotation)])
+            with self.assertRaises((TypeError, ValueError), msg=repr(annotation)):
+                DataType.OBJECT.from_dataclass('Hero', Hero)
+        with self.assertRaises(errors.EngineError):
+            DataType.OBJECT.from_dataclass('Hero', _SetSelfRefHero)
+
+    def test_object_from_dataclass_unsupported_member_type_non_strict(self):
+        @dataclasses.dataclass
+        class Address:
+            city: str
+
+        @dataclasses.dataclass
+        class Hero:
+            name: str
+            nicknames: dict[str | None, str]
+            addresses: set[Address]
+            visits: dict[Address, int]
+            homes: frozenset[Address]
+            home: Address | int
+
+        result = DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        for attribute in ('nicknames', 'addresses', 'visits', 'homes', 'home'):
+            self.assertIs(result.attributes[attribute], DataType.UNDEFINED, msg=attribute)
+
+        result = DataType.OBJECT.from_dataclass('Hero', _SetSelfRefHero, strict=False)
+        self.assertIs(result.attributes['name'], DataType.STRING)
+        self.assertIs(result.attributes['allies'], DataType.UNDEFINED)
 
 inf = float('inf')
 nan = float('nan')

@@ -95,7 +95,7 @@ def parse_float(string: str, *, int_max_digits: int | None = None) -> decimal.De
     """
     Parse a literal string representing a floating point value.
 
-    .. versionchanged:: 5.1.1
+    .. versionchanged:: 5.2.0
             Added the *int_max_digits* parameter.
 
     :param str string: The string to parse.

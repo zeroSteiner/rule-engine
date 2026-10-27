@@ -38,13 +38,15 @@ Base Classes
    .. autoattribute:: result_type
       :annotation: = UNDEFINED
 
-.. autoclass:: LeftOperatorRightExpressionBase
+.. autoclass:: BinaryExpressionBase
    :show-inheritance:
 
    .. autoattribute:: compatible_types
-      :annotation:
+      :no-value:
 
    .. automethod:: __init__
+
+.. autoclass:: LeftOperatorRightExpressionBase
 
 .. autoclass:: LiteralExpressionBase
    :show-inheritance:

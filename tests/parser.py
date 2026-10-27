@@ -287,6 +287,12 @@ class ParserLiteralTests(ParserTestsBase):
         self.assertIsInstance(statement.expression, ast_expression, msg='the statement expression is not the correct literal type')
         self.assertEqual(python_value, statement.expression.value, msg=msg or "{0!r} does not evaluate to {1!r}".format(string, python_value))
 
+    def assertStringLiteralEqual(self, string, python_value):
+        with warnings.catch_warnings(record=True) as captured:
+            warnings.simplefilter('always')
+            self.assertLiteralStatementEqual(string, ast.StringExpression, python_value)
+        self.assertEqual([str(warning.message) for warning in captured], [], msg="{0!r} raised a warning".format(string))
+
     def test_parse_array(self):
         self.assertLiteralStatementEvalEqual('[ ]', tuple())
         self.assertLiteralStatementEvalEqual('[1, 2]', tuple((decimal.Decimal('1.0'), decimal.Decimal('2.0'))))
@@ -509,6 +515,38 @@ class ParserLiteralTests(ParserTestsBase):
         self.assertLiteralStatementEqual('"Alice\'s"', ast.StringExpression, 'Alice\'s')
         with self.assertRaises(errors.StringSyntaxError):
             self._parse('"\\xyz"', self.context)
+
+    def test_parse_string_escapes_unknown(self):
+        # unknown escapes keep their backslash, like in python but without the warning
+        self.assertStringLiteralEqual(r'"\."', '\\.')
+        self.assertStringLiteralEqual(r'"^joe\.blogs$"', '^joe\\.blogs$')
+        self.assertStringLiteralEqual(r"'\q\8\9\ \{\}'", '\\q\\8\\9\\ \\{\\}')
+        self.assertStringLiteralEqual(r's"\d+\s*\w"', '\\d+\\s*\\w')
+        self.assertStringLiteralEqual(r'"\\."', '\\.')
+        self.assertStringLiteralEqual(r'"\\\."', '\\\\.')
+        self.assertStringLiteralEqual(r'"\.\t\x41\u00e9\N{LATIN SMALL LETTER A}\."', '\\.\tA\u00e9a\\.')
+        # known escapes still decode
+        self.assertStringLiteralEqual(
+                r'"\a\b\f\n\r\t\v\\\'\"\x41\u0041\U00000041\N{LATIN CAPITAL LETTER A}\101"',
+                '\a\b\f\n\r\t\v\\\'"AAAAA'
+        )
+        # a backslash before a non-ascii or control character is kept along with the escape for that character
+        self.assertStringLiteralEqual('"\\\u00e9"', '\\xe9')
+        self.assertStringLiteralEqual('"\\\t"', '\\t')
+        # an unknown escape doesn't make an invalid escape valid
+        for string in (r'"\x4\."', r'"\u12\."', r'"\N{\.}"', r'"\N{LATIN SMALL LETTER A\}"', r'"\N\."'):
+            with self.subTest(string=string), self.assertRaises(errors.StringSyntaxError):
+                self._parse(string, self.context)
+
+    def test_parse_string_escapes_octal(self):
+        self.assertStringLiteralEqual(r'"\0\7\101\377"', '\x00\x07A\xff')
+        # escapes above \377 are the characters up to U+01FF, like in python but without the warning
+        self.assertStringLiteralEqual(r'"\400"', '\u0100')
+        self.assertStringLiteralEqual(r'"\777"', '\u01ff')
+        self.assertStringLiteralEqual(r'"\400\.\8"', '\u0100\\.\\8')
+        # an octal escape has at most three digits
+        self.assertStringLiteralEqual(r'"\4001\1234\18"', '\u0100' + '1' + 'S4' + '\x01' + '8')
+        self.assertStringLiteralEqual(r'"\\400\\\400"', '\\400\\\u0100')
 
     def test_parse_string_raw(self):
         self.assertLiteralStatementEqual("r'Alice'", ast.StringExpression, 'Alice')

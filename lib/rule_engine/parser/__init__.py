@@ -58,6 +58,22 @@ def _repl_byte_escape(match: re.Match[bytes]) -> bytes:
     }
     return table[token]
 
+# an escaped backslash, an octal escape above \377, or a backslash followed by a character that the unicode-escape codec
+# doesn't know as an escape
+_STRING_ESCAPE_RE = re.compile(r'\\(\\|[4-7][0-7]{2}|[^\'"abfnrtvxNuU0-7])')
+
+def _repl_string_escape(match: re.Match[str]) -> str:
+    token = match.group(1)
+    # escaped backslashes are matched so that the backslash after one isn't taken as the start of an escape
+    if token == '\\':
+        return match.group(0)
+    # the unicode-escape codec warns about octal escapes above \377, so use the \u escape of the same character
+    if len(token) == 3:
+        return '\\u{:04x}'.format(int(token, 8))
+    # the unicode-escape codec keeps the backslash of an escape it doesn't know but warns that this will stop working,
+    # so escape the backslash to get the same value without the warning
+    return '\\' + match.group(0)
+
 class _DeferredAstNode(object):
     __slots__ = ('cls', 'args', 'kwargs', 'method')
     def __init__(
@@ -508,6 +524,7 @@ class Parser(ParserBase):
             try:
                 value = codecs.encode(value, 'unicode-escape').decode()
                 value = value.replace('\\\\', '\\')
+                value = _STRING_ESCAPE_RE.sub(_repl_string_escape, value)
                 value = codecs.decode(value, 'unicode-escape')
             except UnicodeError:
                 raise errors.StringSyntaxError('invalid string literal', literal[1:-1]) from None

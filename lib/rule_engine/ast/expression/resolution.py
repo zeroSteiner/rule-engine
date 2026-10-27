@@ -197,7 +197,12 @@ class SymbolExpression(ExpressionBase):
                     if has_null and isinstance(effective_type, _MappingDataTypeDef) and _null_allowed(effective_type.key_type):
                         has_null = any(v is None for v in value.values())
                     if has_null:
-                        raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
+                        raise errors.SymbolTypeError(
+                                self.name,
+                                is_value=value,
+                                is_type=_with_null_members(value_type, value),
+                                expected_type=self.result_type
+                        )
             if DataType.is_compatible(effective_type.value_type, value_type.value_type):
                 return self._accept_members(effective_type, value)
 
@@ -205,7 +210,12 @@ class SymbolExpression(ExpressionBase):
         if value_type == DataType.NULL:
             return value
 
-        raise errors.SymbolTypeError(self.name, is_value=value, is_type=value_type, expected_type=self.result_type)
+        raise errors.SymbolTypeError(
+                self.name,
+                is_value=value,
+                is_type=_with_null_members(value_type, value),
+                expected_type=self.result_type
+        )
 
     def _is_re_groups(self, effective_type: _DataTypeDef) -> bool:
         # $re_groups holds None for groups that did not participate in the match (see _RE_GROUPS_TYPE); the type object
@@ -327,3 +337,13 @@ class FunctionCallExpression(ExpressionBase):
         for idx, argument in enumerate(self.arguments, 1):
             argument.to_graphviz(digraph, *args, **kwargs)
             digraph.edge(str(id(self)), str(id(argument)), label="argument #{}".format(idx))
+
+def _with_null_members(value_type: _DataTypeDef, value: Any) -> _DataTypeDef:
+    """
+    Wrap the member type of the ARRAY or SET type *value_type* that was inferred from *value* in NULLABLE when *value*
+    has null members, which the inferred member type leaves out.
+    """
+    if isinstance(value_type, _CollectionDataTypeDef) and value_type.value_type != DataType.UNDEFINED:
+        if any(member is None for member in value):
+            return value_type(DataType.NULLABLE(value_type.value_type))
+    return value_type

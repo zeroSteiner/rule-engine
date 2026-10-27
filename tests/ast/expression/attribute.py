@@ -80,6 +80,25 @@ class GetAttributeExpressionTests(unittest.TestCase):
         expression = ast.GetAttributeExpression(context, ast.NullExpression(context), 'undefined', safe=True)
         self.assertIsNone(expression.evaluate(None))
 
+    def test_ast_expression_attribute_nullable(self):
+        nullable_context = engine.Context(type_resolver=engine.type_resolver_from_dict({
+                'name': types.DataType.NULLABLE(types.DataType.STRING)
+        }))
+        symbol = ast.SymbolExpression(nullable_context, 'name')
+        with self.assertRaises(errors.EvaluationError):
+            ast.GetAttributeExpression(nullable_context, symbol, 'length')
+        expression = ast.GetAttributeExpression(nullable_context, symbol, 'length', safe=True)
+        self.assertIsNone(expression.evaluate({'name': None}))
+        # unsafe access on a NULLABLE target is rejected when the expression is created, so make it unsafe afterwards
+        # to check the error for a null value names the safe navigation operator
+        expression.safe = False
+        with self.assertRaises(errors.EvaluationError) as error_context:
+            expression.evaluate({'name': None})
+        self.assertEqual(
+                error_context.exception.message,
+                'attribute access on a null value (use &. to safely navigate a NULLABLE expression)'
+        )
+
     def test_ast_expression_array_attributes(self):
         ary = (decimal.Decimal(1), decimal.Decimal(2), decimal.Decimal(3))
         symbol = ast.SymbolExpression(context, 'ary')

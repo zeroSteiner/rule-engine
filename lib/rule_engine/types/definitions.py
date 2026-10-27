@@ -34,8 +34,9 @@ from __future__ import annotations
 
 import collections
 import collections.abc
+import operator
 import warnings
-from typing import ClassVar, cast
+from typing import Any, ClassVar, SupportsIndex, cast
 
 from .. import errors
 
@@ -71,6 +72,15 @@ class _DataTypeDef(object):
     def __repr__(self) -> str:
         return "<{} name={} python_type={} >".format(self.__class__.__name__, self.name,  self.python_type.__name__)
 
+    def __reduce_ex__(self, protocol: SupportsIndex) -> str | tuple[Any, ...]:
+        # restore the DataType constants themselves so identity checks (e.g. DataType.is_type for the scalar types)
+        # still work after pickle or copy, protocols 0 and 1 still raise TypeError like they do for the other data types
+        from .datatype import DataType
+        name: Any = getattr(self, 'name', None)
+        if operator.index(protocol) >= 2 and name in DataType and DataType[name] is self:
+            return (getattr, (DataType, name))
+        return super().__reduce_ex__(protocol)
+
     @property
     def is_compound(self) -> bool:
         return not self.is_scalar
@@ -78,6 +88,14 @@ class _DataTypeDef(object):
 class _UndefinedDataTypeDef(_DataTypeDef):
     def __repr__(self) -> str:
         return 'UNDEFINED'
+
+    def __reduce_ex__(self, protocol: SupportsIndex) -> str | tuple[Any, ...]:
+        # restore the module-level instance so identity checks (``is UNDEFINED``) still work after pickle or copy, like
+        # errors.UNDEFINED but only for protocols 2 and up, protocols 0 and 1 still raise TypeError like they do for the
+        # other data types
+        if self is _DATA_TYPE_UNDEFINED and operator.index(protocol) >= 2:
+            return '_DATA_TYPE_UNDEFINED'
+        return super().__reduce_ex__(protocol)
 
 _DATA_TYPE_UNDEFINED = _UndefinedDataTypeDef('UNDEFINED', cast(type, errors.UNDEFINED))
 
@@ -131,6 +149,9 @@ class _NullableDataTypeDef(_DataTypeDef):
     def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar, hash(self.inner_type)))
 
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
+
     @staticmethod
     def unwrap(dt: '_DataTypeDef') -> '_DataTypeDef':
         """Return the inner type of *dt* if it is nullable, otherwise return *dt* unchanged."""
@@ -147,6 +168,36 @@ class _NullableDataTypeDef(_DataTypeDef):
             return dt
         return _NullableDataTypeDef('NULLABLE', object, inner_type=dt)
 
+def _original_undefined(value: Any) -> Any:
+    # the type checks compare data types to UNDEFINED by identity, so a copy of it is replaced with the original, this
+    # includes the members of a tuple (FUNCTION argument types) and the values of a dict (OBJECT attributes), which are
+    # only copied when one needs to be replaced
+    if isinstance(value, _UndefinedDataTypeDef):
+        return _DATA_TYPE_UNDEFINED
+    if isinstance(value, tuple) and any(_is_undefined_copy(item) for item in value):
+        return tuple(_original_undefined(item) for item in value)
+    if isinstance(value, dict) and any(_is_undefined_copy(item) for item in value.values()):
+        return {key: _original_undefined(item) for key, item in value.items()}
+    return value
+
+def _is_undefined_copy(value: Any) -> bool:
+    return isinstance(value, _UndefinedDataTypeDef) and value is not _DATA_TYPE_UNDEFINED
+
+def _set_state(instance: _DataTypeDef, state: Any) -> None:
+    # restore the state the same way that pickle and copy do by default with two exceptions: slots that the class
+    # overrides with a read-only property are skipped (the collection types do this with iterable_type), and copies of
+    # UNDEFINED, like the ones in pickles that earlier versions wrote, are replaced with the original
+    slot_state = None
+    if isinstance(state, tuple) and len(state) == 2:
+        state, slot_state = state
+    if state:
+        instance.__dict__.update(state)
+    if slot_state:
+        for name, value in slot_state.items():
+            if isinstance(getattr(type(instance), name, None), property):
+                continue
+            setattr(instance, name, _original_undefined(value))
+
 class _CollectionDataTypeDef(_DataTypeDef):
     __slots__ = ('value_type',)
     value_type: _DataTypeDef
@@ -157,6 +208,7 @@ class _CollectionDataTypeDef(_DataTypeDef):
             value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
             value_type_nullable: bool | None = None
     ) -> None:
+        self._check_value_type(value_type)
         # check these three classes individually instead of using Collection which isn't available before Python v3.6
         if not issubclass(python_type, collections.abc.Container):
             raise TypeError('the specified python_type is not a container')
@@ -177,6 +229,11 @@ class _CollectionDataTypeDef(_DataTypeDef):
                 value_type = _NullableDataTypeDef.wrap(value_type)
         self.value_type = value_type
 
+    def _check_value_type(self, value_type: _DataTypeDef) -> None:
+        # subclasses validate the member type here instead of overriding __init__, an override would put another frame
+        # between the caller and the value_type_nullable warning in __init__
+        pass
+
     @property
     def iterable_type(self) -> _DataTypeDef:  # type: ignore[override]
         return self.value_type
@@ -184,6 +241,9 @@ class _CollectionDataTypeDef(_DataTypeDef):
     @property
     def value_type_nullable(self) -> bool:
         return isinstance(self.value_type, _NullableDataTypeDef)
+
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
 
     def __call__(self, value_type: _DataTypeDef, value_type_nullable: bool | None = None) -> _CollectionDataTypeDef:
         """
@@ -230,17 +290,10 @@ class _ArrayDataTypeDef(_CollectionDataTypeDef):
     pass
 
 class _SetDataTypeDef(_CollectionDataTypeDef):
-    def __init__(
-            self,
-            name: str,
-            python_type: type,
-            value_type: _DataTypeDef = _DATA_TYPE_UNDEFINED,
-            value_type_nullable: bool | None = None
-    ) -> None:
+    def _check_value_type(self, value_type: _DataTypeDef) -> None:
         inner = value_type.inner_type if isinstance(value_type, _NullableDataTypeDef) else value_type
         if inner.is_object:
             raise errors.EngineError('the OBJECT data type may not be used as a SET member')
-        super(_SetDataTypeDef, self).__init__(name, python_type, value_type=value_type, value_type_nullable=value_type_nullable)
 
 class _MappingDataTypeDef(_DataTypeDef):
     __slots__ = ('key_type', 'value_type')
@@ -281,6 +334,9 @@ class _MappingDataTypeDef(_DataTypeDef):
     @property
     def value_type_nullable(self) -> bool:
         return isinstance(self.value_type, _NullableDataTypeDef)
+
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
 
     def __call__(
             self,
@@ -366,6 +422,20 @@ class _FunctionDataTypeDef(_DataTypeDef):
         self.argument_types = argument_types
         self.minimum_arguments = minimum_arguments
 
+    def __reduce_ex__(self, protocol: SupportsIndex) -> str | tuple[Any, ...]:
+        # pickle saves the python_type by name and the default one, types.FunctionType, can't be found by its name
+        # (builtins.function), so it's left out of the state and _new_function_data_type sets it instead
+        reduced = super().__reduce_ex__(protocol)
+        if isinstance(reduced, tuple) and len(reduced) > 2 and isinstance(reduced[2], tuple):
+            state, slot_state = reduced[2]
+            if slot_state and slot_state.get('python_type') is _PYTHON_FUNCTION_TYPE:
+                slot_state = {name: value for name, value in slot_state.items() if name != 'python_type'}
+                return (_new_function_data_type, (type(self),), (state, slot_state)) + reduced[3:]
+        return reduced
+
+    def __setstate__(self, state: Any) -> None:
+        _set_state(self, state)
+
     def __call__(
             self,
             name: str,
@@ -412,6 +482,13 @@ class _FunctionDataTypeDef(_DataTypeDef):
 
     def __hash__(self) -> int:
         return hash((self.python_type, self.is_scalar, hash((self.return_type, self.argument_types, self.minimum_arguments))))
+
+def _new_function_data_type(cls: type[_FunctionDataTypeDef]) -> _FunctionDataTypeDef:
+    # the FUNCTION definitions are pickled with this instead of copyreg.__newobj__ so that versions which can't restore
+    # their python_type fail to load them
+    instance = cls.__new__(cls)
+    instance.python_type = _PYTHON_FUNCTION_TYPE
+    return instance
 
 class _ReferenceDataTypeDef(_DataTypeDef):
     """

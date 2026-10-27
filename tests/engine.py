@@ -917,6 +917,79 @@ class ContextSerializationTests(unittest.TestCase):
         with self.assertRaises(errors.SymbolResolutionError):
             rule.evaluate({})
 
+    def test_context_pickle_with_compound_types(self):
+        DataType = types.DataType
+        type_map = {
+                'tags': DataType.ARRAY,
+                'names': DataType.ARRAY(DataType.STRING),
+                'ids': DataType.SET(DataType.FLOAT),
+                'scores': DataType.MAPPING(DataType.STRING, DataType.ARRAY(DataType.FLOAT)),
+                'meta': DataType.MAPPING,
+                'hero': DataType.OBJECT('Hero', attributes={'aliases': DataType.ARRAY(DataType.STRING)}),
+        }
+        context = engine.Context(type_resolver=type_map, resolver=engine.resolve_item)
+        text = '"a" in tags and names[0] == "x" and 1 in ids and scores["a"][0] > 1 and meta["k"] == "v"'
+        thing = {'tags': ('a',), 'names': ('x',), 'ids': {1}, 'scores': {'a': (2,)}, 'meta': {'k': 'v'}}
+        restored = [('deepcopy', copy.deepcopy(context))]
+        for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
+            restored.append(('pickle protocol {}'.format(protocol), pickle.loads(pickle.dumps(context, protocol=protocol))))
+        for label, context2 in restored:
+            with self.subTest(label):
+                for name, data_type in type_map.items():
+                    self.assertEqual(context2.resolve_type(name), data_type)
+                self.assertTrue(engine.Rule(text, context=context2).matches(thing))
+                with self.assertRaises(errors.EvaluationError):
+                    engine.Rule('names[0] + 1', context=context2)
+                with self.assertRaises(errors.EvaluationError):
+                    engine.Rule('hero.aliases[0] + 1', context=context2)
+        rule = pickle.loads(pickle.dumps(engine.Rule(text, context=context)))
+        self.assertTrue(rule.matches(thing))
+        self.assertFalse(rule.matches(dict(thing, tags=('b',))))
+
+    def test_context_pickle_with_undefined_types(self):
+        DataType = types.DataType
+        context = engine.Context(type_resolver={'value': DataType.UNDEFINED})
+        for label, context2 in (('pickle', pickle.loads(pickle.dumps(context))), ('deepcopy', copy.deepcopy(context))):
+            with self.subTest(label):
+                self.assertIs(context2.resolve_type('value'), DataType.UNDEFINED)
+                rule = engine.Rule('[v for v in value]', context=context2)
+                self.assertEqual(rule.evaluate({'value': ('a',)}), ('a',))
+        context = copy.deepcopy(engine.Context(type_resolver={'test': DataType.FUNCTION('test')}))
+        # the function's arguments are UNDEFINED, so they aren't checked
+        engine.Rule('test(1, "two")', context=context)
+
+    def test_context_pickle_with_function_types(self):
+        DataType = types.DataType
+        type_map = {
+                'test': DataType.FUNCTION('test', return_type=DataType.STRING, argument_types=(DataType.FLOAT,)),
+                'anything': DataType.FUNCTION,
+        }
+        context = engine.Context(type_resolver=type_map)
+        thing = {'test': lambda value: str(value), 'anything': lambda: 1}
+        for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
+            with self.subTest(protocol=protocol):
+                context2 = pickle.loads(pickle.dumps(context, protocol=protocol))
+                self.assertEqual(context2.resolve_type('test'), type_map['test'])
+                self.assertIs(context2.resolve_type('anything'), DataType.FUNCTION)
+                self.assertEqual(engine.Rule('test(1)', context=context2).evaluate(thing), '1')
+                with self.assertRaises(errors.FunctionCallError):
+                    engine.Rule('test("one")', context=context2)
+                with self.assertRaises(errors.EvaluationError):
+                    engine.Rule('test(1) + 1', context=context2)
+
+    def test_context_unpickle_normalizes_undefined_data_type_copies(self):
+        # pickles made before the UNDEFINED data type preserved its identity hold copies of it in the type map
+        DataType = types.DataType
+        stray_undefined = type(DataType.UNDEFINED)('UNDEFINED', errors.UNDEFINED)
+        state = engine.Context(type_resolver={'value': stray_undefined, 'name': DataType.STRING}).__getstate__()
+        context = engine.Context.__new__(engine.Context)
+        context.__setstate__(state)
+        self.assertIs(context.resolve_type('value'), DataType.UNDEFINED)
+        self.assertIs(context.resolve_type('name'), DataType.STRING)
+        self.assertEqual(engine.Rule('[v for v in value]', context=context).evaluate({'value': ('a',)}), ('a',))
+        with self.assertRaises(errors.SymbolResolutionError):
+            context.resolve_type('missing')
+
 class EngineIntMaxDigitsTests(unittest.TestCase):
     def _set_int_max_str_digits(self, int_max_digits):
         if not hasattr(sys, 'set_int_max_str_digits'):

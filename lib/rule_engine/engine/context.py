@@ -49,6 +49,7 @@ from .. import errors
 from .. import types
 from ..suggestions import suggest_symbol
 from ..types import DataType, _DataTypeDef
+from ..types.definitions import _original_undefined
 
 from ._attribute_resolver import _AttributeResolver
 
@@ -374,7 +375,18 @@ class Context(object):
         self._mapping_fallback_warned = state['_mapping_fallback_warned']
         # pickles created before 5.1.1 don't include _null_member_warned
         self._null_member_warned = set(state.get('_null_member_warned', ()))
-        self.__type_resolver = state['_Context__type_resolver']
+        type_resolver = state['_Context__type_resolver']
+        if isinstance(type_resolver, functools.partial) and type_resolver.func is _type_resolver and type_resolver.args:
+            # pickles created before the UNDEFINED data type preserved its identity restore copies of it in the type map
+            type_map = _original_undefined(type_resolver.args[0])
+            if type_map is not type_resolver.args[0]:
+                type_resolver = functools.partial(
+                        _type_resolver,
+                        type_map,
+                        *type_resolver.args[1:],
+                        **type_resolver.keywords
+                )
+        self.__type_resolver = type_resolver
         self.__resolver = state['_Context__resolver']
         # recreate transient objects that can not be pickled
         self._thread_local = threading.local()

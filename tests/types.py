@@ -31,10 +31,12 @@
 #
 
 import collections
+import copy
 import dataclasses
 import datetime
 import decimal
 import enum
+import pickle
 import sys
 import typing
 import unittest
@@ -141,6 +143,16 @@ class CoercionTests(unittest.TestCase):
             types.coerce_value(10 ** 20, True, 20)
 
 
+class _FunctionDataTypeWithDict(types._FunctionDataTypeDef):
+    # without __slots__, instances of this subclass have a __dict__
+    pass
+
+def _restore_data_type(data_type):
+    restored = [('copy', copy.copy(data_type)), ('deepcopy', copy.deepcopy(data_type))]
+    for protocol in range(2, pickle.HIGHEST_PROTOCOL + 1):
+        restored.append(('pickle protocol {}'.format(protocol), pickle.loads(pickle.dumps(data_type, protocol=protocol))))
+    return restored
+
 class DataTypeTests(unittest.TestCase):
     class _UnsupportedType(object):
         pass
@@ -211,6 +223,22 @@ class DataTypeTests(unittest.TestCase):
         self.assertFalse(DataType.SET(DataType.STRING).value_type_nullable)
         self.assertTrue(DataType.MAPPING(DataType.STRING, DataType.NULLABLE(DataType.STRING)).value_type_nullable)
         self.assertFalse(DataType.MAPPING(DataType.STRING, DataType.STRING).value_type_nullable)
+
+    def test_data_type_value_type_nullable_kwarg_warns_at_caller(self):
+        string = DataType.STRING
+        for label, constructor in (
+                ('ARRAY', lambda: DataType.ARRAY(string, value_type_nullable=True)),
+                ('SET', lambda: DataType.SET(string, value_type_nullable=True)),
+                ('MAPPING', lambda: DataType.MAPPING(string, string, value_type_nullable=True)),
+                ('ARRAY class', lambda: type(DataType.ARRAY)('ARRAY', tuple, value_type=string, value_type_nullable=True)),
+                ('SET class', lambda: type(DataType.SET)('SET', set, value_type=string, value_type_nullable=True)),
+                ('MAPPING class', lambda: type(DataType.MAPPING)('MAPPING', dict, string, string, value_type_nullable=True)),
+        ):
+            with self.subTest(label):
+                with self.assertWarns(DeprecationWarning) as cm:
+                    constructor()
+                self.assertEqual(cm.filename, __file__)
+                self.assertEqual(cm.lineno, constructor.__code__.co_firstlineno)
 
     def test_data_type_from_name(self):
         self.assertIs(DataType.from_name('ARRAY'), DataType.ARRAY)
@@ -343,6 +371,197 @@ class DataTypeTests(unittest.TestCase):
                 continue
             data_type = getattr(DataType, name)
             self.assertRegex(repr(data_type), 'name=' + name)
+
+    def test_data_type_pickle_compound(self):
+        for data_type in (
+                DataType.ARRAY,
+                DataType.ARRAY(DataType.STRING),
+                DataType.ARRAY(DataType.NULLABLE(DataType.STRING)),
+                DataType.ARRAY(DataType.MAPPING(DataType.STRING, DataType.ARRAY(DataType.FLOAT))),
+                DataType.SET,
+                DataType.SET(DataType.FLOAT),
+                DataType.SET(DataType.NULLABLE(DataType.STRING)),
+                DataType.MAPPING,
+                DataType.MAPPING(DataType.STRING),
+                DataType.MAPPING(DataType.ARRAY(DataType.STRING), DataType.SET(DataType.DATETIME)),
+                DataType.NULLABLE(DataType.ARRAY(DataType.STRING)),
+                DataType.NULLABLE(DataType.MAPPING(DataType.STRING, DataType.NULLABLE(DataType.FLOAT))),
+        ):
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, data_type=data_type):
+                    self.assertEqual(restored, data_type)
+                    self.assertEqual(hash(restored), hash(data_type))
+                    self.assertEqual(repr(restored), repr(data_type))
+                    self.assertEqual(restored.is_iterable, data_type.is_iterable)
+
+    def test_data_type_pickle_compound_members(self):
+        array_type = DataType.ARRAY(DataType.NULLABLE(DataType.STRING))
+        for label, restored in _restore_data_type(array_type):
+            with self.subTest(label):
+                self.assertEqual(restored.value_type, DataType.NULLABLE(DataType.STRING))
+                self.assertIs(restored.iterable_type, restored.value_type)
+                self.assertTrue(restored.value_type_nullable)
+        mapping_type = DataType.MAPPING(DataType.STRING, DataType.FLOAT)
+        for label, restored in _restore_data_type(mapping_type):
+            with self.subTest(label):
+                self.assertEqual(restored.key_type, DataType.STRING)
+                self.assertEqual(restored.value_type, DataType.FLOAT)
+                self.assertIs(restored.iterable_type, restored.key_type)
+                self.assertFalse(restored.value_type_nullable)
+        # the ARRAY and SET definitions have a __dict__ too, it's restored like it is by default
+        set_type = DataType.SET(DataType.STRING)
+        set_type.comment = 'tags'
+        for label, restored in _restore_data_type(set_type):
+            with self.subTest(label):
+                self.assertEqual(restored.comment, 'tags')
+
+    def test_data_type_pickle_compound_undefined_members(self):
+        # the type checks compare members to UNDEFINED by identity, a copy of it would make untyped members incompatible
+        # with typed ones
+        for data_type, typed_data_type in (
+                (DataType.ARRAY, DataType.ARRAY(DataType.STRING)),
+                (DataType.SET, DataType.SET(DataType.STRING)),
+                (DataType.MAPPING, DataType.MAPPING(DataType.STRING, DataType.FLOAT)),
+        ):
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, data_type=data_type):
+                    self.assertIs(restored.value_type, DataType.UNDEFINED)
+                    self.assertIs(restored.iterable_type, DataType.UNDEFINED)
+                    self.assertTrue(DataType.is_compatible(restored, typed_data_type))
+
+    def test_data_type_unpickle_compound_from_earlier_versions(self):
+        # earlier versions could write this pickle of DataType.ARRAY but not load it, it holds a copy of UNDEFINED and
+        # the iterable_type slot
+        restored = pickle.loads(
+                b'\x80\x02crule_engine.types.definitions\n_ArrayDataTypeDef\n)\x81N}(X\n\x00\x00\x00value_type'
+                b'crule_engine.types.definitions\n_UndefinedDataTypeDef\n)\x81q\x00N}(X\x04\x00\x00\x00nameq\x01X\t\x00\x00'
+                b'\x00UNDEFINEDX\x0b\x00\x00\x00python_typeq\x02crule_engine.errors\nUNDEFINED\nX\t\x00\x00\x00is_scalarq'
+                b'\x03\x88u\x86bh\x01X\x05\x00\x00\x00ARRAYh\x02c__builtin__\ntuple\nh\x03\x89X\r\x00\x00\x00iterable_typeh'
+                b'\x00u\x86b.'
+        )
+        self.assertEqual(restored, DataType.ARRAY)
+        self.assertEqual(repr(restored), repr(DataType.ARRAY))
+        self.assertIs(restored.value_type, DataType.UNDEFINED)
+        self.assertTrue(DataType.is_compatible(restored, DataType.ARRAY(DataType.STRING)))
+
+    def test_data_type_pickle_undefined_keeps_identity(self):
+        for label, restored in _restore_data_type(DataType.UNDEFINED):
+            with self.subTest(label):
+                self.assertIs(restored, DataType.UNDEFINED)
+                self.assertTrue(DataType.is_compatible(restored, DataType.STRING))
+        function_type = DataType.FUNCTION('test', return_type=DataType.FLOAT)
+        restored = copy.deepcopy(function_type)
+        self.assertIs(restored.argument_types, DataType.UNDEFINED)
+        self.assertIs(restored.minimum_arguments, DataType.UNDEFINED)
+        object_type = DataType.OBJECT('Hero', attributes={'misc': DataType.UNDEFINED})
+        for label, restored in _restore_data_type(object_type):
+            with self.subTest(label):
+                self.assertIs(restored.attributes['misc'], DataType.UNDEFINED)
+        # a shallow copy still shares the attributes when there's nothing to replace
+        self.assertIs(copy.copy(object_type).attributes, object_type.attributes)
+        # another instance, like one from a pickle that an earlier version wrote, still pickles
+        other = type(DataType.UNDEFINED)('UNDEFINED', errors.UNDEFINED)
+        for label, restored in _restore_data_type(other):
+            with self.subTest(label):
+                self.assertEqual(restored, DataType.UNDEFINED)
+
+    def test_data_type_pickle_constants_keep_identity(self):
+        hero = DataType.OBJECT('Hero', attributes={'name': DataType.STRING})
+        for name in DataType:
+            data_type = DataType[name]
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, name=name):
+                    self.assertIs(restored, data_type)
+                    self.assertTrue(DataType.is_type(restored, data_type))
+        for label, restored in _restore_data_type(DataType.OBJECT):
+            with self.subTest(label):
+                # the bare OBJECT is compatible with every OBJECT schema
+                self.assertTrue(DataType.is_compatible(restored, hero))
+        for label, restored in _restore_data_type(DataType.ARRAY(DataType.STRING)):
+            with self.subTest(label):
+                self.assertIs(restored.value_type, DataType.STRING)
+        # other instances that are equal to a constant are still copied
+        for label, restored in _restore_data_type(types._DataTypeDef('STRING', str)):
+            with self.subTest(label):
+                self.assertEqual(restored, DataType.STRING)
+                self.assertIsNot(restored, DataType.STRING)
+
+    def test_data_type_pickle_names_that_are_not_constants(self):
+        # the name isn't always a string, or even set
+        unnamed = types._DataTypeDef.__new__(types._DataTypeDef)
+        unnamed.python_type = str
+        for data_type in (
+                DataType.OBJECT(None),
+                DataType.OBJECT(1),
+                DataType.OBJECT(['STRING']),
+                types._DataTypeDef(None, str),
+                DataType.OBJECT.reference(None),
+                unnamed,
+        ):
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, data_type=type(data_type).__name__):
+                    self.assertIsNot(restored, data_type)
+                    self.assertIs(type(restored), type(data_type))
+                    self.assertEqual(getattr(restored, 'name', 'unset'), getattr(data_type, 'name', 'unset'))
+
+    def test_data_type_pickle_function(self):
+        Hero = DataType.OBJECT('Hero', attributes={
+                'promote': DataType.FUNCTION('promote', return_type=DataType.OBJECT.self, argument_types=(DataType.STRING,)),
+        })
+        for data_type in (
+                DataType.FUNCTION('test'),
+                DataType.FUNCTION('test', return_type=DataType.FLOAT, argument_types=(DataType.STRING, DataType.ARRAY), minimum_arguments=1),
+                DataType.ARRAY(DataType.FUNCTION('test', return_type=DataType.NULLABLE(DataType.STRING))),
+                Hero,
+        ):
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, data_type=data_type):
+                    self.assertEqual(restored, data_type)
+                    self.assertEqual(hash(restored), hash(data_type))
+                    self.assertEqual(repr(restored), repr(data_type))
+        for label, restored in _restore_data_type(Hero):
+            with self.subTest(label):
+                promote = restored.attributes['promote']
+                self.assertIs(promote.python_type, DataType.FUNCTION.python_type)
+                self.assertEqual(promote.value_name, 'promote')
+                if label != 'copy':
+                    self.assertIs(promote.return_type, restored)
+        # a FUNCTION definition with another python_type keeps it
+        function_type = types._FunctionDataTypeDef('FUNCTION', collections.OrderedDict, value_name='test')
+        for label, restored in _restore_data_type(function_type):
+            with self.subTest(label):
+                self.assertEqual(restored, function_type)
+                self.assertIs(restored.python_type, collections.OrderedDict)
+
+    def test_data_type_pickle_function_with_dict(self):
+        for python_type in (DataType.FUNCTION.python_type, collections.OrderedDict):
+            function_type = _FunctionDataTypeWithDict('FUNCTION', python_type, value_name='test')
+            function_type.comment = 'note'
+            for label, restored in _restore_data_type(function_type):
+                with self.subTest(label, python_type=python_type.__name__):
+                    self.assertIs(type(restored), _FunctionDataTypeWithDict)
+                    self.assertIs(restored.python_type, python_type)
+                    self.assertEqual(restored.comment, 'note')
+                    self.assertEqual(restored, function_type)
+
+    def test_data_type_pickle_undefined_copies_replaced(self):
+        # pickles that earlier versions wrote hold copies of UNDEFINED, wherever a data type can hold one
+        other = type(DataType.UNDEFINED)('UNDEFINED', errors.UNDEFINED)
+        object_type = DataType.OBJECT('Hero', attributes={'misc': other, 'name': DataType.STRING})
+        nullable_type = type(DataType.NULLABLE)('NULLABLE', object, inner_type=other)
+        for label, restored in _restore_data_type(object_type):
+            with self.subTest(label):
+                self.assertIs(restored.attributes['misc'], DataType.UNDEFINED)
+                self.assertEqual(restored.attributes['name'], DataType.STRING)
+        for label, restored in _restore_data_type(nullable_type):
+            with self.subTest(label):
+                self.assertIs(restored.inner_type, DataType.UNDEFINED)
+        function_type = DataType.FUNCTION('test', return_type=other, argument_types=(other, DataType.STRING))
+        for label, restored in (('copy', copy.copy(function_type)), ('deepcopy', copy.deepcopy(function_type))):
+            with self.subTest(label):
+                self.assertIs(restored.return_type, DataType.UNDEFINED)
+                self.assertEqual(restored.argument_types, (DataType.UNDEFINED, DataType.STRING))
+                self.assertIs(restored.argument_types[0], DataType.UNDEFINED)
 
 class MetaDataTypeTests(unittest.TestCase):
     def test_data_type_is_iterable(self):
@@ -1041,6 +1260,39 @@ class ObjectDataTypeTests(unittest.TestCase):
         result = DataType.OBJECT.from_dataclass('Hero', Hero, strict=False)
         self.assertIs(result.attributes['name'], DataType.STRING)
         self.assertIs(result.attributes['identifier'], DataType.UNDEFINED)
+
+    def test_object_pickle_with_compound_attributes(self):
+        Hero = DataType.OBJECT('Hero', attributes={
+                'name': DataType.STRING,
+                'aliases': DataType.SET(DataType.STRING),
+                'sidekicks': DataType.ARRAY(DataType.OBJECT.self),
+                'allies': DataType.MAPPING(DataType.STRING, DataType.NULLABLE(DataType.OBJECT.self)),
+                'scores': DataType.NULLABLE(DataType.ARRAY(DataType.FLOAT)),
+                'employers': DataType.ARRAY(DataType.OBJECT.reference('Company')),
+                'notes': DataType.ARRAY,
+        })
+        for label, restored in _restore_data_type(Hero):
+            with self.subTest(label):
+                self.assertEqual(restored, Hero)
+                self.assertEqual(hash(restored), hash(Hero))
+                self.assertEqual(repr(restored), repr(Hero))
+                for name, attribute_type in Hero.attributes.items():
+                    self.assertEqual(restored.attributes[name], attribute_type)
+                    self.assertEqual(repr(restored.attributes[name]), repr(attribute_type))
+                self.assertIs(restored.attributes['notes'].value_type, DataType.UNDEFINED)
+                if label != 'copy':
+                    # the self references point at the restored schema, not the original
+                    self.assertIs(restored.attributes['sidekicks'].value_type, restored)
+                    self.assertIs(restored.attributes['allies'].value_type.inner_type, restored)
+
+    def test_object_pickle_recursive_dataclass(self):
+        for name, cls in (('Hero', _ArraySelfRefHero), ('Hero', _MappingSelfRefHero), ('Person', _MutualPerson)):
+            data_type = DataType.OBJECT.from_dataclass(name, cls)
+            for label, restored in _restore_data_type(data_type):
+                with self.subTest(label, cls=cls.__name__):
+                    self.assertEqual(restored, data_type)
+                    self.assertEqual(hash(restored), hash(data_type))
+                    self.assertEqual(repr(restored), repr(data_type))
 
 inf = float('inf')
 nan = float('nan')

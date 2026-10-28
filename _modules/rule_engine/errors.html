@@ -110,6 +110,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">copyreg</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
 
@@ -137,6 +138,30 @@
 <span class="sd">        The sentinel keeps its identity when it is pickled or copied.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_format_data_type</span><span class="p">(</span><span class="n">data_type</span><span class="p">:</span> <span class="n">_DataTypeDef</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">definitions</span>  <span class="c1"># avoid circular imports</span>
+    <span class="k">return</span> <span class="n">definitions</span><span class="o">.</span><span class="n">_format_data_type</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_reduce_error</span><span class="p">(</span><span class="n">error</span><span class="p">:</span> <span class="ne">BaseException</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reduce *error* for pickling and copying. Errors are created again from their arguments by default, which fails when</span>
+<span class="sd">    the error was created with some of its arguments passed by keyword, because those aren&#39;t part of the arguments.</span>
+<span class="sd">    Such errors are created without calling ``__init__`` instead, and their attributes, including the ones in slots,</span>
+<span class="sd">    are restored. Errors whose arguments fit ``__init__`` are reduced the default way.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>  <span class="c1"># it&#39;s slow to import and only needed here</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="o">*</span><span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ne">BaseException</span><span class="o">.</span><span class="n">__reduce__</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">copyreg</span><span class="o">.</span><span class="n">_slotnames</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)):</span>  <span class="c1"># type: ignore[attr-defined]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="n">state</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">copyreg</span><span class="o">.</span><span class="n">__newobj__</span><span class="p">,</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">),)</span> <span class="o">+</span> <span class="n">error</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
+
 <div class="viewcode-block" id="EngineError">
 <a class="viewcode-back" href="../../rule_engine/errors.html#rule_engine.errors.EngineError">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EngineError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -152,7 +177,13 @@
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> message=</span><span class="si">{!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> message=</span><span class="si">{!r}</span><span class="s2"> &gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># __init__ doesn&#39;t initialize the arguments, which are whatever positional arguments the error was created with</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">EngineError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="MappingAttributeLookupDeprecation">
@@ -304,7 +335,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The :py:exc:`re.error` exception from which this error was triggered.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The regular expression value which contains the syntax error which caused this exception to be raised.&quot;&quot;&quot;</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+        <span class="c1"># *error* and *value* are passed by keyword when the package raises this error</span>
+        <span class="k">return</span> <span class="n">_reduce_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RuleSyntaxError">
@@ -412,11 +447,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The :py:class:`rule-engine type&lt;rule_engine.types.DataType&gt;` that was expected for this attribute.&quot;&quot;&quot;</span>
         <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;attribute </span><span class="si">{0!r}</span><span class="s2"> resolved to incorrect datatype (is: </span><span class="si">{1}</span><span class="s2">, expected: </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">attribute_name</span><span class="p">,</span>
-                <span class="n">is_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">expected_type</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">_format_data_type</span><span class="p">(</span><span class="n">is_type</span><span class="p">),</span>
+                <span class="n">_format_data_type</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AttributeTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+        <span class="c1"># *is_value*, *is_type* and *expected_type* are passed by keyword when the package raises this error</span>
+        <span class="k">return</span> <span class="n">_reduce_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="LookupError">
@@ -506,11 +545,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The :py:class:`rule-engine type&lt;rule_engine.types.DataType&gt;` that was expected for this symbol.&quot;&quot;&quot;</span>
         <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;symbol </span><span class="si">{0!r}</span><span class="s2"> resolved to incorrect datatype (is: </span><span class="si">{1}</span><span class="s2">, expected: </span><span class="si">{2}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">symbol_name</span><span class="p">,</span>
-                <span class="n">is_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">expected_type</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">_format_data_type</span><span class="p">(</span><span class="n">is_type</span><span class="p">),</span>
+                <span class="n">_format_data_type</span><span class="p">(</span><span class="n">expected_type</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SymbolTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+        <span class="c1"># *is_value*, *is_type* and *expected_type* are passed by keyword when the package raises this error</span>
+        <span class="k">return</span> <span class="n">_reduce_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FunctionCallError">
@@ -560,7 +603,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The object that was evaluated by the chain.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ChainExhaustedError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;no rule in the chain matched and no default value is set&#39;</span><span class="p">)</span>
         <span class="c1"># EngineError doesn&#39;t initialize the arguments so they would include *thing* when it&#39;s passed positionally, set</span>
-        <span class="c1"># them to the message to keep its contents out of str(), tracebacks and anything that serializes them</span>
+        <span class="c1"># them to the message to keep its contents out of anything that serializes them</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,)</span></div>
 </div>
 

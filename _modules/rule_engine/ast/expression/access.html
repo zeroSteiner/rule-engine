@@ -258,7 +258,7 @@
             <span class="k">return</span> <span class="n">resolved_obj</span>
         <span class="k">if</span> <span class="n">resolved_obj</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">DataType</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">result_type</span><span class="p">,</span> <span class="n">DataType</span><span class="o">.</span><span class="n">NULLABLE</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">errors</span><span class="o">.</span><span class="n">EvaluationError</span><span class="p">(</span>
-                    <span class="s2">&quot;attribute access on a null value (use ?. to safely navigate a NULLABLE expression)&quot;</span>
+                    <span class="s2">&quot;attribute access on a null value (use &amp;. to safely navigate a NULLABLE expression)&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_object_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

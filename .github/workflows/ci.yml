@@ -6,11 +6,19 @@ on:
 
 jobs:
   unit-tests:
-    name: Test on Python v${{ matrix.python-version }}
+    name: Test on Python v${{ matrix.python-version }}${{ matrix.dateutil && format(' with python-dateutil {0}', matrix.dateutil) || '' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        # an empty value keeps the locked python-dateutil, the include entries below replace it
+        dateutil: ['']
+        include:
+          # the newest python-dateutil releases, on a Python version that all of them support
+          - python-version: '3.14'
+            dateutil: '3.0.0'
+          - python-version: '3.14'
+            dateutil: '4.0.0'
 
     steps:
       - name: Checkout the repository
@@ -31,16 +39,20 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev
 
+      - name: Install python-dateutil ${{ matrix.dateutil }}
+        if: matrix.dateutil
+        run: uv pip install "python-dateutil==${{ matrix.dateutil }}"
+
       - name: Generate the parser tables
-        run: uv run invoke tables
+        run: uv run --no-sync invoke tables
 
       - name: Run tests
-        run: uv run python -m unittest -v tests
+        run: uv run --no-sync python -m unittest -v tests
 
       - name: Run tests with coverage
         run: |
-          uv run coverage run -m unittest -v tests
-          uv run coverage report --include="*/rule_engine/*"
+          uv run --no-sync coverage run -m unittest -v tests
+          uv run --no-sync coverage report --include="*/rule_engine/*"
 
       - name: Check the parser tables in the wheel
         run: |

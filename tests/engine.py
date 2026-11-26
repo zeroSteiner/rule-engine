@@ -850,6 +850,33 @@ class EngineRuleTests(unittest.TestCase):
         self.assertEqual(engine.Rule('zip.to_int').evaluate({'zip': '02134'}), 2134)
         self.assertEqual(engine.Rule('zip.to_flt').evaluate({'zip': '02134'}), 2134)
 
+    def test_engine_rule_string_to_flt_invalid_infinity(self):
+        for value in ('information', '-information', 'infinite', 'inf1', 'Foobar'):
+            for text, thing in (
+                    ('{!r}.to_flt.is_nan'.format(value), {}),
+                    ('value.to_flt.is_nan', {'value': value})
+                ):
+                with self.subTest(value=value, text=text):
+                    self.assertTrue(engine.Rule(text).evaluate(thing))
+
+    def test_engine_rule_string_to_int_invalid_infinity(self):
+        for value in ('information', '-infinite', 'Foobar'):
+            for text, thing in (
+                    ('{!r}.to_int'.format(value), {}),
+                    ('value.to_int', {'value': value})
+                ):
+                with self.subTest(value=value, text=text), self.assertRaises(errors.EvaluationError):
+                    engine.Rule(text).evaluate(thing)
+
+    def test_engine_rule_string_to_flt_infinity(self):
+        for value in ('inf', '-inf', 'infinity', '-infinity', 'infiNITY'):
+            for text, thing in (
+                    ('{!r}.to_flt'.format(value), {}),
+                    ('value.to_flt', {'value': value})
+                ):
+                with self.subTest(value=value, text=text):
+                    self.assertEqual(engine.Rule(text).evaluate(thing), decimal.Decimal(value))
+
     def test_engine_rule_parse_float_invalid_prefixed_no_warnings(self):
         rule = engine.Rule('$parse_float(value)')
         with warnings.catch_warnings(record=True) as caught:

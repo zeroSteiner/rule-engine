@@ -301,7 +301,10 @@ class _AttributeResolver(object):
     def string_to_flt(self, value: str) -> decimal.Decimal:
         value = value.strip()
         if re.match(r'-?inf', value):
-            return decimal.Decimal(value)
+            try:
+                return decimal.Decimal(value)
+            except decimal.InvalidOperation:
+                return decimal.Decimal('nan')
         match = re.match(r'^(' + parser.Parser.get_token_regex('FLOAT') + ')$', value)
         if match is None:
             return decimal.Decimal('nan')

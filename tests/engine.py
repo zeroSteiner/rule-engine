@@ -851,7 +851,12 @@ class EngineRuleTests(unittest.TestCase):
         self.assertEqual(engine.Rule('zip.to_flt').evaluate({'zip': '02134'}), 2134)
 
     def test_engine_rule_string_to_flt_invalid_infinity(self):
-        for value in ('information', '-information', 'infinite', 'inf1', 'Foobar'):
+        for value in (
+                'information', '-information', 'infinite', 'inf1', 'Foobar',
+                'inf_inity', 'inf_', '-inf_', 'infinity_',
+                'INF', '+inf', '+INF', 'Infinity',
+                'inf\u0131nity', 'inf\u0130nity', 'infin\u0131ty', 'infin\u0130ty'
+            ):
             for text, thing in (
                     ('{!r}.to_flt.is_nan'.format(value), {}),
                     ('value.to_flt.is_nan', {'value': value})
@@ -869,7 +874,7 @@ class EngineRuleTests(unittest.TestCase):
                     engine.Rule(text).evaluate(thing)
 
     def test_engine_rule_string_to_flt_infinity(self):
-        for value in ('inf', '-inf', 'infinity', '-infinity', 'infiNITY'):
+        for value in ('inf', '-inf', 'infinity', '-infinity', 'infiNITY', '-infINITY', ' \t-infinity\n '):
             for text, thing in (
                     ('{!r}.to_flt'.format(value), {}),
                     ('value.to_flt', {'value': value})

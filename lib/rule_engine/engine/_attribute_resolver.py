@@ -300,11 +300,8 @@ class _AttributeResolver(object):
     @attribute('to_flt', types.DataType.STRING, result_type=types.DataType.FLOAT)
     def string_to_flt(self, value: str) -> decimal.Decimal:
         value = value.strip()
-        if re.match(r'-?inf', value):
-            try:
-                return decimal.Decimal(value)
-            except decimal.InvalidOperation:
-                return decimal.Decimal('nan')
+        if re.fullmatch(r'-?inf(?ai:inity)?', value):
+            return decimal.Decimal(value)
         match = re.match(r'^(' + parser.Parser.get_token_regex('FLOAT') + ')$', value)
         if match is None:
             return decimal.Decimal('nan')

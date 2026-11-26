@@ -855,7 +855,8 @@ class EngineRuleTests(unittest.TestCase):
                 'information', '-information', 'infinite', 'inf1', 'Foobar',
                 'inf_inity', 'inf_', '-inf_', 'infinity_',
                 'INF', '+inf', '+INF', 'Infinity',
-                'inf\u0131nity', 'inf\u0130nity', 'infin\u0131ty', 'infin\u0130ty'
+                'inf\u0131nity', 'inf\u0130nity', 'infin\u0131ty', 'infin\u0130ty',
+                'infInItY', 'infINITY'
             ):
             for text, thing in (
                     ('{!r}.to_flt.is_nan'.format(value), {}),
@@ -874,7 +875,7 @@ class EngineRuleTests(unittest.TestCase):
                     engine.Rule(text).evaluate(thing)
 
     def test_engine_rule_string_to_flt_infinity(self):
-        for value in ('inf', '-inf', 'infinity', '-infinity', 'infiNITY', '-infINITY', ' \t-infinity\n '):
+        for value in ('inf', '-inf', 'infinity', '-infinity', ' \t-infinity\n '):
             for text, thing in (
                     ('{!r}.to_flt'.format(value), {}),
                     ('value.to_flt', {'value': value})
